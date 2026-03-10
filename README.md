@@ -41,6 +41,14 @@ cd awless
 go build -o awless .
 ```
 
+### Development setup
+
+After cloning, enable the pre-commit hooks to catch formatting and lint errors before pushing:
+
+```sh
+git config core.hooksPath .githooks
+```
+
 ### Pre-built binaries
 
 Download the latest `awless` binaries (Windows/Linux/macOS) [from Github releases](https://github.com/babyhuey/awless/releases/latest).
