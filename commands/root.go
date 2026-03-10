@@ -74,9 +74,20 @@ func init() {
 }
 
 var RootCmd = &cobra.Command{
-	Use:                    "awless COMMAND",
-	Short:                  "Manage  and explore your cloud",
-	Long:                   "awless is a powerful CLI to explore, sync and manage your cloud infrastructure",
+	Use:   "awless COMMAND",
+	Short: "Manage  and explore your cloud",
+	Long: `awless is a powerful CLI to explore, sync and manage your cloud infrastructure.
+
+Supported services: EC2, IAM, S3, RDS, ELBv2, Auto Scaling, Lambda, SNS, SQS, Route53,
+CloudWatch, CloudFront, ECR, ECS, ACM, CloudFormation, EKS, DynamoDB, Secrets Manager,
+KMS, API Gateway v2, SSM, EFS, CloudTrail, CloudWatch Logs.
+
+Quick examples:
+  awless list instances --filter state=running
+  awless list loggroups --format json
+  awless show my-resource
+  awless create instance type=t2.micro distro=debian
+  awless ssh my-instance`,
 	BashCompletionFunction: bash_completion_func,
 	RunE: func(c *cobra.Command, args []string) error {
 		if versionGlobalFlag {

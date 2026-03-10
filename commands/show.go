@@ -55,8 +55,11 @@ var showCmd = &cobra.Command{
 	Short: "Show resources lineage and dependencies given a REFERENCE: name, id, arn, etc...",
 	Example: `  awless show i-8d43b21b            # show an instance via its ref
   awless show AIDAJ3Z24GOKHTZO4OIX6 # show a user via its ref
-  awless show jsmith                # show a user via its ref,
-  awless show @jsmith               # forcing search by name`,
+  awless show jsmith                # show a user via its ref
+  awless show @jsmith               # forcing search by name
+  awless show /aws/lambda/my-func   # show a log group by name
+  awless show my-cluster            # show an EKS cluster
+  awless show my-table              # show a DynamoDB table`,
 	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
 	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 
