@@ -299,6 +299,9 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 	if err := structInjector(cmd, input, renv.Context()) ; err != nil {
 		return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %s", err)
 	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
 	start := time.Now()
 	output, err := cmd.api.{{ $tag.Call }}(context.Background(), input)
 	renv.Log().ExtraVerbosef("{{ $tag.API }}.{{ $tag.Call }} call took %s", time.Since(start))
@@ -348,6 +351,9 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 		input.DryRun = aws.Bool(true)
 		if err := structInjector(cmd, input, renv.Context()) ; err != nil {
 			return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %s", err)
+		}
+		if v, ok := implementsInputPostProcessor(cmd); ok {
+			v.PostProcessInput(input)
 		}
 
 		start := time.Now()

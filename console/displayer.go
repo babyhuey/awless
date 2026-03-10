@@ -571,7 +571,7 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 	}
 
 	var enableWraping bool
-	if d.maxwidth <= maxWidthNoWraping {
+	if d.maxwidth > 0 && d.maxwidth <= maxWidthNoWraping {
 		enableWraping = true
 	}
 
@@ -991,6 +991,10 @@ func valueLowerOrEqual(a, b interface{}) bool {
 		aa := a.(time.Time)
 		bb := b.(time.Time)
 		return aa.After(bb)
+	case bool:
+		aa := a.(bool)
+		bb := b.(bool)
+		return !aa || bb
 	case []string, []int:
 		return fmt.Sprint(a) <= fmt.Sprint(b)
 	default:

@@ -36,6 +36,10 @@ type ResultExtractor interface {
 	ExtractResult(interface{}) string
 }
 
+type InputPostProcessor interface {
+	PostProcessInput(interface{})
+}
+
 type command interface {
 	ParamsSpec() params.Spec
 	inject(map[string]interface{}) error
@@ -54,6 +58,11 @@ func implementsAfterRun(i interface{}) (AfterRunner, bool) {
 
 func implementsResultExtractor(i interface{}) (ResultExtractor, bool) {
 	v, ok := i.(ResultExtractor)
+	return v, ok
+}
+
+func implementsInputPostProcessor(i interface{}) (InputPostProcessor, bool) {
+	v, ok := i.(InputPostProcessor)
 	return v, ok
 }
 

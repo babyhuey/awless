@@ -23,6 +23,7 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/smithy-go"
 
@@ -47,21 +48,50 @@ type CreateInstance struct {
 	UserData       *string   `awsName:"UserData" awsType:"awsuserdatatobase64" templateName:"userdata"`
 	SecurityGroups []*string `awsName:"SecurityGroupIds" awsType:"awsstringslice" templateName:"securitygroup"`
 	Lock           *bool     `awsName:"DisableApiTermination" awsType:"awsbool" templateName:"lock"`
-	EbsOptimized   *bool     `awsName:"EbsOptimized" awsType:"awsbool" templateName:"ebs-optimized"`
-	Role           *string   `awsName:"IamInstanceProfile.Name" awsType:"awsstr" templateName:"role"`
-	DistroQuery    *string   `awsType:"awsstr" templateName:"distro"`
+	EbsOptimized     *bool     `awsName:"EbsOptimized" awsType:"awsbool" templateName:"ebs-optimized"`
+	Role             *string   `awsName:"IamInstanceProfile.Name" awsType:"awsstr" templateName:"role"`
+	DistroQuery      *string   `awsType:"awsstr" templateName:"distro"`
+	AssociatePublicIP *bool    `templateName:"associate-public-ip"`
 }
 
 func (cmd *CreateInstance) ParamsSpec() params.Spec {
 	builder := params.SpecBuilder(
 		params.AllOf(params.OnlyOneOf(params.Key("distro"), params.Key("image")),
 			params.Key("count"), params.Key("type"), params.Key("name"), params.Key("subnet"),
-			params.Opt(params.Suggested("keypair", "securitygroup"), "ip", "userdata", "lock", "ebs-optimized", "role"),
+			params.Opt(params.Suggested("keypair", "securitygroup"), "ip", "userdata", "lock", "ebs-optimized", "role", "associate-public-ip"),
 		),
 		params.Validators{"ip": params.IsIP},
 	)
 	builder.AddReducer(cmd.convertDistroToAMI, "distro")
 	return builder.Done()
+}
+
+// PostProcessInput adjusts the RunInstancesInput when associate-public-ip is
+// requested. Because AssociatePublicIpAddress must live inside
+// NetworkInterfaces[0], SecurityGroupIds and SubnetId must also be moved there
+// (AWS rejects mixing top-level and NetworkInterfaces for these fields).
+func (cmd *CreateInstance) PostProcessInput(iface interface{}) {
+	input, ok := iface.(*ec2.RunInstancesInput)
+	if !ok || cmd.AssociatePublicIP == nil {
+		return
+	}
+
+	nic := ec2types.InstanceNetworkInterfaceSpecification{
+		AssociatePublicIpAddress: cmd.AssociatePublicIP,
+		DeviceIndex:             awssdk.Int32(0),
+	}
+
+	if len(input.SecurityGroupIds) > 0 {
+		nic.Groups = input.SecurityGroupIds
+		input.SecurityGroupIds = nil
+	}
+
+	if input.SubnetId != nil {
+		nic.SubnetId = input.SubnetId
+		input.SubnetId = nil
+	}
+
+	input.NetworkInterfaces = []ec2types.InstanceNetworkInterfaceSpecification{nic}
 }
 
 func (cmd *CreateInstance) convertDistroToAMI(values map[string]interface{}) (map[string]interface{}, error) {

@@ -12,7 +12,7 @@ var (
 	instanceTypes = []string{"t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "t2.xlarge", "t2.2xlarge", "m4.large", "m4.xlarge", "c4.large", "c4.xlarge"}
 	s3ACLs        = []string{"private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write"}
 	distros       = []string{"amazonlinux", "canonical:ubuntu", "redhat:rhel", "debian:debian", "centos:centos", "coreos:coreos", "suselinux", "windows:server"}
-	regions       = []string{"us-east-1", "us-east-2", "us-west-1", "us-west-2", "eu-west-1", "eu-west-2", "eu-west-3", "eu-central-1", "ca-central-1", "ap-northeast-1", "ap-northeast-2", "ap-southeast-1", "ap-southeast-2", "ap-south-1", "sa-east-1"}
+	regions       = []string{"af-south-1", "ap-east-1", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "ap-south-1", "ap-south-2", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ap-southeast-4", "ca-central-1", "ca-west-1", "eu-central-1", "eu-central-2", "eu-north-1", "eu-south-1", "eu-south-2", "eu-west-1", "eu-west-2", "eu-west-3", "il-central-1", "me-central-1", "me-south-1", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2"}
 )
 
 var EnumDoc = map[string][]string{
@@ -92,11 +92,12 @@ var EnumDoc = map[string][]string{
 
 	"create.function.runtime": {"nodejs", "nodejs4.3", "nodejs6.10", "java8", "python2.7", "python3.6", "dotnetcore1.0", "nodejs4.3-edge"},
 
-	"create.instance.distro":   distros,
-	"create.instance.type":     instanceTypes,
-	"create.instance.lock":          boolean,
-	"create.instance.ebs-optimized": boolean,
-	"create.instance.userdata": {""},
+	"create.instance.associate-public-ip": boolean,
+	"create.instance.distro":              distros,
+	"create.instance.type":                instanceTypes,
+	"create.instance.lock":                boolean,
+	"create.instance.ebs-optimized":       boolean,
+	"create.instance.userdata":            {""},
 
 	"create.image.reboot": boolean,
 

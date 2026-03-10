@@ -83,6 +83,34 @@ func TestSorting(t *testing.T) {
 	})
 }
 
+// #248: sorting by a boolean column like Public should not panic
+func TestSortByBoolColumn(t *testing.T) {
+	g := graph.NewGraph()
+	g.AddResource(
+		resourcetest.Subnet("sub_1").Prop(p.Name, "public_subnet").Prop(p.Public, true).Build(),
+		resourcetest.Subnet("sub_2").Prop(p.Name, "private_subnet").Prop(p.Public, false).Build(),
+	)
+
+	var w bytes.Buffer
+	displayer, _ := BuildOptions(
+		WithRdfType("subnet"),
+		WithColumns([]string{"ID", "Name", "Public"}),
+		WithFormat("csv"),
+		WithSortBy("Public"),
+	).SetSource(g).Build()
+
+	if err := displayer.Print(&w); err != nil {
+		t.Fatal(err)
+	}
+	// false sorts before true
+	expected := "ID,Name,Public\n" +
+		"sub_2,private_subnet,false\n" +
+		"sub_1,public_subnet,true\n"
+	if got, want := w.String(), expected; got != want {
+		t.Fatalf("got \n%q\n\nwant\n\n%q\n", got, want)
+	}
+}
+
 func TestJSONDisplays(t *testing.T) {
 	g := createInfraGraph()
 	var w bytes.Buffer
@@ -606,6 +634,40 @@ Columns truncated to fit terminal: 'T', 'P'
 	}
 }
 
+// #251: when maxwidth is 0 (piped output), columns should not be truncated
+func TestPipeOutputNotTruncated(t *testing.T) {
+	g := createInfraGraph()
+	columns := []string{"ID", "Name", "State", "Type", "PublicIP"}
+
+	// maxwidth=0 simulates pipe/non-terminal output
+	displayer, _ := BuildOptions(
+		WithRdfType("instance"),
+		WithColumns(columns),
+		WithFormat("table"),
+		WithMaxWidth(0),
+	).SetSource(g).Build()
+
+	var w bytes.Buffer
+	if err := displayer.Print(&w); err != nil {
+		t.Fatal(err)
+	}
+	output := w.String()
+	// With maxwidth=0, output should NOT contain "Columns truncated"
+	if contains := "Columns truncated"; len(output) > 0 {
+		for _, line := range []string{contains} {
+			if bytes.Contains([]byte(output), []byte(line)) {
+				t.Fatalf("pipe output should not truncate columns, but got:\n%s", output)
+			}
+		}
+	}
+	// All column headers should be present (not truncated)
+	for _, col := range []string{"ID", "Name", "State", "Type", "Public IP"} {
+		if !bytes.Contains([]byte(output), []byte(col)) {
+			t.Fatalf("pipe output missing column %q:\n%s", col, output)
+		}
+	}
+}
+
 func TestFilter(t *testing.T) {
 	g := graph.NewGraph()
 	g.AddResource(
@@ -679,6 +741,20 @@ func TestCompareInterface(t *testing.T) {
 	}
 	if got, want := valueLowerOrEqual(interface{}(1.2), interface{}(1.1)), false; got != want {
 		t.Fatalf("got %t want %t", got, want)
+	}
+
+	// #248: bool comparison should not panic
+	if got, want := valueLowerOrEqual(interface{}(false), interface{}(true)), true; got != want {
+		t.Fatalf("bool: got %t want %t", got, want)
+	}
+	if got, want := valueLowerOrEqual(interface{}(true), interface{}(false)), false; got != want {
+		t.Fatalf("bool: got %t want %t", got, want)
+	}
+	if got, want := valueLowerOrEqual(interface{}(false), interface{}(false)), true; got != want {
+		t.Fatalf("bool: got %t want %t", got, want)
+	}
+	if got, want := valueLowerOrEqual(interface{}(true), interface{}(true)), true; got != want {
+		t.Fatalf("bool: got %t want %t", got, want)
 	}
 }
 

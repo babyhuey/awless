@@ -18,6 +18,8 @@ limitations under the License.
 package awsconv
 
 import (
+	"reflect"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/cloud/properties"
 )
@@ -43,7 +45,19 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Architecture:      {name: "Architecture", transform: extractValueFn},
 		properties.Hypervisor:        {name: "Hypervisor", transform: extractValueFn},
 		properties.Profile:           {name: "IamInstanceProfile", transform: extractFieldFn("Arn")},
-		properties.Lifecycle:         {name: "InstanceLifecycle", transform: extractValueFn},
+		properties.Lifecycle: {fetch: func(i interface{}) (interface{}, error) {
+			val := reflect.ValueOf(i)
+			field := val.FieldByName("InstanceLifecycle")
+			if field.IsValid() {
+				s := field.String()
+				if s == "" {
+					return "on-demand", nil
+				}
+				return s, nil
+			}
+			return "on-demand", nil
+		}},
+		properties.PlatformDetails:   {name: "PlatformDetails", transform: extractValueFn},
 		properties.NetworkInterfaces: {name: "NetworkInterfaces", transform: extractStringSliceValues("NetworkInterfaceId")},
 		properties.PublicDNS:         {name: "PublicDnsName", transform: extractValueFn},
 		properties.RootDevice:        {name: "RootDeviceName", transform: extractValueFn},

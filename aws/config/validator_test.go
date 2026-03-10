@@ -110,6 +110,35 @@ func TestParseInstanceType(t *testing.T) {
 	})
 }
 
+// #302: newer AWS regions like af-south-1 must appear in allRegions()
+func TestNewerRegionsInAllRegions(t *testing.T) {
+	regions := allRegions()
+	newer := []string{
+		"af-south-1",
+		"ap-east-1",
+		"ap-northeast-3",
+		"ap-southeast-3",
+		"eu-north-1",
+		"eu-south-1",
+		"me-south-1",
+		"me-central-1",
+		"il-central-1",
+		"ca-west-1",
+	}
+	for _, r := range newer {
+		found := false
+		for _, ar := range regions {
+			if ar == r {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("allRegions() missing newer region %q", r)
+		}
+	}
+}
+
 func TestAllRegions(t *testing.T) {
 	regions := allRegions()
 

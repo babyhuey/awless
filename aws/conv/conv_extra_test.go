@@ -603,6 +603,46 @@ func TestNewResource(t *testing.T) {
 		}
 	})
 
+	// #263: Instance should have Lifecycle and PlatformDetails properties
+	t.Run("Instance with spot lifecycle", func(t *testing.T) {
+		t.Parallel()
+		inst := ec2types.Instance{
+			InstanceId:        awssdk.String("i-spot"),
+			InstanceLifecycle: ec2types.InstanceLifecycleTypeSpot,
+			PlatformDetails:   awssdk.String("Linux/UNIX"),
+		}
+		res, err := NewResource(inst)
+		if err != nil {
+			t.Fatalf("NewResource returned error: %v", err)
+		}
+		props := res.Properties()
+		if got, want := props[properties.Lifecycle], "spot"; got != want {
+			t.Errorf("properties.Lifecycle: got %v, want %v", got, want)
+		}
+		if got, want := props[properties.PlatformDetails], "Linux/UNIX"; got != want {
+			t.Errorf("properties.PlatformDetails: got %v, want %v", got, want)
+		}
+	})
+
+	t.Run("Instance with on-demand lifecycle (empty field)", func(t *testing.T) {
+		t.Parallel()
+		inst := ec2types.Instance{
+			InstanceId:      awssdk.String("i-ondemand"),
+			PlatformDetails: awssdk.String("Windows"),
+		}
+		res, err := NewResource(inst)
+		if err != nil {
+			t.Fatalf("NewResource returned error: %v", err)
+		}
+		props := res.Properties()
+		if got, want := props[properties.Lifecycle], "on-demand"; got != want {
+			t.Errorf("properties.Lifecycle: got %v, want %v (empty InstanceLifecycle should default to on-demand)", got, want)
+		}
+		if got, want := props[properties.PlatformDetails], "Windows"; got != want {
+			t.Errorf("properties.PlatformDetails: got %v, want %v", got, want)
+		}
+	})
+
 	t.Run("unknown type returns error", func(t *testing.T) {
 		t.Parallel()
 		_, err := NewResource(42)

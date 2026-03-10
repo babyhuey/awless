@@ -293,6 +293,9 @@ func (cmd *DeleteImage) imageSnapshots(id string) ([]string, error) {
 		return snapshots, fmt.Errorf("multiple images found with id '%s'", id)
 	}
 	for _, dev := range imgs.Images[0].BlockDeviceMappings {
+		if dev.Ebs == nil {
+			continue
+		}
 		if snapshot := StringValue(dev.Ebs.SnapshotId); snapshot != "" {
 			snapshots = append(snapshots, snapshot)
 		}

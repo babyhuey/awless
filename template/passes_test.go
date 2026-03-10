@@ -278,6 +278,8 @@ func TestResolveMissingSuggestedPass(t *testing.T) {
 			return "arole"
 		case "create.instance.userdata":
 			return "/path/to/my/file"
+		case "create.instance.associate-public-ip":
+			return "true"
 		default:
 			t.Fatalf("unexepected optional parameter %s: %v", in, paramPaths)
 			return ""
@@ -322,10 +324,10 @@ func TestResolveMissingSuggestedPass(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got, want := count, 6; got != want {
+	if got, want := count, 7; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := compiled.String(), "create instance count=1 ebs-optimized=true image=ami-1a17137a ip=1.2.3.4 keypair=mykeypair lock=true name=my-instance role=arole securitygroup=@my-sec-group subnet=sub-1234 type=t2.nano userdata=/path/to/my/file"; got != want {
+	if got, want := compiled.String(), "create instance associate-public-ip=true count=1 ebs-optimized=true image=ami-1a17137a ip=1.2.3.4 keypair=mykeypair lock=true name=my-instance role=arole securitygroup=@my-sec-group subnet=sub-1234 type=t2.nano userdata=/path/to/my/file"; got != want {
 		t.Fatalf("got \n%s, want \n%s", got, want)
 	}
 }

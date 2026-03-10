@@ -24,7 +24,7 @@ import (
 )
 
 var ColumnsInListing = map[string][]string{
-	cloud.Instance:            {properties.ID, properties.AvailabilityZone, properties.Name, properties.State, properties.Type, properties.PublicIP, properties.PrivateIP, properties.Launched, properties.KeyPair},
+	cloud.Instance:            {properties.ID, properties.AvailabilityZone, properties.Name, properties.State, properties.Type, properties.PublicIP, properties.PrivateIP, properties.Launched, properties.KeyPair, properties.Lifecycle, properties.PlatformDetails},
 	cloud.Vpc:                 {properties.ID, properties.Name, properties.Default, properties.State, properties.CIDR},
 	cloud.Subnet:              {properties.ID, properties.Name, properties.CIDR, properties.AvailabilityZone, properties.Default, properties.Vpc, properties.Public, properties.State},
 	cloud.SecurityGroup:       {properties.ID, properties.Vpc, properties.InboundRules, properties.OutboundRules, properties.Name, properties.Description},
@@ -101,6 +101,11 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.PrivateIP, Friendly: "Private IP"},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Launched, Friendly: "Uptime"}},
 		StringColumnDefinition{Prop: properties.KeyPair},
+		ColoredValueColumnDefinition{
+			StringColumnDefinition: StringColumnDefinition{Prop: properties.Lifecycle},
+			ColoredValues:          map[string]color.Attribute{"spot": color.FgYellow, "on-demand": color.FgGreen},
+		},
+		StringColumnDefinition{Prop: properties.PlatformDetails, Friendly: "Platform"},
 	},
 	cloud.Vpc: {
 		StringColumnDefinition{Prop: properties.ID},
