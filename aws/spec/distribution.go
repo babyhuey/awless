@@ -24,10 +24,13 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/cloudfront"
-	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -39,7 +42,7 @@ type CreateDistribution struct {
 	_              string `action:"create" entity:"distribution" awsAPI:"cloudfront"`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            cloudfrontiface.CloudFrontAPI
+	api            *cloudfront.Client
 	OriginDomain   *string   `templateName:"origin-domain"`
 	Certificate    *string   `templateName:"certificate"`
 	Comment        *string   `templateName:"comment"`
@@ -63,26 +66,26 @@ func (cmd *CreateDistribution) ParamsSpec() params.Spec {
 func (cmd *CreateDistribution) ManualRun(renv env.Running) (interface{}, error) {
 	originId := "orig_1"
 	input := &cloudfront.CreateDistributionInput{
-		DistributionConfig: &cloudfront.DistributionConfig{
+		DistributionConfig: &cloudfronttypes.DistributionConfig{
 			CallerReference: aws.String(CallerReferenceFunc()),
 			Comment:         cmd.OriginDomain,
-			DefaultCacheBehavior: &cloudfront.DefaultCacheBehavior{
+			DefaultCacheBehavior: &cloudfronttypes.DefaultCacheBehavior{
 				MinTTL: aws.Int64(0),
-				ForwardedValues: &cloudfront.ForwardedValues{
-					Cookies:     &cloudfront.CookiePreference{Forward: aws.String("all")},
+				ForwardedValues: &cloudfronttypes.ForwardedValues{
+					Cookies:     &cloudfronttypes.CookiePreference{Forward: cloudfronttypes.ItemSelectionAll},
 					QueryString: aws.Bool(true),
 				},
-				TrustedSigners: &cloudfront.TrustedSigners{
+				TrustedSigners: &cloudfronttypes.TrustedSigners{
 					Enabled:  aws.Bool(false),
-					Quantity: aws.Int64(0),
+					Quantity: aws.Int32(0),
 				},
 				TargetOriginId:       aws.String(originId),
-				ViewerProtocolPolicy: aws.String("allow-all"),
+				ViewerProtocolPolicy: cloudfronttypes.ViewerProtocolPolicyAllowAll,
 			},
 			Enabled: aws.Bool(true),
-			Origins: &cloudfront.Origins{
-				Quantity: aws.Int64(1),
-				Items: []*cloudfront.Origin{
+			Origins: &cloudfronttypes.Origins{
+				Quantity: aws.Int32(1),
+				Items: []cloudfronttypes.Origin{
 					{Id: aws.String(originId)},
 				},
 			},
@@ -90,7 +93,7 @@ func (cmd *CreateDistribution) ManualRun(renv env.Running) (interface{}, error) 
 	}
 
 	if domain := StringValue(cmd.OriginDomain); strings.HasSuffix(domain, ".s3.amazonaws.com") || (strings.HasSuffix(domain, ".amazonaws.com") && strings.Contains(domain, ".s3-website-")) {
-		input.DistributionConfig.Origins.Items[0].S3OriginConfig = &cloudfront.S3OriginConfig{OriginAccessIdentity: aws.String("")}
+		input.DistributionConfig.Origins.Items[0].S3OriginConfig = &cloudfronttypes.S3OriginConfig{OriginAccessIdentity: aws.String("")}
 	}
 
 	call := &awsCall{
@@ -150,7 +153,7 @@ type CheckDistribution struct {
 	_       string `action:"check" entity:"distribution" awsAPI:"cloudfront"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     cloudfrontiface.CloudFrontAPI
+	api     *cloudfront.Client
 	Id      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -174,10 +177,10 @@ func (cmd *CheckDistribution) ManualRun(renv env.Running) (interface{}, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.GetDistribution(input)
+			output, err := cmd.api.GetDistribution(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(awserr.Error); ok {
-					if awserr.Code() == "NoSuchDistribution" {
+				if awserr, ok := err.(smithy.APIError); ok {
+					if awserr.ErrorCode() == "NoSuchDistribution" {
 						return notFoundState, nil
 					}
 					return "", awserr
@@ -185,7 +188,7 @@ func (cmd *CheckDistribution) ManualRun(renv env.Running) (interface{}, error) {
 					return "", err
 				}
 			} else {
-				return aws.StringValue(output.Distribution.Status), nil
+				return aws.ToString(output.Distribution.Status), nil
 			}
 		},
 		expect: StringValue(cmd.State),
@@ -198,7 +201,7 @@ type UpdateDistribution struct {
 	_              string `action:"update" entity:"distribution" awsAPI:"cloudfront"`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            cloudfrontiface.CloudFrontAPI
+	api            *cloudfront.Client
 	Id             *string   `awsName:"Id" awsType:"awsstr" templateName:"id"`
 	OriginDomain   *string   `templateName:"origin-domain"`
 	Certificate    *string   `templateName:"certificate"`
@@ -221,7 +224,7 @@ func (cmd *UpdateDistribution) ParamsSpec() params.Spec {
 }
 
 func (cmd *UpdateDistribution) ManualRun(renv env.Running) (interface{}, error) {
-	distribOutput, err := cmd.api.GetDistribution(&cloudfront.GetDistributionInput{
+	distribOutput, err := cmd.api.GetDistribution(context.Background(), &cloudfront.GetDistributionInput{
 		Id: cmd.Id,
 	})
 	if err != nil {
@@ -230,7 +233,7 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (interface{}, error) 
 	distriToUpdate := distribOutput.Distribution
 	configToUpdate := distriToUpdate.DistributionConfig
 	etag := distribOutput.ETag
-	beforeUpdate := distribOutput.Distribution.DistributionConfig.String()
+	beforeUpdate := fmt.Sprintf("%v", distribOutput.Distribution.DistributionConfig)
 
 	input := &cloudfront.UpdateDistributionInput{
 		IfMatch:            etag,
@@ -247,9 +250,9 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (interface{}, error) 
 	}
 	if cmd.OriginDomain != nil || cmd.OriginPath != nil {
 		if configToUpdate.Origins == nil || len(configToUpdate.Origins.Items) == 0 {
-			configToUpdate.Origins = &cloudfront.Origins{
-				Quantity: aws.Int64(1),
-				Items: []*cloudfront.Origin{
+			configToUpdate.Origins = &cloudfronttypes.Origins{
+				Quantity: aws.Int32(1),
+				Items: []cloudfronttypes.Origin{
 					{Id: aws.String("orig_1")},
 				},
 			}
@@ -258,8 +261,8 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (interface{}, error) 
 			if err = setFieldWithType(cmd.OriginDomain, input, "DistributionConfig.Origins.Items[0].DomainName", awsstr); err != nil {
 				return nil, err
 			}
-			if domain := aws.StringValue(input.DistributionConfig.Origins.Items[0].DomainName); strings.HasSuffix(domain, ".s3.amazonaws.com") || (strings.HasSuffix(domain, ".amazonaws.com") && strings.Contains(domain, ".s3-website-")) {
-				input.DistributionConfig.Origins.Items[0].S3OriginConfig = &cloudfront.S3OriginConfig{OriginAccessIdentity: aws.String("")}
+			if domain := aws.ToString(input.DistributionConfig.Origins.Items[0].DomainName); strings.HasSuffix(domain, ".s3.amazonaws.com") || (strings.HasSuffix(domain, ".amazonaws.com") && strings.Contains(domain, ".s3-website-")) {
+				input.DistributionConfig.Origins.Items[0].S3OriginConfig = &cloudfronttypes.S3OriginConfig{OriginAccessIdentity: aws.String("")}
 			}
 		}
 
@@ -325,17 +328,17 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (interface{}, error) 
 	}
 
 	if aliases := input.DistributionConfig.Aliases; aliases != nil {
-		aliases.Quantity = aws.Int64(int64(len(aliases.Items)))
+		aliases.Quantity = aws.Int32(int32(len(aliases.Items)))
 	}
 
-	if beforeUpdate == input.DistributionConfig.String() {
+	if beforeUpdate == fmt.Sprintf("%v", input.DistributionConfig) {
 		cmd.logger.Infof("no property has been changed to distribution '%s'", StringValue(cmd.Id))
 		return distribOutput, nil
 	}
 
 	start := time.Now()
 	var output *cloudfront.UpdateDistributionOutput
-	output, err = cmd.api.UpdateDistribution(input)
+	output, err = cmd.api.UpdateDistribution(context.Background(), input)
 	cmd.logger.ExtraVerbosef("cloudfront.UpdateDistribution call took %s", time.Since(start))
 	return output, err
 }
@@ -355,7 +358,7 @@ type DeleteDistribution struct {
 	_      string `action:"delete" entity:"distribution" awsAPI:"cloudfront"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    cloudfrontiface.CloudFrontAPI
+	api    *cloudfront.Client
 	Id     *string `awsName:"Id" awsType:"awsstr" templateName:"id"`
 }
 
@@ -403,7 +406,7 @@ func (cmd *DeleteDistribution) ManualRun(renv env.Running) (interface{}, error) 
 	}
 
 	start := time.Now()
-	output, err := cmd.api.DeleteDistribution(input)
+	output, err := cmd.api.DeleteDistribution(context.Background(), input)
 	cmd.logger.ExtraVerbosef("cloudfront.DeleteDistribution call took %s", time.Since(start))
 	return output, err
 }

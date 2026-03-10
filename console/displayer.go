@@ -29,6 +29,10 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/pkg/twwarp"
+	"github.com/olekukonko/tablewriter/pkg/twwidth"
+	"github.com/olekukonko/tablewriter/tw"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/cloud/match"
 	"github.com/wallix/awless/graph"
@@ -79,7 +83,7 @@ func (b *Builder) buildQuery() (cloud.Query, error) {
 			key := ColumnDefinitions(b.columnDefinitions).resolveKey(name)
 
 			if key != "" {
-				matchers = append(matchers, match.Property(key, val).IgnoreCase().MatchString().Contains())
+				matchers = append(matchers, match.Property(key, val).IgnoreCase().MatchString())
 			} else {
 				var allowed []string
 				for _, h := range b.columnDefinitions {
@@ -545,10 +549,15 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 	}
 
 	table := tablewriter.NewWriter(w)
-	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	table.SetCenterSeparator("|")
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetColWidth(tableColWidth)
+	table.Options(
+		tablewriter.WithRendition(tw.Rendition{
+			Borders: tw.Border{Left: tw.On, Top: tw.Off, Right: tw.On, Bottom: tw.Off},
+			Symbols: tw.NewSymbols(tw.StyleMarkdown),
+		}),
+		tablewriter.WithRowAlignment(tw.AlignLeft),
+		tablewriter.WithRowMaxWidth(tableColWidth),
+		tablewriter.WithHeaderAutoFormat(tw.Off),
+	)
 	if !d.noHeaders {
 		var displayHeaders []string
 		for i, h := range columnsToDisplay {
@@ -558,7 +567,7 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 			}
 			displayHeaders = append(displayHeaders, h.title(symbol))
 		}
-		table.SetHeader(displayHeaders)
+		table.Header(displayHeaders)
 	}
 
 	var enableWraping bool
@@ -685,12 +694,18 @@ func (d *multiResourcesTableDisplayer) Print(w io.Writer) error {
 	ds.sort(values)
 
 	table := tablewriter.NewWriter(w)
-	table.SetAutoMergeCells(true)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetColWidth(tableColWidth)
-	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	table.SetCenterSeparator("|")
-	table.SetHeader([]string{"Type" + ds.symbol(), "Name/Id", "Property", "Value"})
+	table.Options(
+		tablewriter.WithRowMergeMode(tw.MergeVertical),
+		tablewriter.WithRowAlignment(tw.AlignLeft),
+		tablewriter.WithRowMaxWidth(tableColWidth),
+		tablewriter.WithHeaderMaxWidth(tableColWidth),
+		tablewriter.WithRendition(tw.Rendition{
+			Borders: tw.Border{Left: tw.On, Top: tw.Off, Right: tw.On, Bottom: tw.Off},
+			Symbols: tw.NewSymbols(tw.StyleMarkdown),
+		}),
+		tablewriter.WithHeaderAutoFormat(tw.Off),
+	)
+	table.Header([]string{"Type" + ds.symbol(), "Name/Id", "Property", "Value"})
 
 	wraper := autoWraper{maxWidth: autowrapMaxSize, wrappingChar: " "}
 
@@ -813,11 +828,16 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 	ds.sort(values)
 
 	table := tablewriter.NewWriter(w)
-	table.SetAutoMergeCells(true)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	table.SetCenterSeparator("|")
-	table.SetHeader([]string{"Type" + ds.symbol(), "Name/Id", "Property", "Value"})
+	table.Options(
+		tablewriter.WithRowMergeMode(tw.MergeVertical),
+		tablewriter.WithRowAlignment(tw.AlignLeft),
+		tablewriter.WithRendition(tw.Rendition{
+			Borders: tw.Border{Left: tw.On, Top: tw.Off, Right: tw.On, Bottom: tw.Off},
+			Symbols: tw.NewSymbols(tw.StyleMarkdown),
+		}),
+		tablewriter.WithHeaderAutoFormat(tw.Off),
+	)
+	table.Header([]string{"Type" + ds.symbol(), "Name/Id", "Property", "Value"})
 
 	for i := range values {
 		row := make([]string, len(values[i]))
@@ -1002,19 +1022,19 @@ func resolveSortIndexes(headers []ColumnDefinition, sortingBy ...string) ([]int,
 }
 
 func colWidth(j int, t table, h ColumnDefinition, sortSymbol string) int {
-	max := tablewriter.DisplayWidth(h.title(sortSymbol))
+	max := twwidth.Width(h.title(sortSymbol))
 	wraper := autoWraper{maxWidth: autowrapMaxSize, wrappingChar: " "}
 	for i := range t {
 		val := wraper.Wrap(h.format(t[i][j]))
-		valLen := tablewriter.DisplayWidth(val)
+		valLen := twwidth.Width(val)
 		if valLen > tableColWidth {
 			if tableColWidth > max {
 				max = tableColWidth
 			}
 		}
-		lines, _ := tablewriter.WrapString(val, tableColWidth)
+		lines, _ := twwarp.WrapString(val, tableColWidth)
 		for _, line := range lines {
-			width := tablewriter.DisplayWidth(line)
+			width := twwidth.Width(line)
 			if width > max {
 				max = width
 			}
@@ -1024,18 +1044,18 @@ func colWidth(j int, t table, h ColumnDefinition, sortSymbol string) int {
 }
 
 func colWidthNoWraping(j int, t table, h ColumnDefinition, sortSymbol string) int {
-	max := tablewriter.DisplayWidth(h.title(sortSymbol))
+	max := twwidth.Width(h.title(sortSymbol))
 	for i := range t {
 		val := h.format(t[i][j])
-		valLen := tablewriter.DisplayWidth(val)
+		valLen := twwidth.Width(val)
 		if valLen > tableColWidth {
 			if tableColWidth > max {
 				max = tableColWidth
 			}
 		}
-		lines, _ := tablewriter.WrapString(val, tableColWidth)
+		lines, _ := twwarp.WrapString(val, tableColWidth)
 		for _, line := range lines {
-			width := tablewriter.DisplayWidth(line)
+			width := twwidth.Width(line)
 			if width > max {
 				max = width
 			}

@@ -3,49 +3,63 @@ package awsfetch
 import (
 	"reflect"
 
-	"github.com/aws/aws-sdk-go/service/acm/acmiface"
-	"github.com/aws/aws-sdk-go/service/applicationautoscaling/applicationautoscalingiface"
-	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
-	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
-	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
-	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
-	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
-	"github.com/aws/aws-sdk-go/service/elb/elbiface"
-	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
-	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
-	"github.com/aws/aws-sdk-go/service/route53/route53iface"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
-	"github.com/aws/aws-sdk-go/service/sns/snsiface"
-	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
-	"github.com/aws/aws-sdk-go/service/sts/stsiface"
+	"github.com/aws/aws-sdk-go-v2/service/acm"
+	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
+	"github.com/aws/aws-sdk-go-v2/service/applicationautoscaling"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ecr"
+	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	"github.com/aws/aws-sdk-go-v2/service/efs"
+	"github.com/aws/aws-sdk-go-v2/service/eks"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/kms"
+	"github.com/aws/aws-sdk-go-v2/service/lambda"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/route53"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/ssm"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/wallix/awless/logger"
 )
 
 type AWSAPI struct {
-	Iam                    iamiface.IAMAPI
-	Ec2                    ec2iface.EC2API
-	Elbv2                  elbv2iface.ELBV2API
-	Elb                    elbiface.ELBAPI
-	Rds                    rdsiface.RDSAPI
-	Autoscaling            autoscalingiface.AutoScalingAPI
-	Ecr                    ecriface.ECRAPI
-	Ecs                    ecsiface.ECSAPI
-	Applicationautoscaling applicationautoscalingiface.ApplicationAutoScalingAPI
-	Sts                    stsiface.STSAPI
-	S3                     s3iface.S3API
-	Sns                    snsiface.SNSAPI
-	Sqs                    sqsiface.SQSAPI
-	Route53                route53iface.Route53API
-	Lambda                 lambdaiface.LambdaAPI
-	Cloudwatch             cloudwatchiface.CloudWatchAPI
-	Cloudfront             cloudfrontiface.CloudFrontAPI
-	Cloudformation         cloudformationiface.CloudFormationAPI
-	Acm                    acmiface.ACMAPI
+	Iam                    *iam.Client
+	Ec2                    *ec2.Client
+	Elbv2                  *elasticloadbalancingv2.Client
+	Elb                    *elasticloadbalancing.Client
+	Rds                    *rds.Client
+	Autoscaling            *autoscaling.Client
+	Ecr                    *ecr.Client
+	Ecs                    *ecs.Client
+	Applicationautoscaling *applicationautoscaling.Client
+	Sts                    *sts.Client
+	S3                     *s3.Client
+	Sns                    *sns.Client
+	Sqs                    *sqs.Client
+	Route53                *route53.Client
+	Lambda                 *lambda.Client
+	Cloudwatch             *cloudwatch.Client
+	Cloudfront             *cloudfront.Client
+	Cloudformation         *cloudformation.Client
+	Acm                    *acm.Client
+	Eks                    *eks.Client
+	Dynamodb               *dynamodb.Client
+	Secretsmanager         *secretsmanager.Client
+	Kms                    *kms.Client
+	Apigatewayv2           *apigatewayv2.Client
+	Ssm                    *ssm.Client
+	Efs                    *efs.Client
 }
 
 type Config struct {

@@ -18,67 +18,61 @@ limitations under the License.
 
 package awsservices
 
+// DO NOT EDIT - This file was automatically generated with go generate
+
 import (
 	"context"
-	"strconv"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/acm"
-	"github.com/aws/aws-sdk-go/service/acm/acmiface"
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
-	"github.com/aws/aws-sdk-go/service/cloudfront"
-	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/aws/aws-sdk-go/service/ecr"
-	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
-	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
-	"github.com/aws/aws-sdk-go/service/elb"
-	"github.com/aws/aws-sdk-go/service/elb/elbiface"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
-	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
-	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/aws/aws-sdk-go/service/route53/route53iface"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
-	"github.com/aws/aws-sdk-go/service/sns"
-	"github.com/aws/aws-sdk-go/service/sns/snsiface"
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	acm "github.com/aws/aws-sdk-go-v2/service/acm"
+	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
+	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
+	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
+	ecs "github.com/aws/aws-sdk-go-v2/service/ecs"
+	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	iam "github.com/aws/aws-sdk-go-v2/service/iam"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	rds "github.com/aws/aws-sdk-go-v2/service/rds"
+	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
+	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
+	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
+	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+	sns "github.com/aws/aws-sdk-go-v2/service/sns"
+	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
+	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/wallix/awless/cloud"
 )
 
-// DO NOT EDIT - This file was automatically generated with go generate
-
 type mockEc2 struct {
-	ec2iface.EC2API
-	instances         []*ec2.Instance
-	subnets           []*ec2.Subnet
-	vpcs              []*ec2.Vpc
-	keypairinfos      []*ec2.KeyPairInfo
-	securitygroups    []*ec2.SecurityGroup
-	volumes           []*ec2.Volume
-	internetgateways  []*ec2.InternetGateway
-	natgateways       []*ec2.NatGateway
-	routetables       []*ec2.RouteTable
-	availabilityzones []*ec2.AvailabilityZone
-	images            []*ec2.Image
-	importimagetasks  []*ec2.ImportImageTask
-	addresss          []*ec2.Address
-	snapshots         []*ec2.Snapshot
-	networkinterfaces []*ec2.NetworkInterface
+	instances         []ec2types.Instance
+	subnets           []ec2types.Subnet
+	vpcs              []ec2types.Vpc
+	keypairinfos      []ec2types.KeyPairInfo
+	securitygroups    []ec2types.SecurityGroup
+	volumes           []ec2types.Volume
+	internetgateways  []ec2types.InternetGateway
+	natgateways       []ec2types.NatGateway
+	routetables       []ec2types.RouteTable
+	availabilityzones []ec2types.AvailabilityZone
+	images            []ec2types.Image
+	importimagetasks  []ec2types.ImportImageTask
+	addresss          []ec2types.Address
+	snapshots         []ec2types.Snapshot
+	networkinterfaces []ec2types.NetworkInterface
 }
 
 func (m *mockEc2) Name() string {
@@ -117,94 +111,67 @@ func (m *mockEc2) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockEc2) DescribeSubnets(input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
+func (m *mockEc2) DescribeSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSubnetsOutput, error) {
 	return &ec2.DescribeSubnetsOutput{Subnets: m.subnets}, nil
 }
 
-func (m *mockEc2) DescribeVpcs(input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
+func (m *mockEc2) DescribeVpcs(ctx context.Context, input *ec2.DescribeVpcsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVpcsOutput, error) {
 	return &ec2.DescribeVpcsOutput{Vpcs: m.vpcs}, nil
 }
 
-func (m *mockEc2) DescribeKeyPairs(input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error) {
+func (m *mockEc2) DescribeKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeKeyPairsOutput, error) {
 	return &ec2.DescribeKeyPairsOutput{KeyPairs: m.keypairinfos}, nil
 }
 
-func (m *mockEc2) DescribeSecurityGroups(input *ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {
+func (m *mockEc2) DescribeSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error) {
 	return &ec2.DescribeSecurityGroupsOutput{SecurityGroups: m.securitygroups}, nil
 }
 
-func (m *mockEc2) DescribeVolumesPages(input *ec2.DescribeVolumesInput, fn func(p *ec2.DescribeVolumesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*ec2.Volume
-	for i := 0; i < len(m.volumes); i += 2 {
-		page := []*ec2.Volume{m.volumes[i]}
-		if i+1 < len(m.volumes) {
-			page = append(page, m.volumes[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&ec2.DescribeVolumesOutput{Volumes: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockEc2) DescribeVolumes(ctx context.Context, input *ec2.DescribeVolumesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVolumesOutput, error) {
+	return &ec2.DescribeVolumesOutput{Volumes: m.volumes}, nil
 }
 
-func (m *mockEc2) DescribeInternetGateways(input *ec2.DescribeInternetGatewaysInput) (*ec2.DescribeInternetGatewaysOutput, error) {
+func (m *mockEc2) DescribeInternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInternetGatewaysOutput, error) {
 	return &ec2.DescribeInternetGatewaysOutput{InternetGateways: m.internetgateways}, nil
 }
 
-func (m *mockEc2) DescribeNatGateways(input *ec2.DescribeNatGatewaysInput) (*ec2.DescribeNatGatewaysOutput, error) {
+func (m *mockEc2) DescribeNatGateways(ctx context.Context, input *ec2.DescribeNatGatewaysInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNatGatewaysOutput, error) {
 	return &ec2.DescribeNatGatewaysOutput{NatGateways: m.natgateways}, nil
 }
 
-func (m *mockEc2) DescribeRouteTables(input *ec2.DescribeRouteTablesInput) (*ec2.DescribeRouteTablesOutput, error) {
+func (m *mockEc2) DescribeRouteTables(ctx context.Context, input *ec2.DescribeRouteTablesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRouteTablesOutput, error) {
 	return &ec2.DescribeRouteTablesOutput{RouteTables: m.routetables}, nil
 }
 
-func (m *mockEc2) DescribeAvailabilityZones(input *ec2.DescribeAvailabilityZonesInput) (*ec2.DescribeAvailabilityZonesOutput, error) {
+func (m *mockEc2) DescribeAvailabilityZones(ctx context.Context, input *ec2.DescribeAvailabilityZonesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAvailabilityZonesOutput, error) {
 	return &ec2.DescribeAvailabilityZonesOutput{AvailabilityZones: m.availabilityzones}, nil
 }
 
-func (m *mockEc2) DescribeImages(input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
+func (m *mockEc2) DescribeImages(ctx context.Context, input *ec2.DescribeImagesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeImagesOutput, error) {
 	return &ec2.DescribeImagesOutput{Images: m.images}, nil
 }
 
-func (m *mockEc2) DescribeImportImageTasks(input *ec2.DescribeImportImageTasksInput) (*ec2.DescribeImportImageTasksOutput, error) {
+func (m *mockEc2) DescribeImportImageTasks(ctx context.Context, input *ec2.DescribeImportImageTasksInput, optFns ...func(*ec2.Options)) (*ec2.DescribeImportImageTasksOutput, error) {
 	return &ec2.DescribeImportImageTasksOutput{ImportImageTasks: m.importimagetasks}, nil
 }
 
-func (m *mockEc2) DescribeAddresses(input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
+func (m *mockEc2) DescribeAddresses(ctx context.Context, input *ec2.DescribeAddressesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAddressesOutput, error) {
 	return &ec2.DescribeAddressesOutput{Addresses: m.addresss}, nil
 }
 
-func (m *mockEc2) DescribeSnapshotsPages(input *ec2.DescribeSnapshotsInput, fn func(p *ec2.DescribeSnapshotsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*ec2.Snapshot
-	for i := 0; i < len(m.snapshots); i += 2 {
-		page := []*ec2.Snapshot{m.snapshots[i]}
-		if i+1 < len(m.snapshots) {
-			page = append(page, m.snapshots[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&ec2.DescribeSnapshotsOutput{Snapshots: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockEc2) DescribeSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSnapshotsOutput, error) {
+	return &ec2.DescribeSnapshotsOutput{Snapshots: m.snapshots}, nil
 }
 
-func (m *mockEc2) DescribeNetworkInterfaces(input *ec2.DescribeNetworkInterfacesInput) (*ec2.DescribeNetworkInterfacesOutput, error) {
+func (m *mockEc2) DescribeNetworkInterfaces(ctx context.Context, input *ec2.DescribeNetworkInterfacesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNetworkInterfacesOutput, error) {
 	return &ec2.DescribeNetworkInterfacesOutput{NetworkInterfaces: m.networkinterfaces}, nil
 }
 
 type mockElbv2 struct {
-	elbv2iface.ELBV2API
-	loadbalancers            []*elbv2.LoadBalancer
-	targetgroups             []*elbv2.TargetGroup
-	listeners                []*elbv2.Listener
-	targethealthdescriptions map[string][]*elbv2.TargetHealthDescription
+	loadbalancers            []elbv2types.LoadBalancer
+	targetgroups             []elbv2types.TargetGroup
+	listeners                []elbv2types.Listener
+	targethealthdescriptions map[string][]elbv2types.TargetHealthDescription
 }
 
 func (m *mockElbv2) Name() string {
@@ -243,30 +210,16 @@ func (m *mockElbv2) FetchByType(context.Context, string) (cloud.GraphAPI, error)
 	return nil, nil
 }
 
-func (m *mockElbv2) DescribeLoadBalancersPages(input *elbv2.DescribeLoadBalancersInput, fn func(p *elbv2.DescribeLoadBalancersOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*elbv2.LoadBalancer
-	for i := 0; i < len(m.loadbalancers); i += 2 {
-		page := []*elbv2.LoadBalancer{m.loadbalancers[i]}
-		if i+1 < len(m.loadbalancers) {
-			page = append(page, m.loadbalancers[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&elbv2.DescribeLoadBalancersOutput{LoadBalancers: page, NextMarker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockElbv2) DescribeLoadBalancers(ctx context.Context, input *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
+	return &elbv2.DescribeLoadBalancersOutput{LoadBalancers: m.loadbalancers}, nil
 }
 
-func (m *mockElbv2) DescribeTargetGroups(input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {
+func (m *mockElbv2) DescribeTargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
 	return &elbv2.DescribeTargetGroupsOutput{TargetGroups: m.targetgroups}, nil
 }
 
 type mockElb struct {
-	elbiface.ELBAPI
-	loadbalancerdescriptions []*elb.LoadBalancerDescription
+	loadbalancerdescriptions []elbtypes.LoadBalancerDescription
 }
 
 func (m *mockElb) Name() string {
@@ -305,27 +258,13 @@ func (m *mockElb) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockElb) DescribeLoadBalancersPages(input *elb.DescribeLoadBalancersInput, fn func(p *elb.DescribeLoadBalancersOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*elb.LoadBalancerDescription
-	for i := 0; i < len(m.loadbalancerdescriptions); i += 2 {
-		page := []*elb.LoadBalancerDescription{m.loadbalancerdescriptions[i]}
-		if i+1 < len(m.loadbalancerdescriptions) {
-			page = append(page, m.loadbalancerdescriptions[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&elb.DescribeLoadBalancersOutput{LoadBalancerDescriptions: page, NextMarker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockElb) DescribeLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
+	return &elb.DescribeLoadBalancersOutput{LoadBalancerDescriptions: m.loadbalancerdescriptions}, nil
 }
 
 type mockRds struct {
-	rdsiface.RDSAPI
-	dbinstances    []*rds.DBInstance
-	dbsubnetgroups []*rds.DBSubnetGroup
+	dbinstances    []rdstypes.DBInstance
+	dbsubnetgroups []rdstypes.DBSubnetGroup
 }
 
 func (m *mockRds) Name() string {
@@ -364,45 +303,18 @@ func (m *mockRds) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockRds) DescribeDBInstancesPages(input *rds.DescribeDBInstancesInput, fn func(p *rds.DescribeDBInstancesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*rds.DBInstance
-	for i := 0; i < len(m.dbinstances); i += 2 {
-		page := []*rds.DBInstance{m.dbinstances[i]}
-		if i+1 < len(m.dbinstances) {
-			page = append(page, m.dbinstances[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&rds.DescribeDBInstancesOutput{DBInstances: page, Marker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockRds) DescribeDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput, optFns ...func(*rds.Options)) (*rds.DescribeDBInstancesOutput, error) {
+	return &rds.DescribeDBInstancesOutput{DBInstances: m.dbinstances}, nil
 }
 
-func (m *mockRds) DescribeDBSubnetGroupsPages(input *rds.DescribeDBSubnetGroupsInput, fn func(p *rds.DescribeDBSubnetGroupsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*rds.DBSubnetGroup
-	for i := 0; i < len(m.dbsubnetgroups); i += 2 {
-		page := []*rds.DBSubnetGroup{m.dbsubnetgroups[i]}
-		if i+1 < len(m.dbsubnetgroups) {
-			page = append(page, m.dbsubnetgroups[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&rds.DescribeDBSubnetGroupsOutput{DBSubnetGroups: page, Marker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockRds) DescribeDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput, optFns ...func(*rds.Options)) (*rds.DescribeDBSubnetGroupsOutput, error) {
+	return &rds.DescribeDBSubnetGroupsOutput{DBSubnetGroups: m.dbsubnetgroups}, nil
 }
 
 type mockAutoscaling struct {
-	autoscalingiface.AutoScalingAPI
-	launchconfigurations []*autoscaling.LaunchConfiguration
-	groups               []*autoscaling.Group
-	scalingpolicys       []*autoscaling.ScalingPolicy
+	launchconfigurations []autoscalingtypes.LaunchConfiguration
+	autoscalinggroups    []autoscalingtypes.AutoScalingGroup
+	scalingpolicys       []autoscalingtypes.ScalingPolicy
 }
 
 func (m *mockAutoscaling) Name() string {
@@ -441,60 +353,20 @@ func (m *mockAutoscaling) FetchByType(context.Context, string) (cloud.GraphAPI, 
 	return nil, nil
 }
 
-func (m *mockAutoscaling) DescribeLaunchConfigurationsPages(input *autoscaling.DescribeLaunchConfigurationsInput, fn func(p *autoscaling.DescribeLaunchConfigurationsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*autoscaling.LaunchConfiguration
-	for i := 0; i < len(m.launchconfigurations); i += 2 {
-		page := []*autoscaling.LaunchConfiguration{m.launchconfigurations[i]}
-		if i+1 < len(m.launchconfigurations) {
-			page = append(page, m.launchconfigurations[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&autoscaling.DescribeLaunchConfigurationsOutput{LaunchConfigurations: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockAutoscaling) DescribeLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribeLaunchConfigurationsOutput, error) {
+	return &autoscaling.DescribeLaunchConfigurationsOutput{LaunchConfigurations: m.launchconfigurations}, nil
 }
 
-func (m *mockAutoscaling) DescribeAutoScalingGroupsPages(input *autoscaling.DescribeAutoScalingGroupsInput, fn func(p *autoscaling.DescribeAutoScalingGroupsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*autoscaling.Group
-	for i := 0; i < len(m.groups); i += 2 {
-		page := []*autoscaling.Group{m.groups[i]}
-		if i+1 < len(m.groups) {
-			page = append(page, m.groups[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&autoscaling.DescribeAutoScalingGroupsOutput{AutoScalingGroups: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockAutoscaling) DescribeAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
+	return &autoscaling.DescribeAutoScalingGroupsOutput{AutoScalingGroups: m.autoscalinggroups}, nil
 }
 
-func (m *mockAutoscaling) DescribePoliciesPages(input *autoscaling.DescribePoliciesInput, fn func(p *autoscaling.DescribePoliciesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*autoscaling.ScalingPolicy
-	for i := 0; i < len(m.scalingpolicys); i += 2 {
-		page := []*autoscaling.ScalingPolicy{m.scalingpolicys[i]}
-		if i+1 < len(m.scalingpolicys) {
-			page = append(page, m.scalingpolicys[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&autoscaling.DescribePoliciesOutput{ScalingPolicies: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockAutoscaling) DescribePolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribePoliciesOutput, error) {
+	return &autoscaling.DescribePoliciesOutput{ScalingPolicies: m.scalingpolicys}, nil
 }
 
 type mockAcm struct {
-	acmiface.ACMAPI
-	certificatesummarys []*acm.CertificateSummary
+	certificatesummarys []acmtypes.CertificateSummary
 }
 
 func (m *mockAcm) Name() string {
@@ -533,34 +405,20 @@ func (m *mockAcm) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockAcm) ListCertificatesPages(input *acm.ListCertificatesInput, fn func(p *acm.ListCertificatesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*acm.CertificateSummary
-	for i := 0; i < len(m.certificatesummarys); i += 2 {
-		page := []*acm.CertificateSummary{m.certificatesummarys[i]}
-		if i+1 < len(m.certificatesummarys) {
-			page = append(page, m.certificatesummarys[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&acm.ListCertificatesOutput{CertificateSummaryList: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockAcm) ListCertificates(ctx context.Context, input *acm.ListCertificatesInput, optFns ...func(*acm.Options)) (*acm.ListCertificatesOutput, error) {
+	return &acm.ListCertificatesOutput{CertificateSummaryList: m.certificatesummarys}, nil
 }
 
 type mockIam struct {
-	iamiface.IAMAPI
-	userdetails          []*iam.UserDetail
-	groupdetails         []*iam.GroupDetail
-	roledetails          []*iam.RoleDetail
-	policys              []*iam.Policy
-	accesskeymetadatas   []*iam.AccessKeyMetadata
-	instanceprofiles     []*iam.InstanceProfile
-	managedpolicydetails []*iam.ManagedPolicyDetail
-	users                []*iam.User
-	virtualmfadevices    []*iam.VirtualMFADevice
+	userdetails          []iamtypes.UserDetail
+	groupdetails         []iamtypes.GroupDetail
+	roledetails          []iamtypes.RoleDetail
+	policys              []iamtypes.Policy
+	accesskeymetadatas   []iamtypes.AccessKeyMetadata
+	instanceprofiles     []iamtypes.InstanceProfile
+	managedpolicydetails []iamtypes.ManagedPolicyDetail
+	users                []iamtypes.User
+	virtualmfadevices    []iamtypes.VirtualMFADevice
 }
 
 func (m *mockIam) Name() string {
@@ -599,62 +457,22 @@ func (m *mockIam) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockIam) ListAccessKeysPages(input *iam.ListAccessKeysInput, fn func(p *iam.ListAccessKeysOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*iam.AccessKeyMetadata
-	for i := 0; i < len(m.accesskeymetadatas); i += 2 {
-		page := []*iam.AccessKeyMetadata{m.accesskeymetadatas[i]}
-		if i+1 < len(m.accesskeymetadatas) {
-			page = append(page, m.accesskeymetadatas[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&iam.ListAccessKeysOutput{AccessKeyMetadata: page, Marker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockIam) ListAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput, optFns ...func(*iam.Options)) (*iam.ListAccessKeysOutput, error) {
+	return &iam.ListAccessKeysOutput{AccessKeyMetadata: m.accesskeymetadatas}, nil
 }
 
-func (m *mockIam) ListInstanceProfilesPages(input *iam.ListInstanceProfilesInput, fn func(p *iam.ListInstanceProfilesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*iam.InstanceProfile
-	for i := 0; i < len(m.instanceprofiles); i += 2 {
-		page := []*iam.InstanceProfile{m.instanceprofiles[i]}
-		if i+1 < len(m.instanceprofiles) {
-			page = append(page, m.instanceprofiles[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&iam.ListInstanceProfilesOutput{InstanceProfiles: page, Marker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockIam) ListInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput, optFns ...func(*iam.Options)) (*iam.ListInstanceProfilesOutput, error) {
+	return &iam.ListInstanceProfilesOutput{InstanceProfiles: m.instanceprofiles}, nil
 }
 
-func (m *mockIam) ListVirtualMFADevicesPages(input *iam.ListVirtualMFADevicesInput, fn func(p *iam.ListVirtualMFADevicesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*iam.VirtualMFADevice
-	for i := 0; i < len(m.virtualmfadevices); i += 2 {
-		page := []*iam.VirtualMFADevice{m.virtualmfadevices[i]}
-		if i+1 < len(m.virtualmfadevices) {
-			page = append(page, m.virtualmfadevices[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&iam.ListVirtualMFADevicesOutput{VirtualMFADevices: page, Marker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockIam) ListVirtualMFADevices(ctx context.Context, input *iam.ListVirtualMFADevicesInput, optFns ...func(*iam.Options)) (*iam.ListVirtualMFADevicesOutput, error) {
+	return &iam.ListVirtualMFADevicesOutput{VirtualMFADevices: m.virtualmfadevices}, nil
 }
 
 type mockS3 struct {
-	s3iface.S3API
-	buckets map[string][]*s3.Bucket
-	objects map[string][]*s3.Object
-	grants  map[string][]*s3.Grant
+	buckets map[string][]s3types.Bucket
+	objects map[string][]s3types.Object
+	grants  map[string][]s3types.Grant
 }
 
 func (m *mockS3) Name() string {
@@ -694,9 +512,8 @@ func (m *mockS3) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 }
 
 type mockSns struct {
-	snsiface.SNSAPI
-	subscriptions []*sns.Subscription
-	topics        []*sns.Topic
+	subscriptions []snstypes.Subscription
+	topics        []snstypes.Topic
 }
 
 func (m *mockSns) Name() string {
@@ -735,44 +552,17 @@ func (m *mockSns) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockSns) ListSubscriptionsPages(input *sns.ListSubscriptionsInput, fn func(p *sns.ListSubscriptionsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*sns.Subscription
-	for i := 0; i < len(m.subscriptions); i += 2 {
-		page := []*sns.Subscription{m.subscriptions[i]}
-		if i+1 < len(m.subscriptions) {
-			page = append(page, m.subscriptions[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&sns.ListSubscriptionsOutput{Subscriptions: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockSns) ListSubscriptions(ctx context.Context, input *sns.ListSubscriptionsInput, optFns ...func(*sns.Options)) (*sns.ListSubscriptionsOutput, error) {
+	return &sns.ListSubscriptionsOutput{Subscriptions: m.subscriptions}, nil
 }
 
-func (m *mockSns) ListTopicsPages(input *sns.ListTopicsInput, fn func(p *sns.ListTopicsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*sns.Topic
-	for i := 0; i < len(m.topics); i += 2 {
-		page := []*sns.Topic{m.topics[i]}
-		if i+1 < len(m.topics) {
-			page = append(page, m.topics[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&sns.ListTopicsOutput{Topics: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockSns) ListTopics(ctx context.Context, input *sns.ListTopicsInput, optFns ...func(*sns.Options)) (*sns.ListTopicsOutput, error) {
+	return &sns.ListTopicsOutput{Topics: m.topics}, nil
 }
 
 type mockSqs struct {
-	sqsiface.SQSAPI
-	strings    []*string
-	attributes map[string]map[string]*string
+	strings    []string
+	attributes map[string]map[string]string
 }
 
 func (m *mockSqs) Name() string {
@@ -811,14 +601,13 @@ func (m *mockSqs) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockSqs) ListQueues(input *sqs.ListQueuesInput) (*sqs.ListQueuesOutput, error) {
+func (m *mockSqs) ListQueues(ctx context.Context, input *sqs.ListQueuesInput, optFns ...func(*sqs.Options)) (*sqs.ListQueuesOutput, error) {
 	return &sqs.ListQueuesOutput{QueueUrls: m.strings}, nil
 }
 
 type mockRoute53 struct {
-	route53iface.Route53API
-	hostedzones        []*route53.HostedZone
-	resourcerecordsets map[string][]*route53.ResourceRecordSet
+	hostedzones        []route53types.HostedZone
+	resourcerecordsets map[string][]route53types.ResourceRecordSet
 }
 
 func (m *mockRoute53) Name() string {
@@ -857,26 +646,12 @@ func (m *mockRoute53) FetchByType(context.Context, string) (cloud.GraphAPI, erro
 	return nil, nil
 }
 
-func (m *mockRoute53) ListHostedZonesPages(input *route53.ListHostedZonesInput, fn func(p *route53.ListHostedZonesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*route53.HostedZone
-	for i := 0; i < len(m.hostedzones); i += 2 {
-		page := []*route53.HostedZone{m.hostedzones[i]}
-		if i+1 < len(m.hostedzones) {
-			page = append(page, m.hostedzones[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&route53.ListHostedZonesOutput{HostedZones: page, NextMarker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockRoute53) ListHostedZones(ctx context.Context, input *route53.ListHostedZonesInput, optFns ...func(*route53.Options)) (*route53.ListHostedZonesOutput, error) {
+	return &route53.ListHostedZonesOutput{HostedZones: m.hostedzones}, nil
 }
 
 type mockLambda struct {
-	lambdaiface.LambdaAPI
-	functionconfigurations []*lambda.FunctionConfiguration
+	functionconfigurations []lambdatypes.FunctionConfiguration
 }
 
 func (m *mockLambda) Name() string {
@@ -915,27 +690,13 @@ func (m *mockLambda) FetchByType(context.Context, string) (cloud.GraphAPI, error
 	return nil, nil
 }
 
-func (m *mockLambda) ListFunctionsPages(input *lambda.ListFunctionsInput, fn func(p *lambda.ListFunctionsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*lambda.FunctionConfiguration
-	for i := 0; i < len(m.functionconfigurations); i += 2 {
-		page := []*lambda.FunctionConfiguration{m.functionconfigurations[i]}
-		if i+1 < len(m.functionconfigurations) {
-			page = append(page, m.functionconfigurations[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&lambda.ListFunctionsOutput{Functions: page, NextMarker: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockLambda) ListFunctions(ctx context.Context, input *lambda.ListFunctionsInput, optFns ...func(*lambda.Options)) (*lambda.ListFunctionsOutput, error) {
+	return &lambda.ListFunctionsOutput{Functions: m.functionconfigurations}, nil
 }
 
 type mockCloudwatch struct {
-	cloudwatchiface.CloudWatchAPI
-	metrics      []*cloudwatch.Metric
-	metricalarms []*cloudwatch.MetricAlarm
+	metrics      []cloudwatchtypes.Metric
+	metricalarms []cloudwatchtypes.MetricAlarm
 }
 
 func (m *mockCloudwatch) Name() string {
@@ -974,43 +735,16 @@ func (m *mockCloudwatch) FetchByType(context.Context, string) (cloud.GraphAPI, e
 	return nil, nil
 }
 
-func (m *mockCloudwatch) ListMetricsPages(input *cloudwatch.ListMetricsInput, fn func(p *cloudwatch.ListMetricsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*cloudwatch.Metric
-	for i := 0; i < len(m.metrics); i += 2 {
-		page := []*cloudwatch.Metric{m.metrics[i]}
-		if i+1 < len(m.metrics) {
-			page = append(page, m.metrics[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&cloudwatch.ListMetricsOutput{Metrics: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockCloudwatch) ListMetrics(ctx context.Context, input *cloudwatch.ListMetricsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	return &cloudwatch.ListMetricsOutput{Metrics: m.metrics}, nil
 }
 
-func (m *mockCloudwatch) DescribeAlarmsPages(input *cloudwatch.DescribeAlarmsInput, fn func(p *cloudwatch.DescribeAlarmsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*cloudwatch.MetricAlarm
-	for i := 0; i < len(m.metricalarms); i += 2 {
-		page := []*cloudwatch.MetricAlarm{m.metricalarms[i]}
-		if i+1 < len(m.metricalarms) {
-			page = append(page, m.metricalarms[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&cloudwatch.DescribeAlarmsOutput{MetricAlarms: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockCloudwatch) DescribeAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsOutput, error) {
+	return &cloudwatch.DescribeAlarmsOutput{MetricAlarms: m.metricalarms}, nil
 }
 
 type mockCloudfront struct {
-	cloudfrontiface.CloudFrontAPI
-	distributionsummarys []*cloudfront.DistributionSummary
+	distributionsummarys []cloudfronttypes.DistributionSummary
 }
 
 func (m *mockCloudfront) Name() string {
@@ -1050,8 +784,7 @@ func (m *mockCloudfront) FetchByType(context.Context, string) (cloud.GraphAPI, e
 }
 
 type mockCloudformation struct {
-	cloudformationiface.CloudFormationAPI
-	stacks []*cloudformation.Stack
+	stacks []cloudformationtypes.Stack
 }
 
 func (m *mockCloudformation) Name() string {
@@ -1090,26 +823,12 @@ func (m *mockCloudformation) FetchByType(context.Context, string) (cloud.GraphAP
 	return nil, nil
 }
 
-func (m *mockCloudformation) DescribeStacksPages(input *cloudformation.DescribeStacksInput, fn func(p *cloudformation.DescribeStacksOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*cloudformation.Stack
-	for i := 0; i < len(m.stacks); i += 2 {
-		page := []*cloudformation.Stack{m.stacks[i]}
-		if i+1 < len(m.stacks) {
-			page = append(page, m.stacks[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&cloudformation.DescribeStacksOutput{Stacks: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockCloudformation) DescribeStacks(ctx context.Context, input *cloudformation.DescribeStacksInput, optFns ...func(*cloudformation.Options)) (*cloudformation.DescribeStacksOutput, error) {
+	return &cloudformation.DescribeStacksOutput{Stacks: m.stacks}, nil
 }
 
 type mockEcr struct {
-	ecriface.ECRAPI
-	repositorys []*ecr.Repository
+	repositorys []ecrtypes.Repository
 }
 
 func (m *mockEcr) Name() string {
@@ -1148,33 +867,19 @@ func (m *mockEcr) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockEcr) DescribeRepositoriesPages(input *ecr.DescribeRepositoriesInput, fn func(p *ecr.DescribeRepositoriesOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*ecr.Repository
-	for i := 0; i < len(m.repositorys); i += 2 {
-		page := []*ecr.Repository{m.repositorys[i]}
-		if i+1 < len(m.repositorys) {
-			page = append(page, m.repositorys[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&ecr.DescribeRepositoriesOutput{Repositories: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockEcr) DescribeRepositories(ctx context.Context, input *ecr.DescribeRepositoriesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeRepositoriesOutput, error) {
+	return &ecr.DescribeRepositoriesOutput{Repositories: m.repositorys}, nil
 }
 
 type mockEcs struct {
-	ecsiface.ECSAPI
-	clusters                []*ecs.Cluster
-	clusterNames            []*string
-	taskdefinitions         []*ecs.TaskDefinition
-	taskdefinitionNames     []*string
-	tasks                   map[string][]*ecs.Task
-	tasksNames              map[string][]*string
-	containerinstancesNames map[string][]*string
-	containerinstances      map[string][]*ecs.ContainerInstance
+	clusters                []ecstypes.Cluster
+	clusterNames            []string
+	taskdefinitions         []ecstypes.TaskDefinition
+	taskdefinitionNames     []string
+	tasks                   map[string][]ecstypes.Task
+	tasksNames              map[string][]string
+	containerinstancesNames map[string][]string
+	containerinstances      map[string][]ecstypes.ContainerInstance
 }
 
 func (m *mockEcs) Name() string {
@@ -1213,36 +918,10 @@ func (m *mockEcs) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m *mockEcs) ListClustersPages(input *ecs.ListClustersInput, fn func(p *ecs.ListClustersOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*string
-	for i := 0; i < len(m.clusterNames); i += 2 {
-		page := []*string{m.clusterNames[i]}
-		if i+1 < len(m.clusterNames) {
-			page = append(page, m.clusterNames[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&ecs.ListClustersOutput{ClusterArns: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockEcs) ListClusters(ctx context.Context, input *ecs.ListClustersInput, optFns ...func(*ecs.Options)) (*ecs.ListClustersOutput, error) {
+	return &ecs.ListClustersOutput{ClusterArns: m.clusterNames}, nil
 }
 
-func (m *mockEcs) ListTaskDefinitionsPages(input *ecs.ListTaskDefinitionsInput, fn func(p *ecs.ListTaskDefinitionsOutput, lastPage bool) (shouldContinue bool)) error {
-	var pages [][]*string
-	for i := 0; i < len(m.taskdefinitionNames); i += 2 {
-		page := []*string{m.taskdefinitionNames[i]}
-		if i+1 < len(m.taskdefinitionNames) {
-			page = append(page, m.taskdefinitionNames[i+1])
-		}
-		pages = append(pages, page)
-	}
-	for i, page := range pages {
-		fn(&ecs.ListTaskDefinitionsOutput{TaskDefinitionArns: page, NextToken: aws.String(strconv.Itoa(i + 1))},
-			i < len(pages),
-		)
-	}
-	return nil
+func (m *mockEcs) ListTaskDefinitions(ctx context.Context, input *ecs.ListTaskDefinitionsInput, optFns ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error) {
+	return &ecs.ListTaskDefinitionsOutput{TaskDefinitionArns: m.taskdefinitionNames}, nil
 }

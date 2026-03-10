@@ -16,13 +16,14 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/env"
@@ -33,7 +34,7 @@ type CreateLoadbalancer struct {
 	_              string `action:"create" entity:"loadbalancer" awsAPI:"elbv2" awsCall:"CreateLoadBalancer" awsInput:"elbv2.CreateLoadBalancerInput" awsOutput:"elbv2.CreateLoadBalancerOutput"`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            elbv2iface.ELBV2API
+	api            *elbv2.Client
 	Name           *string   `awsName:"Name" awsType:"awsstr" templateName:"name"`
 	Subnets        []*string `awsName:"Subnets" awsType:"awsstringslice" templateName:"subnets"`
 	SubnetMappings []*string `awsName:"SubnetMappings" awsType:"awssubnetmappings" templateName:"subnet-mappings"`
@@ -51,14 +52,14 @@ func (cmd *CreateLoadbalancer) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateLoadbalancer) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*elbv2.CreateLoadBalancerOutput).LoadBalancers[0].LoadBalancerArn)
+	return awssdk.ToString(i.(*elbv2.CreateLoadBalancerOutput).LoadBalancers[0].LoadBalancerArn)
 }
 
 type DeleteLoadbalancer struct {
 	_      string `action:"delete" entity:"loadbalancer" awsAPI:"elbv2" awsCall:"DeleteLoadBalancer" awsInput:"elbv2.DeleteLoadBalancerInput" awsOutput:"elbv2.DeleteLoadBalancerOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    elbv2iface.ELBV2API
+	api    *elbv2.Client
 	Id     *string `awsName:"LoadBalancerArn" awsType:"awsstr" templateName:"id"`
 }
 
@@ -70,7 +71,7 @@ type CheckLoadbalancer struct {
 	_       string `action:"check" entity:"loadbalancer" awsAPI:"elbv2"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     elbv2iface.ELBV2API
+	api     *elbv2.Client
 	Id      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -86,7 +87,7 @@ func (cmd *CheckLoadbalancer) ParamsSpec() params.Spec {
 
 func (cmd *CheckLoadbalancer) ManualRun(renv env.Running) (interface{}, error) {
 	input := &elbv2.DescribeLoadBalancersInput{
-		LoadBalancerArns: []*string{cmd.Id},
+		LoadBalancerArns: []string{awssdk.ToString(cmd.Id)},
 	}
 
 	c := &checker{
@@ -94,10 +95,10 @@ func (cmd *CheckLoadbalancer) ManualRun(renv env.Running) (interface{}, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeLoadBalancers(input)
+			output, err := cmd.api.DescribeLoadBalancers(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(awserr.Error); ok {
-					if awserr.Code() == "LoadBalancerNotFound" {
+				if awserr, ok := err.(smithy.APIError); ok {
+					if awserr.ErrorCode() == "LoadBalancerNotFound" {
 						return notFoundState, nil
 					}
 				} else {
@@ -106,7 +107,7 @@ func (cmd *CheckLoadbalancer) ManualRun(renv env.Running) (interface{}, error) {
 			} else {
 				for _, lb := range output.LoadBalancers {
 					if StringValue(lb.LoadBalancerArn) == StringValue(cmd.Id) {
-						return StringValue(lb.State.Code), nil
+						return string(lb.State.Code), nil
 					}
 				}
 			}

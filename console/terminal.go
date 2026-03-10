@@ -23,11 +23,11 @@ import (
 	"os/signal"
 
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func GetTerminalWidth() int {
-	w, _, err := terminal.GetSize(int(os.Stdout.Fd()))
+	w, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		return 0
 	}
@@ -35,7 +35,7 @@ func GetTerminalWidth() int {
 }
 
 func GetTerminalHeight() int {
-	_, h, err := terminal.GetSize(int(os.Stdout.Fd()))
+	_, h, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		return 0
 	}

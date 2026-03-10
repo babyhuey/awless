@@ -23,22 +23,41 @@ package awsfetch
 import (
 	"context"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/acm"
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/cloudfront"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ecr"
-	"github.com/aws/aws-sdk-go/service/elb"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/aws/aws-sdk-go/service/sns"
-	"github.com/wallix/awless/aws/conv"
+	acm "github.com/aws/aws-sdk-go-v2/service/acm"
+	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
+	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
+	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
+	efs "github.com/aws/aws-sdk-go-v2/service/efs"
+	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
+	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	iam "github.com/aws/aws-sdk-go-v2/service/iam"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	rds "github.com/aws/aws-sdk-go-v2/service/rds"
+	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
+	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
+	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
+	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sns "github.com/aws/aws-sdk-go-v2/service/sns"
+	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
+	ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
+	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
+	awsconv "github.com/wallix/awless/aws/conv"
 	"github.com/wallix/awless/fetch"
 	"github.com/wallix/awless/graph"
 )
@@ -50,47 +69,44 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["instance"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.Instance
+		var objects []ec2types.Instance
 
 		if !conf.getBoolDefaultTrue("aws.infra.instance.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[instance]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Ec2.DescribeInstancesPages(&ec2.DescribeInstancesInput{},
-			func(out *ec2.DescribeInstancesOutput, lastPage bool) (shouldContinue bool) {
-				for _, all := range out.Reservations {
-					for _, output := range all.Instances {
-						if badResErr != nil {
-							return false
-						}
-						objects = append(objects, output)
-						var res *graph.Resource
-						if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-							return false
-						}
-						resources = append(resources, res)
+		paginator := ec2.NewDescribeInstancesPaginator(conf.APIs.Ec2, &ec2.DescribeInstancesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, all := range out.Reservations {
+				for _, output := range all.Instances {
+					objects = append(objects, output)
+					var res *graph.Resource
+					res, err = awsconv.NewResource(output)
+					if err != nil {
+						return resources, objects, err
 					}
+					resources = append(resources, res)
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["subnet"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.Subnet
+		var objects []ec2types.Subnet
 
 		if !conf.getBoolDefaultTrue("aws.infra.subnet.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[subnet]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeSubnets(&ec2.DescribeSubnetsInput{})
+		out, err := conf.APIs.Ec2.DescribeSubnets(ctx, &ec2.DescribeSubnetsInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -109,14 +125,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["vpc"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.Vpc
+		var objects []ec2types.Vpc
 
 		if !conf.getBoolDefaultTrue("aws.infra.vpc.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[vpc]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeVpcs(&ec2.DescribeVpcsInput{})
+		out, err := conf.APIs.Ec2.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -135,14 +151,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["keypair"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.KeyPairInfo
+		var objects []ec2types.KeyPairInfo
 
 		if !conf.getBoolDefaultTrue("aws.infra.keypair.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[keypair]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeKeyPairs(&ec2.DescribeKeyPairsInput{})
+		out, err := conf.APIs.Ec2.DescribeKeyPairs(ctx, &ec2.DescribeKeyPairsInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -161,14 +177,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["securitygroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.SecurityGroup
+		var objects []ec2types.SecurityGroup
 
 		if !conf.getBoolDefaultTrue("aws.infra.securitygroup.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[securitygroup]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{})
+		out, err := conf.APIs.Ec2.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -187,45 +203,42 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["volume"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.Volume
+		var objects []ec2types.Volume
 
 		if !conf.getBoolDefaultTrue("aws.infra.volume.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[volume]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Ec2.DescribeVolumesPages(&ec2.DescribeVolumesInput{},
-			func(out *ec2.DescribeVolumesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Volumes {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := ec2.NewDescribeVolumesPaginator(conf.APIs.Ec2, &ec2.DescribeVolumesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Volumes {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["internetgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.InternetGateway
+		var objects []ec2types.InternetGateway
 
 		if !conf.getBoolDefaultTrue("aws.infra.internetgateway.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[internetgateway]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeInternetGateways(&ec2.DescribeInternetGatewaysInput{})
+		out, err := conf.APIs.Ec2.DescribeInternetGateways(ctx, &ec2.DescribeInternetGatewaysInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -244,14 +257,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["natgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.NatGateway
+		var objects []ec2types.NatGateway
 
 		if !conf.getBoolDefaultTrue("aws.infra.natgateway.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[natgateway]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeNatGateways(&ec2.DescribeNatGatewaysInput{})
+		out, err := conf.APIs.Ec2.DescribeNatGateways(ctx, &ec2.DescribeNatGatewaysInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -270,14 +283,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["routetable"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.RouteTable
+		var objects []ec2types.RouteTable
 
 		if !conf.getBoolDefaultTrue("aws.infra.routetable.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[routetable]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeRouteTables(&ec2.DescribeRouteTablesInput{})
+		out, err := conf.APIs.Ec2.DescribeRouteTables(ctx, &ec2.DescribeRouteTablesInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -296,14 +309,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["availabilityzone"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.AvailabilityZone
+		var objects []ec2types.AvailabilityZone
 
 		if !conf.getBoolDefaultTrue("aws.infra.availabilityzone.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[availabilityzone]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeAvailabilityZones(&ec2.DescribeAvailabilityZonesInput{})
+		out, err := conf.APIs.Ec2.DescribeAvailabilityZones(ctx, &ec2.DescribeAvailabilityZonesInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -322,14 +335,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["image"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.Image
+		var objects []ec2types.Image
 
 		if !conf.getBoolDefaultTrue("aws.infra.image.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[image]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeImages(&ec2.DescribeImagesInput{Owners: []*string{awssdk.String("self")}})
+		out, err := conf.APIs.Ec2.DescribeImages(ctx, &ec2.DescribeImagesInput{Owners: []string{"self"}})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -348,14 +361,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["importimagetask"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.ImportImageTask
+		var objects []ec2types.ImportImageTask
 
 		if !conf.getBoolDefaultTrue("aws.infra.importimagetask.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[importimagetask]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeImportImageTasks(&ec2.DescribeImportImageTasksInput{})
+		out, err := conf.APIs.Ec2.DescribeImportImageTasks(ctx, &ec2.DescribeImportImageTasksInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -374,14 +387,14 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["elasticip"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.Address
+		var objects []ec2types.Address
 
 		if !conf.getBoolDefaultTrue("aws.infra.elasticip.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[elasticip]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeAddresses(&ec2.DescribeAddressesInput{})
+		out, err := conf.APIs.Ec2.DescribeAddresses(ctx, &ec2.DescribeAddressesInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -400,45 +413,42 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["snapshot"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.Snapshot
+		var objects []ec2types.Snapshot
 
 		if !conf.getBoolDefaultTrue("aws.infra.snapshot.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[snapshot]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Ec2.DescribeSnapshotsPages(&ec2.DescribeSnapshotsInput{OwnerIds: []*string{awssdk.String("self")}},
-			func(out *ec2.DescribeSnapshotsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Snapshots {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := ec2.NewDescribeSnapshotsPaginator(conf.APIs.Ec2, &ec2.DescribeSnapshotsInput{OwnerIds: []string{"self"}})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Snapshots {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["networkinterface"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ec2.NetworkInterface
+		var objects []ec2types.NetworkInterface
 
 		if !conf.getBoolDefaultTrue("aws.infra.networkinterface.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[networkinterface]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Ec2.DescribeNetworkInterfaces(&ec2.DescribeNetworkInterfacesInput{})
+		out, err := conf.APIs.Ec2.DescribeNetworkInterfaces(ctx, &ec2.DescribeNetworkInterfacesInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -457,76 +467,70 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["classicloadbalancer"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*elb.LoadBalancerDescription
+		var objects []elbtypes.LoadBalancerDescription
 
 		if !conf.getBoolDefaultTrue("aws.infra.classicloadbalancer.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[classicloadbalancer]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Elb.DescribeLoadBalancersPages(&elb.DescribeLoadBalancersInput{},
-			func(out *elb.DescribeLoadBalancersOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.LoadBalancerDescriptions {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := elb.NewDescribeLoadBalancersPaginator(conf.APIs.Elb, &elb.DescribeLoadBalancersInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.LoadBalancerDescriptions {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextMarker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["loadbalancer"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*elbv2.LoadBalancer
+		var objects []elbv2types.LoadBalancer
 
 		if !conf.getBoolDefaultTrue("aws.infra.loadbalancer.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[loadbalancer]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Elbv2.DescribeLoadBalancersPages(&elbv2.DescribeLoadBalancersInput{},
-			func(out *elbv2.DescribeLoadBalancersOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.LoadBalancers {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := elbv2.NewDescribeLoadBalancersPaginator(conf.APIs.Elbv2, &elbv2.DescribeLoadBalancersInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.LoadBalancers {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextMarker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["targetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*elbv2.TargetGroup
+		var objects []elbv2types.TargetGroup
 
 		if !conf.getBoolDefaultTrue("aws.infra.targetgroup.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[targetgroup]")
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Elbv2.DescribeTargetGroups(&elbv2.DescribeTargetGroupsInput{})
+		out, err := conf.APIs.Elbv2.DescribeTargetGroups(ctx, &elbv2.DescribeTargetGroupsInput{})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -545,219 +549,198 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["database"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*rds.DBInstance
+		var objects []rdstypes.DBInstance
 
 		if !conf.getBoolDefaultTrue("aws.infra.database.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[database]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Rds.DescribeDBInstancesPages(&rds.DescribeDBInstancesInput{},
-			func(out *rds.DescribeDBInstancesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.DBInstances {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := rds.NewDescribeDBInstancesPaginator(conf.APIs.Rds, &rds.DescribeDBInstancesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.DBInstances {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.Marker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["dbsubnetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*rds.DBSubnetGroup
+		var objects []rdstypes.DBSubnetGroup
 
 		if !conf.getBoolDefaultTrue("aws.infra.dbsubnetgroup.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[dbsubnetgroup]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Rds.DescribeDBSubnetGroupsPages(&rds.DescribeDBSubnetGroupsInput{},
-			func(out *rds.DescribeDBSubnetGroupsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.DBSubnetGroups {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := rds.NewDescribeDBSubnetGroupsPaginator(conf.APIs.Rds, &rds.DescribeDBSubnetGroupsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.DBSubnetGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.Marker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["launchconfiguration"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*autoscaling.LaunchConfiguration
+		var objects []autoscalingtypes.LaunchConfiguration
 
 		if !conf.getBoolDefaultTrue("aws.infra.launchconfiguration.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[launchconfiguration]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Autoscaling.DescribeLaunchConfigurationsPages(&autoscaling.DescribeLaunchConfigurationsInput{},
-			func(out *autoscaling.DescribeLaunchConfigurationsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.LaunchConfigurations {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := autoscaling.NewDescribeLaunchConfigurationsPaginator(conf.APIs.Autoscaling, &autoscaling.DescribeLaunchConfigurationsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.LaunchConfigurations {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["scalinggroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*autoscaling.Group
+		var objects []autoscalingtypes.AutoScalingGroup
 
 		if !conf.getBoolDefaultTrue("aws.infra.scalinggroup.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[scalinggroup]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Autoscaling.DescribeAutoScalingGroupsPages(&autoscaling.DescribeAutoScalingGroupsInput{},
-			func(out *autoscaling.DescribeAutoScalingGroupsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.AutoScalingGroups {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := autoscaling.NewDescribeAutoScalingGroupsPaginator(conf.APIs.Autoscaling, &autoscaling.DescribeAutoScalingGroupsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.AutoScalingGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["scalingpolicy"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*autoscaling.ScalingPolicy
+		var objects []autoscalingtypes.ScalingPolicy
 
 		if !conf.getBoolDefaultTrue("aws.infra.scalingpolicy.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[scalingpolicy]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Autoscaling.DescribePoliciesPages(&autoscaling.DescribePoliciesInput{},
-			func(out *autoscaling.DescribePoliciesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.ScalingPolicies {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := autoscaling.NewDescribePoliciesPaginator(conf.APIs.Autoscaling, &autoscaling.DescribePoliciesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.ScalingPolicies {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["repository"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*ecr.Repository
+		var objects []ecrtypes.Repository
 
 		if !conf.getBoolDefaultTrue("aws.infra.repository.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[repository]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Ecr.DescribeRepositoriesPages(&ecr.DescribeRepositoriesInput{},
-			func(out *ecr.DescribeRepositoriesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Repositories {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := ecr.NewDescribeRepositoriesPaginator(conf.APIs.Ecr, &ecr.DescribeRepositoriesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Repositories {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["certificate"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*acm.CertificateSummary
+		var objects []acmtypes.CertificateSummary
 
 		if !conf.getBoolDefaultTrue("aws.infra.certificate.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource infra[certificate]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Acm.ListCertificatesPages(&acm.ListCertificatesInput{},
-			func(out *acm.ListCertificatesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.CertificateSummaryList {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := acm.NewListCertificatesPaginator(conf.APIs.Acm, &acm.ListCertificatesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.CertificateSummaryList {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 	return funcs
 }
@@ -768,64 +751,58 @@ func BuildAccessFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["instanceprofile"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*iam.InstanceProfile
+		var objects []iamtypes.InstanceProfile
 
 		if !conf.getBoolDefaultTrue("aws.access.instanceprofile.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource access[instanceprofile]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Iam.ListInstanceProfilesPages(&iam.ListInstanceProfilesInput{},
-			func(out *iam.ListInstanceProfilesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.InstanceProfiles {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := iam.NewListInstanceProfilesPaginator(conf.APIs.Iam, &iam.ListInstanceProfilesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.InstanceProfiles {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.Marker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["mfadevice"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*iam.VirtualMFADevice
+		var objects []iamtypes.VirtualMFADevice
 
 		if !conf.getBoolDefaultTrue("aws.access.mfadevice.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource access[mfadevice]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Iam.ListVirtualMFADevicesPages(&iam.ListVirtualMFADevicesInput{},
-			func(out *iam.ListVirtualMFADevicesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.VirtualMFADevices {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := iam.NewListVirtualMFADevicesPaginator(conf.APIs.Iam, &iam.ListVirtualMFADevicesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.VirtualMFADevices {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.Marker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 	return funcs
 }
@@ -842,64 +819,58 @@ func BuildMessagingFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["subscription"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*sns.Subscription
+		var objects []snstypes.Subscription
 
 		if !conf.getBoolDefaultTrue("aws.messaging.subscription.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource messaging[subscription]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Sns.ListSubscriptionsPages(&sns.ListSubscriptionsInput{},
-			func(out *sns.ListSubscriptionsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Subscriptions {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := sns.NewListSubscriptionsPaginator(conf.APIs.Sns, &sns.ListSubscriptionsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Subscriptions {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["topic"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*sns.Topic
+		var objects []snstypes.Topic
 
 		if !conf.getBoolDefaultTrue("aws.messaging.topic.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource messaging[topic]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Sns.ListTopicsPages(&sns.ListTopicsInput{},
-			func(out *sns.ListTopicsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Topics {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := sns.NewListTopicsPaginator(conf.APIs.Sns, &sns.ListTopicsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Topics {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 	return funcs
 }
@@ -910,33 +881,30 @@ func BuildDnsFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["zone"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*route53.HostedZone
+		var objects []route53types.HostedZone
 
 		if !conf.getBoolDefaultTrue("aws.dns.zone.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource dns[zone]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Route53.ListHostedZonesPages(&route53.ListHostedZonesInput{},
-			func(out *route53.ListHostedZonesOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.HostedZones {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := route53.NewListHostedZonesPaginator(conf.APIs.Route53, &route53.ListHostedZonesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.HostedZones {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextMarker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 	return funcs
 }
@@ -947,33 +915,30 @@ func BuildLambdaFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["function"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*lambda.FunctionConfiguration
+		var objects []lambdatypes.FunctionConfiguration
 
 		if !conf.getBoolDefaultTrue("aws.lambda.function.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource lambda[function]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Lambda.ListFunctionsPages(&lambda.ListFunctionsInput{},
-			func(out *lambda.ListFunctionsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Functions {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := lambda.NewListFunctionsPaginator(conf.APIs.Lambda, &lambda.ListFunctionsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Functions {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextMarker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 	return funcs
 }
@@ -984,64 +949,58 @@ func BuildMonitoringFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["metric"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*cloudwatch.Metric
+		var objects []cloudwatchtypes.Metric
 
 		if !conf.getBoolDefaultTrue("aws.monitoring.metric.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource monitoring[metric]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Cloudwatch.ListMetricsPages(&cloudwatch.ListMetricsInput{},
-			func(out *cloudwatch.ListMetricsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Metrics {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := cloudwatch.NewListMetricsPaginator(conf.APIs.Cloudwatch, &cloudwatch.ListMetricsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Metrics {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 
 	funcs["alarm"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*cloudwatch.MetricAlarm
+		var objects []cloudwatchtypes.MetricAlarm
 
 		if !conf.getBoolDefaultTrue("aws.monitoring.alarm.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource monitoring[alarm]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Cloudwatch.DescribeAlarmsPages(&cloudwatch.DescribeAlarmsInput{},
-			func(out *cloudwatch.DescribeAlarmsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.MetricAlarms {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := cloudwatch.NewDescribeAlarmsPaginator(conf.APIs.Cloudwatch, &cloudwatch.DescribeAlarmsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.MetricAlarms {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 	return funcs
 }
@@ -1052,33 +1011,30 @@ func BuildCdnFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["distribution"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*cloudfront.DistributionSummary
+		var objects []cloudfronttypes.DistributionSummary
 
 		if !conf.getBoolDefaultTrue("aws.cdn.distribution.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource cdn[distribution]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Cloudfront.ListDistributionsPages(&cloudfront.ListDistributionsInput{},
-			func(out *cloudfront.ListDistributionsOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.DistributionList.Items {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := cloudfront.NewListDistributionsPaginator(conf.APIs.Cloudfront, &cloudfront.ListDistributionsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.DistributionList.Items {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.DistributionList.NextMarker != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 	}
 	return funcs
 }
@@ -1089,33 +1045,150 @@ func BuildCloudformationFetchFuncs(conf *Config) fetch.Funcs {
 
 	funcs["stack"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*cloudformation.Stack
+		var objects []cloudformationtypes.Stack
 
 		if !conf.getBoolDefaultTrue("aws.cloudformation.stack.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource cloudformation[stack]")
 			return resources, objects, nil
 		}
-		var badResErr error
-		err := conf.APIs.Cloudformation.DescribeStacksPages(&cloudformation.DescribeStacksInput{},
-			func(out *cloudformation.DescribeStacksOutput, lastPage bool) (shouldContinue bool) {
-				for _, output := range out.Stacks {
-					if badResErr != nil {
-						return false
-					}
-					objects = append(objects, output)
-					var res *graph.Resource
-					if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-						return false
-					}
-					resources = append(resources, res)
+		paginator := cloudformation.NewDescribeStacksPaginator(conf.APIs.Cloudformation, &cloudformation.DescribeStacksInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Stacks {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
-				return out.NextToken != nil
-			})
-		if err != nil {
-			return resources, objects, err
+				resources = append(resources, res)
+			}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildEksFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualEksFetchFuncs(conf, funcs)
+	return funcs
+}
+func BuildDynamodbFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualDynamodbFetchFuncs(conf, funcs)
+	return funcs
+}
+func BuildSecretsmanagerFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualSecretsmanagerFetchFuncs(conf, funcs)
+
+	funcs["secret"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+		var resources []*graph.Resource
+		var objects []secretsmanagertypes.SecretListEntry
+
+		if !conf.getBoolDefaultTrue("aws.secretsmanager.secret.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource secretsmanager[secret]")
+			return resources, objects, nil
+		}
+		paginator := secretsmanager.NewListSecretsPaginator(conf.APIs.Secretsmanager, &secretsmanager.ListSecretsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.SecretList {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildApigatewayFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualApigatewayFetchFuncs(conf, funcs)
+	return funcs
+}
+func BuildSsmFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualSsmFetchFuncs(conf, funcs)
+
+	funcs["ssmparameter"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+		var resources []*graph.Resource
+		var objects []ssmtypes.ParameterMetadata
+
+		if !conf.getBoolDefaultTrue("aws.ssm.ssmparameter.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource ssm[ssmparameter]")
+			return resources, objects, nil
+		}
+		paginator := ssm.NewDescribeParametersPaginator(conf.APIs.Ssm, &ssm.DescribeParametersInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Parameters {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildEfsFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualEfsFetchFuncs(conf, funcs)
+
+	funcs["filesystem"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+		var resources []*graph.Resource
+		var objects []efstypes.FileSystemDescription
+
+		if !conf.getBoolDefaultTrue("aws.efs.filesystem.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource efs[filesystem]")
+			return resources, objects, nil
+		}
+		paginator := efs.NewDescribeFileSystemsPaginator(conf.APIs.Efs, &efs.DescribeFileSystemsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.FileSystems {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
 	}
 	return funcs
 }

@@ -24,11 +24,22 @@ import (
 )
 
 func generateTestMocks() {
+	// Build a set of APIs that need types imports based on AWSType references
+	apisNeedingTypes := make(map[string]bool)
+	for _, mock := range aws.Mocks() {
+		for _, f := range mock.Funcs {
+			if f.AWSType != "" && strings.Contains(f.AWSType, "types.") {
+				apisNeedingTypes[mock.Api] = true
+			}
+		}
+	}
+
 	templ, err := template.New("mocks").Funcs(template.FuncMap{
-		"Title":          strings.Title,
-		"ToUpper":        strings.ToUpper,
-		"Join":           strings.Join,
-		"ApiToInterface": aws.ApiToInterface,
+		"Title":            strings.Title,
+		"ToUpper":          strings.ToUpper,
+		"Join":             strings.Join,
+		"SdkModulePath":    aws.SdkModulePath,
+		"NeedsTypesImport": func(api string) bool { return apisNeedingTypes[api] },
 	}).Parse(mocksTempl)
 
 	if err != nil {
@@ -60,17 +71,28 @@ package awsservices
 
 // DO NOT EDIT - This file was automatically generated with go generate
 
+import (
+  "context"
+
+  {{- range $index, $mock := . }}
+  {{ $mock.Api }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $mock.Api }}"
+  {{- if NeedsTypesImport $mock.Api }}
+  {{ $mock.Api }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $mock.Api }}/types"
+  {{- end }}
+  {{- end }}
+  "github.com/wallix/awless/cloud"
+)
+
 {{ range $, $mock := . }}
 
 type {{ $mock.Name }} struct {
-	{{ $mock.Api }}iface.{{ ApiToInterface $mock.Api }}
 	{{- range $, $func := $mock.Funcs }}
 	{{- if eq $func.MockFieldType "mapslice" }}
-		{{ $func.MockField}} map[string][]*{{ $func.AWSType }}
+		{{ $func.MockField}} map[string][]{{ $func.AWSType }}
 	{{- else if eq $func.MockFieldType "map" }}
 			{{ $func.MockField}} map[string]{{ $func.AWSType }}
 	{{- else }}
-		{{ $func.MockField}} []*{{ $func.AWSType }}
+		{{ $func.MockField}} []{{ $func.AWSType }}
 	{{- end }}
 	{{- end }}
 }
@@ -114,28 +136,9 @@ func (m * {{ $mock.Name }}) FetchByType(context.Context, string) (cloud.GraphAPI
 {{ range $, $func := $mock.Funcs }}
 	{{- if not $func.Manual }}
 		{{- if eq $func.FuncType "list" }}
-			{{- if $func.Multipage }}
-				func (m * {{ $mock.Name }}) {{ $func.ApiMethod }}(input *{{ $func.Input }}, fn func(p *{{ $func.Output}}, lastPage bool) (shouldContinue bool)) error {
-					var pages [][]*{{ $func.AWSType }}
-					for i := 0; i < len(m.{{ $func.MockField}}); i += 2 {
-						page := []*{{ $func.AWSType }}{m.{{ $func.MockField}}[i]}
-						if i+1 < len(m.{{ $func.MockField}}) {
-							page = append(page, m.{{ $func.MockField}}[i+1])
-						}
-						pages = append(pages, page)
-					}
-					for i, page := range pages {
-						fn(&{{ $func.Output }} { {{ $func.OutputsExtractor }}: page, {{ $func.NextPageMarker }}: aws.String(strconv.Itoa(i + 1))},
-							i < len(pages),
-						)
-					}
-					return nil
-				}
-			{{ else }}
-				func (m * {{ $mock.Name }}) {{ $func.ApiMethod }}(input *{{ $func.Input }}) (*{{ $func.Output}}, error ){
-					return &{{ $func.Output}}{ {{ $func.OutputsExtractor }}: m.{{ $func.MockField}} }, nil
-				}
-			{{ end }}
+			func (m * {{ $mock.Name }}) {{ $func.ApiMethod }}(ctx context.Context, input *{{ $func.Input }}, optFns ...func(*{{ $mock.Api }}.Options)) (*{{ $func.Output}}, error) {
+				return &{{ $func.Output}}{ {{ $func.OutputsExtractor }}: m.{{ $func.MockField}} }, nil
+			}
 		{{- end }}
 	{{- end }}
 

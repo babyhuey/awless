@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"mime"
 	"os"
 	"path/filepath"
@@ -24,10 +25,10 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/mitchellh/ioprogress"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -35,7 +36,7 @@ type CreateS3object struct {
 	_      string `action:"create" entity:"s3object" awsAPI:"s3"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    s3iface.S3API
+	api    *s3.Client
 	Bucket *string `awsName:"Bucket" awsType:"awsstr" templateName:"bucket"`
 	File   *string `awsName:"Body" awsType:"awsstr" templateName:"file"`
 	Name   *string `awsName:"Key" awsType:"awsstr" templateName:"name"`
@@ -90,7 +91,7 @@ func (cmd *CreateS3object) ManualRun(env.Running) (interface{}, error) {
 
 	cmd.logger.Infof("uploading '%s'", fileName)
 
-	if _, err = cmd.api.PutObject(input); err != nil {
+	if _, err = cmd.api.PutObject(context.Background(), input); err != nil {
 		return nil, err
 	}
 
@@ -105,7 +106,7 @@ type UpdateS3object struct {
 	_       string `action:"update" entity:"s3object" awsAPI:"s3" awsCall:"PutObjectAcl" awsInput:"s3.PutObjectAclInput" awsOutput:"s3.PutObjectAclOutput"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     s3iface.S3API
+	api     *s3.Client
 	Bucket  *string `awsName:"Bucket" awsType:"awsstr" templateName:"bucket"`
 	Name    *string `awsName:"Key" awsType:"awsstr" templateName:"name"`
 	Acl     *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
@@ -122,7 +123,7 @@ type DeleteS3object struct {
 	_      string `action:"delete" entity:"s3object" awsAPI:"s3" awsCall:"DeleteObject" awsInput:"s3.DeleteObjectInput" awsOutput:"s3.DeleteObjectOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    s3iface.S3API
+	api    *s3.Client
 	Bucket *string `awsName:"Bucket" awsType:"awsstr" templateName:"bucket"`
 	Name   *string `awsName:"Key" awsType:"awsstr" templateName:"name"`
 }

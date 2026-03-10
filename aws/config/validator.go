@@ -3,7 +3,6 @@ package awsconfig
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -12,7 +11,6 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/chzyer/readline"
 )
 
@@ -111,11 +109,10 @@ func StdinInstanceTypeSelector() string {
 }
 
 func IsValidRegion(given string) bool {
-	reg, _ := regexp.Compile("^(us|eu|ap|sa|ca)\\-\\w+\\-\\d+$")
-	regChina, _ := regexp.Compile("^cn\\-\\w+\\-\\d+$")
-	regUsGov, _ := regexp.Compile("^us\\-gov\\-\\w+\\-\\d+$")
+	reg, _ := regexp.Compile("^(us|eu|ap|sa|ca|af|me|il|cn)\\-\\w+\\-\\d+$")
+	regCompound, _ := regexp.Compile("^(us\\-gov|us\\-iso|us\\-isob|eu\\-isoe)\\-\\w+\\-\\d+$")
 
-	return reg.MatchString(given) || regChina.MatchString(given) || regUsGov.MatchString(given)
+	return reg.MatchString(given) || regCompound.MatchString(given)
 }
 
 func isValidInstanceType(given string) bool {
@@ -123,12 +120,41 @@ func isValidInstanceType(given string) bool {
 }
 
 func allRegions() []string {
-	var regions sort.StringSlice
-	partitions := endpoints.DefaultResolver().(endpoints.EnumPartitions).Partitions()
-	for _, p := range partitions {
-		for id := range p.Regions() {
-			regions = append(regions, id)
-		}
+	regions := sort.StringSlice{
+		"af-south-1",
+		"ap-east-1",
+		"ap-northeast-1",
+		"ap-northeast-2",
+		"ap-northeast-3",
+		"ap-south-1",
+		"ap-south-2",
+		"ap-southeast-1",
+		"ap-southeast-2",
+		"ap-southeast-3",
+		"ap-southeast-4",
+		"ap-southeast-5",
+		"ca-central-1",
+		"ca-west-1",
+		"cn-north-1",
+		"cn-northwest-1",
+		"eu-central-1",
+		"eu-central-2",
+		"eu-north-1",
+		"eu-south-1",
+		"eu-south-2",
+		"eu-west-1",
+		"eu-west-2",
+		"eu-west-3",
+		"il-central-1",
+		"me-central-1",
+		"me-south-1",
+		"sa-east-1",
+		"us-east-1",
+		"us-east-2",
+		"us-gov-east-1",
+		"us-gov-west-1",
+		"us-west-1",
+		"us-west-2",
 	}
 	sort.Sort(regions)
 	return regions
@@ -149,7 +175,7 @@ func AllProfiles() (profiles []string) {
 		if _, err := os.Stat(f); err != nil {
 			continue
 		}
-		out, err := ioutil.ReadFile(f)
+		out, err := os.ReadFile(f)
 		if err != nil {
 			continue
 		}

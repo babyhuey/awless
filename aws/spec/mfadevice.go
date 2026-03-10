@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -24,17 +25,17 @@ import (
 	"strings"
 	"time"
 
+	awsconfig "github.com/wallix/awless/aws/config"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
 	"github.com/chzyer/readline"
 	"github.com/fatih/color"
-	"github.com/wallix/awless/aws/config"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -42,7 +43,7 @@ type CreateMfadevice struct {
 	_      string `action:"create" entity:"mfadevice" awsAPI:"iam"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `templateName:"name"`
 }
 
@@ -59,7 +60,7 @@ func (cmd *CreateMfadevice) ManualRun(renv env.Running) (interface{}, error) {
 
 	start := time.Now()
 	var output *iam.CreateVirtualMFADeviceOutput
-	output, err = cmd.api.CreateVirtualMFADevice(input)
+	output, err = cmd.api.CreateVirtualMFADevice(context.Background(), input)
 	if err != nil {
 		return nil, fmt.Errorf("%s", err)
 	}
@@ -91,7 +92,7 @@ type DeleteMfadevice struct {
 	_      string `action:"delete" entity:"mfadevice" awsAPI:"iam" awsCall:"DeleteVirtualMFADevice" awsInput:"iam.DeleteVirtualMFADeviceInput" awsOutput:"iam.DeleteVirtualMFADeviceOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Id     *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
 }
 
@@ -107,7 +108,7 @@ type AttachMfadevice struct {
 	_        string `action:"attach" entity:"mfadevice" awsAPI:"iam" awsCall:"EnableMFADevice" awsInput:"iam.EnableMFADeviceInput" awsOutput:"iam.EnableMFADeviceOutput"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      iamiface.IAMAPI
+	api      *iam.Client
 	Id       *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
 	User     *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 	MfaCode1 *string `awsName:"AuthenticationCode1" awsType:"aws6digitsstring" templateName:"mfa-code-1"`
@@ -165,7 +166,7 @@ type DetachMfadevice struct {
 	_      string `action:"detach" entity:"mfadevice" awsAPI:"iam" awsCall:"DeactivateMFADevice" awsInput:"iam.DeactivateMFADeviceInput" awsOutput:"iam.DeactivateMFADeviceOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Id     *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
 	User   *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 }
@@ -192,7 +193,7 @@ func displayQRCode(w io.Writer, qrCode barcode.Barcode) {
 }
 
 func promptStringWithDefault(msg, def string) (res string) {
-	fmt.Fprintf(os.Stderr, msg)
+	fmt.Fprintf(os.Stderr, "%s", msg)
 	fmt.Scanln(&res)
 	res = strings.TrimSpace(res)
 	if res == "" {
@@ -201,15 +202,21 @@ func promptStringWithDefault(msg, def string) (res string) {
 	return
 }
 
-func promptRole(api iamiface.IAMAPI) (string, error) {
+func promptRole(api *iam.Client) (string, error) {
 	rolesNameToArn := make(map[string]string)
 
-	err := api.ListRolesPages(&iam.ListRolesInput{}, func(out *iam.ListRolesOutput, lastPage bool) bool {
+	paginator := iam.NewListRolesPaginator(api, &iam.ListRolesInput{})
+	var err error
+	for paginator.HasMorePages() {
+		out, e := paginator.NextPage(context.Background())
+		if e != nil {
+			err = e
+			break
+		}
 		for _, role := range out.Roles {
 			rolesNameToArn[StringValue(role.RoleName)] = StringValue(role.Arn)
 		}
-		return out.Marker != nil
-	})
+	}
 
 	if err == nil && len(rolesNameToArn) > 0 {
 		var roles []readline.PrefixCompleterInterface

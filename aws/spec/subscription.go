@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/sns"
-	"github.com/aws/aws-sdk-go/service/sns/snsiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateSubscription struct {
 	_        string `action:"create" entity:"subscription" awsAPI:"sns" awsCall:"Subscribe" awsInput:"sns.SubscribeInput" awsOutput:"sns.SubscribeOutput"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      snsiface.SNSAPI
+	api      *sns.Client
 	Topic    *string `awsName:"TopicArn" awsType:"awsstr" templateName:"topic"`
 	Endpoint *string `awsName:"Endpoint" awsType:"awsstr" templateName:"endpoint"`
 	Protocol *string `awsName:"Protocol" awsType:"awsstr" templateName:"protocol"`
@@ -39,14 +39,14 @@ func (cmd *CreateSubscription) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateSubscription) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*sns.SubscribeOutput).SubscriptionArn)
+	return awssdk.ToString(i.(*sns.SubscribeOutput).SubscriptionArn)
 }
 
 type DeleteSubscription struct {
 	_      string `action:"delete" entity:"subscription" awsAPI:"sns" awsCall:"Unsubscribe" awsInput:"sns.UnsubscribeInput" awsOutput:"sns.UnsubscribeOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    snsiface.SNSAPI
+	api    *sns.Client
 	Id     *string `awsName:"SubscriptionArn" awsType:"awsstr" templateName:"id"`
 }
 

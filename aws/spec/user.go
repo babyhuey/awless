@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateUser struct {
 	_      string `action:"create" entity:"user" awsAPI:"iam" awsCall:"CreateUser" awsInput:"iam.CreateUserInput" awsOutput:"iam.CreateUserOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `awsName:"UserName" awsType:"awsstr" templateName:"name"`
 }
 
@@ -37,14 +37,14 @@ func (cmd *CreateUser) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateUser) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*iam.CreateUserOutput).User.UserId)
+	return awssdk.ToString(i.(*iam.CreateUserOutput).User.UserId)
 }
 
 type DeleteUser struct {
 	_      string `action:"delete" entity:"user" awsAPI:"iam" awsCall:"DeleteUser" awsInput:"iam.DeleteUserInput" awsOutput:"iam.DeleteUserOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `awsName:"UserName" awsType:"awsstr" templateName:"name"`
 }
 
@@ -56,7 +56,7 @@ type AttachUser struct {
 	_      string `action:"attach" entity:"user" awsAPI:"iam" awsCall:"AddUserToGroup" awsInput:"iam.AddUserToGroupInput" awsOutput:"iam.AddUserToGroupOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Group  *string `awsName:"GroupName" awsType:"awsstr" templateName:"group"`
 	Name   *string `awsName:"UserName" awsType:"awsstr" templateName:"name"`
 }
@@ -69,7 +69,7 @@ type DetachUser struct {
 	_      string `action:"detach" entity:"user" awsAPI:"iam" awsCall:"RemoveUserFromGroup" awsInput:"iam.RemoveUserFromGroupInput" awsOutput:"iam.RemoveUserFromGroupOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Group  *string `awsName:"GroupName" awsType:"awsstr" templateName:"group"`
 	Name   *string `awsName:"UserName" awsType:"awsstr" templateName:"name"`
 }

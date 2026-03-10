@@ -199,7 +199,7 @@ func TestGuessEntityType(t *testing.T) {
 		{hole: "any"},
 		{hole: "inst"},
 		{hole: "gateway"},
-		{hole: "gateway.", types: []string{"internetgateway", "natgateway"}},
+		{hole: "gateway.", types: []string{"internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
 		{hole: "instance", types: []string{"instance"}},
 		{hole: "instance.ip", types: []string{"instance"}, prop: "ip"},
 		{hole: "securitygroup.id", types: []string{"securitygroup"}, prop: "id"},
@@ -209,14 +209,14 @@ func TestGuessEntityType(t *testing.T) {
 		{hole: "subnet.cidr", types: []string{"subnet"}, prop: "cidr"},
 		{hole: "subnet.cidr.any", types: []string{"subnet"}},
 		{hole: "vpc.instance", types: []string{"instance"}},
-		{hole: "route.gateway", types: []string{"internetgateway", "natgateway"}},
-		{hole: "route.table", types: []string{"routetable"}},
+		{hole: "route.gateway", types: []string{"internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
+		{hole: "route.table", types: []string{"routetable", "dynamodbtable"}},
 
 		{hole: "zone.1", types: []string{"zone"}, prop: "1"},
 		{hole: "availabilityzone.1", types: []string{"availabilityzone"}, prop: "1"},
 
-		{hole: "gateway.1", types: []string{"internetgateway", "natgateway"}},
-		{hole: "gateway.in", types: []string{"internetgateway", "natgateway"}},
+		{hole: "gateway.1", types: []string{"internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
+		{hole: "gateway.in", types: []string{"internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
 		{hole: "gateway.inst", types: []string{"instance", "containerinstance", "instanceprofile"}},
 
 		{hole: "gateway.inst.any", types: []string{"instance", "containerinstance", "instanceprofile"}},

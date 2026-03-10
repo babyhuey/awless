@@ -17,7 +17,6 @@ package awsspec
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -26,8 +25,8 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+
 	"github.com/wallix/awless/console"
 	"github.com/wallix/awless/logger"
 )
@@ -38,7 +37,7 @@ type CreateKeypair struct {
 	_                 string `action:"create" entity:"keypair" awsAPI:"ec2" awsCall:"ImportKeyPair" awsInput:"ec2.ImportKeyPairInput" awsOutput:"ec2.ImportKeyPairOutput"`
 	logger            *logger.Logger
 	graph             cloud.GraphAPI
-	api               ec2iface.EC2API
+	api               *ec2.Client
 	Name              *string `awsName:"KeyName" awsType:"awsstr" templateName:"name"`
 	Encrypted         *bool   `templateName:"encrypted"`
 	PublicKeyMaterial []byte  `awsName:"PublicKeyMaterial" awsType:"awsbyteslice"`
@@ -84,7 +83,7 @@ func (cmd *CreateKeypair) BeforeRun(renv env.Running) error {
 	if err != nil {
 		return fmt.Errorf("generating key: %s", err)
 	}
-	if err = ioutil.WriteFile(privKeyPath, priv, 0400); err != nil {
+	if err = os.WriteFile(privKeyPath, priv, 0400); err != nil {
 		return fmt.Errorf("saving private key: %s", err)
 	}
 	cmd.PublicKeyMaterial = pub
@@ -99,7 +98,7 @@ type DeleteKeypair struct {
 	_      string `action:"delete" entity:"keypair" awsAPI:"ec2" awsCall:"DeleteKeyPair" awsInput:"ec2.DeleteKeyPairInput" awsOutput:"ec2.DeleteKeyPairOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Name   *string `awsName:"KeyName" awsType:"awsstr" templateName:"name"`
 }
 

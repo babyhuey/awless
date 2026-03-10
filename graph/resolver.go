@@ -3,9 +3,10 @@ package graph
 import (
 	"fmt"
 
+	tstore "github.com/wallix/triplestore"
+
 	"github.com/wallix/awless/cloud/properties"
 	"github.com/wallix/awless/cloud/rdf"
-	tstore "github.com/wallix/triplestore"
 )
 
 type Resolver interface {

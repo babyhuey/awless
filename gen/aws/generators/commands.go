@@ -46,11 +46,25 @@ func loadCommandStructs() map[string]cmdData {
 	return finder.result
 }
 
+func uniqueAPIs(cmds map[string]cmdData) []string {
+	seen := make(map[string]bool)
+	var apis []string
+	for _, cmd := range cmds {
+		if !seen[cmd.API] {
+			seen[cmd.API] = true
+			apis = append(apis, cmd.API)
+		}
+	}
+	sort.Strings(apis)
+	return apis
+}
+
 func generateCommands() {
 	cmdsData := loadCommandStructs()
 	templ, err := template.New("cmdRuns").Funcs(
 		template.FuncMap{
-			"ApiToInterface": aws.ApiToInterface,
+			"SdkModulePath": aws.SdkModulePath,
+			"UniqueAPIs":    uniqueAPIs,
 		},
 	).Parse(cmdRuns)
 	if err != nil {
@@ -226,22 +240,39 @@ limitations under the License.
 // This file was automatically generated with go generate
 package awsspec
 
+import (
+	"context"
+	"errors"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	{{- range $, $api := UniqueAPIs . }}
+	{{ $api }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}"
+	{{- end }}
+	"github.com/aws/smithy-go"
+	"github.com/wallix/awless/cloud"
+	"github.com/wallix/awless/logger"
+	"github.com/wallix/awless/template/env"
+)
+
 {{ range $cmdName, $tag := . }}
-func New{{ $cmdName }}(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *{{ $cmdName }}{
+func New{{ $cmdName }}(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *{{ $cmdName }}{
 	cmd := new({{ $cmdName }})
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = {{ $tag.API }}.New(sess)
+	if cfg.Region != "" {
+		cmd.api = {{ $tag.API }}.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *{{ $cmdName }}) SetApi(api {{$tag.API}}iface.{{ ApiToInterface $tag.API }}) {
+func (cmd *{{ $cmdName }}) SetApi(api *{{$tag.API}}.Client) {
 	cmd.api = api
 }
 
@@ -269,7 +300,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.{{ $tag.Call }}(input)
+	output, err := cmd.api.{{ $tag.Call }}(context.Background(), input)
 	renv.Log().ExtraVerbosef("{{ $tag.API }}.{{ $tag.Call }} call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -314,16 +345,17 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 		}
 
 		input := &{{ $tag.Input }}{}
-		input.SetDryRun(true)
+		input.DryRun = aws.Bool(true)
 		if err := structInjector(cmd, input, renv.Context()) ; err != nil {
 			return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %s", err)
 		}
 
 		start := time.Now()
-		_, err := cmd.api.{{ $tag.Call }}(input);
-		if awsErr, ok := err.(awserr.Error); ok {
-			switch code := awsErr.Code(); {
-			case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+		_, err := cmd.api.{{ $tag.Call }}(context.Background(), input);
+		var ae smithy.APIError
+		if errors.As(err, &ae) {
+			switch code := ae.ErrorCode(); {
+			case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 				renv.Log().ExtraVerbosef("dry run: {{ $tag.API }}.{{ $tag.Call }} call took %s", time.Since(start))
 				renv.Log().Verbose("dry run: {{ $tag.Action }} {{ $tag.Entity }} ok")
 				return fakeDryRunId("{{ $tag.Entity }}"), nil
@@ -365,8 +397,8 @@ limitations under the License.
 package awsspec
 
 import (
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/awstesting/mock"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 )
 
@@ -377,13 +409,13 @@ type Factory interface {
 var CommandFactory Factory
 
 var MockAWSSessionFactory = &AWSFactory{
-	Log:  logger.DiscardLogger,
-	Sess: mock.Session,
+	Log: logger.DiscardLogger,
+	Cfg: aws.Config{},
 }
 
 type AWSFactory struct {
 	Log   *logger.Logger
-	Sess *session.Session
+	Cfg   aws.Config
 	Graph cloud.GraphAPI
 }
 
@@ -391,7 +423,7 @@ func (f *AWSFactory) Build(key string) func() interface{} {
 	switch key {
 	{{- range $cmdName, $tag := . }}
 	case "{{ $tag.Action }}{{ $tag.Entity }}":
-		return func() interface{} { return New{{ $cmdName }}(f.Sess, f.Graph, f.Log) }
+		return func() interface{} { return New{{ $cmdName }}(f.Cfg, f.Graph, f.Log) }
 	{{- end}}
 	}
 	return nil
@@ -422,11 +454,6 @@ limitations under the License.
 // DO NOT EDIT
 // This file was automatically generated with go generate
 package awsspec
-
-import (
-	"github.com/wallix/awless/template"
-)
-
 
 var APIPerTemplateDefName = map[string]string {
 {{- range $, $cmd := . }}

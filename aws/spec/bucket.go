@@ -16,15 +16,17 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"time"
 
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -32,7 +34,7 @@ type CreateBucket struct {
 	_      string `action:"create" entity:"bucket" awsAPI:"s3" awsCall:"CreateBucket" awsInput:"s3.CreateBucketInput" awsOutput:"s3.CreateBucketOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    s3iface.S3API
+	api    *s3.Client
 	Name   *string `awsName:"Bucket" awsType:"awsstr" templateName:"name"`
 	Acl    *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
 }
@@ -51,7 +53,7 @@ type UpdateBucket struct {
 	_                string `action:"update" entity:"bucket" awsAPI:"s3"`
 	logger           *logger.Logger
 	graph            cloud.GraphAPI
-	api              s3iface.S3API
+	api              *s3.Client
 	Name             *string `templateName:"name"`
 	Acl              *string `templateName:"acl"`
 	PublicWebsite    *bool   `templateName:"public-website"`
@@ -78,7 +80,7 @@ func (cmd *UpdateBucket) ManualRun(renv env.Running) (interface{}, error) {
 			return nil, err
 		}
 
-		if _, err := cmd.api.PutBucketAcl(input); err != nil {
+		if _, err := cmd.api.PutBucketAcl(context.Background(), input); err != nil {
 			return nil, err
 		}
 
@@ -90,24 +92,24 @@ func (cmd *UpdateBucket) ManualRun(renv env.Running) (interface{}, error) {
 		if BoolValue(cmd.PublicWebsite) {
 			input := &s3.PutBucketWebsiteInput{
 				Bucket:               cmd.Name,
-				WebsiteConfiguration: &s3.WebsiteConfiguration{},
+				WebsiteConfiguration: &s3types.WebsiteConfiguration{},
 			}
 			if cmd.RedirectHostname != nil {
-				input.WebsiteConfiguration.RedirectAllRequestsTo = &s3.RedirectAllRequestsTo{HostName: cmd.RedirectHostname}
+				input.WebsiteConfiguration.RedirectAllRequestsTo = &s3types.RedirectAllRequestsTo{HostName: cmd.RedirectHostname}
 				if BoolValue(cmd.EnforceHttps) {
-					input.WebsiteConfiguration.RedirectAllRequestsTo.Protocol = aws.String("https")
+					input.WebsiteConfiguration.RedirectAllRequestsTo.Protocol = s3types.ProtocolHttps
 				}
 			} else if cmd.IndexSuffix != nil {
-				input.WebsiteConfiguration.IndexDocument = &s3.IndexDocument{Suffix: cmd.IndexSuffix}
+				input.WebsiteConfiguration.IndexDocument = &s3types.IndexDocument{Suffix: cmd.IndexSuffix}
 			} else {
-				input.WebsiteConfiguration.IndexDocument = &s3.IndexDocument{Suffix: aws.String("index.html")}
+				input.WebsiteConfiguration.IndexDocument = &s3types.IndexDocument{Suffix: aws.String("index.html")}
 			}
 
-			if _, err := cmd.api.PutBucketWebsite(input); err != nil {
+			if _, err := cmd.api.PutBucketWebsite(context.Background(), input); err != nil {
 				return nil, err
 			}
 		} else {
-			if _, err := cmd.api.DeleteBucketWebsite(&s3.DeleteBucketWebsiteInput{Bucket: cmd.Name}); err != nil {
+			if _, err := cmd.api.DeleteBucketWebsite(context.Background(), &s3.DeleteBucketWebsiteInput{Bucket: cmd.Name}); err != nil {
 				return nil, err
 			}
 		}
@@ -120,7 +122,7 @@ type DeleteBucket struct {
 	_      string `action:"delete" entity:"bucket" awsAPI:"s3" awsCall:"DeleteBucket" awsInput:"s3.DeleteBucketInput" awsOutput:"s3.DeleteBucketOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    s3iface.S3API
+	api    *s3.Client
 	Name   *string `awsName:"Bucket" awsType:"awsstr" templateName:"name"`
 }
 

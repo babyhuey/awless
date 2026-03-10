@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -23,10 +24,10 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -34,7 +35,7 @@ type CreateNatgateway struct {
 	_           string `action:"create" entity:"natgateway" awsAPI:"ec2" awsCall:"CreateNatGateway" awsInput:"ec2.CreateNatGatewayInput" awsOutput:"ec2.CreateNatGatewayOutput"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         ec2iface.EC2API
+	api         *ec2.Client
 	ElasticipId *string `awsName:"AllocationId" awsType:"awsstr" templateName:"elasticip-id"`
 	Subnet      *string `awsName:"SubnetId" awsType:"awsstr" templateName:"subnet"`
 }
@@ -44,14 +45,14 @@ func (cmd *CreateNatgateway) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateNatgateway) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.CreateNatGatewayOutput).NatGateway.NatGatewayId)
+	return awssdk.ToString(i.(*ec2.CreateNatGatewayOutput).NatGateway.NatGatewayId)
 }
 
 type DeleteNatgateway struct {
 	_      string `action:"delete" entity:"natgateway" awsAPI:"ec2" awsCall:"DeleteNatGateway" awsInput:"ec2.DeleteNatGatewayInput" awsOutput:"ec2.DeleteNatGatewayOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"NatGatewayId" awsType:"awsstr" templateName:"id"`
 }
 
@@ -63,7 +64,7 @@ type CheckNatgateway struct {
 	_       string `action:"check" entity:"natgateway" awsAPI:"ec2"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     ec2iface.EC2API
+	api     *ec2.Client
 	Id      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -79,7 +80,7 @@ func (cmd *CheckNatgateway) ParamsSpec() params.Spec {
 
 func (cmd *CheckNatgateway) ManualRun(renv env.Running) (interface{}, error) {
 	input := &ec2.DescribeNatGatewaysInput{
-		NatGatewayIds: []*string{cmd.Id},
+		NatGatewayIds: []string{awssdk.ToString(cmd.Id)},
 	}
 
 	c := &checker{
@@ -87,10 +88,10 @@ func (cmd *CheckNatgateway) ManualRun(renv env.Running) (interface{}, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeNatGateways(input)
+			output, err := cmd.api.DescribeNatGateways(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(awserr.Error); ok {
-					if awserr.Code() == "NatGatewayNotFound" {
+				if awserr, ok := err.(smithy.APIError); ok {
+					if awserr.ErrorCode() == "NatGatewayNotFound" {
 						return notFoundState, nil
 					}
 				} else {
@@ -99,7 +100,7 @@ func (cmd *CheckNatgateway) ManualRun(renv env.Running) (interface{}, error) {
 			} else {
 				for _, nat := range output.NatGateways {
 					if StringValue(nat.NatGatewayId) == StringValue(cmd.Id) {
-						return StringValue(nat.State), nil
+						return string(nat.State), nil
 					}
 				}
 			}

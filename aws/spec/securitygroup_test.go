@@ -19,14 +19,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 )
 
 func TestBuildIpPermissionsFromParams(t *testing.T) {
 	tcases := []struct {
 		params   map[string]interface{}
-		expected []*ec2.IpPermission
+		expected []ec2types.IpPermission
 	}{
 		{
 			params: map[string]interface{}{
@@ -34,12 +34,12 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 				"cidr":      "192.168.1.10/24",
 				"portrange": 80,
 			},
-			expected: []*ec2.IpPermission{
+			expected: []ec2types.IpPermission{
 				{
-					IpProtocol: aws.String("tcp"),
-					IpRanges:   []*ec2.IpRange{{CidrIp: aws.String("192.168.1.10/24")}},
-					FromPort:   aws.Int64(int64(80)),
-					ToPort:     aws.Int64(int64(80)),
+					IpProtocol: awssdk.String("tcp"),
+					IpRanges:   []ec2types.IpRange{{CidrIp: awssdk.String("192.168.1.10/24")}},
+					FromPort:   awssdk.Int32(int32(80)),
+					ToPort:     awssdk.Int32(int32(80)),
 				},
 			},
 		},
@@ -48,12 +48,12 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 				"protocol": "any",
 				"cidr":     "192.168.1.18/32",
 			},
-			expected: []*ec2.IpPermission{
+			expected: []ec2types.IpPermission{
 				{
-					IpProtocol: aws.String("-1"),
-					IpRanges:   []*ec2.IpRange{{CidrIp: aws.String("192.168.1.18/32")}},
-					FromPort:   aws.Int64(int64(-1)),
-					ToPort:     aws.Int64(int64(-1)),
+					IpProtocol: awssdk.String("-1"),
+					IpRanges:   []ec2types.IpRange{{CidrIp: awssdk.String("192.168.1.18/32")}},
+					FromPort:   awssdk.Int32(int32(-1)),
+					ToPort:     awssdk.Int32(int32(-1)),
 				},
 			},
 		},
@@ -63,12 +63,12 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 				"cidr":      "0.0.0.0/0",
 				"portrange": "22-23",
 			},
-			expected: []*ec2.IpPermission{
+			expected: []ec2types.IpPermission{
 				{
-					IpProtocol: aws.String("udp"),
-					IpRanges:   []*ec2.IpRange{{CidrIp: aws.String("0.0.0.0/0")}},
-					FromPort:   aws.Int64(int64(22)),
-					ToPort:     aws.Int64(int64(23)),
+					IpProtocol: awssdk.String("udp"),
+					IpRanges:   []ec2types.IpRange{{CidrIp: awssdk.String("0.0.0.0/0")}},
+					FromPort:   awssdk.Int32(int32(22)),
+					ToPort:     awssdk.Int32(int32(23)),
 				},
 			},
 		},
@@ -78,12 +78,12 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 				"cidr":      "10.0.0.0/16",
 				"portrange": "any",
 			},
-			expected: []*ec2.IpPermission{
+			expected: []ec2types.IpPermission{
 				{
-					IpProtocol: aws.String("icmp"),
-					IpRanges:   []*ec2.IpRange{{CidrIp: aws.String("10.0.0.0/16")}},
-					FromPort:   aws.Int64(int64(-1)),
-					ToPort:     aws.Int64(int64(-1)),
+					IpProtocol: awssdk.String("icmp"),
+					IpRanges:   []ec2types.IpRange{{CidrIp: awssdk.String("10.0.0.0/16")}},
+					FromPort:   awssdk.Int32(int32(-1)),
+					ToPort:     awssdk.Int32(int32(-1)),
 				},
 			},
 		},
@@ -93,12 +93,12 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 				"securitygroup": "sg-12345",
 				"portrange":     "any",
 			},
-			expected: []*ec2.IpPermission{
+			expected: []ec2types.IpPermission{
 				{
-					IpProtocol:       aws.String("icmp"),
-					UserIdGroupPairs: []*ec2.UserIdGroupPair{{GroupId: aws.String("sg-12345")}},
-					FromPort:         aws.Int64(int64(-1)),
-					ToPort:           aws.Int64(int64(-1)),
+					IpProtocol:       awssdk.String("icmp"),
+					UserIdGroupPairs: []ec2types.UserIdGroupPair{{GroupId: awssdk.String("sg-12345")}},
+					FromPort:         awssdk.Int32(int32(-1)),
+					ToPort:           awssdk.Int32(int32(-1)),
 				},
 			},
 		},
@@ -109,12 +109,12 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 				"securitygroup": "sg-23456",
 				"portrange":     80,
 			},
-			expected: []*ec2.IpPermission{
+			expected: []ec2types.IpPermission{
 				{
-					IpProtocol:       aws.String("tcp"),
-					UserIdGroupPairs: []*ec2.UserIdGroupPair{{GroupId: aws.String("sg-23456")}},
-					FromPort:         aws.Int64(int64(80)),
-					ToPort:           aws.Int64(int64(80)),
+					IpProtocol:       awssdk.String("tcp"),
+					UserIdGroupPairs: []ec2types.UserIdGroupPair{{GroupId: awssdk.String("sg-23456")}},
+					FromPort:         awssdk.Int32(int32(80)),
+					ToPort:           awssdk.Int32(int32(80)),
 				},
 			},
 		},

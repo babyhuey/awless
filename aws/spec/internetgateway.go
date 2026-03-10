@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateInternetgateway struct {
 	_      string `action:"create" entity:"internetgateway" awsAPI:"ec2" awsCall:"CreateInternetGateway" awsInput:"ec2.CreateInternetGatewayInput" awsOutput:"ec2.CreateInternetGatewayOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 }
 
 func (cmd *CreateInternetgateway) ParamsSpec() params.Spec {
@@ -36,14 +36,14 @@ func (cmd *CreateInternetgateway) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateInternetgateway) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.CreateInternetGatewayOutput).InternetGateway.InternetGatewayId)
+	return awssdk.ToString(i.(*ec2.CreateInternetGatewayOutput).InternetGateway.InternetGatewayId)
 }
 
 type DeleteInternetgateway struct {
 	_      string `action:"delete" entity:"internetgateway" awsAPI:"ec2" awsCall:"DeleteInternetGateway" awsInput:"ec2.DeleteInternetGatewayInput" awsOutput:"ec2.DeleteInternetGatewayOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
 }
 
@@ -55,7 +55,7 @@ type AttachInternetgateway struct {
 	_      string `action:"attach" entity:"internetgateway" awsAPI:"ec2" awsCall:"AttachInternetGateway" awsInput:"ec2.AttachInternetGatewayInput" awsOutput:"ec2.AttachInternetGatewayOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
 	Vpc    *string `awsName:"VpcId" awsType:"awsstr" templateName:"vpc"`
 }
@@ -68,7 +68,7 @@ type DetachInternetgateway struct {
 	_      string `action:"detach" entity:"internetgateway" awsAPI:"ec2" awsCall:"DetachInternetGateway" awsInput:"ec2.DetachInternetGatewayInput" awsOutput:"ec2.DetachInternetGatewayOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
 	Vpc    *string `awsName:"VpcId" awsType:"awsstr" templateName:"vpc"`
 }

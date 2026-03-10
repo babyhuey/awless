@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/applicationautoscaling"
-	"github.com/aws/aws-sdk-go/service/applicationautoscaling/applicationautoscalingiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/applicationautoscaling"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateAppscalingpolicy struct {
 	_                                 string `action:"create" entity:"appscalingpolicy" awsAPI:"applicationautoscaling" awsCall:"PutScalingPolicy" awsInput:"applicationautoscaling.PutScalingPolicyInput" awsOutput:"applicationautoscaling.PutScalingPolicyOutput"`
 	logger                            *logger.Logger
 	graph                             cloud.GraphAPI
-	api                               applicationautoscalingiface.ApplicationAutoScalingAPI
+	api                               *applicationautoscaling.Client
 	Name                              *string   `awsName:"PolicyName" awsType:"awsstr" templateName:"name"`
 	Type                              *string   `awsName:"PolicyType" awsType:"awsstr" templateName:"type"`
 	Resource                          *string   `awsName:"ResourceId" awsType:"awsstr" templateName:"resource"`
@@ -48,14 +48,14 @@ func (cmd *CreateAppscalingpolicy) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateAppscalingpolicy) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*applicationautoscaling.PutScalingPolicyOutput).PolicyARN)
+	return awssdk.ToString(i.(*applicationautoscaling.PutScalingPolicyOutput).PolicyARN)
 }
 
 type DeleteAppscalingpolicy struct {
 	_                string `action:"delete" entity:"appscalingpolicy" awsAPI:"applicationautoscaling" awsCall:"DeleteScalingPolicy" awsInput:"applicationautoscaling.DeleteScalingPolicyInput" awsOutput:"applicationautoscaling.DeleteScalingPolicyOutput"`
 	logger           *logger.Logger
 	graph            cloud.GraphAPI
-	api              applicationautoscalingiface.ApplicationAutoScalingAPI
+	api              *applicationautoscaling.Client
 	Name             *string `awsName:"PolicyName" awsType:"awsstr" templateName:"name"`
 	Resource         *string `awsName:"ResourceId" awsType:"awsstr" templateName:"resource"`
 	Dimension        *string `awsName:"ScalableDimension" awsType:"awsstr" templateName:"dimension"`

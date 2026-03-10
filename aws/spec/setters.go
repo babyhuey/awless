@@ -19,8 +19,9 @@ package awsspec
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -28,18 +29,18 @@ import (
 	gotemplate "text/template"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/elb"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-
 	"bytes"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/aws/aws-sdk-go/service/applicationautoscaling"
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ecs"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	applicationautoscalingtypes "github.com/aws/aws-sdk-go-v2/service/applicationautoscaling/types"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	"github.com/wallix/awless/logger"
 )
 
@@ -132,55 +133,55 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 	case awscsvstr:
 		v = strings.Join(castStringSlice(v), ",")
 	case awsdimensionslice:
-		if dimensions, isDim := v.([]*cloudwatch.Dimension); isDim {
+		if dimensions, isDim := v.([]cloudwatchtypes.Dimension); isDim {
 			v = dimensions
 		} else {
-			dimensions = []*cloudwatch.Dimension{}
+			dimensions = []cloudwatchtypes.Dimension{}
 			sl := castStringSlice(v)
 			for _, s := range sl {
 				splits := strings.SplitN(s, ":", 2)
 				if len(splits) != 2 {
 					return fmt.Errorf("invalid dimension '%s', expected 'key:value'", s)
 				}
-				dimensions = append(dimensions, &cloudwatch.Dimension{Name: aws.String(splits[0]), Value: aws.String(splits[1])})
+				dimensions = append(dimensions, cloudwatchtypes.Dimension{Name: aws.String(splits[0]), Value: aws.String(splits[1])})
 				v = dimensions
 			}
 		}
 	case awsecskeyvalue:
 		sl := castStringSlice(v)
-		var keyvalues []*ecs.KeyValuePair
+		var keyvalues []ecstypes.KeyValuePair
 		for _, s := range sl {
 			splits := strings.SplitN(s, ":", 2)
 			if len(splits) != 2 {
 				return fmt.Errorf("invalid keyvalue '%s', expected 'key:value'", s)
 			}
-			keyvalues = append(keyvalues, &ecs.KeyValuePair{Name: aws.String(splits[0]), Value: aws.String(splits[1])})
+			keyvalues = append(keyvalues, ecstypes.KeyValuePair{Name: aws.String(splits[0]), Value: aws.String(splits[1])})
 		}
 		v = keyvalues
 	case awsparameterslice:
 		sl := castStringSlice(v)
-		var parameters []*cloudformation.Parameter
+		var parameters []cloudformationtypes.Parameter
 		for _, s := range sl {
 			splits := strings.SplitN(s, ":", 2)
 			if len(splits) != 2 {
 				return fmt.Errorf("invalid parameter '%s', expected 'key:value'", s)
 			}
-			parameters = append(parameters, &cloudformation.Parameter{ParameterKey: aws.String(splits[0]), ParameterValue: aws.String(splits[1])})
+			parameters = append(parameters, cloudformationtypes.Parameter{ParameterKey: aws.String(splits[0]), ParameterValue: aws.String(splits[1])})
 		}
 		v = parameters
 	case awssubnetmappings:
 		sl := castStringSlice(v)
-		var subnetMappings []*elbv2.SubnetMapping
+		var subnetMappings []elbv2types.SubnetMapping
 		for i, s := range sl {
 			splits := strings.Split(s, ":")
 			if len(splits) != 2 {
 				return fmt.Errorf("invalid element %d in subnet mapping %v, expect format [subnet-123:eipalloc-321, subnet-234:eipalloc-678, ...]", i+1, splits)
 			}
-			subnetMappings = append(subnetMappings, &elbv2.SubnetMapping{SubnetId: aws.String(splits[0]), AllocationId: aws.String(splits[1])})
+			subnetMappings = append(subnetMappings, elbv2types.SubnetMapping{SubnetId: aws.String(splits[0]), AllocationId: aws.String(splits[1])})
 		}
 		v = subnetMappings
 	case awsclassicloadblisteners:
-		var listeners []*elb.Listener
+		var listeners []elbtypes.Listener
 		for _, s := range castStringSlice(v) {
 			splits := strings.Split(s, ":")
 			if len(splits) != 4 {
@@ -194,19 +195,19 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 			if err != nil {
 				return fmt.Errorf("expecting numerical port value for instance port in '%s', (expect format like HTTP:80:HTTP:80)", splits)
 			}
-			listeners = append(listeners, &elb.Listener{
+			listeners = append(listeners, elbtypes.Listener{
 				Protocol:         aws.String(splits[0]),
-				LoadBalancerPort: aws.Int64(loadbPort),
+				LoadBalancerPort: int32(loadbPort),
 				InstanceProtocol: aws.String(splits[2]),
-				InstancePort:     aws.Int64(instancePort),
+				InstancePort:     aws.Int32(int32(instancePort)),
 			})
 		}
 		v = listeners
 	case awsportmappings:
 		sl := castStringSlice(v)
-		var portMappings []*ecs.PortMapping
+		var portMappings []ecstypes.PortMapping
 		for _, s := range sl {
-			portMapping := &ecs.PortMapping{}
+			portMapping := &ecstypes.PortMapping{}
 			if strings.Contains(s, "-") {
 				return fmt.Errorf("invalid port mapping '%s', AWS do not support portrange (from-to)", s)
 			}
@@ -218,43 +219,43 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 					return fmt.Errorf("invalid port mapping '%s', invalid protocol, expect tcp or udp, got %s", s, protocol)
 				}
 				s = strings.TrimRight(s, "/"+protocol)
-				portMapping.Protocol = aws.String(protocol)
+				portMapping.Protocol = ecstypes.TransportProtocol(protocol)
 			}
 			splits := strings.Split(s, ":")
 			switch len(splits) {
 			case 1:
-				containerPort, err := strconv.ParseInt(s, 10, 64)
+				containerPort, err := strconv.ParseInt(s, 10, 32)
 				if err != nil {
 					return fmt.Errorf("invalid port mapping '%s', expect from[:to][/protocol]", s)
 				}
-				portMapping.ContainerPort = aws.Int64(containerPort)
+				portMapping.ContainerPort = aws.Int32(int32(containerPort))
 			case 2:
-				hostPort, err := strconv.ParseInt(splits[0], 10, 64)
+				hostPort, err := strconv.ParseInt(splits[0], 10, 32)
 				if err != nil {
 					return fmt.Errorf("invalid port mapping '%s', expect from[:to][/protocol]", s)
 				}
-				containerPort, err := strconv.ParseInt(splits[1], 10, 64)
+				containerPort, err := strconv.ParseInt(splits[1], 10, 32)
 				if err != nil {
 					return fmt.Errorf("invalid port mapping '%s', expect from[:to][/protocol]", s)
 				}
-				portMapping.HostPort = aws.Int64(hostPort)
-				portMapping.ContainerPort = aws.Int64(containerPort)
+				portMapping.HostPort = aws.Int32(int32(hostPort))
+				portMapping.ContainerPort = aws.Int32(int32(containerPort))
 			default:
 				return fmt.Errorf("invalid port mapping '%s', expect from[:to][/protocol]", s)
 			}
 
-			portMappings = append(portMappings, portMapping)
+			portMappings = append(portMappings, *portMapping)
 		}
 		v = portMappings
 	case awsstepadjustments:
 		sl := castStringSlice(v)
-		var stepAdjustments []*applicationautoscaling.StepAdjustment
+		var stepAdjustments []applicationautoscalingtypes.StepAdjustment
 		for _, s := range sl {
 			splits := strings.Split(s, ":")
 			if len(splits) != 3 {
 				return fmt.Errorf("invalid step adjustment '%s', expect from:to:scaling-adjustment", s)
 			}
-			stepAdjustment := &applicationautoscaling.StepAdjustment{}
+			stepAdjustment := &applicationautoscalingtypes.StepAdjustment{}
 			if splits[0] != "" {
 				lower, err := strconv.ParseFloat(splits[0], 64)
 				if err != nil {
@@ -269,12 +270,12 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 				}
 				stepAdjustment.MetricIntervalUpperBound = aws.Float64(upper)
 			}
-			adjustment, err := strconv.ParseInt(splits[2], 10, 64)
+			adjustment, err := strconv.ParseInt(splits[2], 10, 32)
 			if err != nil {
 				return fmt.Errorf("invalid adjustment-adjustment '%s' in step adjustmentstep adjustment '%s', expect from:to:scaling-adjustment", splits[2], s)
 			}
-			stepAdjustment.ScalingAdjustment = aws.Int64(adjustment)
-			stepAdjustments = append(stepAdjustments, stepAdjustment)
+			stepAdjustment.ScalingAdjustment = aws.Int32(int32(adjustment))
+			stepAdjustments = append(stepAdjustments, *stepAdjustment)
 		}
 		v = stepAdjustments
 	case awsuserdatatobase64:
@@ -287,13 +288,13 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 			return err
 		}
 	case awsfiletobyteslice:
-		v, err = ioutil.ReadFile(castString(v))
+		v, err = os.ReadFile(castString(v))
 		if err != nil {
 			return err
 		}
 	case awsfiletostring:
 		var b []byte
-		b, err = ioutil.ReadFile(castString(v))
+		b, err = os.ReadFile(castString(v))
 		if err != nil {
 			return err
 		}
@@ -311,10 +312,10 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 		if err != nil {
 			return
 		}
-		v = &ec2.AttributeBooleanValue{Value: &b}
+		v = &ec2types.AttributeBooleanValue{Value: &b}
 	case awsstringattribute:
 		str := castString(v)
-		v = &ec2.AttributeValue{Value: &str}
+		v = &ec2types.AttributeValue{Value: &str}
 	case awsstringpointermap:
 		matches := mapAttributeRegex.FindStringSubmatch(fieldPath)
 		if len(matches) < 2 {
@@ -370,25 +371,25 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 			err = fmt.Errorf("set field awsslicestruct: field %s is not a slice of struct pointer, but a %s", matches[0], sliceField.Kind())
 			return
 		}
-		awsutil.SetValueAtPath(elemToSet.Interface(), matches[2], v)
+		setValueAtPath(elemToSet.Interface(), matches[2], v)
 
 		return nil
 	case awstagslice:
 		var (
-			elbTags    []*elb.Tag
-			cfTags     []*cloudformation.Tag
+			elbTags    []elbtypes.Tag
+			cfTags     []cloudformationtypes.Tag
 			appendFunc func(s1, s2 string)
 			assignFunc func()
 		)
 		switch i.(type) {
 		case *elb.CreateLoadBalancerInput:
 			appendFunc = func(s1, s2 string) {
-				elbTags = append(elbTags, &elb.Tag{Key: aws.String(s1), Value: aws.String(s2)})
+				elbTags = append(elbTags, elbtypes.Tag{Key: aws.String(s1), Value: aws.String(s2)})
 			}
 			assignFunc = func() { v = elbTags }
 		case *cloudformation.CreateStackInput, *cloudformation.UpdateStackInput:
 			appendFunc = func(s1, s2 string) {
-				cfTags = append(cfTags, &cloudformation.Tag{Key: aws.String(s1), Value: aws.String(s2)})
+				cfTags = append(cfTags, cloudformationtypes.Tag{Key: aws.String(s1), Value: aws.String(s2)})
 			}
 			assignFunc = func() { v = cfTags }
 		}
@@ -401,10 +402,10 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 		}
 		assignFunc()
 	case awsalarmrollbacktriggers:
-		var triggers []*cloudformation.RollbackTrigger
+		var triggers []cloudformationtypes.RollbackTrigger
 		if list := castStringSlice(v); len(list) > 0 {
 			for _, t := range list {
-				triggers = append(triggers, &cloudformation.RollbackTrigger{
+				triggers = append(triggers, cloudformationtypes.RollbackTrigger{
 					Arn:  aws.String(t),
 					Type: aws.String("AWS::CloudWatch::Alarm"),
 				})
@@ -413,7 +414,7 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 		v = triggers
 	}
 
-	awsutil.SetValueAtPath(i, fieldPath, v)
+	setValueAtPath(i, fieldPath, v)
 	return nil
 }
 
@@ -441,7 +442,7 @@ func castFloat(v interface{}) (float64, error) {
 	case float64:
 		return vv, nil
 	case *float64:
-		return aws.Float64Value(vv), nil
+		return aws.ToFloat64(vv), nil
 	case int:
 		return float64(vv), nil
 	case int64:
@@ -454,9 +455,9 @@ func castFloat(v interface{}) (float64, error) {
 func castInt(v interface{}) (int, error) {
 	switch vv := v.(type) {
 	case *string:
-		i, err := strconv.Atoi(aws.StringValue(vv))
+		i, err := strconv.Atoi(aws.ToString(vv))
 		if err != nil {
-			return i, fmt.Errorf("invalid integer value '%s'", aws.StringValue(vv))
+			return i, fmt.Errorf("invalid integer value '%s'", aws.ToString(vv))
 		}
 		return i, nil
 	case string:
@@ -466,13 +467,13 @@ func castInt(v interface{}) (int, error) {
 		}
 		return i, nil
 	case *int:
-		return aws.IntValue(vv), nil
+		return aws.ToInt(vv), nil
 	case int:
 		return vv, nil
 	case int64:
 		return int(vv), nil
 	case *int64:
-		return int(aws.Int64Value(vv)), nil
+		return int(aws.ToInt64(vv)), nil
 	default:
 		return 0, fmt.Errorf("cannot cast %T to int", v)
 	}
@@ -489,7 +490,7 @@ func castBool(v interface{}) (bool, error) {
 	case bool:
 		return vv, nil
 	case *bool:
-		return aws.BoolValue(vv), nil
+		return aws.ToBool(vv), nil
 	default:
 		return false, fmt.Errorf("cannot cast %T to bool", v)
 	}
@@ -506,11 +507,11 @@ func castInt64(v interface{}) (int64, error) {
 	case int:
 		return int64(vv), nil
 	case *int:
-		return int64(aws.IntValue(vv)), nil
+		return int64(aws.ToInt(vv)), nil
 	case int64:
 		return vv, nil
 	case *int64:
-		return aws.Int64Value(vv), nil
+		return aws.ToInt64(vv), nil
 	default:
 		return int64(0), fmt.Errorf("cannot cast %T to int64", v)
 	}
@@ -521,9 +522,9 @@ func castStringSlice(v interface{}) []string {
 	case string:
 		return []string{vv}
 	case *string:
-		return []string{aws.StringValue(vv)}
+		return []string{aws.ToString(vv)}
 	case []*string:
-		return aws.StringValueSlice(vv)
+		return aws.ToStringSlice(vv)
 	case []string:
 		return vv
 	case []interface{}:
@@ -597,9 +598,9 @@ func userDataContentAsBase64(v interface{}, tplData interface{}) (string, error)
 			return "", fmt.Errorf("'%s' when fetching userdata at '%s'", resp.Status, userdata)
 		}
 
-		content, readErr = ioutil.ReadAll(resp.Body)
+		content, readErr = io.ReadAll(resp.Body)
 	} else {
-		content, readErr = ioutil.ReadFile(userdata)
+		content, readErr = os.ReadFile(userdata)
 	}
 
 	if readErr != nil {
@@ -696,4 +697,60 @@ func contains(arr []string, e string) bool {
 		}
 	}
 	return false
+}
+
+// setValueAtPath sets a value at a dot-separated field path in a struct.
+// Replaces awsutil.SetValueAtPath from SDK v1.
+func setValueAtPath(i interface{}, path string, v interface{}) {
+	path = strings.TrimPrefix(path, ".")
+	if path == "" {
+		return
+	}
+	parts := strings.Split(path, ".")
+	val := reflect.ValueOf(i)
+	for val.Kind() == reflect.Ptr {
+		if val.IsNil() {
+			return
+		}
+		val = val.Elem()
+	}
+
+	for idx, part := range parts {
+		if val.Kind() != reflect.Struct {
+			return
+		}
+		field := val.FieldByName(part)
+		if !field.IsValid() || !field.CanSet() {
+			return
+		}
+		if idx == len(parts)-1 {
+			rv := reflect.ValueOf(v)
+			if field.Kind() == reflect.Ptr {
+				if rv.Kind() == reflect.Ptr {
+					field.Set(rv.Convert(field.Type()))
+				} else {
+					ptr := reflect.New(field.Type().Elem())
+					ptr.Elem().Set(rv.Convert(field.Type().Elem()))
+					field.Set(ptr)
+				}
+			} else if rv.Kind() == reflect.Ptr && !rv.IsNil() {
+				field.Set(rv.Elem().Convert(field.Type()))
+			} else if rv.Type().AssignableTo(field.Type()) {
+				field.Set(rv)
+			} else if rv.Type().ConvertibleTo(field.Type()) {
+				field.Set(rv.Convert(field.Type()))
+			} else {
+				field.Set(rv)
+			}
+		} else {
+			if field.Kind() == reflect.Ptr {
+				if field.IsNil() {
+					field.Set(reflect.New(field.Type().Elem()))
+				}
+				val = field.Elem()
+			} else {
+				val = field
+			}
+		}
+	}
 }

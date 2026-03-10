@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/env"
@@ -29,7 +29,7 @@ type CreateSubnet struct {
 	_                string `action:"create" entity:"subnet" awsAPI:"ec2" awsCall:"CreateSubnet" awsInput:"ec2.CreateSubnetInput" awsOutput:"ec2.CreateSubnetOutput" awsDryRun:""`
 	logger           *logger.Logger
 	graph            cloud.GraphAPI
-	api              ec2iface.EC2API
+	api              *ec2.Client
 	CIDR             *string `awsName:"CidrBlock" awsType:"awsstr" templateName:"cidr"`
 	VPC              *string `awsName:"VpcId" awsType:"awsstr" templateName:"vpc"`
 	AvailabilityZone *string `awsName:"AvailabilityZone" awsType:"awsstr" templateName:"availabilityzone"`
@@ -44,7 +44,7 @@ func (cmd *CreateSubnet) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateSubnet) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.CreateSubnetOutput).Subnet.SubnetId)
+	return awssdk.ToString(i.(*ec2.CreateSubnetOutput).Subnet.SubnetId)
 }
 
 func (cmd *CreateSubnet) AfterRun(renv env.Running, output interface{}) error {
@@ -69,7 +69,7 @@ type UpdateSubnet struct {
 	_      string `action:"update" entity:"subnet" awsAPI:"ec2" awsCall:"ModifySubnetAttribute" awsInput:"ec2.ModifySubnetAttributeInput" awsOutput:"ec2.ModifySubnetAttributeOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"SubnetId" awsType:"awsstr" templateName:"id"`
 	Public *bool   `awsName:"MapPublicIpOnLaunch" awsType:"awsboolattribute" templateName:"public"`
 }
@@ -82,7 +82,7 @@ type DeleteSubnet struct {
 	_      string `action:"delete" entity:"subnet" awsAPI:"ec2" awsCall:"DeleteSubnet" awsInput:"ec2.DeleteSubnetInput" awsOutput:"ec2.DeleteSubnetOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"SubnetId" awsType:"awsstr" templateName:"id"`
 }
 

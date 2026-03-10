@@ -26,7 +26,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/wallix/awless/aws/config"
+
+	awsconfig "github.com/wallix/awless/aws/config"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/cloud/properties"
 	"github.com/wallix/awless/cloud/rdf"
@@ -199,8 +200,8 @@ func showResource(resource cloud.Resource, gph cloud.GraphAPI) {
 
 	if len(parents) > 0 || hasChildren {
 		fmt.Println(renderCyanBoldFn("\nLineage:"))
-		fmt.Printf(parentsW.String())
-		fmt.Printf(childrenW.String())
+		fmt.Printf("%s", parentsW.String())
+		fmt.Printf("%s", childrenW.String())
 	}
 
 	appliedOn, err := gph.ResourceRelations(resource, rdf.ApplyOn, false)
@@ -250,7 +251,7 @@ func findResourceInLocalGraphs(ref string) (cloud.Resource, cloud.GraphAPI) {
 			if state, ok := res.Properties()[properties.State].(string); ok {
 				buf.WriteString(fmt.Sprintf(" (state: '%s')", state))
 			}
-			logger.Infof(buf.String())
+			logger.Infof("%s", buf.String())
 		}
 
 		os.Exit(0)

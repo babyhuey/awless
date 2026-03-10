@@ -1,10 +1,11 @@
-/* Copyright 2017 WALLIX
+/*
+	Copyright 2017 WALLIX
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"time"
@@ -23,8 +25,8 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -32,7 +34,7 @@ type CreateRole struct {
 	_                string `action:"create" entity:"role" awsAPI:"iam"`
 	logger           *logger.Logger
 	graph            cloud.GraphAPI
-	api              iamiface.IAMAPI
+	api              *iam.Client
 	Name             *string   `awsName:"RoleName" awsType:"awsstr" templateName:"name" `
 	PrincipalAccount *string   `templateName:"principal-account"`
 	PrincipalUser    *string   `templateName:"principal-user"`
@@ -116,7 +118,7 @@ type DeleteRole struct {
 	_      string `action:"delete" entity:"role" awsAPI:"iam"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `awsName:"RoleName" awsType:"awsstr" templateName:"name" `
 }
 
@@ -140,7 +142,7 @@ func (cmd *DeleteRole) ManualRun(renv env.Running) (interface{}, error) {
 	}
 
 	start := time.Now()
-	output, err := cmd.api.DeleteRole(input)
+	output, err := cmd.api.DeleteRole(context.Background(), input)
 	cmd.logger.ExtraVerbosef("iam.DeleteRole call took %s", time.Since(start))
 	return output, err
 }
@@ -149,7 +151,7 @@ type AttachRole struct {
 	_               string `action:"attach" entity:"role" awsAPI:"iam" awsCall:"AddRoleToInstanceProfile" awsInput:"iam.AddRoleToInstanceProfileInput" awsOutput:"iam.AddRoleToInstanceProfileOutput"`
 	logger          *logger.Logger
 	graph           cloud.GraphAPI
-	api             iamiface.IAMAPI
+	api             *iam.Client
 	Instanceprofile *string `awsName:"InstanceProfileName" awsType:"awsstr" templateName:"instanceprofile" `
 	Name            *string `awsName:"RoleName" awsType:"awsstr" templateName:"name" `
 }
@@ -162,7 +164,7 @@ type DetachRole struct {
 	_               string `action:"detach" entity:"role" awsAPI:"iam" awsCall:"RemoveRoleFromInstanceProfile" awsInput:"iam.RemoveRoleFromInstanceProfileInput" awsOutput:"iam.RemoveRoleFromInstanceProfileOutput"`
 	logger          *logger.Logger
 	graph           cloud.GraphAPI
-	api             iamiface.IAMAPI
+	api             *iam.Client
 	Instanceprofile *string `awsName:"InstanceProfileName" awsType:"awsstr" templateName:"instanceprofile" `
 	Name            *string `awsName:"RoleName" awsType:"awsstr" templateName:"name" `
 }

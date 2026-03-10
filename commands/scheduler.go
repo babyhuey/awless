@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+
 	"github.com/wallix/awless-scheduler/client"
 	"github.com/wallix/awless-scheduler/model"
 	"github.com/wallix/awless/config"

@@ -21,6 +21,8 @@ import (
 	"io"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/tw"
+
 	"github.com/wallix/awless/cloud"
 )
 
@@ -66,11 +68,17 @@ func (d *tableResourceDisplayer) Print(w io.Writer) error {
 	}
 
 	table := tablewriter.NewWriter(w)
-	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	table.SetColWidth(valueColumnMaxwidth)
-	table.SetCenterSeparator("|")
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetHeader([]string{"Property" + ds.symbol(), "Value"})
+	table.Options(
+		tablewriter.WithRendition(tw.Rendition{
+			Borders: tw.Border{Left: tw.On, Top: tw.Off, Right: tw.On, Bottom: tw.Off},
+			Symbols: tw.NewSymbols(tw.StyleMarkdown),
+		}),
+		tablewriter.WithRowMaxWidth(valueColumnMaxwidth),
+		tablewriter.WithHeaderMaxWidth(valueColumnMaxwidth),
+		tablewriter.WithRowAlignment(tw.AlignLeft),
+		tablewriter.WithHeaderAutoFormat(tw.Off),
+	)
+	table.Header([]string{"Property" + ds.symbol(), "Value"})
 
 	wraper := autoWraper{maxWidth: valueColumnMaxwidth, wrappingChar: " "}
 

@@ -21,7 +21,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/wallix/awless/aws/config"
+
+	awsconfig "github.com/wallix/awless/aws/config"
 	"github.com/wallix/awless/config"
 )
 

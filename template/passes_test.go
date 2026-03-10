@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wallix/awless/aws/spec"
+	awsspec "github.com/wallix/awless/aws/spec"
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/internal/ast"
 	"github.com/wallix/awless/template/params"
@@ -272,6 +272,8 @@ func TestResolveMissingSuggestedPass(t *testing.T) {
 			return "mykeypair"
 		case "create.instance.lock":
 			return "true"
+		case "create.instance.ebs-optimized":
+			return "true"
 		case "create.instance.role":
 			return "arole"
 		case "create.instance.userdata":
@@ -320,10 +322,10 @@ func TestResolveMissingSuggestedPass(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got, want := count, 5; got != want {
+	if got, want := count, 6; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := compiled.String(), "create instance count=1 image=ami-1a17137a ip=1.2.3.4 keypair=mykeypair lock=true name=my-instance role=arole securitygroup=@my-sec-group subnet=sub-1234 type=t2.nano userdata=/path/to/my/file"; got != want {
+	if got, want := compiled.String(), "create instance count=1 ebs-optimized=true image=ami-1a17137a ip=1.2.3.4 keypair=mykeypair lock=true name=my-instance role=arole securitygroup=@my-sec-group subnet=sub-1234 type=t2.nano userdata=/path/to/my/file"; got != want {
 		t.Fatalf("got \n%s, want \n%s", got, want)
 	}
 }

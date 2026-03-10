@@ -24,11 +24,22 @@ import (
 )
 
 func generateServicesFuncs() {
+	// Build a set of APIs that need types imports based on AWSType references
+	apisNeedingTypes := make(map[string]bool)
+	for _, def := range aws.FetchersDefs {
+		for _, f := range def.Fetchers {
+			if idx := strings.Index(f.AWSType, "types."); idx > 0 {
+				apisNeedingTypes[f.AWSType[:idx]] = true
+			}
+		}
+	}
+
 	templ, err := template.New("funcs").Funcs(template.FuncMap{
-		"Title":          strings.Title,
-		"ToUpper":        strings.ToUpper,
-		"Join":           strings.Join,
-		"ApiToInterface": aws.ApiToInterface,
+		"Title":            strings.Title,
+		"ToUpper":          strings.ToUpper,
+		"Join":             strings.Join,
+		"SdkModulePath":    aws.SdkModulePath,
+		"NeedsTypesImport": func(api string) bool { return apisNeedingTypes[api] },
 	}).Parse(servicesTempl)
 
 	if err != nil {
@@ -61,23 +72,25 @@ package awsservices
 // DO NOT EDIT - This file was automatically generated with go generate
 
 import (
-  "fmt"
+  "context"
+  "errors"
 	"sync"
 
-  awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-  "github.com/aws/aws-sdk-go/aws/session"
+  "github.com/aws/aws-sdk-go-v2/aws"
   {{- range $index, $service := . }}
   {{- range $, $api := $service.Api }}
-  "github.com/aws/aws-sdk-go/service/{{ $api }}"
-  "github.com/aws/aws-sdk-go/service/{{ $api }}/{{ $api }}iface"
+  {{ $api }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}"
+  {{- if NeedsTypesImport $api }}
+  {{ $api }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}/types"
   {{- end }}
   {{- end }}
+  {{- end }}
+  "github.com/aws/smithy-go"
 	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/config"
+	"github.com/wallix/awless/graph"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/fetch"
-	"github.com/wallix/awless/aws/fetch"
+	awsfetch "github.com/wallix/awless/aws/fetch"
 	tstore "github.com/wallix/triplestore"
 )
 
@@ -128,32 +141,32 @@ type {{ Title $service.Name }} struct {
 	config map[string]interface{}
 	log *logger.Logger
 	{{- range $, $api := $service.Api }}
-		{{ $api }}iface.{{ ApiToInterface $api }}
+		{{ Title $api }}Client *{{ $api }}.Client
 	{{- end }}
 }
 
-func New{{ Title $service.Name }}(sess *session.Session, profile string, extraConf map[string]interface{}, log *logger.Logger) cloud.Service {
+func New{{ Title $service.Name }}(cfg aws.Config, profile string, extraConf map[string]interface{}, log *logger.Logger) cloud.Service {
   {{- if $service.Global }}
 	region := "global"
 	{{- else}}
-	region := awssdk.StringValue(sess.Config.Region)
-	{{- end}}	
+	region := cfg.Region
+	{{- end}}
 
 	{{- range $, $api := $service.Api }}
-		{{$api }}API := {{ $api }}.New(sess)
+		{{ $api }}Client := {{ $api }}.NewFromConfig(cfg)
 	{{- end }}
 
 	fetchConfig := awsfetch.NewConfig(
 		{{- range $, $api := $service.Api }}
-			{{$api }}API,
+			{{ $api }}Client,
 		{{- end }}
 	)
 	fetchConfig.Extra = extraConf
 	fetchConfig.Log = log
 
-	return &{{ Title $service.Name }}{ 
+	return &{{ Title $service.Name }}{
 	{{- range $, $api := $service.Api }}
-		{{ApiToInterface $api }}: {{ $api }}API,
+		{{ Title $api }}Client: {{ $api }}Client,
 	{{- end }}
 		fetcher: fetch.NewFetcher(awsfetch.Build{{ Title $service.Name }}FetchFuncs(fetchConfig)),
 		config: extraConf,
@@ -195,17 +208,15 @@ func (s *{{ Title $service.Name }}) Fetch(ctx context.Context) (cloud.GraphAPI, 
 	
 	for _, e := range *fetch.WrapError(err) {
 		switch ee := e.(type) {
-		case awserr.RequestFailure:
-			switch ee.Message() {
-			case accessDenied:
-				allErrors.Add(cloud.ErrFetchAccessDenied)
-			default:
-				allErrors.Add(ee)
-			}
 		case nil:
 			continue
 		default:
-			allErrors.Add(ee)
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
 		}
 	}
 
@@ -224,10 +235,10 @@ func (s *{{ Title $service.Name }}) Fetch(ctx context.Context) (cloud.GraphAPI, 
 		if err != nil {
 			return gph, err
 		}
-		if _, ok := list.([]*{{ $fetcher.AWSType }}); !ok {
-			return gph, errors.New("cannot cast to '[]*{{ $fetcher.AWSType }}' type from fetch context")
+		if _, ok := list.([]{{ $fetcher.AWSType }}); !ok {
+			return gph, errors.New("cannot cast to '[]{{ $fetcher.AWSType }}' type from fetch context")
 		}
-		for _, r := range list.([]*{{ $fetcher.AWSType }}) {
+		for _, r := range list.([]{{ $fetcher.AWSType }}) {
 			for _, fn := range addParentsFns["{{ $fetcher.ResourceType }}"] {
 				wg.Add(1)
 				go func(f addParentFn, snap tstore.RDFGraph, region string, res *{{ $fetcher.AWSType }}) {
@@ -237,7 +248,7 @@ func (s *{{ Title $service.Name }}) Fetch(ctx context.Context) (cloud.GraphAPI, 
 						errc <- err
 						return
 					}
-				}(fn, snap, s.region, r)
+				}(fn, snap, s.region, &r)
 			}
 		}
 	}

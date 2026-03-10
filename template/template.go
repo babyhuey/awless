@@ -24,6 +24,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/oklog/ulid"
+
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/internal/ast"
 )

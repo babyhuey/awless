@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -23,9 +24,10 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -33,7 +35,7 @@ type CreateAlarm struct {
 	_                       string `action:"create" entity:"alarm" awsAPI:"cloudwatch" awsCall:"PutMetricAlarm" awsInput:"cloudwatch.PutMetricAlarmInput" awsOutput:"cloudwatch.PutMetricAlarmOutput"`
 	logger                  *logger.Logger
 	graph                   cloud.GraphAPI
-	api                     cloudwatchiface.CloudWatchAPI
+	api                     *cloudwatch.Client
 	Name                    *string   `awsName:"AlarmName" awsType:"awsstr" templateName:"name"`
 	Operator                *string   `awsName:"ComparisonOperator" awsType:"awsstr" templateName:"operator"`
 	Metric                  *string   `awsName:"MetricName" awsType:"awsstr" templateName:"metric"`
@@ -69,7 +71,7 @@ type DeleteAlarm struct {
 	_      string `action:"delete" entity:"alarm" awsAPI:"cloudwatch" awsCall:"DeleteAlarms" awsInput:"cloudwatch.DeleteAlarmsInput" awsOutput:"cloudwatch.DeleteAlarmsOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    cloudwatchiface.CloudWatchAPI
+	api    *cloudwatch.Client
 	Name   []*string `awsName:"AlarmNames" awsType:"awsstringslice" templateName:"name"`
 }
 
@@ -81,7 +83,7 @@ type StartAlarm struct {
 	_      string `action:"start" entity:"alarm" awsAPI:"cloudwatch" awsCall:"EnableAlarmActions" awsInput:"cloudwatch.EnableAlarmActionsInput" awsOutput:"cloudwatch.EnableAlarmActionsOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    cloudwatchiface.CloudWatchAPI
+	api    *cloudwatch.Client
 	Names  []*string `awsName:"AlarmNames" awsType:"awsstringslice" templateName:"names"`
 }
 
@@ -93,7 +95,7 @@ type StopAlarm struct {
 	_      string `action:"stop" entity:"alarm" awsAPI:"cloudwatch" awsCall:"DisableAlarmActions" awsInput:"cloudwatch.DisableAlarmActionsInput" awsOutput:"cloudwatch.DisableAlarmActionsOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    cloudwatchiface.CloudWatchAPI
+	api    *cloudwatch.Client
 	Names  []*string `awsName:"AlarmNames" awsType:"awsstringslice" templateName:"names"`
 }
 
@@ -105,7 +107,7 @@ type AttachAlarm struct {
 	_         string `action:"attach" entity:"alarm" awsAPI:"cloudwatch"`
 	logger    *logger.Logger
 	graph     cloud.GraphAPI
-	api       cloudwatchiface.CloudWatchAPI
+	api       *cloudwatch.Client
 	Name      *string `templateName:"name"`
 	ActionArn *string `templateName:"action-arn"`
 }
@@ -119,9 +121,9 @@ func (cmd *AttachAlarm) ManualRun(renv env.Running) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	alarm.AlarmActions = append(alarm.AlarmActions, cmd.ActionArn)
+	alarm.AlarmActions = append(alarm.AlarmActions, aws.ToString(cmd.ActionArn))
 
-	return cmd.api.PutMetricAlarm(&cloudwatch.PutMetricAlarmInput{
+	return cmd.api.PutMetricAlarm(context.Background(), &cloudwatch.PutMetricAlarmInput{
 		ActionsEnabled:                   alarm.ActionsEnabled,
 		AlarmActions:                     alarm.AlarmActions,
 		AlarmDescription:                 alarm.AlarmDescription,
@@ -147,7 +149,7 @@ type DetachAlarm struct {
 	_         string `action:"detach" entity:"alarm" awsAPI:"cloudwatch"`
 	logger    *logger.Logger
 	graph     cloud.GraphAPI
-	api       cloudwatchiface.CloudWatchAPI
+	api       *cloudwatch.Client
 	Name      *string `templateName:"name"`
 	ActionArn *string `templateName:"action-arn"`
 }
@@ -161,21 +163,21 @@ func (cmd *DetachAlarm) ManualRun(renv env.Running) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	actionArn := aws.StringValue(cmd.ActionArn)
+	actionArn := aws.ToString(cmd.ActionArn)
 	var found bool
-	var updatedActions []*string
+	var updatedActions []string
 	for _, action := range alarm.AlarmActions {
-		if aws.StringValue(action) == actionArn {
+		if action == actionArn {
 			found = true
 		} else {
 			updatedActions = append(updatedActions, action)
 		}
 	}
 	if !found {
-		return nil, fmt.Errorf("detach alarm: action '%s' is not attached to alarm actions of alarm %s", actionArn, aws.StringValue(alarm.AlarmName))
+		return nil, fmt.Errorf("detach alarm: action '%s' is not attached to alarm actions of alarm %s", actionArn, aws.ToString(alarm.AlarmName))
 	}
 
-	return cmd.api.PutMetricAlarm(&cloudwatch.PutMetricAlarmInput{
+	return cmd.api.PutMetricAlarm(context.Background(), &cloudwatch.PutMetricAlarmInput{
 		ActionsEnabled:                   alarm.ActionsEnabled,
 		AlarmActions:                     updatedActions,
 		AlarmDescription:                 alarm.AlarmDescription,
@@ -197,11 +199,11 @@ func (cmd *DetachAlarm) ManualRun(renv env.Running) (interface{}, error) {
 	})
 }
 
-func getAlarm(api cloudwatchiface.CloudWatchAPI, name *string) (*cloudwatch.MetricAlarm, error) {
+func getAlarm(api *cloudwatch.Client, name *string) (*cloudwatchtypes.MetricAlarm, error) {
 	if name == nil {
 		return nil, errors.New("missing required params 'name'")
 	}
-	out, err := api.DescribeAlarms(&cloudwatch.DescribeAlarmsInput{AlarmNames: []*string{name}})
+	out, err := api.DescribeAlarms(context.Background(), &cloudwatch.DescribeAlarmsInput{AlarmNames: []string{*name}})
 	if err != nil {
 		return nil, err
 	}
@@ -210,5 +212,5 @@ func getAlarm(api cloudwatchiface.CloudWatchAPI, name *string) (*cloudwatch.Metr
 	} else if l > 1 {
 		return nil, fmt.Errorf("%d alarms found with name '%s'", l, StringValue(name))
 	}
-	return out.MetricAlarms[0], nil
+	return &out.MetricAlarms[0], nil
 }

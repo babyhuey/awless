@@ -19,7 +19,6 @@ package logger
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -29,7 +28,7 @@ import (
 )
 
 var DefaultLogger *Logger = New("", 0)
-var DiscardLogger *Logger = New("", 0, ioutil.Discard)
+var DiscardLogger *Logger = New("", 0, io.Discard)
 
 const (
 	VerboseF = 1 << iota

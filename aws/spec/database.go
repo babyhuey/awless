@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -23,10 +24,10 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -34,7 +35,7 @@ type CreateDatabase struct {
 	_      string `action:"create" entity:"database" awsAPI:"rds"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    rdsiface.RDSAPI
+	api    *rds.Client
 
 	// Required for DB
 	Type     *string `awsName:"DBInstanceClass" awsType:"awsstr" templateName:"type"`
@@ -148,7 +149,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err 
 			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceReadReplicaInput: %s", ierr)
 		}
 		start := time.Now()
-		output, err = cmd.api.CreateDBInstanceReadReplica(input)
+		output, err = cmd.api.CreateDBInstanceReadReplica(context.Background(), input)
 		cmd.logger.ExtraVerbosef("rds.CreateDBInstanceReadReplica call took %s", time.Since(start))
 	} else {
 		input := &rds.CreateDBInstanceInput{}
@@ -156,7 +157,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err 
 			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceInput: %s", ierr)
 		}
 		start := time.Now()
-		output, err = cmd.api.CreateDBInstance(input)
+		output, err = cmd.api.CreateDBInstance(context.Background(), input)
 		cmd.logger.ExtraVerbosef("rds.CreateDBInstance call took %s", time.Since(start))
 	}
 	if err != nil {
@@ -168,9 +169,9 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err 
 func (cmd *CreateDatabase) ExtractResult(i interface{}) string {
 	switch i.(type) {
 	case *rds.CreateDBInstanceOutput:
-		return awssdk.StringValue(i.(*rds.CreateDBInstanceOutput).DBInstance.DBInstanceIdentifier)
+		return awssdk.ToString(i.(*rds.CreateDBInstanceOutput).DBInstance.DBInstanceIdentifier)
 	case *rds.CreateDBInstanceReadReplicaOutput:
-		return awssdk.StringValue(i.(*rds.CreateDBInstanceReadReplicaOutput).DBInstance.DBInstanceIdentifier)
+		return awssdk.ToString(i.(*rds.CreateDBInstanceReadReplicaOutput).DBInstance.DBInstanceIdentifier)
 	default:
 		logger.Errorf("unexpected interface type %T", i)
 		return ""
@@ -181,7 +182,7 @@ type DeleteDatabase struct {
 	_            string `action:"delete" entity:"database" awsAPI:"rds" awsCall:"DeleteDBInstance" awsInput:"rds.DeleteDBInstanceInput" awsOutput:"rds.DeleteDBInstanceOutput"`
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
-	api          rdsiface.RDSAPI
+	api          *rds.Client
 	Id           *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 	SkipSnapshot *bool   `awsName:"SkipFinalSnapshot" awsType:"awsbool" templateName:"skip-snapshot"`
 	Snapshot     *string `awsName:"FinalDBSnapshotIdentifier" awsType:"awsstr" templateName:"snapshot"`
@@ -197,7 +198,7 @@ type CheckDatabase struct {
 	_       string `action:"check" entity:"database" awsAPI:"rds"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     rdsiface.RDSAPI
+	api     *rds.Client
 	Id      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -225,10 +226,10 @@ func (cmd *CheckDatabase) ManualRun(renv env.Running) (interface{}, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeDBInstances(input)
+			output, err := cmd.api.DescribeDBInstances(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(awserr.Error); ok {
-					if awserr.Code() == "DatabaseNotFound" {
+				if awserr, ok := err.(smithy.APIError); ok {
+					if awserr.ErrorCode() == "DatabaseNotFound" {
 						return notFoundState, nil
 					}
 				} else {
@@ -255,7 +256,7 @@ type StartDatabase struct {
 	_      string `action:"start" entity:"database" awsAPI:"rds" awsCall:"StartDBInstance" awsInput:"rds.StartDBInstanceInput" awsOutput:"rds.StartDBInstanceOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    rdsiface.RDSAPI
+	api    *rds.Client
 	Id     *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 }
 
@@ -267,7 +268,7 @@ type StopDatabase struct {
 	_      string `action:"stop" entity:"database" awsAPI:"rds" awsCall:"StopDBInstance" awsInput:"rds.StopDBInstanceInput" awsOutput:"rds.StopDBInstanceOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    rdsiface.RDSAPI
+	api    *rds.Client
 	Id     *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 }
 
@@ -279,7 +280,7 @@ type RestartDatabase struct {
 	_            string `action:"restart" entity:"database" awsAPI:"rds" awsCall:"RebootDBInstance" awsInput:"rds.RebootDBInstanceInput" awsOutput:"rds.RebootDBInstanceOutput"`
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
-	api          rdsiface.RDSAPI
+	api          *rds.Client
 	Id           *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 	WithFailover *bool   `awsName:"ForceFailover" awsType:"awsbool" templateName:"with-failover"`
 }

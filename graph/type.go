@@ -24,8 +24,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wallix/awless/cloud/rdf"
 	tstore "github.com/wallix/triplestore"
+
+	"github.com/wallix/awless/cloud/rdf"
 )
 
 type FirewallRules []*FirewallRule

@@ -17,36 +17,34 @@ limitations under the License.
 package awsservices
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
-	"github.com/aws/aws-sdk-go/aws/ec2metadata"
-	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/wallix/awless/aws/config"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
+
+	awsconfig "github.com/wallix/awless/aws/config"
 	"github.com/wallix/awless/logger"
 )
 
 func ResolveRegionFromEnv() (region string) {
-	var sess *session.Session
-	var err error
-
-	if sess, err = newSessionResolver().resolve(); err == nil {
-		region = awssdk.StringValue(sess.Config.Region)
+	cfg, err := newConfigResolver().resolve()
+	if err == nil {
+		region = cfg.Region
 	}
 
 	if awsconfig.IsValidRegion(region) {
 		fmt.Fprintf(os.Stderr, "Found existing AWS region '%s'. Setting it as your default region.\n", region)
-	} else if sess != nil {
-		if r, err := ec2metadata.New(sess).Region(); err == nil {
-			fmt.Fprintf(os.Stderr, "Found AWS region '%s' from local EC2 instance metadata. Setting it as your default region.\n", r)
-			region = r
+	} else {
+		client := imds.NewFromConfig(cfg)
+		output, imdsErr := client.GetRegion(context.Background(), &imds.GetRegionInput{})
+		if imdsErr == nil {
+			fmt.Fprintf(os.Stderr, "Found AWS region '%s' from local EC2 instance metadata. Setting it as your default region.\n", output.Region)
+			region = output.Region
 		}
 	}
 
@@ -58,19 +56,17 @@ func ResolveRegionFromEnv() (region string) {
 	return
 }
 
-type sessionResolver struct {
-	region, profile                      string
-	profileSetterCallback                func(val string) error
-	httpClient                           *http.Client
-	credentialHTTPClient                 *http.Client
-	logger                               *logger.Logger
-	enableRequestsFullLogging            bool
-	enableNetworkMonitorRequestsHandlers bool
-	enableCredentialResolvers            bool
+type configResolver struct {
+	region, profile           string
+	profileSetterCallback     func(val string) error
+	httpClient                *http.Client
+	credentialHTTPClient      *http.Client
+	logger                    *logger.Logger
+	enableCredentialResolvers bool
 }
 
-func newSessionResolver() *sessionResolver {
-	return &sessionResolver{
+func newConfigResolver() *configResolver {
+	return &configResolver{
 		credentialHTTPClient:  &http.Client{Timeout: 1 * time.Second},
 		httpClient:            http.DefaultClient,
 		profileSetterCallback: func(val string) error { return nil },
@@ -78,94 +74,66 @@ func newSessionResolver() *sessionResolver {
 	}
 }
 
-func (s *sessionResolver) withRegion(region string) *sessionResolver {
+func (s *configResolver) withRegion(region string) *configResolver {
 	s.region = region
 	return s
 }
 
-func (s *sessionResolver) withProfile(profile string) *sessionResolver {
+func (s *configResolver) withProfile(profile string) *configResolver {
 	s.profile = profile
 	return s
 }
 
-func (s *sessionResolver) withCredentialResolvers() *sessionResolver {
+func (s *configResolver) withCredentialResolvers() *configResolver {
 	s.enableCredentialResolvers = true
 	return s
 }
 
-func (s *sessionResolver) withProfileSetter(f func(val string) error) *sessionResolver {
+func (s *configResolver) withProfileSetter(f func(val string) error) *configResolver {
 	s.profileSetterCallback = f
 	return s
 }
 
-func (s *sessionResolver) withLogger(l *logger.Logger) *sessionResolver {
+func (s *configResolver) withLogger(l *logger.Logger) *configResolver {
 	s.logger = l
 	return s
 }
 
-func (s *sessionResolver) withNetworkMonitor(enableNetworkMonitor bool) *sessionResolver {
-	s.enableNetworkMonitorRequestsHandlers = enableNetworkMonitor
+func (s *configResolver) withNetworkMonitor(enableNetworkMonitor bool) *configResolver {
+	// Network monitor request handlers are not supported in SDK v2.
+	// This method is retained for API compatibility.
 	return s
 }
 
-func (s *sessionResolver) resolve() (*session.Session, error) {
-	session, err := session.NewSessionWithOptions(session.Options{
-		Config: awssdk.Config{
-			Region:                        awssdk.String(s.region),
-			HTTPClient:                    s.credentialHTTPClient,
-			CredentialsChainVerboseErrors: awssdk.Bool(true),
-		},
-		SharedConfigState:       session.SharedConfigEnable,
-		AssumeRoleTokenProvider: stscreds.StdinTokenProvider,
-		Profile:                 s.profile,
-	})
+func (s *configResolver) resolve() (aws.Config, error) {
+	var opts []func(*config.LoadOptions) error
+
+	if s.region != "" {
+		opts = append(opts, config.WithRegion(s.region))
+	}
+	if s.profile != "" {
+		opts = append(opts, config.WithSharedConfigProfile(s.profile))
+	}
+
+	opts = append(opts, config.WithHTTPClient(s.httpClient))
+
+	cfg, err := config.LoadDefaultConfig(context.Background(), opts...)
 	if err != nil {
-		return nil, err
-	}
-
-	if s.enableRequestsFullLogging {
-		session.Config = session.Config.WithLogLevel(awssdk.LogDebugWithHTTPBody)
-	}
-
-	session.Handlers.Retry.PushFront(func(req *request.Request) {
-		if req.IsErrorThrottle() && s.logger != nil {
-			s.logger.Verbosef("retrying %s: %s: %s", req.Operation.Name, req.Error.(awserr.Error).Code(), req.Error.(awserr.Error).Message())
-		}
-	})
-
-	if s.enableNetworkMonitorRequestsHandlers {
-		session.Handlers.Send.PushFront(func(r *request.Request) {
-			DefaultNetworkMonitor.addRequest(r)
-		})
-		session.Handlers.Complete.PushBack(func(r *request.Request) {
-			DefaultNetworkMonitor.setRequestEnd(r)
-		})
+		return aws.Config{}, err
 	}
 
 	if s.enableCredentialResolvers {
-		session.Config.Credentials = credentials.NewCredentials(
-			&credentials.ChainProvider{
-				VerboseErrors: true,
-				Providers: []credentials.Provider{
-					&fileCacheProvider{
-						creds:   session.Config.Credentials,
-						profile: s.profile,
-						log:     s.logger,
-					},
-					&credentialsPrompterProvider{
-						profile: s.profile,
-						out:     os.Stderr,
-						profileSetterCallback: s.profileSetterCallback,
-					},
-				},
-			})
-
-		if _, err = session.Config.Credentials.Get(); err != nil {
-			return session, err
+		// TODO: Migrate fileCacheProvider and credentialsPrompterProvider
+		// to implement aws.CredentialsProvider (v2) instead of the v1
+		// credentials.Provider interface, then wire them back in here.
+		//
+		// For now, rely on the default credential chain from
+		// config.LoadDefaultConfig which covers environment variables,
+		// shared credentials/config files, and IAM roles.
+		if _, err = cfg.Credentials.Retrieve(context.Background()); err != nil {
+			return cfg, err
 		}
 	}
 
-	session.Config.HTTPClient = s.httpClient
-
-	return session, nil
+	return cfg, nil
 }

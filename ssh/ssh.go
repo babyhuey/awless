@@ -6,7 +6,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
@@ -122,12 +121,12 @@ func (c *Client) NewClientWithProxy(destinationHost string, destinationPort int,
 		c.logger.ExtraVerbosef("proxied successfully with user %s", user)
 
 		return &Client{
-			Client:  gossh.NewClient(conn, chans, reqs),
-			Proxy:   c,
-			IP:      destinationHost,
-			User:    user,
-			Keypath: c.Keypath,
-			Port:    destinationPort,
+			Client:                  gossh.NewClient(conn, chans, reqs),
+			Proxy:                   c,
+			IP:                      destinationHost,
+			User:                    user,
+			Keypath:                 c.Keypath,
+			Port:                    destinationPort,
 			InteractiveTerminalFunc: func(*gossh.Client) error { return nil },
 			StrictHostKeyChecking:   c.StrictHostKeyChecking,
 			logger:                  logger.DiscardLogger,
@@ -286,7 +285,7 @@ func findPrivateKeyFromName(keyname string, keyFolders ...string) (privateKey, b
 	}
 
 	for _, path := range keyPaths {
-		b, err := ioutil.ReadFile(path)
+		b, err := os.ReadFile(path)
 		if err == nil {
 			priv.path = path
 			priv.body = b
@@ -380,8 +379,9 @@ const tmpProxyCommandScriptFilename = "awless-ssh-proxycommand"
 // Bug: when executing syscall.Exec(args[0], args, os.Environ()) and args contains
 // the proxy command (typically args := []string{"/usr/bin/ssh", "ec2-user@172.31.78.138", "-o", "StrictHostKeychecking=no", "-o", "ProxyCommand='ssh ec2-user@52.26.181.76 -W [%h]:%p'"}
 // we get an error like (in Go, Python):
-//     /bin/bash: 1: exec: ssh ec2-user@52.26.181.76 -W [172.31.78.138]:22: not found
-//     ssh_exchange_identification: Connection closed by remote host
+//
+//	/bin/bash: 1: exec: ssh ec2-user@52.26.181.76 -W [172.31.78.138]:22: not found
+//	ssh_exchange_identification: Connection closed by remote host
 //
 // Since execve(2) can take as the first argument a filename, the workaround is to use
 // a temporary script to execute this command.

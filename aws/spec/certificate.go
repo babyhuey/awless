@@ -24,10 +24,13 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/acm"
-	"github.com/aws/aws-sdk-go/service/acm/acmiface"
+	"context"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/acm"
+	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -35,7 +38,7 @@ type CreateCertificate struct {
 	_                 string `action:"create" entity:"certificate" awsAPI:"acm"`
 	logger            *logger.Logger
 	graph             cloud.GraphAPI
-	api               acmiface.ACMAPI
+	api               *acm.Client
 	Domains           []*string `templateName:"domains"`
 	ValidationDomains []*string `templateName:"validation-domains"`
 }
@@ -48,7 +51,7 @@ func (cmd *CreateCertificate) ParamsSpec() params.Spec {
 
 func (cmd *CreateCertificate) ManualRun(renv env.Running) (interface{}, error) {
 	input := &acm.RequestCertificateInput{}
-	domains := awssdk.StringValueSlice(cmd.Domains)
+	domains := awssdk.ToStringSlice(cmd.Domains)
 	if len(domains) == 0 {
 		return nil, fmt.Errorf("'domains' must contain at least one element")
 	}
@@ -66,15 +69,15 @@ func (cmd *CreateCertificate) ManualRun(renv env.Running) (interface{}, error) {
 	domainsToValidate := make(map[string]string)
 	// Extra params
 	if len(cmd.ValidationDomains) > 0 {
-		var validationOptions []*acm.DomainValidationOption
+		var validationOptions []acmtypes.DomainValidationOption
 
-		validation := awssdk.StringValueSlice(cmd.ValidationDomains)
+		validation := awssdk.ToStringSlice(cmd.ValidationDomains)
 		for i, validationDomain := range validation {
 			if i >= len(domains) {
 				return nil, fmt.Errorf("there is more validation-domains than certificate domains: %v", validation)
 			}
 			domainsToValidate[domains[i]] = validationDomain
-			validationOptions = append(validationOptions, &acm.DomainValidationOption{DomainName: String(domains[i]), ValidationDomain: String(validationDomain)})
+			validationOptions = append(validationOptions, acmtypes.DomainValidationOption{DomainName: String(domains[i]), ValidationDomain: String(validationDomain)})
 		}
 		input.DomainValidationOptions = validationOptions
 	}
@@ -86,7 +89,7 @@ func (cmd *CreateCertificate) ManualRun(renv env.Running) (interface{}, error) {
 
 	start := time.Now()
 	var output *acm.RequestCertificateOutput
-	output, err = cmd.api.RequestCertificate(input)
+	output, err = cmd.api.RequestCertificate(context.Background(), input)
 	if err != nil {
 		return nil, err
 	}
@@ -103,14 +106,14 @@ func (cmd *CreateCertificate) ManualRun(renv env.Running) (interface{}, error) {
 }
 
 func (cmd *CreateCertificate) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*acm.RequestCertificateOutput).CertificateArn)
+	return awssdk.ToString(i.(*acm.RequestCertificateOutput).CertificateArn)
 }
 
 type DeleteCertificate struct {
 	_      string `action:"delete" entity:"certificate" awsAPI:"acm" awsCall:"DeleteCertificate" awsInput:"acm.DeleteCertificateInput" awsOutput:"acm.DeleteCertificateOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    acmiface.ACMAPI
+	api    *acm.Client
 	Arn    *string `awsName:"CertificateArn" awsType:"awsstr" templateName:"arn"`
 }
 
@@ -122,7 +125,7 @@ type CheckCertificate struct {
 	_       string `action:"check" entity:"certificate" awsAPI:"acm"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     acmiface.ACMAPI
+	api     *acm.Client
 	Arn     *string `templateName:"arn"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -146,10 +149,10 @@ func (cmd *CheckCertificate) ManualRun(renv env.Running) (interface{}, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeCertificate(input)
+			output, err := cmd.api.DescribeCertificate(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(awserr.Error); ok {
-					if awserr.Code() == "CertificateNotFound" {
+				if awserr, ok := err.(smithy.APIError); ok {
+					if awserr.ErrorCode() == "CertificateNotFound" {
 						return notFoundState, nil
 					}
 				} else {
@@ -159,7 +162,7 @@ func (cmd *CheckCertificate) ManualRun(renv env.Running) (interface{}, error) {
 			if output.Certificate == nil {
 				return notFoundState, nil
 			}
-			return StringValue(output.Certificate.Status), nil
+			return string(output.Certificate.Status), nil
 		},
 		expect: StringValue(cmd.State),
 		logger: cmd.logger,

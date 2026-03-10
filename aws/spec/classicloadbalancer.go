@@ -18,8 +18,9 @@ package awsspec
 import (
 	"strings"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/elb/elbiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/env"
@@ -30,7 +31,7 @@ type CreateClassicLoadbalancer struct {
 	_                     string `action:"create" entity:"classicloadbalancer" awsAPI:"elb" awsCall:"CreateLoadBalancer" awsInput:"elb.CreateLoadBalancerInput" awsOutput:"elb.CreateLoadBalancerOutput"`
 	logger                *logger.Logger
 	graph                 cloud.GraphAPI
-	api                   elbiface.ELBAPI
+	api                   *elb.Client
 	Name                  *string   `awsName:"LoadBalancerName" awsType:"awsstr" templateName:"name"`
 	AvailabilityZones     []*string `awsName:"AvailabilityZones" awsType:"awsstringslice" templateName:"zones"`
 	Listeners             []*string `awsName:"Listeners" awsType:"awsclassicloadblisteners" templateName:"listeners"`
@@ -50,7 +51,7 @@ func (cmd *CreateClassicLoadbalancer) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateClassicLoadbalancer) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(cmd.Name)
+	return awssdk.ToString(cmd.Name)
 }
 
 func (cmd *CreateClassicLoadbalancer) AfterRun(renv env.Running, output interface{}) (err error) {
@@ -94,7 +95,7 @@ type UpdateClassicLoadbalancer struct {
 	_                             string `action:"update" entity:"classicloadbalancer" awsAPI:"elb" awsCall:"ConfigureHealthCheck" awsInput:"elb.ConfigureHealthCheckInput" awsOutput:"elb.ConfigureHealthCheckOutput"`
 	logger                        *logger.Logger
 	graph                         cloud.GraphAPI
-	api                           elbiface.ELBAPI
+	api                           *elb.Client
 	Name                          *string `awsName:"LoadBalancerName" awsType:"awsstr" templateName:"name"`
 	HealthcheckHealthyThreshold   *int64  `awsName:"Healthcheck.HealthyThreshold" awsType:"awsint64" templateName:"healthy-threshold"`
 	HealthcheckUnhealthyThreshold *int64  `awsName:"Healthcheck.UnhealthyThreshold" awsType:"awsint64" templateName:"unhealthy-threshold"`
@@ -114,7 +115,7 @@ type DeleteClassicLoadbalancer struct {
 	_      string `action:"delete" entity:"classicloadbalancer" awsAPI:"elb" awsCall:"DeleteLoadBalancer" awsInput:"elb.DeleteLoadBalancerInput" awsOutput:"elb.DeleteLoadBalancerOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    elbiface.ELBAPI
+	api    *elb.Client
 	Name   *string `awsName:"LoadBalancerName" awsType:"awsstr" templateName:"name"`
 }
 
@@ -126,7 +127,7 @@ type AttachClassicLoadbalancer struct {
 	_        string `action:"attach" entity:"classicloadbalancer" awsAPI:"elb" awsCall:"RegisterInstancesWithLoadBalancer" awsInput:"elb.RegisterInstancesWithLoadBalancerInput" awsOutput:"elb.RegisterInstancesWithLoadBalancerOutput"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      elbiface.ELBAPI
+	api      *elb.Client
 	Name     *string `awsName:"LoadBalancerName" awsType:"awsstr" templateName:"name"`
 	Instance *string `awsName:"Instances[0]InstanceId" awsType:"awsslicestruct" templateName:"instance"`
 }
@@ -136,14 +137,14 @@ func (cmd *AttachClassicLoadbalancer) ParamsSpec() params.Spec {
 }
 
 func (cmd *AttachClassicLoadbalancer) ExtractResult(interface{}) string {
-	return awssdk.StringValue(cmd.Instance)
+	return awssdk.ToString(cmd.Instance)
 }
 
 type DetachClassicLoadbalancer struct {
 	_        string `action:"detach" entity:"classicloadbalancer" awsAPI:"elb" awsCall:"DeregisterInstancesFromLoadBalancer" awsInput:"elb.DeregisterInstancesFromLoadBalancerInput" awsOutput:"elb.DeregisterInstancesFromLoadBalancerOutput"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      elbiface.ELBAPI
+	api      *elb.Client
 	Name     *string `awsName:"LoadBalancerName" awsType:"awsstr" templateName:"name"`
 	Instance *string `awsName:"Instances[0]InstanceId" awsType:"awsslicestruct" templateName:"instance"`
 }
@@ -153,5 +154,5 @@ func (cmd *DetachClassicLoadbalancer) ParamsSpec() params.Spec {
 }
 
 func (cmd *DetachClassicLoadbalancer) ExtractResult(interface{}) string {
-	return awssdk.StringValue(cmd.Instance)
+	return awssdk.ToString(cmd.Instance)
 }

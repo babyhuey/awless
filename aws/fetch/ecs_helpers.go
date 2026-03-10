@@ -4,29 +4,34 @@ import (
 	"context"
 	"sync"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+
 	"github.com/wallix/awless/fetch"
 )
 
-func getClusterArns(ctx context.Context, cache fetch.Cache, api ecsiface.ECSAPI) ([]string, error) {
+func getClusterArns(ctx context.Context, cache fetch.Cache, api *ecs.Client) ([]string, error) {
 	var arns []string
 	if clusterName, hasFilter := getUserFiltersFromContext(ctx)["cluster"]; hasFilter {
-		out, err := api.DescribeClusters(&ecs.DescribeClustersInput{Clusters: []*string{&clusterName}})
+		out, err := api.DescribeClusters(ctx, &ecs.DescribeClustersInput{Clusters: []string{clusterName}})
 		if err != nil {
 			return arns, err
 		}
 		for _, c := range out.Clusters {
-			arns = append(arns, awssdk.StringValue(c.ClusterArn))
+			arns = append(arns, awssdk.ToString(c.ClusterArn))
 		}
 	} else {
 		if val, cerr := cache.Get("getClustersNames", func() (interface{}, error) {
-			err := api.ListClustersPages(&ecs.ListClustersInput{}, func(out *ecs.ListClustersOutput, lastPage bool) (shouldContinue bool) {
-				arns = append(arns, awssdk.StringValueSlice(out.ClusterArns)...)
-				return out.NextToken != nil
-			})
-			return arns, err
+			paginator := ecs.NewListClustersPaginator(api, &ecs.ListClustersInput{})
+			for paginator.HasMorePages() {
+				out, err := paginator.NextPage(ctx)
+				if err != nil {
+					return arns, err
+				}
+				arns = append(arns, out.ClusterArns...)
+			}
+			return arns, nil
 		}); cerr != nil {
 			return arns, cerr
 		} else if v, ok := val.([]string); ok {
@@ -36,7 +41,7 @@ func getClusterArns(ctx context.Context, cache fetch.Cache, api ecsiface.ECSAPI)
 	return arns, nil
 }
 
-func getAllTasks(ctx context.Context, cache fetch.Cache, api ecsiface.ECSAPI) (res []*ecs.Task, err error) {
+func getAllTasks(ctx context.Context, cache fetch.Cache, api *ecs.Client) (res []ecstypes.Task, err error) {
 	clusterArns, cerr := getClusterArns(ctx, cache, api)
 	if cerr != nil {
 		return res, cerr
@@ -45,32 +50,37 @@ func getAllTasks(ctx context.Context, cache fetch.Cache, api ecsiface.ECSAPI) (r
 	type listTasksOutput struct {
 		err     error
 		output  *ecs.ListTasksOutput
-		cluster *string
+		cluster string
 	}
 	tasksNamesc := make(chan listTasksOutput)
 	var wg sync.WaitGroup
-
-	addTaskContainersFunc := func(cl string) func(*ecs.ListTasksOutput, bool) bool {
-		return func(out *ecs.ListTasksOutput, lastPage bool) (shouldContinue bool) {
-			tasksNamesc <- listTasksOutput{output: out, cluster: awssdk.String(cl)}
-			return out.NextToken != nil
-		}
-	}
 
 	for _, cluster := range clusterArns {
 		wg.Add(1)
 		go func(cl string) {
 			defer wg.Done()
-			if er := api.ListTasksPages(&ecs.ListTasksInput{Cluster: &cl, DesiredStatus: awssdk.String("RUNNING")}, addTaskContainersFunc(cl)); er != nil {
-				tasksNamesc <- listTasksOutput{err: er}
+			paginator := ecs.NewListTasksPaginator(api, &ecs.ListTasksInput{Cluster: &cl, DesiredStatus: ecstypes.DesiredStatusRunning})
+			for paginator.HasMorePages() {
+				out, er := paginator.NextPage(ctx)
+				if er != nil {
+					tasksNamesc <- listTasksOutput{err: er}
+					return
+				}
+				tasksNamesc <- listTasksOutput{output: out, cluster: cl}
 			}
 		}(cluster)
 
 		wg.Add(1)
 		go func(cl string) {
 			defer wg.Done()
-			if er := api.ListTasksPages(&ecs.ListTasksInput{Cluster: &cl, DesiredStatus: awssdk.String("STOPPED")}, addTaskContainersFunc(cl)); er != nil {
-				tasksNamesc <- listTasksOutput{err: er}
+			paginator := ecs.NewListTasksPaginator(api, &ecs.ListTasksInput{Cluster: &cl, DesiredStatus: ecstypes.DesiredStatusStopped})
+			for paginator.HasMorePages() {
+				out, er := paginator.NextPage(ctx)
+				if er != nil {
+					tasksNamesc <- listTasksOutput{err: er}
+					return
+				}
+				tasksNamesc <- listTasksOutput{output: out, cluster: cl}
 			}
 		}(cluster)
 	}
@@ -96,9 +106,9 @@ func getAllTasks(ctx context.Context, cache fetch.Cache, api ecsiface.ECSAPI) (r
 			}
 
 			tasksWG.Add(1)
-			go func(arns []*string, cluster *string) {
+			go func(taskArns []string, cluster string) {
 				defer tasksWG.Done()
-				tasksOut, er := api.DescribeTasks(&ecs.DescribeTasksInput{Cluster: cluster, Tasks: arns})
+				tasksOut, er := api.DescribeTasks(ctx, &ecs.DescribeTasksInput{Cluster: &cluster, Tasks: taskArns})
 				tasksc <- describeTasksOutput{err: er, output: tasksOut}
 			}(r.output.TaskArns, r.cluster)
 		}

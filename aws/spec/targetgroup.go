@@ -1,10 +1,11 @@
-/* Copyright 2017 WALLIX
+/*
+	Copyright 2017 WALLIX
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,9 +22,12 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"context"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -31,7 +35,7 @@ type CreateTargetgroup struct {
 	_                   string `action:"create" entity:"targetgroup" awsAPI:"elbv2" awsCall:"CreateTargetGroup" awsInput:"elbv2.CreateTargetGroupInput" awsOutput:"elbv2.CreateTargetGroupOutput"`
 	logger              *logger.Logger
 	graph               cloud.GraphAPI
-	api                 elbv2iface.ELBV2API
+	api                 *elbv2.Client
 	Name                *string `awsName:"Name" awsType:"awsstr" templateName:"name"`
 	Port                *int64  `awsName:"Port" awsType:"awsint64" templateName:"port"`
 	Protocol            *string `awsName:"Protocol" awsType:"awsstr" templateName:"protocol"`
@@ -53,14 +57,14 @@ func (cmd *CreateTargetgroup) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateTargetgroup) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*elbv2.CreateTargetGroupOutput).TargetGroups[0].TargetGroupArn)
+	return awssdk.ToString(i.(*elbv2.CreateTargetGroupOutput).TargetGroups[0].TargetGroupArn)
 }
 
 type UpdateTargetgroup struct {
 	_                   string `action:"update" entity:"targetgroup" awsAPI:"elbv2"`
 	logger              *logger.Logger
 	graph               cloud.GraphAPI
-	api                 elbv2iface.ELBV2API
+	api                 *elbv2.Client
 	Id                  *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"id"`
 	Deregistrationdelay *string `awsType:"awsstr" templateName:"deregistrationdelay"`
 	Stickiness          *string `awsType:"awsstr" templateName:"stickiness"`
@@ -88,21 +92,21 @@ func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (interface{}, error) {
 	var areTargetAttrsModified bool
 
 	if v := tg.Stickiness; v != nil {
-		attrsInput.Attributes = append(attrsInput.Attributes, &elbv2.TargetGroupAttribute{
+		attrsInput.Attributes = append(attrsInput.Attributes, elbv2types.TargetGroupAttribute{
 			Key:   String("stickiness.enabled"),
 			Value: v,
 		})
 		areTargetAttrsModified = true
 	}
 	if v := tg.Stickinessduration; v != nil {
-		attrsInput.Attributes = append(attrsInput.Attributes, &elbv2.TargetGroupAttribute{
+		attrsInput.Attributes = append(attrsInput.Attributes, elbv2types.TargetGroupAttribute{
 			Key:   String("stickiness.lb_cookie.duration_seconds"),
 			Value: v,
 		})
 		areTargetAttrsModified = true
 	}
 	if v := tg.Deregistrationdelay; v != nil {
-		attrsInput.Attributes = append(attrsInput.Attributes, &elbv2.TargetGroupAttribute{
+		attrsInput.Attributes = append(attrsInput.Attributes, elbv2types.TargetGroupAttribute{
 			Key:   String("deregistration_delay.timeout_seconds"),
 			Value: v,
 		})
@@ -116,7 +120,7 @@ func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (interface{}, error) {
 			return nil, err
 		}
 		start := time.Now()
-		if _, err = tg.api.ModifyTargetGroupAttributes(attrsInput); err != nil {
+		if _, err = tg.api.ModifyTargetGroupAttributes(context.Background(), attrsInput); err != nil {
 			return nil, err
 		}
 		tg.logger.ExtraVerbosef("elbv2.ModifyTargetGroupAttributes call took %s", time.Since(start))
@@ -178,7 +182,7 @@ func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (interface{}, error) {
 			return nil, err
 		}
 		start := time.Now()
-		output, err := tg.api.ModifyTargetGroup(input)
+		output, err := tg.api.ModifyTargetGroup(context.Background(), input)
 		tg.logger.ExtraVerbosef("elbv2.ModifyTargetGroup call took %s", time.Since(start))
 		return output, err
 	}
@@ -189,7 +193,7 @@ type DeleteTargetgroup struct {
 	_      string `action:"delete" entity:"targetgroup" awsAPI:"elbv2" awsCall:"DeleteTargetGroup" awsInput:"elbv2.DeleteTargetGroupInput" awsOutput:"elbv2.DeleteTargetGroupOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    elbv2iface.ELBV2API
+	api    *elbv2.Client
 	Id     *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"id"`
 }
 

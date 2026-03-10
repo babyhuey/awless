@@ -32,9 +32,12 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -42,7 +45,7 @@ type CreatePolicy struct {
 	_           string `action:"create" entity:"policy" awsAPI:"iam" awsCall:"CreatePolicy" awsInput:"iam.CreatePolicyInput" awsOutput:"iam.CreatePolicyOutput"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         iamiface.IAMAPI
+	api         *iam.Client
 	Name        *string   `awsName:"PolicyName" awsType:"awsstr" templateName:"name"`
 	Effect      *string   `templateName:"effect"`
 	Action      []*string `templateName:"action"`
@@ -85,7 +88,7 @@ type UpdatePolicy struct {
 	_              string `action:"update" entity:"policy" awsAPI:"iam" awsCall:"CreatePolicyVersion" awsInput:"iam.CreatePolicyVersionInput" awsOutput:"iam.CreatePolicyVersionOutput"`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            iamiface.IAMAPI
+	api            *iam.Client
 	Arn            *string   `awsName:"PolicyArn" awsType:"awsstr" templateName:"arn"`
 	Effect         *string   `templateName:"effect"`
 	Action         []*string `templateName:"action"`
@@ -140,19 +143,19 @@ func (cmd *UpdatePolicy) getPolicyLastVersionDocument(arn *string) (string, erro
 	listVersionsInput := &iam.ListPolicyVersionsInput{
 		PolicyArn: arn,
 	}
-	listVersionsOut, err := cmd.api.ListPolicyVersions(listVersionsInput)
+	listVersionsOut, err := cmd.api.ListPolicyVersions(context.Background(), listVersionsInput)
 	if err != nil {
 		return "", err
 	}
-	var defaultVersion *iam.PolicyVersion
+	var defaultVersion *iamtypes.PolicyVersion
 	for _, version := range listVersionsOut.Versions {
-		if aws.BoolValue(version.IsDefaultVersion) {
+		if version.IsDefaultVersion {
 			policyDetailInput := &iam.GetPolicyVersionInput{
 				VersionId: version.VersionId,
 				PolicyArn: arn,
 			}
 			var policyDetailOutput *iam.GetPolicyVersionOutput
-			if policyDetailOutput, err = cmd.api.GetPolicyVersion(policyDetailInput); err != nil {
+			if policyDetailOutput, err = cmd.api.GetPolicyVersion(context.Background(), policyDetailInput); err != nil {
 				return "", err
 			}
 			defaultVersion = policyDetailOutput.PolicyVersion
@@ -161,7 +164,7 @@ func (cmd *UpdatePolicy) getPolicyLastVersionDocument(arn *string) (string, erro
 	if defaultVersion == nil {
 		return "", fmt.Errorf("update policy: can not find default version for policy with arn '%s'", StringValue(arn))
 	}
-	document, err := url.QueryUnescape(aws.StringValue(defaultVersion.Document))
+	document, err := url.QueryUnescape(aws.ToString(defaultVersion.Document))
 	if err != nil {
 		return "", fmt.Errorf("decoding policy document: %s", err)
 	}
@@ -172,7 +175,7 @@ type DeletePolicy struct {
 	_           string `action:"delete" entity:"policy" awsAPI:"iam"  awsCall:"DeletePolicy" awsInput:"iam.DeletePolicyInput" awsOutput:"iam.DeletePolicyOutput"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         iamiface.IAMAPI
+	api         *iam.Client
 	Arn         *string `awsName:"PolicyArn" awsType:"awsstr" templateName:"arn"`
 	AllVersions *bool   `templateName:"all-versions"`
 }
@@ -185,15 +188,15 @@ func (cmd *DeletePolicy) ParamsSpec() params.Spec {
 
 func (cmd *DeletePolicy) BeforeRun(renv env.Running) error {
 	if BoolValue(cmd.AllVersions) {
-		list, err := cmd.api.ListPolicyVersions(&iam.ListPolicyVersionsInput{PolicyArn: cmd.Arn})
+		list, err := cmd.api.ListPolicyVersions(context.Background(), &iam.ListPolicyVersionsInput{PolicyArn: cmd.Arn})
 		if err != nil {
 			return fmt.Errorf("list all policy versions: %s", err)
 		}
 		for _, v := range list.Versions {
-			if !aws.BoolValue(v.IsDefaultVersion) {
-				cmd.logger.Verbosef("deleting version '%s' of policy '%s'", aws.StringValue(v.VersionId), StringValue(cmd.Arn))
-				if _, err := cmd.api.DeletePolicyVersion(&iam.DeletePolicyVersionInput{PolicyArn: cmd.Arn, VersionId: v.VersionId}); err != nil {
-					return fmt.Errorf("delete version %s: %s", aws.StringValue(v.VersionId), err)
+			if !v.IsDefaultVersion {
+				cmd.logger.Verbosef("deleting version '%s' of policy '%s'", aws.ToString(v.VersionId), StringValue(cmd.Arn))
+				if _, err := cmd.api.DeletePolicyVersion(context.Background(), &iam.DeletePolicyVersionInput{PolicyArn: cmd.Arn, VersionId: v.VersionId}); err != nil {
+					return fmt.Errorf("delete version %s: %s", aws.ToString(v.VersionId), err)
 				}
 			}
 		}
@@ -205,7 +208,7 @@ type AttachPolicy struct {
 	_       string `action:"attach" entity:"policy" awsAPI:"iam"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     iamiface.IAMAPI
+	api     *iam.Client
 	Arn     *string `awsName:"PolicyArn" awsType:"awsstr" templateName:"arn"`
 	User    *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 	Group   *string `awsName:"GroupName" awsType:"awsstr" templateName:"group"`
@@ -245,21 +248,21 @@ func (cmd *AttachPolicy) ManualRun(renv env.Running) (interface{}, error) {
 		input := &iam.AttachUserPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.UserName = cmd.User
-		output, err := cmd.api.AttachUserPolicy(input)
+		output, err := cmd.api.AttachUserPolicy(context.Background(), input)
 		cmd.logger.ExtraVerbosef("ec2.AttachUserPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Group != nil:
 		input := &iam.AttachGroupPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.GroupName = cmd.Group
-		output, err := cmd.api.AttachGroupPolicy(input)
+		output, err := cmd.api.AttachGroupPolicy(context.Background(), input)
 		cmd.logger.ExtraVerbosef("ec2.AttachGroupPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Role != nil:
 		input := &iam.AttachRolePolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.RoleName = cmd.Role
-		output, err := cmd.api.AttachRolePolicy(input)
+		output, err := cmd.api.AttachRolePolicy(context.Background(), input)
 		cmd.logger.ExtraVerbosef("ec2.AttachRolePolicy call took %s", time.Since(start))
 		return output, err
 	default:
@@ -271,7 +274,7 @@ type DetachPolicy struct {
 	_      string `action:"detach" entity:"policy" awsAPI:"iam"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Arn    *string `awsName:"PolicyArn" awsType:"awsstr" templateName:"arn"`
 	User   *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 	Group  *string `awsName:"GroupName" awsType:"awsstr" templateName:"group"`
@@ -294,21 +297,21 @@ func (cmd *DetachPolicy) ManualRun(renv env.Running) (interface{}, error) {
 		input := &iam.DetachUserPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.UserName = cmd.User
-		output, err := cmd.api.DetachUserPolicy(input)
+		output, err := cmd.api.DetachUserPolicy(context.Background(), input)
 		cmd.logger.ExtraVerbosef("ec2.DetachUserPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Group != nil:
 		input := &iam.DetachGroupPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.GroupName = cmd.Group
-		output, err := cmd.api.DetachGroupPolicy(input)
+		output, err := cmd.api.DetachGroupPolicy(context.Background(), input)
 		cmd.logger.ExtraVerbosef("ec2.DetachGroupPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Role != nil:
 		input := &iam.DetachRolePolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.RoleName = cmd.Role
-		output, err := cmd.api.DetachRolePolicy(input)
+		output, err := cmd.api.DetachRolePolicy(context.Background(), input)
 		cmd.logger.ExtraVerbosef("ec2.DetachRolePolicy call took %s", time.Since(start))
 		return output, err
 	default:

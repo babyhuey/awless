@@ -17,22 +17,24 @@ limitations under the License.
 package awsservices
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"reflect"
 	"strings"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/wallix/awless/aws/conv"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	tstore "github.com/wallix/triplestore"
+
+	awsconv "github.com/wallix/awless/aws/conv"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/graph"
-	tstore "github.com/wallix/triplestore"
 )
 
 const (
@@ -172,21 +174,26 @@ func (fb funcBuilder) build() addParentFn {
 
 func (fb funcBuilder) addRelationWithField() addParentFn {
 	return func(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
-		vals, err := awsutil.ValuesAtPath(i, fb.fieldName)
+		val, err := valueAtPath(i, fb.fieldName)
 		if err != nil {
 			return err
 		}
-		switch len(vals) {
-		case 0:
+		if val == nil {
 			return nil
-		case 1:
-			break
-		default:
-			return fmt.Errorf("%d values found at path '%s' for value '%#v'", len(vals), fb.fieldName, i)
 		}
-		str, ok := vals[0].(*string)
-		if !ok {
-			return fmt.Errorf("add parent to %s: %T not a string pointer", fb.fieldName, vals[0])
+
+		var strVal string
+		switch s := val.(type) {
+		case *string:
+			strVal = aws.ToString(s)
+		case string:
+			strVal = s
+		default:
+			return fmt.Errorf("add parent to %s: %T not a string", fb.fieldName, val)
+		}
+
+		if strVal == "" {
+			return nil
 		}
 
 		res, err := awsconv.InitResource(i)
@@ -194,11 +201,7 @@ func (fb funcBuilder) addRelationWithField() addParentFn {
 			return err
 		}
 
-		if awssdk.StringValue(str) == "" {
-			return nil
-		}
-
-		parent := graph.InitResource(fb.parent, awssdk.StringValue(str))
+		parent := graph.InitResource(fb.parent, strVal)
 		return addRelation(g, parent, res, fb.relation)
 	}
 }
@@ -220,15 +223,21 @@ func (fb funcBuilder) addRelationListWithStringField() addParentFn {
 		}
 
 		for i := 0; i < structField.Len(); i++ {
-			str, ok := structField.Index(i).Interface().(*string)
-			if !ok {
-				return fmt.Errorf("add parent to %s: not a string pointer: %T", res.Id(), str)
+			elem := structField.Index(i).Interface()
+			var strVal string
+			switch s := elem.(type) {
+			case *string:
+				strVal = aws.ToString(s)
+			case string:
+				strVal = s
+			default:
+				return fmt.Errorf("add parent to %s: not a string: %T", res.Id(), elem)
 			}
 
-			if awssdk.StringValue(str) == "" {
+			if strVal == "" {
 				continue
 			}
-			parent := graph.InitResource(fb.parent, awssdk.StringValue(str))
+			parent := graph.InitResource(fb.parent, strVal)
 
 			if err = addRelation(g, parent, res, fb.relation); err != nil {
 				return err
@@ -256,10 +265,15 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 
 		for i := 0; i < structField.Len(); i++ {
 			listValue := structField.Index(i)
-			if listValue.Kind() != reflect.Ptr {
-				return fmt.Errorf("add parent to %s: not a pointer: %s", res.Id(), listValue.Kind())
+			var listStruc reflect.Value
+			switch listValue.Kind() {
+			case reflect.Ptr:
+				listStruc = listValue.Elem()
+			case reflect.Struct:
+				listStruc = listValue
+			default:
+				return fmt.Errorf("add parent to %s: not a struct or pointer: %s", res.Id(), listValue.Kind())
 			}
-			listStruc := listValue.Elem()
 			if listStruc.Kind() != reflect.Struct {
 				return fmt.Errorf("add parent to %s: not a struct: %s", res.Id(), listStruc.Kind())
 			}
@@ -267,15 +281,21 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 			if !listStructField.IsValid() {
 				return fmt.Errorf("add parent to %s: unknown field %s in %d", res.Id(), listStructField, i)
 			}
-			str, ok := listStructField.Interface().(*string)
-			if !ok {
-				return fmt.Errorf("add parent to %s: %T is not a string pointer", listStructField, listStructField.Interface())
+
+			var strVal string
+			switch s := listStructField.Interface().(type) {
+			case *string:
+				strVal = aws.ToString(s)
+			case string:
+				strVal = s
+			default:
+				return fmt.Errorf("add parent to %s: %T is not a string", listStructField, listStructField.Interface())
 			}
 
-			if awssdk.StringValue(str) == "" {
+			if strVal == "" {
 				continue
 			}
-			parent := graph.InitResource(fb.parent, awssdk.StringValue(str))
+			parent := graph.InitResource(fb.parent, strVal)
 
 			if err = addRelation(g, parent, res, fb.relation); err != nil {
 				return err
@@ -344,18 +364,18 @@ func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 	if !structField.IsValid() {
 		return fmt.Errorf("add parent to %s: unknown field %s in %d", res.Id(), structField, i)
 	}
-	policies, ok := structField.Interface().([]*iam.AttachedPolicy)
+	policies, ok := structField.Interface().([]iamtypes.AttachedPolicy)
 	if !ok {
 		return fmt.Errorf("add parent to %s: not a valid attached policy list: %T", res.Id(), structField.Interface())
 	}
 
 	for _, policy := range policies {
-		policies, err := graph.ResolveResourcesWithProp(snap, cloud.Policy, "Name", awssdk.StringValue(policy.PolicyName))
+		policies, err := graph.ResolveResourcesWithProp(snap, cloud.Policy, "Name", aws.ToString(policy.PolicyName))
 		if err != nil {
 			return err
 		}
 		if len(policies) != 1 {
-			fmt.Fprintf(os.Stderr, "add parent to '%s/%s': unknown policy named '%s'. Ignoring it.\n", res.Type(), res.Id(), awssdk.StringValue(policy.PolicyName))
+			fmt.Fprintf(os.Stderr, "add parent to '%s/%s': unknown policy named '%s'. Ignoring it.\n", res.Type(), res.Id(), aws.ToString(policy.PolicyName))
 			return nil
 		}
 		g.AddAppliesOnRelation(policies[0], res)
@@ -364,7 +384,7 @@ func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 }
 
 func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
-	user, ok := i.(*iam.UserDetail)
+	user, ok := i.(*iamtypes.UserDetail)
 	if !ok {
 		return fmt.Errorf("aws fetch: not a user, but a %T", i)
 	}
@@ -374,7 +394,7 @@ func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string,
 	}
 
 	for _, group := range user.GroupList {
-		groupName := awssdk.StringValue(group)
+		groupName := group
 		resources, err := graph.ResolveResourcesWithProp(snap, cloud.Group, "Name", groupName)
 		if err != nil {
 			return err
@@ -392,7 +412,7 @@ func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string,
 }
 
 func fetchTargetsAndAddRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
-	group, ok := i.(*elbv2.TargetGroup)
+	group, ok := i.(*elbv2types.TargetGroup)
 	if !ok {
 		return fmt.Errorf("add targets relation: not a target group, but a %T", i)
 	}
@@ -401,13 +421,13 @@ func fetchTargetsAndAddRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 		return err
 	}
 
-	targets, err := InfraService.(*Infra).DescribeTargetHealth(&elbv2.DescribeTargetHealthInput{TargetGroupArn: group.TargetGroupArn})
+	targets, err := InfraService.(*Infra).Elbv2Client.DescribeTargetHealth(context.Background(), &elbv2.DescribeTargetHealthInput{TargetGroupArn: group.TargetGroupArn})
 	if err != nil {
 		return err
 	}
 
 	for _, t := range targets.TargetHealthDescriptions {
-		n := graph.InitResource(cloud.Instance, awssdk.StringValue(t.Target.Id))
+		n := graph.InitResource(cloud.Instance, aws.ToString(t.Target.Id))
 		err = g.AddAppliesOnRelation(parent, n)
 		if err != nil {
 			return err
@@ -417,7 +437,7 @@ func fetchTargetsAndAddRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 }
 
 func addScalingGroupSubnets(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
-	group, ok := i.(*autoscaling.Group)
+	group, ok := i.(*autoscalingtypes.AutoScalingGroup)
 	if !ok {
 		return fmt.Errorf("add autoscaling group relation: not a autoscaling group, but a %T", i)
 	}
@@ -425,7 +445,7 @@ func addScalingGroupSubnets(g *graph.Graph, snap tstore.RDFGraph, region string,
 	if err != nil {
 		return err
 	}
-	if subnets := awssdk.StringValue(group.VPCZoneIdentifier); subnets != "" {
+	if subnets := aws.ToString(group.VPCZoneIdentifier); subnets != "" {
 		splits := strings.Split(subnets, ",")
 		for _, split := range splits {
 			n := graph.InitResource(cloud.Subnet, split)
@@ -438,8 +458,31 @@ func addScalingGroupSubnets(g *graph.Graph, snap tstore.RDFGraph, region string,
 	return nil
 }
 
+// valueAtPath navigates a dot-separated field path through struct fields,
+// returning the value found. Replaces awsutil.ValuesAtPath from SDK v1.
+func valueAtPath(i interface{}, path string) (interface{}, error) {
+	parts := strings.Split(path, ".")
+	v := reflect.ValueOf(i)
+	for _, part := range parts {
+		for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+			if v.IsNil() {
+				return nil, nil
+			}
+			v = v.Elem()
+		}
+		if v.Kind() != reflect.Struct {
+			return nil, fmt.Errorf("expected struct at path segment '%s', got %s", part, v.Kind())
+		}
+		v = v.FieldByName(part)
+		if !v.IsValid() {
+			return nil, fmt.Errorf("field '%s' not found", part)
+		}
+	}
+	return v.Interface(), nil
+}
+
 func addAlarmMetric(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
-	alarm, ok := i.(*cloudwatch.MetricAlarm)
+	alarm, ok := i.(*cloudwatchtypes.MetricAlarm)
 	if !ok {
 		return fmt.Errorf("add alarm metric relation: not a alarm, but a %T", i)
 	}
@@ -447,7 +490,7 @@ func addAlarmMetric(g *graph.Graph, snap tstore.RDFGraph, region string, i inter
 	if err != nil {
 		return err
 	}
-	if namespace, metric := awssdk.StringValue(alarm.Namespace), awssdk.StringValue(alarm.MetricName); namespace != "" && metric != "" {
+	if namespace, metric := aws.ToString(alarm.Namespace), aws.ToString(alarm.MetricName); namespace != "" && metric != "" {
 		id := awsconv.HashFields(namespace, metric)
 		n := graph.InitResource(cloud.Metric, id)
 		err = g.AddAppliesOnRelation(parent, n)

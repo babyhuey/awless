@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 /*
@@ -26,7 +27,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -86,7 +86,7 @@ func buildAndZip(osname, arch string) error {
 		fmt.Sprintf("GOOS=%s", osname),
 	}
 
-	builddir, err := ioutil.TempDir("", "")
+	builddir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func buildAndZip(osname, arch string) error {
 			return err
 		}
 
-		content, err := ioutil.ReadFile(artefactPath)
+		content, err := os.ReadFile(artefactPath)
 		if err != nil {
 			return err
 		}

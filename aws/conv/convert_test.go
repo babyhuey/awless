@@ -22,18 +22,18 @@ import (
 	"reflect"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/wallix/awless/graph"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/elb"
+	"github.com/wallix/awless/graph"
 )
 
 func TestTransformFunctions(t *testing.T) {
 	t.Parallel()
 	t.Run("extractTag", func(t *testing.T) {
 		t.Parallel()
-		tag := []*ec2.Tag{
+		tag := []ec2types.Tag{
 			{Key: awssdk.String("Name"), Value: awssdk.String("instance-name")},
 			{Key: awssdk.String("Created with"), Value: awssdk.String("awless")},
 		}
@@ -73,23 +73,23 @@ func TestTransformFunctions(t *testing.T) {
 
 	t.Run("extractField", func(t *testing.T) {
 		t.Parallel()
-		data := &ec2.InstanceState{Code: awssdk.Int64(12), Name: awssdk.String("running")}
+		data := &ec2types.InstanceState{Code: awssdk.Int32(12), Name: ec2types.InstanceStateNameRunning}
 
 		val, _ := extractFieldFn("Code")(data)
-		if got, want := val.(int64), int64(12); got != want {
+		if got, want := val.(int32), int32(12); got != want {
 			t.Fatalf("got %d, want %d", got, want)
 		}
 		val, _ = extractFieldFn("Name")(data)
-		if got, want := val.(string), "running"; got != want {
+		if got, want := fmt.Sprint(val), "running"; got != want {
 			t.Fatalf("got %s, want %s", got, want)
 		}
 	})
 
 	t.Run("extractClassicLoadbListenerDescriptions", func(t *testing.T) {
 		t.Parallel()
-		descriptions := []*elb.ListenerDescription{
-			{Listener: &elb.Listener{LoadBalancerPort: awssdk.Int64(443), Protocol: awssdk.String("HTTPS"), InstancePort: awssdk.Int64(8080), InstanceProtocol: awssdk.String("HTTP")}},
-			{Listener: &elb.Listener{LoadBalancerPort: awssdk.Int64(5000), Protocol: awssdk.String("SSL"), InstancePort: awssdk.Int64(3000), InstanceProtocol: awssdk.String("TCP")}},
+		descriptions := []elbtypes.ListenerDescription{
+			{Listener: &elbtypes.Listener{LoadBalancerPort: 443, Protocol: awssdk.String("HTTPS"), InstancePort: awssdk.Int32(8080), InstanceProtocol: awssdk.String("HTTP")}},
+			{Listener: &elbtypes.Listener{LoadBalancerPort: 5000, Protocol: awssdk.String("SSL"), InstancePort: awssdk.Int32(3000), InstanceProtocol: awssdk.String("TCP")}},
 		}
 
 		expected := []string{"HTTPS:443:HTTP:8080", "SSL:5000:TCP:3000"}
@@ -112,40 +112,40 @@ func TestTransformFunctions(t *testing.T) {
 
 	t.Run("extractIpPermissions", func(t *testing.T) {
 		t.Parallel()
-		ipPermissions := []*ec2.IpPermission{
-			{FromPort: awssdk.Int64(70),
-				ToPort:     awssdk.Int64(85),
+		ipPermissions := []ec2types.IpPermission{
+			{FromPort: awssdk.Int32(70),
+				ToPort:     awssdk.Int32(85),
 				IpProtocol: awssdk.String("udp"),
-				IpRanges:   []*ec2.IpRange{},
+				IpRanges:   []ec2types.IpRange{},
 			},
-			{FromPort: awssdk.Int64(-1),
-				ToPort:     awssdk.Int64(-1),
+			{FromPort: awssdk.Int32(-1),
+				ToPort:     awssdk.Int32(-1),
 				IpProtocol: awssdk.String("-1"),
-				IpRanges:   []*ec2.IpRange{{CidrIp: awssdk.String("10.192.24.0/24")}},
+				IpRanges:   []ec2types.IpRange{{CidrIp: awssdk.String("10.192.24.0/24")}},
 			},
-			{FromPort: awssdk.Int64(12),
-				ToPort:     awssdk.Int64(12),
+			{FromPort: awssdk.Int32(12),
+				ToPort:     awssdk.Int32(12),
 				IpProtocol: awssdk.String("27"),
-				IpRanges: []*ec2.IpRange{
+				IpRanges: []ec2types.IpRange{
 					{CidrIp: awssdk.String("1.2.3.4/32")},
 					{CidrIp: awssdk.String("2.3.0.0/16")},
 				},
 			},
-			{FromPort: awssdk.Int64(22),
-				ToPort:     awssdk.Int64(22),
+			{FromPort: awssdk.Int32(22),
+				ToPort:     awssdk.Int32(22),
 				IpProtocol: awssdk.String("tcp"),
-				IpRanges: []*ec2.IpRange{
+				IpRanges: []ec2types.IpRange{
 					{CidrIp: awssdk.String("1.2.3.4/32")},
 				},
-				Ipv6Ranges: []*ec2.Ipv6Range{
+				Ipv6Ranges: []ec2types.Ipv6Range{
 					{CidrIpv6: awssdk.String("fd34:fe56:7891:2f3a::/64")},
 					{CidrIpv6: awssdk.String("2001:db8::/110")},
 				},
 			},
-			{FromPort: awssdk.Int64(0),
-				ToPort:     awssdk.Int64(65535),
+			{FromPort: awssdk.Int32(0),
+				ToPort:     awssdk.Int32(65535),
 				IpProtocol: awssdk.String("tcp"),
-				UserIdGroupPairs: []*ec2.UserIdGroupPair{
+				UserIdGroupPairs: []ec2types.UserIdGroupPair{
 					{GroupId: awssdk.String("group_1")},
 					{GroupId: awssdk.String("group_2")},
 				},
@@ -206,7 +206,7 @@ func TestTransformFunctions(t *testing.T) {
 
 	t.Run("extractSliceValues", func(t *testing.T) {
 		t.Parallel()
-		slice := []*ec2.GroupIdentifier{
+		slice := []ec2types.GroupIdentifier{
 			{GroupId: awssdk.String("MyGroup1"), GroupName: awssdk.String("MyGroupName1")},
 			{GroupId: awssdk.String("MyGroup2"), GroupName: awssdk.String("MyGroupName2")},
 		}
@@ -231,7 +231,7 @@ func TestTransformFunctions(t *testing.T) {
 
 	t.Run("extractRoutesSlice", func(t *testing.T) {
 		t.Parallel()
-		routes := []*ec2.Route{
+		routes := []ec2types.Route{
 			{
 				DestinationCidrBlock:        awssdk.String("10.0.0.0/24"),
 				EgressOnlyInternetGatewayId: awssdk.String("test_id_1"),
@@ -351,7 +351,7 @@ func TestTransformFunctions(t *testing.T) {
 
 	t.Run("extractHasATrueBoolInStructSlice", func(t *testing.T) {
 		t.Parallel()
-		slice := []*ec2.RouteTableAssociation{
+		slice := []ec2types.RouteTableAssociation{
 			{Main: awssdk.Bool(false), RouteTableAssociationId: awssdk.String("test")},
 			{RouteTableId: awssdk.String("test2"), Main: awssdk.Bool(true)},
 		}
@@ -364,7 +364,7 @@ func TestTransformFunctions(t *testing.T) {
 			t.Fatalf("got %t, want %t", got, want)
 		}
 
-		slice = []*ec2.RouteTableAssociation{
+		slice = []ec2types.RouteTableAssociation{
 			{Main: awssdk.Bool(false), RouteTableAssociationId: awssdk.String("test")},
 			{RouteTableId: awssdk.String("test2"), Main: awssdk.Bool(false)},
 		}

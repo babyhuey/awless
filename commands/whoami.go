@@ -18,15 +18,18 @@ package commands
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
+	"errors"
+
+	"github.com/aws/smithy-go"
 	"github.com/spf13/cobra"
-	"github.com/wallix/awless/aws/services"
+
+	awsservices "github.com/wallix/awless/aws/services"
 	"github.com/wallix/awless/logger"
 )
 
@@ -97,7 +100,8 @@ var whoamiCmd = &cobra.Command{
 
 		policies, err := awsservices.AccessService.(*awsservices.Access).GetUserPolicies(me.Resource)
 		if err != nil {
-			if aerr, ok := err.(awserr.RequestFailure); ok && aerr.Code() == "AccessDenied" {
+			var ae smithy.APIError
+			if errors.As(err, &ae) && ae.ErrorCode() == "AccessDenied" {
 				logger.Warningf("user '%s' is not authorized to list its policies", me.Resource)
 			} else {
 				logger.Error(err)
@@ -132,7 +136,7 @@ var whoamiCmd = &cobra.Command{
 func getMyIP() net.IP {
 	client := &http.Client{Timeout: 3 * time.Second}
 	if resp, err := client.Get("http://checkip.amazonaws.com/"); err == nil {
-		b, _ := ioutil.ReadAll(resp.Body)
+		b, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		return net.ParseIP(strings.TrimSpace(string(b)))
 	}

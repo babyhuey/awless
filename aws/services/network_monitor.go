@@ -9,19 +9,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/wallix/awless/console"
 )
 
-var DefaultNetworkMonitor = &NetworkMonitor{requests: make(map[*request.Request]*req)}
+var DefaultNetworkMonitor = &NetworkMonitor{requests: make(map[string]*req)}
 
 type NetworkMonitor struct {
-	requests map[*request.Request]*req
+	requests map[string]*req
 	l        sync.Mutex
 }
 
 type req struct {
-	*request.Request
+	name    string
 	from    time.Time
 	to      time.Time
 	retries []time.Time
@@ -41,8 +40,8 @@ func (n *NetworkMonitor) DisplayStats(w io.Writer) {
 		if max.IsZero() || r.to.After(max) {
 			max = r.to
 		}
-		if len(r.Operation.Name) > maxFunctionNameLength {
-			maxFunctionNameLength = len(r.Operation.Name)
+		if len(r.name) > maxFunctionNameLength {
+			maxFunctionNameLength = len(r.name)
 		}
 		sorted = append(sorted, r)
 	}
@@ -58,13 +57,13 @@ func (n *NetworkMonitor) DisplayStats(w io.Writer) {
 
 	for _, r := range sorted {
 		if len(r.retries) > 0 {
-			drawRequest(w, r.Operation.Name, min, r.from, r.retries[0], maxwidth, maxDuration, "[", "X")
+			drawRequest(w, r.name, min, r.from, r.retries[0], maxwidth, maxDuration, "[", "X")
 			for i := 0; i < len(r.retries)-1; i++ {
-				drawRequest(w, r.Operation.Name, min, r.retries[i], r.retries[i+1], maxwidth, maxDuration, "o", "X")
+				drawRequest(w, r.name, min, r.retries[i], r.retries[i+1], maxwidth, maxDuration, "o", "X")
 			}
-			drawRequest(w, r.Operation.Name, min, r.retries[len(r.retries)-1], r.to, maxwidth, maxDuration, "o", "]")
+			drawRequest(w, r.name, min, r.retries[len(r.retries)-1], r.to, maxwidth, maxDuration, "o", "]")
 		} else {
-			drawRequest(w, r.Operation.Name, min, r.from, r.to, maxwidth, maxDuration, "[", "]")
+			drawRequest(w, r.name, min, r.from, r.to, maxwidth, maxDuration, "[", "]")
 		}
 	}
 }
@@ -77,23 +76,23 @@ func drawRequest(w io.Writer, name string, min, from, to time.Time, maxwidth uin
 	fmt.Fprintf(w, "%s%s%s%s%s %s(%dms)\n", strings.Repeat(" ", int(before)), startChar, strings.Repeat("-", int(width)), stopChar, strings.Repeat(" ", int(after)), name, duration/(1000*1000))
 }
 
-func (n *NetworkMonitor) addRequest(r *request.Request) {
+func (n *NetworkMonitor) AddRequest(name string) {
 	n.l.Lock()
 	defer n.l.Unlock()
-	if request, ok := n.requests[r]; ok {
-		request.retries = append(request.retries, time.Now().UTC())
+	if r, ok := n.requests[name]; ok {
+		r.retries = append(r.retries, time.Now().UTC())
 	} else {
-		n.requests[r] = &req{Request: r, from: time.Now().UTC()}
+		n.requests[name] = &req{name: name, from: time.Now().UTC()}
 	}
 }
 
-func (n *NetworkMonitor) setRequestEnd(r *request.Request) {
+func (n *NetworkMonitor) SetRequestEnd(name string) {
 	n.l.Lock()
 	defer n.l.Unlock()
-	request, ok := n.requests[r]
+	r, ok := n.requests[name]
 	if !ok {
-		fmt.Fprintf(os.Stderr, "request '%s' not found\n", r.RequestID)
+		fmt.Fprintf(os.Stderr, "request '%s' not found\n", name)
 		return
 	}
-	request.to = time.Now().UTC()
+	r.to = time.Now().UTC()
 }

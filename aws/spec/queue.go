@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateQueue struct {
 	_                 string `action:"create" entity:"queue" awsAPI:"sqs" awsCall:"CreateQueue" awsInput:"sqs.CreateQueueInput" awsOutput:"sqs.CreateQueueOutput"`
 	logger            *logger.Logger
 	graph             cloud.GraphAPI
-	api               sqsiface.SQSAPI
+	api               *sqs.Client
 	Name              *string `awsName:"QueueName" awsType:"awsstr" templateName:"name"`
 	Delay             *string `awsName:"Attributes[DelaySeconds]" awsType:"awsstringpointermap" templateName:"delay"`
 	MaxMsgSize        *string `awsName:"Attributes[MaximumMessageSize]" awsType:"awsstringpointermap" templateName:"max-msg-size"`
@@ -46,14 +46,14 @@ func (cmd *CreateQueue) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateQueue) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*sqs.CreateQueueOutput).QueueUrl)
+	return awssdk.ToString(i.(*sqs.CreateQueueOutput).QueueUrl)
 }
 
 type DeleteQueue struct {
 	_      string `action:"delete" entity:"queue" awsAPI:"sqs" awsCall:"DeleteQueue" awsInput:"sqs.DeleteQueueInput" awsOutput:"sqs.DeleteQueueOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    sqsiface.SQSAPI
+	api    *sqs.Client
 	Url    *string `awsName:"QueueUrl" awsType:"awsstr" templateName:"url"`
 }
 

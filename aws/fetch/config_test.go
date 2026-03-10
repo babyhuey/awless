@@ -3,21 +3,15 @@ package awsfetch
 import (
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
 )
 
 func TestAssignAPIs(t *testing.T) {
-	type iamMock struct {
-		iamiface.IAMAPI
-	}
-	type ec2Mock struct {
-		ec2iface.EC2API
-	}
-	type any struct {
-	}
+	iamClient := &iam.Client{}
+	ec2Client := &ec2.Client{}
 
-	conf := NewConfig(&iamMock{}, ec2Mock{}, nil, nil, any{}, new(any))
+	conf := NewConfig(iamClient, ec2Client, nil)
 	if conf.APIs.Iam == nil {
 		t.Fatal("unexpected nil")
 	}

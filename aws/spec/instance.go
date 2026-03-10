@@ -19,11 +19,13 @@ import (
 	"fmt"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"context"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/env"
@@ -34,7 +36,7 @@ type CreateInstance struct {
 	_              string `action:"create" entity:"instance" awsAPI:"ec2" awsCall:"RunInstances" awsInput:"ec2.RunInstancesInput" awsOutput:"ec2.Reservation" awsDryRun:""`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            ec2iface.EC2API
+	api            *ec2.Client
 	Image          *string   `awsName:"ImageId" awsType:"awsstr" templateName:"image"`
 	Count          *int64    `awsName:"MaxCount,MinCount" awsType:"awsin64" templateName:"count"`
 	Type           *string   `awsName:"InstanceType" awsType:"awsstr" templateName:"type"`
@@ -45,6 +47,7 @@ type CreateInstance struct {
 	UserData       *string   `awsName:"UserData" awsType:"awsuserdatatobase64" templateName:"userdata"`
 	SecurityGroups []*string `awsName:"SecurityGroupIds" awsType:"awsstringslice" templateName:"securitygroup"`
 	Lock           *bool     `awsName:"DisableApiTermination" awsType:"awsbool" templateName:"lock"`
+	EbsOptimized   *bool     `awsName:"EbsOptimized" awsType:"awsbool" templateName:"ebs-optimized"`
 	Role           *string   `awsName:"IamInstanceProfile.Name" awsType:"awsstr" templateName:"role"`
 	DistroQuery    *string   `awsType:"awsstr" templateName:"distro"`
 }
@@ -53,7 +56,7 @@ func (cmd *CreateInstance) ParamsSpec() params.Spec {
 	builder := params.SpecBuilder(
 		params.AllOf(params.OnlyOneOf(params.Key("distro"), params.Key("image")),
 			params.Key("count"), params.Key("type"), params.Key("name"), params.Key("subnet"),
-			params.Opt(params.Suggested("keypair", "securitygroup"), "ip", "userdata", "lock", "role"),
+			params.Opt(params.Suggested("keypair", "securitygroup"), "ip", "userdata", "lock", "ebs-optimized", "role"),
 		),
 		params.Validators{"ip": params.IsIP},
 	)
@@ -88,7 +91,7 @@ func (cmd *CreateInstance) convertDistroToAMI(values map[string]interface{}) (ma
 }
 
 func (cmd *CreateInstance) ExtractResult(i interface{}) string {
-	return StringValue(i.(*ec2.Reservation).Instances[0].InstanceId)
+	return StringValue(i.(*ec2.RunInstancesOutput).Instances[0].InstanceId)
 }
 
 func (cmd *CreateInstance) AfterRun(renv env.Running, output interface{}) error {
@@ -99,7 +102,7 @@ type UpdateInstance struct {
 	_      string `action:"update" entity:"instance" awsAPI:"ec2" awsCall:"ModifyInstanceAttribute" awsInput:"ec2.ModifyInstanceAttributeInput" awsOutput:"ec2.ModifyInstanceAttributeOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"InstanceId" awsType:"awsstr" templateName:"id"`
 	Type   *string `awsName:"InstanceType.Value" awsType:"awsstr" templateName:"type"`
 	Lock   *bool   `awsName:"DisableApiTermination" awsType:"awsboolattribute" templateName:"lock"`
@@ -113,7 +116,7 @@ type DeleteInstance struct {
 	_      string `action:"delete" entity:"instance" awsAPI:"ec2" awsCall:"TerminateInstances" awsInput:"ec2.TerminateInstancesInput" awsOutput:"ec2.TerminateInstancesOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	IDs    []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
 }
 
@@ -127,7 +130,7 @@ type StartInstance struct {
 	_      string `action:"start" entity:"instance" awsAPI:"ec2" awsCall:"StartInstances" awsInput:"ec2.StartInstancesInput" awsOutput:"ec2.StartInstancesOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
 }
 
@@ -138,14 +141,14 @@ func (cmd *StartInstance) ParamsSpec() params.Spec {
 }
 
 func (cmd *StartInstance) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.StartInstancesOutput).StartingInstances[0].InstanceId)
+	return awssdk.ToString(i.(*ec2.StartInstancesOutput).StartingInstances[0].InstanceId)
 }
 
 type StopInstance struct {
 	_      string `action:"stop" entity:"instance" awsAPI:"ec2" awsCall:"StopInstances" awsInput:"ec2.StopInstancesInput" awsOutput:"ec2.StopInstancesOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
 }
 
@@ -163,7 +166,7 @@ type RestartInstance struct {
 	_      string `action:"restart" entity:"instance" awsAPI:"ec2" awsCall:"RebootInstances" awsInput:"ec2.RebootInstancesInput" awsOutput:"ec2.RebootInstancesOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
 }
 
@@ -181,7 +184,7 @@ type CheckInstance struct {
 	_       string `action:"check" entity:"instance" awsAPI:"ec2"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     ec2iface.EC2API
+	api     *ec2.Client
 	Id      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -198,7 +201,7 @@ func (cmd *CheckInstance) ParamsSpec() params.Spec {
 
 func (cmd *CheckInstance) ManualRun(renv env.Running) (interface{}, error) {
 	input := &ec2.DescribeInstancesInput{
-		InstanceIds: []*string{cmd.Id},
+		InstanceIds: []string{awssdk.ToString(cmd.Id)},
 	}
 
 	c := &checker{
@@ -206,10 +209,10 @@ func (cmd *CheckInstance) ManualRun(renv env.Running) (interface{}, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeInstances(input)
+			output, err := cmd.api.DescribeInstances(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(awserr.Error); ok {
-					if awserr.Code() == "InstanceNotFound" {
+				if awserr, ok := err.(smithy.APIError); ok {
+					if awserr.ErrorCode() == "InstanceNotFound" {
 						return notFoundState, nil
 					}
 				} else {
@@ -220,7 +223,7 @@ func (cmd *CheckInstance) ManualRun(renv env.Running) (interface{}, error) {
 					if instances := output.Reservations[0].Instances; len(instances) > 0 {
 						for _, inst := range instances {
 							if StringValue(inst.InstanceId) == StringValue(cmd.Id) {
-								return StringValue(inst.State.Name), nil
+								return string(inst.State.Name), nil
 							}
 						}
 					}
@@ -238,7 +241,7 @@ type AttachInstance struct {
 	_           string `action:"attach" entity:"instance" awsAPI:"elbv2" awsCall:"RegisterTargets" awsInput:"elbv2.RegisterTargetsInput" awsOutput:"elbv2.RegisterTargetsOutput"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         elbv2iface.ELBV2API
+	api         *elbv2.Client
 	Targetgroup *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"targetgroup"`
 	Id          *string `awsName:"Targets[0]Id" awsType:"awsslicestruct" templateName:"id"`
 	Port        *int64  `awsName:"Targets[0]Port" awsType:"awsslicestructint64" templateName:"port"`
@@ -254,7 +257,7 @@ type DetachInstance struct {
 	_           string `action:"detach" entity:"instance" awsAPI:"elbv2" awsCall:"DeregisterTargets" awsInput:"elbv2.DeregisterTargetsInput" awsOutput:"elbv2.DeregisterTargetsOutput"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         elbv2iface.ELBV2API
+	api         *elbv2.Client
 	Targetgroup *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"targetgroup"`
 	Id          *string `awsName:"Targets[0]Id" awsType:"awsslicestruct" templateName:"id"`
 }

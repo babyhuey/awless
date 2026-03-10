@@ -17,8 +17,10 @@ limitations under the License.
 
 package awsconv
 
-import "github.com/wallix/awless/cloud"
-import "github.com/wallix/awless/cloud/properties"
+import (
+	"github.com/wallix/awless/cloud"
+	"github.com/wallix/awless/cloud/properties"
+)
 
 var awsResourcesDef = map[string]map[string]*propertyTransform{
 	//EC2
@@ -532,4 +534,110 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 	},
 	//Queue
 	cloud.Queue: {}, //Manually set
+	// EKS
+	cloud.EKSCluster: {
+		properties.Name:              {name: "Name", transform: extractValueFn},
+		properties.Arn:               {name: "Arn", transform: extractValueFn},
+		properties.State:             {name: "Status", transform: extractValueFn},
+		properties.KubernetesVersion: {name: "Version", transform: extractValueFn},
+		properties.PlatformVersion:   {name: "PlatformVersion", transform: extractValueFn},
+		properties.RoleArn:           {name: "RoleArn", transform: extractValueFn},
+		properties.Endpoint:          {name: "Endpoint", transform: extractValueFn},
+		properties.Created:           {name: "CreatedAt", transform: extractTimeFn},
+		properties.Tags:              {name: "Tags", transform: extractMapTagsFn},
+	},
+	cloud.EKSNodeGroup: {
+		properties.Name:          {name: "NodegroupName", transform: extractValueFn},
+		properties.Arn:           {name: "NodegroupArn", transform: extractValueFn},
+		properties.Cluster:       {name: "ClusterName", transform: extractValueFn},
+		properties.State:         {name: "Status", transform: extractValueFn},
+		properties.Created:       {name: "CreatedAt", transform: extractTimeFn},
+		properties.Subnets:       {name: "Subnets", transform: extractStringPointerSliceValues},
+		properties.Type:          {name: "InstanceTypes", transform: extractStringPointerSliceValues},
+		properties.ScalingConfig: {name: "ScalingConfig", transform: extractEKSScalingConfigFn},
+		properties.Tags:          {name: "Tags", transform: extractMapTagsFn},
+	},
+	// DynamoDB
+	cloud.DynamoDBTable: {
+		properties.Name:      {name: "TableName", transform: extractValueFn},
+		properties.Arn:       {name: "TableArn", transform: extractValueFn},
+		properties.State:     {name: "TableStatus", transform: extractValueFn},
+		properties.Created:   {name: "CreationDateTime", transform: extractTimeFn},
+		properties.ItemCount: {name: "ItemCount", transform: extractValueFn},
+		properties.SizeBytes: {name: "TableSizeBytes", transform: extractValueFn},
+		properties.KeySchema: {name: "KeySchema", transform: extractDynamoDBKeySchemaFn},
+	},
+	// Secrets Manager
+	cloud.Secret: {
+		properties.Name:            {name: "Name", transform: extractValueFn},
+		properties.Arn:             {name: "ARN", transform: extractValueFn},
+		properties.Description:     {name: "Description", transform: extractValueFn},
+		properties.Created:         {name: "CreatedDate", transform: extractTimeFn},
+		properties.Modified:        {name: "LastChangedDate", transform: extractTimeFn},
+		properties.LastAccessed:    {name: "LastAccessedDate", transform: extractTimeFn},
+		properties.LastRotated:     {name: "LastRotatedDate", transform: extractTimeFn},
+		properties.RotationEnabled: {name: "RotationEnabled", transform: extractValueFn},
+		properties.Tags:            {name: "Tags", transform: extractSecretsManagerTagsFn},
+	},
+	// KMS
+	cloud.Key: {
+		properties.Arn:        {name: "Arn", transform: extractValueFn},
+		properties.Name:       {name: "Description", transform: extractValueFn},
+		properties.State:      {name: "KeyState", transform: extractValueFn},
+		properties.KeyManager: {name: "KeyManager", transform: extractValueFn},
+		properties.KeyUsage:   {name: "KeyUsage", transform: extractValueFn},
+		properties.Origin:     {name: "Origin", transform: extractValueFn},
+		properties.Created:    {name: "CreationDate", transform: extractTimeFn},
+		properties.Enabled:    {name: "Enabled", transform: extractValueFn},
+	},
+	// API Gateway
+	cloud.ApiGateway: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+		properties.ApiProtocol: {name: "ProtocolType", transform: extractValueFn},
+		properties.Endpoint:    {name: "ApiEndpoint", transform: extractValueFn},
+		properties.Created:     {name: "CreatedDate", transform: extractTimeFn},
+		properties.Tags:        {name: "Tags", transform: extractMapTagsFn},
+	},
+	cloud.ApiGatewayRoute: {
+		properties.RouteKey: {name: "RouteKey", transform: extractValueFn},
+		properties.Target:   {name: "Target", transform: extractValueFn},
+	},
+	cloud.ApiGatewayStage: {
+		properties.Name:         {name: "StageName", transform: extractValueFn},
+		properties.DeploymentID: {name: "DeploymentId", transform: extractValueFn},
+		properties.AutoDeploy:   {name: "AutoDeploy", transform: extractValueFn},
+		properties.Created:      {name: "CreatedDate", transform: extractTimeFn},
+		properties.Modified:     {name: "LastUpdatedDate", transform: extractTimeFn},
+		properties.Tags:         {name: "Tags", transform: extractMapTagsFn},
+	},
+	// SSM
+	cloud.SSMParameter: {
+		properties.Name:          {name: "Name", transform: extractValueFn},
+		properties.ParameterType: {name: "Type", transform: extractValueFn},
+		properties.DataType:      {name: "DataType", transform: extractValueFn},
+		properties.Tier:          {name: "Tier", transform: extractValueFn},
+		properties.Description:   {name: "Description", transform: extractValueFn},
+		properties.Modified:      {name: "LastModifiedDate", transform: extractTimeFn},
+		properties.Version:       {name: "Version", transform: extractValueAsStringFn},
+	},
+	// EFS
+	cloud.FileSystem: {
+		properties.Name:                 {name: "Tags", transform: extractEFSTagFn("Name")},
+		properties.Arn:                  {name: "FileSystemArn", transform: extractValueFn},
+		properties.State:                {name: "LifeCycleState", transform: extractValueFn},
+		properties.Created:              {name: "CreationTime", transform: extractTimeFn},
+		properties.Encrypted:            {name: "Encrypted", transform: extractValueFn},
+		properties.PerformanceMode:      {name: "PerformanceMode", transform: extractValueFn},
+		properties.ThroughputMode:       {name: "ThroughputMode", transform: extractValueFn},
+		properties.SizeBytes:            {name: "SizeInBytes", transform: extractFieldFn("Value")},
+		properties.NumberOfMountTargets: {name: "NumberOfMountTargets", transform: extractValueFn},
+		properties.Tags:                 {name: "Tags", transform: extractEFSTagsFn},
+	},
+	cloud.MountTarget: {
+		properties.Subnet:         {name: "SubnetId", transform: extractValueFn},
+		properties.Vpc:            {name: "VpcId", transform: extractValueFn},
+		properties.IPAddress:      {name: "IpAddress", transform: extractValueFn},
+		properties.LifecycleState: {name: "LifeCycleState", transform: extractValueFn},
+	},
 }

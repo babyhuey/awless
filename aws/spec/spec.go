@@ -8,11 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
 	"github.com/fatih/color"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 )
@@ -218,8 +220,8 @@ func BoolValue(v *bool) bool {
 }
 
 func decorateAWSError(err error) error {
-	if aerr, ok := err.(awserr.Error); ok {
-		return fmt.Errorf("%s: %s", aerr.Code(), aerr.Message())
+	if aerr, ok := err.(smithy.APIError); ok {
+		return fmt.Errorf("%s: %s", aerr.ErrorCode(), aerr.ErrorMessage())
 	}
 	return err
 }

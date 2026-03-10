@@ -18,68 +18,52 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/acm"
-	"github.com/aws/aws-sdk-go/service/acm/acmiface"
-	"github.com/aws/aws-sdk-go/service/applicationautoscaling"
-	"github.com/aws/aws-sdk-go/service/applicationautoscaling/applicationautoscalingiface"
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
-	"github.com/aws/aws-sdk-go/service/cloudfront"
-	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/aws/aws-sdk-go/service/ecr"
-	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
-	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
-	"github.com/aws/aws-sdk-go/service/elb"
-	"github.com/aws/aws-sdk-go/service/elb/elbiface"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
-	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
-	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/aws/aws-sdk-go/service/route53/route53iface"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
-	"github.com/aws/aws-sdk-go/service/sns"
-	"github.com/aws/aws-sdk-go/service/sns/snsiface"
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	acm "github.com/aws/aws-sdk-go-v2/service/acm"
+	applicationautoscaling "github.com/aws/aws-sdk-go-v2/service/applicationautoscaling"
+	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
+	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
+	ecs "github.com/aws/aws-sdk-go-v2/service/ecs"
+	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	iam "github.com/aws/aws-sdk-go-v2/service/iam"
+	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	rds "github.com/aws/aws-sdk-go-v2/service/rds"
+	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
+	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
+	sns "github.com/aws/aws-sdk-go-v2/service/sns"
+	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/smithy-go"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/env"
 )
 
-func NewAttachAlarm(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachAlarm {
+func NewAttachAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachAlarm {
 	cmd := new(AttachAlarm)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudwatch.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudwatch.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachAlarm) SetApi(api cloudwatchiface.CloudWatchAPI) {
+func (cmd *AttachAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
@@ -138,21 +122,21 @@ func (cmd *AttachAlarm) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachClassicLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachClassicLoadbalancer {
+func NewAttachClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachClassicLoadbalancer {
 	cmd := new(AttachClassicLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elb.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elb.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachClassicLoadbalancer) SetApi(api elbiface.ELBAPI) {
+func (cmd *AttachClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
@@ -179,7 +163,7 @@ func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, fmt.Errorf("cannot inject in elb.RegisterInstancesWithLoadBalancerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RegisterInstancesWithLoadBalancer(input)
+	output, err := cmd.api.RegisterInstancesWithLoadBalancer(context.Background(), input)
 	renv.Log().ExtraVerbosef("elb.RegisterInstancesWithLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -217,21 +201,21 @@ func (cmd *AttachClassicLoadbalancer) inject(params map[string]interface{}) erro
 	return structSetter(cmd, params)
 }
 
-func NewAttachContainertask(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachContainertask {
+func NewAttachContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachContainertask {
 	cmd := new(AttachContainertask)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachContainertask) SetApi(api ecsiface.ECSAPI) {
+func (cmd *AttachContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -290,21 +274,21 @@ func (cmd *AttachContainertask) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachElasticip(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachElasticip {
+func NewAttachElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachElasticip {
 	cmd := new(AttachElasticip)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachElasticip) SetApi(api ec2iface.EC2API) {
+func (cmd *AttachElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -331,7 +315,7 @@ func (cmd *AttachElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AssociateAddress(input)
+	output, err := cmd.api.AssociateAddress(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.AssociateAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -367,16 +351,17 @@ func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]interface
 	}
 
 	input := &ec2.AssociateAddressInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AssociateAddress(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.AssociateAddress(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AssociateAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach elasticip ok")
 			return fakeDryRunId("elasticip"), nil
@@ -390,21 +375,21 @@ func (cmd *AttachElasticip) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachInstance {
+func NewAttachInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachInstance {
 	cmd := new(AttachInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachInstance) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *AttachInstance) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -431,7 +416,7 @@ func (cmd *AttachInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in elbv2.RegisterTargetsInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RegisterTargets(input)
+	output, err := cmd.api.RegisterTargets(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.RegisterTargets call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -469,21 +454,21 @@ func (cmd *AttachInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachInstanceprofile(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachInstanceprofile {
+func NewAttachInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachInstanceprofile {
 	cmd := new(AttachInstanceprofile)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachInstanceprofile) SetApi(api ec2iface.EC2API) {
+func (cmd *AttachInstanceprofile) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -538,21 +523,21 @@ func (cmd *AttachInstanceprofile) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachInternetgateway(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachInternetgateway {
+func NewAttachInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachInternetgateway {
 	cmd := new(AttachInternetgateway)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachInternetgateway) SetApi(api ec2iface.EC2API) {
+func (cmd *AttachInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -579,7 +564,7 @@ func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AttachInternetGateway(input)
+	output, err := cmd.api.AttachInternetGateway(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.AttachInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -615,16 +600,17 @@ func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]int
 	}
 
 	input := &ec2.AttachInternetGatewayInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AttachInternetGateway(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.AttachInternetGateway(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AttachInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach internetgateway ok")
 			return fakeDryRunId("internetgateway"), nil
@@ -638,21 +624,21 @@ func (cmd *AttachInternetgateway) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachListener(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachListener {
+func NewAttachListener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachListener {
 	cmd := new(AttachListener)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachListener) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *AttachListener) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -679,7 +665,7 @@ func (cmd *AttachListener) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in elbv2.AddListenerCertificatesInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AddListenerCertificates(input)
+	output, err := cmd.api.AddListenerCertificates(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.AddListenerCertificates call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -717,21 +703,21 @@ func (cmd *AttachListener) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachMfadevice(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachMfadevice {
+func NewAttachMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachMfadevice {
 	cmd := new(AttachMfadevice)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachMfadevice) SetApi(api iamiface.IAMAPI) {
+func (cmd *AttachMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -758,7 +744,7 @@ func (cmd *AttachMfadevice) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in iam.EnableMFADeviceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.EnableMFADevice(input)
+	output, err := cmd.api.EnableMFADevice(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.EnableMFADevice call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -796,21 +782,21 @@ func (cmd *AttachMfadevice) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachNetworkinterface(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachNetworkinterface {
+func NewAttachNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachNetworkinterface {
 	cmd := new(AttachNetworkinterface)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachNetworkinterface) SetApi(api ec2iface.EC2API) {
+func (cmd *AttachNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -837,7 +823,7 @@ func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AttachNetworkInterface(input)
+	output, err := cmd.api.AttachNetworkInterface(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.AttachNetworkInterface call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -873,16 +859,17 @@ func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]in
 	}
 
 	input := &ec2.AttachNetworkInterfaceInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AttachNetworkInterface(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.AttachNetworkInterface(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AttachNetworkInterface call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach networkinterface ok")
 			return fakeDryRunId("networkinterface"), nil
@@ -896,21 +883,21 @@ func (cmd *AttachNetworkinterface) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachPolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachPolicy {
+func NewAttachPolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachPolicy {
 	cmd := new(AttachPolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachPolicy) SetApi(api iamiface.IAMAPI) {
+func (cmd *AttachPolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -969,21 +956,21 @@ func (cmd *AttachPolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachRole(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachRole {
+func NewAttachRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachRole {
 	cmd := new(AttachRole)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachRole) SetApi(api iamiface.IAMAPI) {
+func (cmd *AttachRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -1010,7 +997,7 @@ func (cmd *AttachRole) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in iam.AddRoleToInstanceProfileInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AddRoleToInstanceProfile(input)
+	output, err := cmd.api.AddRoleToInstanceProfile(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.AddRoleToInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1048,21 +1035,21 @@ func (cmd *AttachRole) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachRoutetable(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachRoutetable {
+func NewAttachRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachRoutetable {
 	cmd := new(AttachRoutetable)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachRoutetable) SetApi(api ec2iface.EC2API) {
+func (cmd *AttachRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -1089,7 +1076,7 @@ func (cmd *AttachRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AssociateRouteTable(input)
+	output, err := cmd.api.AssociateRouteTable(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.AssociateRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1125,16 +1112,17 @@ func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]interfac
 	}
 
 	input := &ec2.AssociateRouteTableInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AssociateRouteTable(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.AssociateRouteTable(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AssociateRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach routetable ok")
 			return fakeDryRunId("routetable"), nil
@@ -1148,21 +1136,21 @@ func (cmd *AttachRoutetable) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachSecuritygroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachSecuritygroup {
+func NewAttachSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachSecuritygroup {
 	cmd := new(AttachSecuritygroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachSecuritygroup) SetApi(api ec2iface.EC2API) {
+func (cmd *AttachSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -1221,21 +1209,21 @@ func (cmd *AttachSecuritygroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachUser(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachUser {
+func NewAttachUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachUser {
 	cmd := new(AttachUser)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachUser) SetApi(api iamiface.IAMAPI) {
+func (cmd *AttachUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -1262,7 +1250,7 @@ func (cmd *AttachUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in iam.AddUserToGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AddUserToGroup(input)
+	output, err := cmd.api.AddUserToGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.AddUserToGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1300,21 +1288,21 @@ func (cmd *AttachUser) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAttachVolume(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AttachVolume {
+func NewAttachVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachVolume {
 	cmd := new(AttachVolume)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AttachVolume) SetApi(api ec2iface.EC2API) {
+func (cmd *AttachVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -1341,7 +1329,7 @@ func (cmd *AttachVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AttachVolume(input)
+	output, err := cmd.api.AttachVolume(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.AttachVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1377,16 +1365,17 @@ func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.AttachVolumeInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AttachVolume(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.AttachVolume(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AttachVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach volume ok")
 			return fakeDryRunId("volume"), nil
@@ -1400,21 +1389,21 @@ func (cmd *AttachVolume) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewAuthenticateRegistry(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *AuthenticateRegistry {
+func NewAuthenticateRegistry(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AuthenticateRegistry {
 	cmd := new(AuthenticateRegistry)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecr.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecr.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *AuthenticateRegistry) SetApi(api ecriface.ECRAPI) {
+func (cmd *AuthenticateRegistry) SetApi(api *ecr.Client) {
 	cmd.api = api
 }
 
@@ -1473,21 +1462,21 @@ func (cmd *AuthenticateRegistry) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckCertificate(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckCertificate {
+func NewCheckCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckCertificate {
 	cmd := new(CheckCertificate)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = acm.New(sess)
+	if cfg.Region != "" {
+		cmd.api = acm.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckCertificate) SetApi(api acmiface.ACMAPI) {
+func (cmd *CheckCertificate) SetApi(api *acm.Client) {
 	cmd.api = api
 }
 
@@ -1546,21 +1535,21 @@ func (cmd *CheckCertificate) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckDatabase(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckDatabase {
+func NewCheckDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckDatabase {
 	cmd := new(CheckDatabase)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckDatabase) SetApi(api rdsiface.RDSAPI) {
+func (cmd *CheckDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -1619,21 +1608,21 @@ func (cmd *CheckDatabase) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckDistribution(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckDistribution {
+func NewCheckDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckDistribution {
 	cmd := new(CheckDistribution)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudfront.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudfront.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckDistribution) SetApi(api cloudfrontiface.CloudFrontAPI) {
+func (cmd *CheckDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
@@ -1692,21 +1681,21 @@ func (cmd *CheckDistribution) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckInstance {
+func NewCheckInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckInstance {
 	cmd := new(CheckInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckInstance) SetApi(api ec2iface.EC2API) {
+func (cmd *CheckInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -1765,21 +1754,21 @@ func (cmd *CheckInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckLoadbalancer {
+func NewCheckLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckLoadbalancer {
 	cmd := new(CheckLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckLoadbalancer) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *CheckLoadbalancer) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -1838,21 +1827,21 @@ func (cmd *CheckLoadbalancer) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckNatgateway(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckNatgateway {
+func NewCheckNatgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckNatgateway {
 	cmd := new(CheckNatgateway)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckNatgateway) SetApi(api ec2iface.EC2API) {
+func (cmd *CheckNatgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -1911,21 +1900,21 @@ func (cmd *CheckNatgateway) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckNetworkinterface(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckNetworkinterface {
+func NewCheckNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckNetworkinterface {
 	cmd := new(CheckNetworkinterface)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckNetworkinterface) SetApi(api ec2iface.EC2API) {
+func (cmd *CheckNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -1984,21 +1973,21 @@ func (cmd *CheckNetworkinterface) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckScalinggroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckScalinggroup {
+func NewCheckScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckScalinggroup {
 	cmd := new(CheckScalinggroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckScalinggroup) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *CheckScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -2057,21 +2046,21 @@ func (cmd *CheckScalinggroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckSecuritygroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckSecuritygroup {
+func NewCheckSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckSecuritygroup {
 	cmd := new(CheckSecuritygroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckSecuritygroup) SetApi(api ec2iface.EC2API) {
+func (cmd *CheckSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -2130,21 +2119,21 @@ func (cmd *CheckSecuritygroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCheckVolume(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CheckVolume {
+func NewCheckVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CheckVolume {
 	cmd := new(CheckVolume)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CheckVolume) SetApi(api ec2iface.EC2API) {
+func (cmd *CheckVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -2203,21 +2192,21 @@ func (cmd *CheckVolume) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCopyImage(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CopyImage {
+func NewCopyImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CopyImage {
 	cmd := new(CopyImage)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CopyImage) SetApi(api ec2iface.EC2API) {
+func (cmd *CopyImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -2244,7 +2233,7 @@ func (cmd *CopyImage) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CopyImage(input)
+	output, err := cmd.api.CopyImage(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CopyImage call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2280,16 +2269,17 @@ func (cmd *CopyImage) dryRun(renv env.Running, params map[string]interface{}) (i
 	}
 
 	input := &ec2.CopyImageInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CopyImage(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CopyImage(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CopyImage call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: copy image ok")
 			return fakeDryRunId("image"), nil
@@ -2303,21 +2293,21 @@ func (cmd *CopyImage) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCopySnapshot(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CopySnapshot {
+func NewCopySnapshot(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CopySnapshot {
 	cmd := new(CopySnapshot)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CopySnapshot) SetApi(api ec2iface.EC2API) {
+func (cmd *CopySnapshot) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -2344,7 +2334,7 @@ func (cmd *CopySnapshot) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CopySnapshot(input)
+	output, err := cmd.api.CopySnapshot(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CopySnapshot call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2380,16 +2370,17 @@ func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.CopySnapshotInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CopySnapshot(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CopySnapshot(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CopySnapshot call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: copy snapshot ok")
 			return fakeDryRunId("snapshot"), nil
@@ -2403,21 +2394,21 @@ func (cmd *CopySnapshot) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateAccesskey(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateAccesskey {
+func NewCreateAccesskey(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAccesskey {
 	cmd := new(CreateAccesskey)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateAccesskey) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreateAccesskey) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -2444,7 +2435,7 @@ func (cmd *CreateAccesskey) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in iam.CreateAccessKeyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateAccessKey(input)
+	output, err := cmd.api.CreateAccessKey(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.CreateAccessKey call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2482,21 +2473,21 @@ func (cmd *CreateAccesskey) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateAlarm(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateAlarm {
+func NewCreateAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAlarm {
 	cmd := new(CreateAlarm)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudwatch.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudwatch.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateAlarm) SetApi(api cloudwatchiface.CloudWatchAPI) {
+func (cmd *CreateAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
@@ -2523,7 +2514,7 @@ func (cmd *CreateAlarm) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in cloudwatch.PutMetricAlarmInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutMetricAlarm(input)
+	output, err := cmd.api.PutMetricAlarm(context.Background(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.PutMetricAlarm call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2561,21 +2552,21 @@ func (cmd *CreateAlarm) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateAppscalingpolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateAppscalingpolicy {
+func NewCreateAppscalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAppscalingpolicy {
 	cmd := new(CreateAppscalingpolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = applicationautoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = applicationautoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateAppscalingpolicy) SetApi(api applicationautoscalingiface.ApplicationAutoScalingAPI) {
+func (cmd *CreateAppscalingpolicy) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
@@ -2602,7 +2593,7 @@ func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.PutScalingPolicyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutScalingPolicy(input)
+	output, err := cmd.api.PutScalingPolicy(context.Background(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.PutScalingPolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2640,21 +2631,21 @@ func (cmd *CreateAppscalingpolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateAppscalingtarget(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateAppscalingtarget {
+func NewCreateAppscalingtarget(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAppscalingtarget {
 	cmd := new(CreateAppscalingtarget)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = applicationautoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = applicationautoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateAppscalingtarget) SetApi(api applicationautoscalingiface.ApplicationAutoScalingAPI) {
+func (cmd *CreateAppscalingtarget) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
@@ -2681,7 +2672,7 @@ func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.RegisterScalableTargetInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RegisterScalableTarget(input)
+	output, err := cmd.api.RegisterScalableTarget(context.Background(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.RegisterScalableTarget call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2719,21 +2710,21 @@ func (cmd *CreateAppscalingtarget) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateBucket(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateBucket {
+func NewCreateBucket(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateBucket {
 	cmd := new(CreateBucket)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = s3.New(sess)
+	if cfg.Region != "" {
+		cmd.api = s3.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateBucket) SetApi(api s3iface.S3API) {
+func (cmd *CreateBucket) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
@@ -2760,7 +2751,7 @@ func (cmd *CreateBucket) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in s3.CreateBucketInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateBucket(input)
+	output, err := cmd.api.CreateBucket(context.Background(), input)
 	renv.Log().ExtraVerbosef("s3.CreateBucket call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2798,21 +2789,21 @@ func (cmd *CreateBucket) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateCertificate(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateCertificate {
+func NewCreateCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateCertificate {
 	cmd := new(CreateCertificate)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = acm.New(sess)
+	if cfg.Region != "" {
+		cmd.api = acm.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateCertificate) SetApi(api acmiface.ACMAPI) {
+func (cmd *CreateCertificate) SetApi(api *acm.Client) {
 	cmd.api = api
 }
 
@@ -2871,21 +2862,21 @@ func (cmd *CreateCertificate) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateClassicLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateClassicLoadbalancer {
+func NewCreateClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateClassicLoadbalancer {
 	cmd := new(CreateClassicLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elb.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elb.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateClassicLoadbalancer) SetApi(api elbiface.ELBAPI) {
+func (cmd *CreateClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
@@ -2912,7 +2903,7 @@ func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, fmt.Errorf("cannot inject in elb.CreateLoadBalancerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLoadBalancer(input)
+	output, err := cmd.api.CreateLoadBalancer(context.Background(), input)
 	renv.Log().ExtraVerbosef("elb.CreateLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2950,21 +2941,21 @@ func (cmd *CreateClassicLoadbalancer) inject(params map[string]interface{}) erro
 	return structSetter(cmd, params)
 }
 
-func NewCreateContainercluster(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateContainercluster {
+func NewCreateContainercluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateContainercluster {
 	cmd := new(CreateContainercluster)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateContainercluster) SetApi(api ecsiface.ECSAPI) {
+func (cmd *CreateContainercluster) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -2991,7 +2982,7 @@ func (cmd *CreateContainercluster) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in ecs.CreateClusterInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateCluster(input)
+	output, err := cmd.api.CreateCluster(context.Background(), input)
 	renv.Log().ExtraVerbosef("ecs.CreateCluster call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3029,21 +3020,21 @@ func (cmd *CreateContainercluster) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateDatabase(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateDatabase {
+func NewCreateDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDatabase {
 	cmd := new(CreateDatabase)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateDatabase) SetApi(api rdsiface.RDSAPI) {
+func (cmd *CreateDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -3102,21 +3093,21 @@ func (cmd *CreateDatabase) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateDbsubnetgroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateDbsubnetgroup {
+func NewCreateDbsubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDbsubnetgroup {
 	cmd := new(CreateDbsubnetgroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateDbsubnetgroup) SetApi(api rdsiface.RDSAPI) {
+func (cmd *CreateDbsubnetgroup) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -3143,7 +3134,7 @@ func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]interfac
 		return nil, fmt.Errorf("cannot inject in rds.CreateDBSubnetGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateDBSubnetGroup(input)
+	output, err := cmd.api.CreateDBSubnetGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("rds.CreateDBSubnetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3181,21 +3172,21 @@ func (cmd *CreateDbsubnetgroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateDistribution(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateDistribution {
+func NewCreateDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDistribution {
 	cmd := new(CreateDistribution)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudfront.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudfront.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateDistribution) SetApi(api cloudfrontiface.CloudFrontAPI) {
+func (cmd *CreateDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
@@ -3254,21 +3245,21 @@ func (cmd *CreateDistribution) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateElasticip(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateElasticip {
+func NewCreateElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateElasticip {
 	cmd := new(CreateElasticip)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateElasticip) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -3295,7 +3286,7 @@ func (cmd *CreateElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.AllocateAddress(input)
+	output, err := cmd.api.AllocateAddress(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.AllocateAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3331,16 +3322,17 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]interface
 	}
 
 	input := &ec2.AllocateAddressInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AllocateAddress(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.AllocateAddress(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AllocateAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create elasticip ok")
 			return fakeDryRunId("elasticip"), nil
@@ -3354,21 +3346,21 @@ func (cmd *CreateElasticip) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateFunction(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateFunction {
+func NewCreateFunction(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateFunction {
 	cmd := new(CreateFunction)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = lambda.New(sess)
+	if cfg.Region != "" {
+		cmd.api = lambda.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateFunction) SetApi(api lambdaiface.LambdaAPI) {
+func (cmd *CreateFunction) SetApi(api *lambda.Client) {
 	cmd.api = api
 }
 
@@ -3395,7 +3387,7 @@ func (cmd *CreateFunction) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in lambda.CreateFunctionInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateFunction(input)
+	output, err := cmd.api.CreateFunction(context.Background(), input)
 	renv.Log().ExtraVerbosef("lambda.CreateFunction call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3433,21 +3425,21 @@ func (cmd *CreateFunction) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateGroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateGroup {
+func NewCreateGroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateGroup {
 	cmd := new(CreateGroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateGroup) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreateGroup) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -3474,7 +3466,7 @@ func (cmd *CreateGroup) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in iam.CreateGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateGroup(input)
+	output, err := cmd.api.CreateGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.CreateGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3512,21 +3504,21 @@ func (cmd *CreateGroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateImage(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateImage {
+func NewCreateImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateImage {
 	cmd := new(CreateImage)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateImage) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -3553,7 +3545,7 @@ func (cmd *CreateImage) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateImage(input)
+	output, err := cmd.api.CreateImage(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateImage call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3589,16 +3581,17 @@ func (cmd *CreateImage) dryRun(renv env.Running, params map[string]interface{}) 
 	}
 
 	input := &ec2.CreateImageInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateImage(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateImage(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateImage call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create image ok")
 			return fakeDryRunId("image"), nil
@@ -3612,21 +3605,21 @@ func (cmd *CreateImage) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateInstance {
+func NewCreateInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateInstance {
 	cmd := new(CreateInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateInstance) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -3653,7 +3646,7 @@ func (cmd *CreateInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RunInstances(input)
+	output, err := cmd.api.RunInstances(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.RunInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3689,16 +3682,17 @@ func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]interface{
 	}
 
 	input := &ec2.RunInstancesInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.RunInstances(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.RunInstances(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.RunInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create instance ok")
 			return fakeDryRunId("instance"), nil
@@ -3712,21 +3706,21 @@ func (cmd *CreateInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateInstanceprofile(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateInstanceprofile {
+func NewCreateInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateInstanceprofile {
 	cmd := new(CreateInstanceprofile)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateInstanceprofile) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreateInstanceprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -3753,7 +3747,7 @@ func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]interf
 		return nil, fmt.Errorf("cannot inject in iam.CreateInstanceProfileInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateInstanceProfile(input)
+	output, err := cmd.api.CreateInstanceProfile(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.CreateInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3791,21 +3785,21 @@ func (cmd *CreateInstanceprofile) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateInternetgateway(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateInternetgateway {
+func NewCreateInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateInternetgateway {
 	cmd := new(CreateInternetgateway)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateInternetgateway) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -3832,7 +3826,7 @@ func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateInternetGateway(input)
+	output, err := cmd.api.CreateInternetGateway(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3868,16 +3862,17 @@ func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]int
 	}
 
 	input := &ec2.CreateInternetGatewayInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateInternetGateway(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateInternetGateway(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create internetgateway ok")
 			return fakeDryRunId("internetgateway"), nil
@@ -3891,21 +3886,21 @@ func (cmd *CreateInternetgateway) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateKeypair(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateKeypair {
+func NewCreateKeypair(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateKeypair {
 	cmd := new(CreateKeypair)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateKeypair) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateKeypair) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -3932,7 +3927,7 @@ func (cmd *CreateKeypair) run(renv env.Running, params map[string]interface{}) (
 		return nil, fmt.Errorf("cannot inject in ec2.ImportKeyPairInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ImportKeyPair(input)
+	output, err := cmd.api.ImportKeyPair(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.ImportKeyPair call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3970,21 +3965,21 @@ func (cmd *CreateKeypair) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateLaunchconfiguration(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateLaunchconfiguration {
+func NewCreateLaunchconfiguration(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateLaunchconfiguration {
 	cmd := new(CreateLaunchconfiguration)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateLaunchconfiguration) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *CreateLaunchconfiguration) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -4011,7 +4006,7 @@ func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]in
 		return nil, fmt.Errorf("cannot inject in autoscaling.CreateLaunchConfigurationInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLaunchConfiguration(input)
+	output, err := cmd.api.CreateLaunchConfiguration(context.Background(), input)
 	renv.Log().ExtraVerbosef("autoscaling.CreateLaunchConfiguration call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4049,21 +4044,21 @@ func (cmd *CreateLaunchconfiguration) inject(params map[string]interface{}) erro
 	return structSetter(cmd, params)
 }
 
-func NewCreateListener(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateListener {
+func NewCreateListener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateListener {
 	cmd := new(CreateListener)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateListener) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *CreateListener) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -4090,7 +4085,7 @@ func (cmd *CreateListener) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in elbv2.CreateListenerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateListener(input)
+	output, err := cmd.api.CreateListener(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.CreateListener call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4128,21 +4123,21 @@ func (cmd *CreateListener) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateLoadbalancer {
+func NewCreateLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateLoadbalancer {
 	cmd := new(CreateLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateLoadbalancer) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *CreateLoadbalancer) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -4169,7 +4164,7 @@ func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in elbv2.CreateLoadBalancerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLoadBalancer(input)
+	output, err := cmd.api.CreateLoadBalancer(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.CreateLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4207,21 +4202,21 @@ func (cmd *CreateLoadbalancer) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateLoginprofile(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateLoginprofile {
+func NewCreateLoginprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateLoginprofile {
 	cmd := new(CreateLoginprofile)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateLoginprofile) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreateLoginprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -4248,7 +4243,7 @@ func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in iam.CreateLoginProfileInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLoginProfile(input)
+	output, err := cmd.api.CreateLoginProfile(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.CreateLoginProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4286,21 +4281,21 @@ func (cmd *CreateLoginprofile) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateMfadevice(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateMfadevice {
+func NewCreateMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateMfadevice {
 	cmd := new(CreateMfadevice)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateMfadevice) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreateMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -4359,21 +4354,21 @@ func (cmd *CreateMfadevice) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateNatgateway(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateNatgateway {
+func NewCreateNatgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateNatgateway {
 	cmd := new(CreateNatgateway)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateNatgateway) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateNatgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -4400,7 +4395,7 @@ func (cmd *CreateNatgateway) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ec2.CreateNatGatewayInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateNatGateway(input)
+	output, err := cmd.api.CreateNatGateway(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateNatGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4438,21 +4433,21 @@ func (cmd *CreateNatgateway) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateNetworkinterface(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateNetworkinterface {
+func NewCreateNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateNetworkinterface {
 	cmd := new(CreateNetworkinterface)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateNetworkinterface) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -4479,7 +4474,7 @@ func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateNetworkInterface(input)
+	output, err := cmd.api.CreateNetworkInterface(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateNetworkInterface call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4515,16 +4510,17 @@ func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]in
 	}
 
 	input := &ec2.CreateNetworkInterfaceInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateNetworkInterface(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateNetworkInterface(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateNetworkInterface call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create networkinterface ok")
 			return fakeDryRunId("networkinterface"), nil
@@ -4538,21 +4534,21 @@ func (cmd *CreateNetworkinterface) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreatePolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreatePolicy {
+func NewCreatePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreatePolicy {
 	cmd := new(CreatePolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreatePolicy) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreatePolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -4579,7 +4575,7 @@ func (cmd *CreatePolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreatePolicy(input)
+	output, err := cmd.api.CreatePolicy(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.CreatePolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4617,21 +4613,21 @@ func (cmd *CreatePolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateQueue(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateQueue {
+func NewCreateQueue(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateQueue {
 	cmd := new(CreateQueue)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = sqs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = sqs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateQueue) SetApi(api sqsiface.SQSAPI) {
+func (cmd *CreateQueue) SetApi(api *sqs.Client) {
 	cmd.api = api
 }
 
@@ -4658,7 +4654,7 @@ func (cmd *CreateQueue) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in sqs.CreateQueueInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateQueue(input)
+	output, err := cmd.api.CreateQueue(context.Background(), input)
 	renv.Log().ExtraVerbosef("sqs.CreateQueue call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4696,21 +4692,21 @@ func (cmd *CreateQueue) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateRecord(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateRecord {
+func NewCreateRecord(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRecord {
 	cmd := new(CreateRecord)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = route53.New(sess)
+	if cfg.Region != "" {
+		cmd.api = route53.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateRecord) SetApi(api route53iface.Route53API) {
+func (cmd *CreateRecord) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
@@ -4769,21 +4765,21 @@ func (cmd *CreateRecord) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateRepository(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateRepository {
+func NewCreateRepository(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRepository {
 	cmd := new(CreateRepository)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecr.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecr.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateRepository) SetApi(api ecriface.ECRAPI) {
+func (cmd *CreateRepository) SetApi(api *ecr.Client) {
 	cmd.api = api
 }
 
@@ -4810,7 +4806,7 @@ func (cmd *CreateRepository) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ecr.CreateRepositoryInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateRepository(input)
+	output, err := cmd.api.CreateRepository(context.Background(), input)
 	renv.Log().ExtraVerbosef("ecr.CreateRepository call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4848,21 +4844,21 @@ func (cmd *CreateRepository) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateRole(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateRole {
+func NewCreateRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRole {
 	cmd := new(CreateRole)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateRole) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreateRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -4921,21 +4917,21 @@ func (cmd *CreateRole) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateRoute(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateRoute {
+func NewCreateRoute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRoute {
 	cmd := new(CreateRoute)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateRoute) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateRoute) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -4962,7 +4958,7 @@ func (cmd *CreateRoute) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateRoute(input)
+	output, err := cmd.api.CreateRoute(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateRoute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4998,16 +4994,17 @@ func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]interface{}) 
 	}
 
 	input := &ec2.CreateRouteInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateRoute(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateRoute(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateRoute call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create route ok")
 			return fakeDryRunId("route"), nil
@@ -5021,21 +5018,21 @@ func (cmd *CreateRoute) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateRoutetable(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateRoutetable {
+func NewCreateRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRoutetable {
 	cmd := new(CreateRoutetable)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateRoutetable) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -5062,7 +5059,7 @@ func (cmd *CreateRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateRouteTable(input)
+	output, err := cmd.api.CreateRouteTable(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5098,16 +5095,17 @@ func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]interfac
 	}
 
 	input := &ec2.CreateRouteTableInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateRouteTable(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateRouteTable(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create routetable ok")
 			return fakeDryRunId("routetable"), nil
@@ -5121,21 +5119,21 @@ func (cmd *CreateRoutetable) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateS3object(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateS3object {
+func NewCreateS3object(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateS3object {
 	cmd := new(CreateS3object)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = s3.New(sess)
+	if cfg.Region != "" {
+		cmd.api = s3.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateS3object) SetApi(api s3iface.S3API) {
+func (cmd *CreateS3object) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
@@ -5194,21 +5192,21 @@ func (cmd *CreateS3object) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateScalinggroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateScalinggroup {
+func NewCreateScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateScalinggroup {
 	cmd := new(CreateScalinggroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateScalinggroup) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *CreateScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -5235,7 +5233,7 @@ func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in autoscaling.CreateAutoScalingGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateAutoScalingGroup(input)
+	output, err := cmd.api.CreateAutoScalingGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("autoscaling.CreateAutoScalingGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5273,21 +5271,21 @@ func (cmd *CreateScalinggroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateScalingpolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateScalingpolicy {
+func NewCreateScalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateScalingpolicy {
 	cmd := new(CreateScalingpolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateScalingpolicy) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *CreateScalingpolicy) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -5314,7 +5312,7 @@ func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]interfac
 		return nil, fmt.Errorf("cannot inject in autoscaling.PutScalingPolicyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutScalingPolicy(input)
+	output, err := cmd.api.PutScalingPolicy(context.Background(), input)
 	renv.Log().ExtraVerbosef("autoscaling.PutScalingPolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5352,21 +5350,21 @@ func (cmd *CreateScalingpolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateSecuritygroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateSecuritygroup {
+func NewCreateSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSecuritygroup {
 	cmd := new(CreateSecuritygroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateSecuritygroup) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -5393,7 +5391,7 @@ func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]interfac
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateSecurityGroup(input)
+	output, err := cmd.api.CreateSecurityGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateSecurityGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5429,16 +5427,17 @@ func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]inter
 	}
 
 	input := &ec2.CreateSecurityGroupInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateSecurityGroup(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateSecurityGroup(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateSecurityGroup call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create securitygroup ok")
 			return fakeDryRunId("securitygroup"), nil
@@ -5452,21 +5451,21 @@ func (cmd *CreateSecuritygroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateSnapshot(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateSnapshot {
+func NewCreateSnapshot(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSnapshot {
 	cmd := new(CreateSnapshot)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateSnapshot) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateSnapshot) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -5493,7 +5492,7 @@ func (cmd *CreateSnapshot) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateSnapshot(input)
+	output, err := cmd.api.CreateSnapshot(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateSnapshot call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5529,16 +5528,17 @@ func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]interface{
 	}
 
 	input := &ec2.CreateSnapshotInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateSnapshot(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateSnapshot(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateSnapshot call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create snapshot ok")
 			return fakeDryRunId("snapshot"), nil
@@ -5552,21 +5552,21 @@ func (cmd *CreateSnapshot) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateStack(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateStack {
+func NewCreateStack(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateStack {
 	cmd := new(CreateStack)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudformation.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudformation.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateStack) SetApi(api cloudformationiface.CloudFormationAPI) {
+func (cmd *CreateStack) SetApi(api *cloudformation.Client) {
 	cmd.api = api
 }
 
@@ -5593,7 +5593,7 @@ func (cmd *CreateStack) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in cloudformation.CreateStackInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateStack(input)
+	output, err := cmd.api.CreateStack(context.Background(), input)
 	renv.Log().ExtraVerbosef("cloudformation.CreateStack call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5631,21 +5631,21 @@ func (cmd *CreateStack) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateSubnet(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateSubnet {
+func NewCreateSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSubnet {
 	cmd := new(CreateSubnet)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateSubnet) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateSubnet) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -5672,7 +5672,7 @@ func (cmd *CreateSubnet) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateSubnet(input)
+	output, err := cmd.api.CreateSubnet(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateSubnet call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5708,16 +5708,17 @@ func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.CreateSubnetInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateSubnet(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateSubnet(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateSubnet call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create subnet ok")
 			return fakeDryRunId("subnet"), nil
@@ -5731,21 +5732,21 @@ func (cmd *CreateSubnet) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateSubscription(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateSubscription {
+func NewCreateSubscription(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSubscription {
 	cmd := new(CreateSubscription)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = sns.New(sess)
+	if cfg.Region != "" {
+		cmd.api = sns.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateSubscription) SetApi(api snsiface.SNSAPI) {
+func (cmd *CreateSubscription) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
@@ -5772,7 +5773,7 @@ func (cmd *CreateSubscription) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in sns.SubscribeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.Subscribe(input)
+	output, err := cmd.api.Subscribe(context.Background(), input)
 	renv.Log().ExtraVerbosef("sns.Subscribe call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5810,21 +5811,21 @@ func (cmd *CreateSubscription) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateTag(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateTag {
+func NewCreateTag(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateTag {
 	cmd := new(CreateTag)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateTag) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateTag) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -5879,21 +5880,21 @@ func (cmd *CreateTag) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateTargetgroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateTargetgroup {
+func NewCreateTargetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateTargetgroup {
 	cmd := new(CreateTargetgroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateTargetgroup) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *CreateTargetgroup) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -5920,7 +5921,7 @@ func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]interface{
 		return nil, fmt.Errorf("cannot inject in elbv2.CreateTargetGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateTargetGroup(input)
+	output, err := cmd.api.CreateTargetGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.CreateTargetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5958,21 +5959,21 @@ func (cmd *CreateTargetgroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateTopic(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateTopic {
+func NewCreateTopic(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateTopic {
 	cmd := new(CreateTopic)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = sns.New(sess)
+	if cfg.Region != "" {
+		cmd.api = sns.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateTopic) SetApi(api snsiface.SNSAPI) {
+func (cmd *CreateTopic) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
@@ -5999,7 +6000,7 @@ func (cmd *CreateTopic) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in sns.CreateTopicInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateTopic(input)
+	output, err := cmd.api.CreateTopic(context.Background(), input)
 	renv.Log().ExtraVerbosef("sns.CreateTopic call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6037,21 +6038,21 @@ func (cmd *CreateTopic) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateUser(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateUser {
+func NewCreateUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateUser {
 	cmd := new(CreateUser)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateUser) SetApi(api iamiface.IAMAPI) {
+func (cmd *CreateUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -6078,7 +6079,7 @@ func (cmd *CreateUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in iam.CreateUserInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateUser(input)
+	output, err := cmd.api.CreateUser(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.CreateUser call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6116,21 +6117,21 @@ func (cmd *CreateUser) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateVolume(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateVolume {
+func NewCreateVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateVolume {
 	cmd := new(CreateVolume)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateVolume) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -6157,7 +6158,7 @@ func (cmd *CreateVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateVolume(input)
+	output, err := cmd.api.CreateVolume(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6193,16 +6194,17 @@ func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.CreateVolumeInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateVolume(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateVolume(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create volume ok")
 			return fakeDryRunId("volume"), nil
@@ -6216,21 +6218,21 @@ func (cmd *CreateVolume) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateVpc(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateVpc {
+func NewCreateVpc(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateVpc {
 	cmd := new(CreateVpc)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateVpc) SetApi(api ec2iface.EC2API) {
+func (cmd *CreateVpc) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -6257,7 +6259,7 @@ func (cmd *CreateVpc) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateVpc(input)
+	output, err := cmd.api.CreateVpc(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateVpc call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6293,16 +6295,17 @@ func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]interface{}) (i
 	}
 
 	input := &ec2.CreateVpcInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateVpc(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.CreateVpc(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateVpc call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create vpc ok")
 			return fakeDryRunId("vpc"), nil
@@ -6316,21 +6319,21 @@ func (cmd *CreateVpc) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewCreateZone(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *CreateZone {
+func NewCreateZone(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateZone {
 	cmd := new(CreateZone)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = route53.New(sess)
+	if cfg.Region != "" {
+		cmd.api = route53.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *CreateZone) SetApi(api route53iface.Route53API) {
+func (cmd *CreateZone) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
@@ -6357,7 +6360,7 @@ func (cmd *CreateZone) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in route53.CreateHostedZoneInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateHostedZone(input)
+	output, err := cmd.api.CreateHostedZone(context.Background(), input)
 	renv.Log().ExtraVerbosef("route53.CreateHostedZone call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6395,21 +6398,21 @@ func (cmd *CreateZone) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteAccesskey(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAccesskey {
+func NewDeleteAccesskey(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAccesskey {
 	cmd := new(DeleteAccesskey)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteAccesskey) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeleteAccesskey) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -6436,7 +6439,7 @@ func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in iam.DeleteAccessKeyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteAccessKey(input)
+	output, err := cmd.api.DeleteAccessKey(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteAccessKey call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6474,21 +6477,21 @@ func (cmd *DeleteAccesskey) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteAlarm(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAlarm {
+func NewDeleteAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAlarm {
 	cmd := new(DeleteAlarm)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudwatch.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudwatch.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteAlarm) SetApi(api cloudwatchiface.CloudWatchAPI) {
+func (cmd *DeleteAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
@@ -6515,7 +6518,7 @@ func (cmd *DeleteAlarm) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in cloudwatch.DeleteAlarmsInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteAlarms(input)
+	output, err := cmd.api.DeleteAlarms(context.Background(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.DeleteAlarms call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6553,21 +6556,21 @@ func (cmd *DeleteAlarm) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteAppscalingpolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAppscalingpolicy {
+func NewDeleteAppscalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAppscalingpolicy {
 	cmd := new(DeleteAppscalingpolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = applicationautoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = applicationautoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteAppscalingpolicy) SetApi(api applicationautoscalingiface.ApplicationAutoScalingAPI) {
+func (cmd *DeleteAppscalingpolicy) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
@@ -6594,7 +6597,7 @@ func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeleteScalingPolicyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteScalingPolicy(input)
+	output, err := cmd.api.DeleteScalingPolicy(context.Background(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.DeleteScalingPolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6632,21 +6635,21 @@ func (cmd *DeleteAppscalingpolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteAppscalingtarget(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAppscalingtarget {
+func NewDeleteAppscalingtarget(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAppscalingtarget {
 	cmd := new(DeleteAppscalingtarget)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = applicationautoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = applicationautoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteAppscalingtarget) SetApi(api applicationautoscalingiface.ApplicationAutoScalingAPI) {
+func (cmd *DeleteAppscalingtarget) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
@@ -6673,7 +6676,7 @@ func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeregisterScalableTargetInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeregisterScalableTarget(input)
+	output, err := cmd.api.DeregisterScalableTarget(context.Background(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.DeregisterScalableTarget call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6711,21 +6714,21 @@ func (cmd *DeleteAppscalingtarget) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteBucket(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteBucket {
+func NewDeleteBucket(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteBucket {
 	cmd := new(DeleteBucket)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = s3.New(sess)
+	if cfg.Region != "" {
+		cmd.api = s3.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteBucket) SetApi(api s3iface.S3API) {
+func (cmd *DeleteBucket) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
@@ -6752,7 +6755,7 @@ func (cmd *DeleteBucket) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in s3.DeleteBucketInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteBucket(input)
+	output, err := cmd.api.DeleteBucket(context.Background(), input)
 	renv.Log().ExtraVerbosef("s3.DeleteBucket call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6790,21 +6793,21 @@ func (cmd *DeleteBucket) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteCertificate(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCertificate {
+func NewDeleteCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCertificate {
 	cmd := new(DeleteCertificate)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = acm.New(sess)
+	if cfg.Region != "" {
+		cmd.api = acm.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteCertificate) SetApi(api acmiface.ACMAPI) {
+func (cmd *DeleteCertificate) SetApi(api *acm.Client) {
 	cmd.api = api
 }
 
@@ -6831,7 +6834,7 @@ func (cmd *DeleteCertificate) run(renv env.Running, params map[string]interface{
 		return nil, fmt.Errorf("cannot inject in acm.DeleteCertificateInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteCertificate(input)
+	output, err := cmd.api.DeleteCertificate(context.Background(), input)
 	renv.Log().ExtraVerbosef("acm.DeleteCertificate call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6869,21 +6872,21 @@ func (cmd *DeleteCertificate) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteClassicLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteClassicLoadbalancer {
+func NewDeleteClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteClassicLoadbalancer {
 	cmd := new(DeleteClassicLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elb.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elb.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteClassicLoadbalancer) SetApi(api elbiface.ELBAPI) {
+func (cmd *DeleteClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
@@ -6910,7 +6913,7 @@ func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, fmt.Errorf("cannot inject in elb.DeleteLoadBalancerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLoadBalancer(input)
+	output, err := cmd.api.DeleteLoadBalancer(context.Background(), input)
 	renv.Log().ExtraVerbosef("elb.DeleteLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6948,21 +6951,21 @@ func (cmd *DeleteClassicLoadbalancer) inject(params map[string]interface{}) erro
 	return structSetter(cmd, params)
 }
 
-func NewDeleteContainercluster(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteContainercluster {
+func NewDeleteContainercluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteContainercluster {
 	cmd := new(DeleteContainercluster)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteContainercluster) SetApi(api ecsiface.ECSAPI) {
+func (cmd *DeleteContainercluster) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -6989,7 +6992,7 @@ func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in ecs.DeleteClusterInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteCluster(input)
+	output, err := cmd.api.DeleteCluster(context.Background(), input)
 	renv.Log().ExtraVerbosef("ecs.DeleteCluster call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7027,21 +7030,21 @@ func (cmd *DeleteContainercluster) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteContainertask(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteContainertask {
+func NewDeleteContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteContainertask {
 	cmd := new(DeleteContainertask)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteContainertask) SetApi(api ecsiface.ECSAPI) {
+func (cmd *DeleteContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -7096,21 +7099,21 @@ func (cmd *DeleteContainertask) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteDatabase(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDatabase {
+func NewDeleteDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDatabase {
 	cmd := new(DeleteDatabase)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteDatabase) SetApi(api rdsiface.RDSAPI) {
+func (cmd *DeleteDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -7137,7 +7140,7 @@ func (cmd *DeleteDatabase) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in rds.DeleteDBInstanceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteDBInstance(input)
+	output, err := cmd.api.DeleteDBInstance(context.Background(), input)
 	renv.Log().ExtraVerbosef("rds.DeleteDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7175,21 +7178,21 @@ func (cmd *DeleteDatabase) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteDbsubnetgroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDbsubnetgroup {
+func NewDeleteDbsubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDbsubnetgroup {
 	cmd := new(DeleteDbsubnetgroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteDbsubnetgroup) SetApi(api rdsiface.RDSAPI) {
+func (cmd *DeleteDbsubnetgroup) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -7216,7 +7219,7 @@ func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]interfac
 		return nil, fmt.Errorf("cannot inject in rds.DeleteDBSubnetGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteDBSubnetGroup(input)
+	output, err := cmd.api.DeleteDBSubnetGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("rds.DeleteDBSubnetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7254,21 +7257,21 @@ func (cmd *DeleteDbsubnetgroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteDistribution(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDistribution {
+func NewDeleteDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDistribution {
 	cmd := new(DeleteDistribution)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudfront.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudfront.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteDistribution) SetApi(api cloudfrontiface.CloudFrontAPI) {
+func (cmd *DeleteDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
@@ -7327,21 +7330,21 @@ func (cmd *DeleteDistribution) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteElasticip(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteElasticip {
+func NewDeleteElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteElasticip {
 	cmd := new(DeleteElasticip)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteElasticip) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -7368,7 +7371,7 @@ func (cmd *DeleteElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ReleaseAddress(input)
+	output, err := cmd.api.ReleaseAddress(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.ReleaseAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7404,16 +7407,17 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]interface
 	}
 
 	input := &ec2.ReleaseAddressInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.ReleaseAddress(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.ReleaseAddress(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.ReleaseAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete elasticip ok")
 			return fakeDryRunId("elasticip"), nil
@@ -7427,21 +7431,21 @@ func (cmd *DeleteElasticip) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteFunction(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteFunction {
+func NewDeleteFunction(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteFunction {
 	cmd := new(DeleteFunction)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = lambda.New(sess)
+	if cfg.Region != "" {
+		cmd.api = lambda.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteFunction) SetApi(api lambdaiface.LambdaAPI) {
+func (cmd *DeleteFunction) SetApi(api *lambda.Client) {
 	cmd.api = api
 }
 
@@ -7468,7 +7472,7 @@ func (cmd *DeleteFunction) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in lambda.DeleteFunctionInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteFunction(input)
+	output, err := cmd.api.DeleteFunction(context.Background(), input)
 	renv.Log().ExtraVerbosef("lambda.DeleteFunction call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7506,21 +7510,21 @@ func (cmd *DeleteFunction) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteGroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteGroup {
+func NewDeleteGroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteGroup {
 	cmd := new(DeleteGroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteGroup) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeleteGroup) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -7547,7 +7551,7 @@ func (cmd *DeleteGroup) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in iam.DeleteGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteGroup(input)
+	output, err := cmd.api.DeleteGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7585,21 +7589,21 @@ func (cmd *DeleteGroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteImage(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteImage {
+func NewDeleteImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteImage {
 	cmd := new(DeleteImage)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteImage) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -7654,21 +7658,21 @@ func (cmd *DeleteImage) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteInstance {
+func NewDeleteInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteInstance {
 	cmd := new(DeleteInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteInstance) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -7695,7 +7699,7 @@ func (cmd *DeleteInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.TerminateInstances(input)
+	output, err := cmd.api.TerminateInstances(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.TerminateInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7731,16 +7735,17 @@ func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]interface{
 	}
 
 	input := &ec2.TerminateInstancesInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.TerminateInstances(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.TerminateInstances(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.TerminateInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete instance ok")
 			return fakeDryRunId("instance"), nil
@@ -7754,21 +7759,21 @@ func (cmd *DeleteInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteInstanceprofile(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteInstanceprofile {
+func NewDeleteInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteInstanceprofile {
 	cmd := new(DeleteInstanceprofile)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteInstanceprofile) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeleteInstanceprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -7795,7 +7800,7 @@ func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]interf
 		return nil, fmt.Errorf("cannot inject in iam.DeleteInstanceProfileInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteInstanceProfile(input)
+	output, err := cmd.api.DeleteInstanceProfile(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7833,21 +7838,21 @@ func (cmd *DeleteInstanceprofile) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteInternetgateway(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteInternetgateway {
+func NewDeleteInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteInternetgateway {
 	cmd := new(DeleteInternetgateway)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteInternetgateway) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -7874,7 +7879,7 @@ func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteInternetGateway(input)
+	output, err := cmd.api.DeleteInternetGateway(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7910,16 +7915,17 @@ func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]int
 	}
 
 	input := &ec2.DeleteInternetGatewayInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteInternetGateway(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteInternetGateway(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete internetgateway ok")
 			return fakeDryRunId("internetgateway"), nil
@@ -7933,21 +7939,21 @@ func (cmd *DeleteInternetgateway) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteKeypair(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteKeypair {
+func NewDeleteKeypair(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteKeypair {
 	cmd := new(DeleteKeypair)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteKeypair) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteKeypair) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -7974,7 +7980,7 @@ func (cmd *DeleteKeypair) run(renv env.Running, params map[string]interface{}) (
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteKeyPair(input)
+	output, err := cmd.api.DeleteKeyPair(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteKeyPair call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8010,16 +8016,17 @@ func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]interface{}
 	}
 
 	input := &ec2.DeleteKeyPairInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteKeyPair(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteKeyPair(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteKeyPair call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete keypair ok")
 			return fakeDryRunId("keypair"), nil
@@ -8033,21 +8040,21 @@ func (cmd *DeleteKeypair) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteLaunchconfiguration(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLaunchconfiguration {
+func NewDeleteLaunchconfiguration(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLaunchconfiguration {
 	cmd := new(DeleteLaunchconfiguration)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteLaunchconfiguration) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *DeleteLaunchconfiguration) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -8074,7 +8081,7 @@ func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]in
 		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteLaunchConfigurationInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLaunchConfiguration(input)
+	output, err := cmd.api.DeleteLaunchConfiguration(context.Background(), input)
 	renv.Log().ExtraVerbosef("autoscaling.DeleteLaunchConfiguration call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8112,21 +8119,21 @@ func (cmd *DeleteLaunchconfiguration) inject(params map[string]interface{}) erro
 	return structSetter(cmd, params)
 }
 
-func NewDeleteListener(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteListener {
+func NewDeleteListener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteListener {
 	cmd := new(DeleteListener)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteListener) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *DeleteListener) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -8153,7 +8160,7 @@ func (cmd *DeleteListener) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in elbv2.DeleteListenerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteListener(input)
+	output, err := cmd.api.DeleteListener(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeleteListener call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8191,21 +8198,21 @@ func (cmd *DeleteListener) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLoadbalancer {
+func NewDeleteLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLoadbalancer {
 	cmd := new(DeleteLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteLoadbalancer) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *DeleteLoadbalancer) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -8232,7 +8239,7 @@ func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in elbv2.DeleteLoadBalancerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLoadBalancer(input)
+	output, err := cmd.api.DeleteLoadBalancer(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeleteLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8270,21 +8277,21 @@ func (cmd *DeleteLoadbalancer) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteLoginprofile(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLoginprofile {
+func NewDeleteLoginprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLoginprofile {
 	cmd := new(DeleteLoginprofile)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteLoginprofile) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeleteLoginprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -8311,7 +8318,7 @@ func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in iam.DeleteLoginProfileInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLoginProfile(input)
+	output, err := cmd.api.DeleteLoginProfile(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteLoginProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8349,21 +8356,21 @@ func (cmd *DeleteLoginprofile) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteMfadevice(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteMfadevice {
+func NewDeleteMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteMfadevice {
 	cmd := new(DeleteMfadevice)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteMfadevice) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeleteMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -8390,7 +8397,7 @@ func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in iam.DeleteVirtualMFADeviceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteVirtualMFADevice(input)
+	output, err := cmd.api.DeleteVirtualMFADevice(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteVirtualMFADevice call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8428,21 +8435,21 @@ func (cmd *DeleteMfadevice) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteNatgateway(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNatgateway {
+func NewDeleteNatgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNatgateway {
 	cmd := new(DeleteNatgateway)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteNatgateway) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteNatgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -8469,7 +8476,7 @@ func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteNatGatewayInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteNatGateway(input)
+	output, err := cmd.api.DeleteNatGateway(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteNatGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8507,21 +8514,21 @@ func (cmd *DeleteNatgateway) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteNetworkinterface(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNetworkinterface {
+func NewDeleteNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNetworkinterface {
 	cmd := new(DeleteNetworkinterface)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteNetworkinterface) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -8548,7 +8555,7 @@ func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]inter
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteNetworkInterface(input)
+	output, err := cmd.api.DeleteNetworkInterface(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteNetworkInterface call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8584,16 +8591,17 @@ func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]in
 	}
 
 	input := &ec2.DeleteNetworkInterfaceInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteNetworkInterface(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteNetworkInterface(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteNetworkInterface call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete networkinterface ok")
 			return fakeDryRunId("networkinterface"), nil
@@ -8607,21 +8615,21 @@ func (cmd *DeleteNetworkinterface) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeletePolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeletePolicy {
+func NewDeletePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeletePolicy {
 	cmd := new(DeletePolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeletePolicy) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeletePolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -8648,7 +8656,7 @@ func (cmd *DeletePolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in iam.DeletePolicyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeletePolicy(input)
+	output, err := cmd.api.DeletePolicy(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeletePolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8686,21 +8694,21 @@ func (cmd *DeletePolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteQueue(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteQueue {
+func NewDeleteQueue(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteQueue {
 	cmd := new(DeleteQueue)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = sqs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = sqs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteQueue) SetApi(api sqsiface.SQSAPI) {
+func (cmd *DeleteQueue) SetApi(api *sqs.Client) {
 	cmd.api = api
 }
 
@@ -8727,7 +8735,7 @@ func (cmd *DeleteQueue) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in sqs.DeleteQueueInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteQueue(input)
+	output, err := cmd.api.DeleteQueue(context.Background(), input)
 	renv.Log().ExtraVerbosef("sqs.DeleteQueue call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8765,21 +8773,21 @@ func (cmd *DeleteQueue) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteRecord(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRecord {
+func NewDeleteRecord(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRecord {
 	cmd := new(DeleteRecord)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = route53.New(sess)
+	if cfg.Region != "" {
+		cmd.api = route53.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteRecord) SetApi(api route53iface.Route53API) {
+func (cmd *DeleteRecord) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
@@ -8838,21 +8846,21 @@ func (cmd *DeleteRecord) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteRepository(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRepository {
+func NewDeleteRepository(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRepository {
 	cmd := new(DeleteRepository)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecr.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecr.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteRepository) SetApi(api ecriface.ECRAPI) {
+func (cmd *DeleteRepository) SetApi(api *ecr.Client) {
 	cmd.api = api
 }
 
@@ -8879,7 +8887,7 @@ func (cmd *DeleteRepository) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ecr.DeleteRepositoryInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteRepository(input)
+	output, err := cmd.api.DeleteRepository(context.Background(), input)
 	renv.Log().ExtraVerbosef("ecr.DeleteRepository call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8917,21 +8925,21 @@ func (cmd *DeleteRepository) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteRole(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRole {
+func NewDeleteRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRole {
 	cmd := new(DeleteRole)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteRole) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeleteRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -8990,21 +8998,21 @@ func (cmd *DeleteRole) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteRoute(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRoute {
+func NewDeleteRoute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRoute {
 	cmd := new(DeleteRoute)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteRoute) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteRoute) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -9031,7 +9039,7 @@ func (cmd *DeleteRoute) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteRoute(input)
+	output, err := cmd.api.DeleteRoute(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteRoute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9067,16 +9075,17 @@ func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]interface{}) 
 	}
 
 	input := &ec2.DeleteRouteInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteRoute(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteRoute(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteRoute call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete route ok")
 			return fakeDryRunId("route"), nil
@@ -9090,21 +9099,21 @@ func (cmd *DeleteRoute) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteRoutetable(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRoutetable {
+func NewDeleteRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRoutetable {
 	cmd := new(DeleteRoutetable)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteRoutetable) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -9131,7 +9140,7 @@ func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteRouteTable(input)
+	output, err := cmd.api.DeleteRouteTable(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9167,16 +9176,17 @@ func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]interfac
 	}
 
 	input := &ec2.DeleteRouteTableInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteRouteTable(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteRouteTable(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete routetable ok")
 			return fakeDryRunId("routetable"), nil
@@ -9190,21 +9200,21 @@ func (cmd *DeleteRoutetable) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteS3object(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteS3object {
+func NewDeleteS3object(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteS3object {
 	cmd := new(DeleteS3object)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = s3.New(sess)
+	if cfg.Region != "" {
+		cmd.api = s3.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteS3object) SetApi(api s3iface.S3API) {
+func (cmd *DeleteS3object) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
@@ -9231,7 +9241,7 @@ func (cmd *DeleteS3object) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in s3.DeleteObjectInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteObject(input)
+	output, err := cmd.api.DeleteObject(context.Background(), input)
 	renv.Log().ExtraVerbosef("s3.DeleteObject call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9269,21 +9279,21 @@ func (cmd *DeleteS3object) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteScalinggroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteScalinggroup {
+func NewDeleteScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteScalinggroup {
 	cmd := new(DeleteScalinggroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteScalinggroup) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *DeleteScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -9310,7 +9320,7 @@ func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteAutoScalingGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteAutoScalingGroup(input)
+	output, err := cmd.api.DeleteAutoScalingGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("autoscaling.DeleteAutoScalingGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9348,21 +9358,21 @@ func (cmd *DeleteScalinggroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteScalingpolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteScalingpolicy {
+func NewDeleteScalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteScalingpolicy {
 	cmd := new(DeleteScalingpolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteScalingpolicy) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *DeleteScalingpolicy) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -9389,7 +9399,7 @@ func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]interfac
 		return nil, fmt.Errorf("cannot inject in autoscaling.DeletePolicyInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeletePolicy(input)
+	output, err := cmd.api.DeletePolicy(context.Background(), input)
 	renv.Log().ExtraVerbosef("autoscaling.DeletePolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9427,21 +9437,21 @@ func (cmd *DeleteScalingpolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteSecuritygroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSecuritygroup {
+func NewDeleteSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSecuritygroup {
 	cmd := new(DeleteSecuritygroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteSecuritygroup) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -9468,7 +9478,7 @@ func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]interfac
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteSecurityGroup(input)
+	output, err := cmd.api.DeleteSecurityGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteSecurityGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9504,16 +9514,17 @@ func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]inter
 	}
 
 	input := &ec2.DeleteSecurityGroupInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteSecurityGroup(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteSecurityGroup(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteSecurityGroup call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete securitygroup ok")
 			return fakeDryRunId("securitygroup"), nil
@@ -9527,21 +9538,21 @@ func (cmd *DeleteSecuritygroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteSnapshot(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSnapshot {
+func NewDeleteSnapshot(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSnapshot {
 	cmd := new(DeleteSnapshot)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteSnapshot) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteSnapshot) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -9568,7 +9579,7 @@ func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteSnapshot(input)
+	output, err := cmd.api.DeleteSnapshot(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteSnapshot call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9604,16 +9615,17 @@ func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]interface{
 	}
 
 	input := &ec2.DeleteSnapshotInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteSnapshot(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteSnapshot(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteSnapshot call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete snapshot ok")
 			return fakeDryRunId("snapshot"), nil
@@ -9627,21 +9639,21 @@ func (cmd *DeleteSnapshot) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteStack(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteStack {
+func NewDeleteStack(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteStack {
 	cmd := new(DeleteStack)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudformation.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudformation.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteStack) SetApi(api cloudformationiface.CloudFormationAPI) {
+func (cmd *DeleteStack) SetApi(api *cloudformation.Client) {
 	cmd.api = api
 }
 
@@ -9668,7 +9680,7 @@ func (cmd *DeleteStack) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in cloudformation.DeleteStackInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteStack(input)
+	output, err := cmd.api.DeleteStack(context.Background(), input)
 	renv.Log().ExtraVerbosef("cloudformation.DeleteStack call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9706,21 +9718,21 @@ func (cmd *DeleteStack) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteSubnet(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSubnet {
+func NewDeleteSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSubnet {
 	cmd := new(DeleteSubnet)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteSubnet) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteSubnet) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -9747,7 +9759,7 @@ func (cmd *DeleteSubnet) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteSubnet(input)
+	output, err := cmd.api.DeleteSubnet(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteSubnet call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9783,16 +9795,17 @@ func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.DeleteSubnetInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteSubnet(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteSubnet(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteSubnet call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete subnet ok")
 			return fakeDryRunId("subnet"), nil
@@ -9806,21 +9819,21 @@ func (cmd *DeleteSubnet) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteSubscription(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSubscription {
+func NewDeleteSubscription(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSubscription {
 	cmd := new(DeleteSubscription)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = sns.New(sess)
+	if cfg.Region != "" {
+		cmd.api = sns.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteSubscription) SetApi(api snsiface.SNSAPI) {
+func (cmd *DeleteSubscription) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
@@ -9847,7 +9860,7 @@ func (cmd *DeleteSubscription) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in sns.UnsubscribeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.Unsubscribe(input)
+	output, err := cmd.api.Unsubscribe(context.Background(), input)
 	renv.Log().ExtraVerbosef("sns.Unsubscribe call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9885,21 +9898,21 @@ func (cmd *DeleteSubscription) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteTag(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTag {
+func NewDeleteTag(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTag {
 	cmd := new(DeleteTag)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteTag) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteTag) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -9954,21 +9967,21 @@ func (cmd *DeleteTag) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteTargetgroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTargetgroup {
+func NewDeleteTargetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTargetgroup {
 	cmd := new(DeleteTargetgroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteTargetgroup) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *DeleteTargetgroup) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -9995,7 +10008,7 @@ func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]interface{
 		return nil, fmt.Errorf("cannot inject in elbv2.DeleteTargetGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteTargetGroup(input)
+	output, err := cmd.api.DeleteTargetGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeleteTargetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10033,21 +10046,21 @@ func (cmd *DeleteTargetgroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteTopic(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTopic {
+func NewDeleteTopic(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTopic {
 	cmd := new(DeleteTopic)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = sns.New(sess)
+	if cfg.Region != "" {
+		cmd.api = sns.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteTopic) SetApi(api snsiface.SNSAPI) {
+func (cmd *DeleteTopic) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
@@ -10074,7 +10087,7 @@ func (cmd *DeleteTopic) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in sns.DeleteTopicInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteTopic(input)
+	output, err := cmd.api.DeleteTopic(context.Background(), input)
 	renv.Log().ExtraVerbosef("sns.DeleteTopic call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10112,21 +10125,21 @@ func (cmd *DeleteTopic) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteUser(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteUser {
+func NewDeleteUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteUser {
 	cmd := new(DeleteUser)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteUser) SetApi(api iamiface.IAMAPI) {
+func (cmd *DeleteUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -10153,7 +10166,7 @@ func (cmd *DeleteUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in iam.DeleteUserInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteUser(input)
+	output, err := cmd.api.DeleteUser(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteUser call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10191,21 +10204,21 @@ func (cmd *DeleteUser) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteVolume(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteVolume {
+func NewDeleteVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteVolume {
 	cmd := new(DeleteVolume)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteVolume) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -10232,7 +10245,7 @@ func (cmd *DeleteVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteVolume(input)
+	output, err := cmd.api.DeleteVolume(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10268,16 +10281,17 @@ func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.DeleteVolumeInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteVolume(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteVolume(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete volume ok")
 			return fakeDryRunId("volume"), nil
@@ -10291,21 +10305,21 @@ func (cmd *DeleteVolume) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteVpc(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteVpc {
+func NewDeleteVpc(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteVpc {
 	cmd := new(DeleteVpc)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteVpc) SetApi(api ec2iface.EC2API) {
+func (cmd *DeleteVpc) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -10332,7 +10346,7 @@ func (cmd *DeleteVpc) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteVpc(input)
+	output, err := cmd.api.DeleteVpc(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteVpc call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10368,16 +10382,17 @@ func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]interface{}) (i
 	}
 
 	input := &ec2.DeleteVpcInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteVpc(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DeleteVpc(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteVpc call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete vpc ok")
 			return fakeDryRunId("vpc"), nil
@@ -10391,21 +10406,21 @@ func (cmd *DeleteVpc) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDeleteZone(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DeleteZone {
+func NewDeleteZone(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteZone {
 	cmd := new(DeleteZone)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = route53.New(sess)
+	if cfg.Region != "" {
+		cmd.api = route53.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DeleteZone) SetApi(api route53iface.Route53API) {
+func (cmd *DeleteZone) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
@@ -10432,7 +10447,7 @@ func (cmd *DeleteZone) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in route53.DeleteHostedZoneInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteHostedZone(input)
+	output, err := cmd.api.DeleteHostedZone(context.Background(), input)
 	renv.Log().ExtraVerbosef("route53.DeleteHostedZone call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10470,21 +10485,21 @@ func (cmd *DeleteZone) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachAlarm(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachAlarm {
+func NewDetachAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachAlarm {
 	cmd := new(DetachAlarm)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudwatch.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudwatch.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachAlarm) SetApi(api cloudwatchiface.CloudWatchAPI) {
+func (cmd *DetachAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
@@ -10543,21 +10558,21 @@ func (cmd *DetachAlarm) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachClassicLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachClassicLoadbalancer {
+func NewDetachClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachClassicLoadbalancer {
 	cmd := new(DetachClassicLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elb.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elb.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachClassicLoadbalancer) SetApi(api elbiface.ELBAPI) {
+func (cmd *DetachClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
@@ -10584,7 +10599,7 @@ func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, fmt.Errorf("cannot inject in elb.DeregisterInstancesFromLoadBalancerInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeregisterInstancesFromLoadBalancer(input)
+	output, err := cmd.api.DeregisterInstancesFromLoadBalancer(context.Background(), input)
 	renv.Log().ExtraVerbosef("elb.DeregisterInstancesFromLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10622,21 +10637,21 @@ func (cmd *DetachClassicLoadbalancer) inject(params map[string]interface{}) erro
 	return structSetter(cmd, params)
 }
 
-func NewDetachContainertask(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachContainertask {
+func NewDetachContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachContainertask {
 	cmd := new(DetachContainertask)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachContainertask) SetApi(api ecsiface.ECSAPI) {
+func (cmd *DetachContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -10695,21 +10710,21 @@ func (cmd *DetachContainertask) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachElasticip(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachElasticip {
+func NewDetachElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachElasticip {
 	cmd := new(DetachElasticip)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachElasticip) SetApi(api ec2iface.EC2API) {
+func (cmd *DetachElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -10736,7 +10751,7 @@ func (cmd *DetachElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DisassociateAddress(input)
+	output, err := cmd.api.DisassociateAddress(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DisassociateAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10772,16 +10787,17 @@ func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]interface
 	}
 
 	input := &ec2.DisassociateAddressInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DisassociateAddress(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DisassociateAddress(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DisassociateAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach elasticip ok")
 			return fakeDryRunId("elasticip"), nil
@@ -10795,21 +10811,21 @@ func (cmd *DetachElasticip) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachInstance {
+func NewDetachInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachInstance {
 	cmd := new(DetachInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachInstance) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *DetachInstance) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
@@ -10836,7 +10852,7 @@ func (cmd *DetachInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in elbv2.DeregisterTargetsInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeregisterTargets(input)
+	output, err := cmd.api.DeregisterTargets(context.Background(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeregisterTargets call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10874,21 +10890,21 @@ func (cmd *DetachInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachInstanceprofile(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachInstanceprofile {
+func NewDetachInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachInstanceprofile {
 	cmd := new(DetachInstanceprofile)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachInstanceprofile) SetApi(api ec2iface.EC2API) {
+func (cmd *DetachInstanceprofile) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -10947,21 +10963,21 @@ func (cmd *DetachInstanceprofile) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachInternetgateway(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachInternetgateway {
+func NewDetachInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachInternetgateway {
 	cmd := new(DetachInternetgateway)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachInternetgateway) SetApi(api ec2iface.EC2API) {
+func (cmd *DetachInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -10988,7 +11004,7 @@ func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DetachInternetGateway(input)
+	output, err := cmd.api.DetachInternetGateway(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DetachInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11024,16 +11040,17 @@ func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]int
 	}
 
 	input := &ec2.DetachInternetGatewayInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DetachInternetGateway(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DetachInternetGateway(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DetachInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach internetgateway ok")
 			return fakeDryRunId("internetgateway"), nil
@@ -11047,21 +11064,21 @@ func (cmd *DetachInternetgateway) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachMfadevice(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachMfadevice {
+func NewDetachMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachMfadevice {
 	cmd := new(DetachMfadevice)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachMfadevice) SetApi(api iamiface.IAMAPI) {
+func (cmd *DetachMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -11088,7 +11105,7 @@ func (cmd *DetachMfadevice) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in iam.DeactivateMFADeviceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeactivateMFADevice(input)
+	output, err := cmd.api.DeactivateMFADevice(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.DeactivateMFADevice call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11126,21 +11143,21 @@ func (cmd *DetachMfadevice) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachNetworkinterface(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachNetworkinterface {
+func NewDetachNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachNetworkinterface {
 	cmd := new(DetachNetworkinterface)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachNetworkinterface) SetApi(api ec2iface.EC2API) {
+func (cmd *DetachNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -11195,21 +11212,21 @@ func (cmd *DetachNetworkinterface) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachPolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachPolicy {
+func NewDetachPolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachPolicy {
 	cmd := new(DetachPolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachPolicy) SetApi(api iamiface.IAMAPI) {
+func (cmd *DetachPolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -11268,21 +11285,21 @@ func (cmd *DetachPolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachRole(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachRole {
+func NewDetachRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachRole {
 	cmd := new(DetachRole)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachRole) SetApi(api iamiface.IAMAPI) {
+func (cmd *DetachRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -11309,7 +11326,7 @@ func (cmd *DetachRole) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in iam.RemoveRoleFromInstanceProfileInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RemoveRoleFromInstanceProfile(input)
+	output, err := cmd.api.RemoveRoleFromInstanceProfile(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.RemoveRoleFromInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11347,21 +11364,21 @@ func (cmd *DetachRole) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachRoutetable(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachRoutetable {
+func NewDetachRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachRoutetable {
 	cmd := new(DetachRoutetable)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachRoutetable) SetApi(api ec2iface.EC2API) {
+func (cmd *DetachRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -11388,7 +11405,7 @@ func (cmd *DetachRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DisassociateRouteTable(input)
+	output, err := cmd.api.DisassociateRouteTable(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DisassociateRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11424,16 +11441,17 @@ func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]interfac
 	}
 
 	input := &ec2.DisassociateRouteTableInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DisassociateRouteTable(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DisassociateRouteTable(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DisassociateRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach routetable ok")
 			return fakeDryRunId("routetable"), nil
@@ -11447,21 +11465,21 @@ func (cmd *DetachRoutetable) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachSecuritygroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachSecuritygroup {
+func NewDetachSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachSecuritygroup {
 	cmd := new(DetachSecuritygroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachSecuritygroup) SetApi(api ec2iface.EC2API) {
+func (cmd *DetachSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -11520,21 +11538,21 @@ func (cmd *DetachSecuritygroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachUser(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachUser {
+func NewDetachUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachUser {
 	cmd := new(DetachUser)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachUser) SetApi(api iamiface.IAMAPI) {
+func (cmd *DetachUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -11561,7 +11579,7 @@ func (cmd *DetachUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in iam.RemoveUserFromGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RemoveUserFromGroup(input)
+	output, err := cmd.api.RemoveUserFromGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.RemoveUserFromGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11599,21 +11617,21 @@ func (cmd *DetachUser) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewDetachVolume(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *DetachVolume {
+func NewDetachVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachVolume {
 	cmd := new(DetachVolume)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *DetachVolume) SetApi(api ec2iface.EC2API) {
+func (cmd *DetachVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -11640,7 +11658,7 @@ func (cmd *DetachVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DetachVolume(input)
+	output, err := cmd.api.DetachVolume(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.DetachVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11676,16 +11694,17 @@ func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.DetachVolumeInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DetachVolume(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.DetachVolume(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DetachVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach volume ok")
 			return fakeDryRunId("volume"), nil
@@ -11699,21 +11718,21 @@ func (cmd *DetachVolume) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewImportImage(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *ImportImage {
+func NewImportImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *ImportImage {
 	cmd := new(ImportImage)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *ImportImage) SetApi(api ec2iface.EC2API) {
+func (cmd *ImportImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -11740,7 +11759,7 @@ func (cmd *ImportImage) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ImportImage(input)
+	output, err := cmd.api.ImportImage(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.ImportImage call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11776,16 +11795,17 @@ func (cmd *ImportImage) dryRun(renv env.Running, params map[string]interface{}) 
 	}
 
 	input := &ec2.ImportImageInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.ImportImage(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.ImportImage(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.ImportImage call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: import image ok")
 			return fakeDryRunId("image"), nil
@@ -11799,21 +11819,21 @@ func (cmd *ImportImage) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewRestartDatabase(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *RestartDatabase {
+func NewRestartDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *RestartDatabase {
 	cmd := new(RestartDatabase)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *RestartDatabase) SetApi(api rdsiface.RDSAPI) {
+func (cmd *RestartDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -11840,7 +11860,7 @@ func (cmd *RestartDatabase) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in rds.RebootDBInstanceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RebootDBInstance(input)
+	output, err := cmd.api.RebootDBInstance(context.Background(), input)
 	renv.Log().ExtraVerbosef("rds.RebootDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11878,21 +11898,21 @@ func (cmd *RestartDatabase) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewRestartInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *RestartInstance {
+func NewRestartInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *RestartInstance {
 	cmd := new(RestartInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *RestartInstance) SetApi(api ec2iface.EC2API) {
+func (cmd *RestartInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -11919,7 +11939,7 @@ func (cmd *RestartInstance) run(renv env.Running, params map[string]interface{})
 		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.RebootInstances(input)
+	output, err := cmd.api.RebootInstances(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.RebootInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11955,16 +11975,17 @@ func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]interface
 	}
 
 	input := &ec2.RebootInstancesInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.RebootInstances(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.RebootInstances(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.RebootInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: restart instance ok")
 			return fakeDryRunId("instance"), nil
@@ -11978,21 +11999,21 @@ func (cmd *RestartInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStartAlarm(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StartAlarm {
+func NewStartAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartAlarm {
 	cmd := new(StartAlarm)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudwatch.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudwatch.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StartAlarm) SetApi(api cloudwatchiface.CloudWatchAPI) {
+func (cmd *StartAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
@@ -12019,7 +12040,7 @@ func (cmd *StartAlarm) run(renv env.Running, params map[string]interface{}) (int
 		return nil, fmt.Errorf("cannot inject in cloudwatch.EnableAlarmActionsInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.EnableAlarmActions(input)
+	output, err := cmd.api.EnableAlarmActions(context.Background(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.EnableAlarmActions call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12057,21 +12078,21 @@ func (cmd *StartAlarm) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStartContainertask(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StartContainertask {
+func NewStartContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartContainertask {
 	cmd := new(StartContainertask)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StartContainertask) SetApi(api ecsiface.ECSAPI) {
+func (cmd *StartContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -12130,21 +12151,21 @@ func (cmd *StartContainertask) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStartDatabase(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StartDatabase {
+func NewStartDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartDatabase {
 	cmd := new(StartDatabase)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StartDatabase) SetApi(api rdsiface.RDSAPI) {
+func (cmd *StartDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -12171,7 +12192,7 @@ func (cmd *StartDatabase) run(renv env.Running, params map[string]interface{}) (
 		return nil, fmt.Errorf("cannot inject in rds.StartDBInstanceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.StartDBInstance(input)
+	output, err := cmd.api.StartDBInstance(context.Background(), input)
 	renv.Log().ExtraVerbosef("rds.StartDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12209,21 +12230,21 @@ func (cmd *StartDatabase) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStartInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StartInstance {
+func NewStartInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartInstance {
 	cmd := new(StartInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StartInstance) SetApi(api ec2iface.EC2API) {
+func (cmd *StartInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -12250,7 +12271,7 @@ func (cmd *StartInstance) run(renv env.Running, params map[string]interface{}) (
 		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.StartInstances(input)
+	output, err := cmd.api.StartInstances(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.StartInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12286,16 +12307,17 @@ func (cmd *StartInstance) dryRun(renv env.Running, params map[string]interface{}
 	}
 
 	input := &ec2.StartInstancesInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.StartInstances(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.StartInstances(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.StartInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: start instance ok")
 			return fakeDryRunId("instance"), nil
@@ -12309,21 +12331,21 @@ func (cmd *StartInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStopAlarm(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StopAlarm {
+func NewStopAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopAlarm {
 	cmd := new(StopAlarm)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudwatch.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudwatch.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StopAlarm) SetApi(api cloudwatchiface.CloudWatchAPI) {
+func (cmd *StopAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
@@ -12350,7 +12372,7 @@ func (cmd *StopAlarm) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, fmt.Errorf("cannot inject in cloudwatch.DisableAlarmActionsInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.DisableAlarmActions(input)
+	output, err := cmd.api.DisableAlarmActions(context.Background(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.DisableAlarmActions call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12388,21 +12410,21 @@ func (cmd *StopAlarm) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStopContainertask(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StopContainertask {
+func NewStopContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopContainertask {
 	cmd := new(StopContainertask)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StopContainertask) SetApi(api ecsiface.ECSAPI) {
+func (cmd *StopContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -12461,21 +12483,21 @@ func (cmd *StopContainertask) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStopDatabase(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StopDatabase {
+func NewStopDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopDatabase {
 	cmd := new(StopDatabase)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = rds.New(sess)
+	if cfg.Region != "" {
+		cmd.api = rds.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StopDatabase) SetApi(api rdsiface.RDSAPI) {
+func (cmd *StopDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
@@ -12502,7 +12524,7 @@ func (cmd *StopDatabase) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in rds.StopDBInstanceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.StopDBInstance(input)
+	output, err := cmd.api.StopDBInstance(context.Background(), input)
 	renv.Log().ExtraVerbosef("rds.StopDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12540,21 +12562,21 @@ func (cmd *StopDatabase) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewStopInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *StopInstance {
+func NewStopInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopInstance {
 	cmd := new(StopInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *StopInstance) SetApi(api ec2iface.EC2API) {
+func (cmd *StopInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -12581,7 +12603,7 @@ func (cmd *StopInstance) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.StopInstances(input)
+	output, err := cmd.api.StopInstances(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.StopInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12617,16 +12639,17 @@ func (cmd *StopInstance) dryRun(renv env.Running, params map[string]interface{})
 	}
 
 	input := &ec2.StopInstancesInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.StopInstances(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.StopInstances(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.StopInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: stop instance ok")
 			return fakeDryRunId("instance"), nil
@@ -12640,21 +12663,21 @@ func (cmd *StopInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateBucket(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateBucket {
+func NewUpdateBucket(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateBucket {
 	cmd := new(UpdateBucket)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = s3.New(sess)
+	if cfg.Region != "" {
+		cmd.api = s3.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateBucket) SetApi(api s3iface.S3API) {
+func (cmd *UpdateBucket) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
@@ -12713,21 +12736,21 @@ func (cmd *UpdateBucket) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateClassicLoadbalancer(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateClassicLoadbalancer {
+func NewUpdateClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateClassicLoadbalancer {
 	cmd := new(UpdateClassicLoadbalancer)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elb.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elb.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateClassicLoadbalancer) SetApi(api elbiface.ELBAPI) {
+func (cmd *UpdateClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
@@ -12754,7 +12777,7 @@ func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, fmt.Errorf("cannot inject in elb.ConfigureHealthCheckInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ConfigureHealthCheck(input)
+	output, err := cmd.api.ConfigureHealthCheck(context.Background(), input)
 	renv.Log().ExtraVerbosef("elb.ConfigureHealthCheck call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12792,21 +12815,21 @@ func (cmd *UpdateClassicLoadbalancer) inject(params map[string]interface{}) erro
 	return structSetter(cmd, params)
 }
 
-func NewUpdateContainertask(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateContainertask {
+func NewUpdateContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateContainertask {
 	cmd := new(UpdateContainertask)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ecs.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ecs.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateContainertask) SetApi(api ecsiface.ECSAPI) {
+func (cmd *UpdateContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
@@ -12833,7 +12856,7 @@ func (cmd *UpdateContainertask) run(renv env.Running, params map[string]interfac
 		return nil, fmt.Errorf("cannot inject in ecs.UpdateServiceInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateService(input)
+	output, err := cmd.api.UpdateService(context.Background(), input)
 	renv.Log().ExtraVerbosef("ecs.UpdateService call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12871,21 +12894,21 @@ func (cmd *UpdateContainertask) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateDistribution(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateDistribution {
+func NewUpdateDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateDistribution {
 	cmd := new(UpdateDistribution)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudfront.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudfront.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateDistribution) SetApi(api cloudfrontiface.CloudFrontAPI) {
+func (cmd *UpdateDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
@@ -12944,21 +12967,21 @@ func (cmd *UpdateDistribution) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateImage(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateImage {
+func NewUpdateImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateImage {
 	cmd := new(UpdateImage)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateImage) SetApi(api ec2iface.EC2API) {
+func (cmd *UpdateImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -13013,21 +13036,21 @@ func (cmd *UpdateImage) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateInstance(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateInstance {
+func NewUpdateInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateInstance {
 	cmd := new(UpdateInstance)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateInstance) SetApi(api ec2iface.EC2API) {
+func (cmd *UpdateInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -13054,7 +13077,7 @@ func (cmd *UpdateInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ModifyInstanceAttribute(input)
+	output, err := cmd.api.ModifyInstanceAttribute(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.ModifyInstanceAttribute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13090,16 +13113,17 @@ func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]interface{
 	}
 
 	input := &ec2.ModifyInstanceAttributeInput{}
-	input.SetDryRun(true)
+	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err := cmd.api.ModifyInstanceAttribute(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err := cmd.api.ModifyInstanceAttribute(context.Background(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.ModifyInstanceAttribute call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: update instance ok")
 			return fakeDryRunId("instance"), nil
@@ -13113,21 +13137,21 @@ func (cmd *UpdateInstance) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateLoginprofile(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateLoginprofile {
+func NewUpdateLoginprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateLoginprofile {
 	cmd := new(UpdateLoginprofile)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateLoginprofile) SetApi(api iamiface.IAMAPI) {
+func (cmd *UpdateLoginprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -13154,7 +13178,7 @@ func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in iam.UpdateLoginProfileInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateLoginProfile(input)
+	output, err := cmd.api.UpdateLoginProfile(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.UpdateLoginProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13192,21 +13216,21 @@ func (cmd *UpdateLoginprofile) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdatePolicy(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdatePolicy {
+func NewUpdatePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdatePolicy {
 	cmd := new(UpdatePolicy)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = iam.New(sess)
+	if cfg.Region != "" {
+		cmd.api = iam.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdatePolicy) SetApi(api iamiface.IAMAPI) {
+func (cmd *UpdatePolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
@@ -13233,7 +13257,7 @@ func (cmd *UpdatePolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyVersionInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreatePolicyVersion(input)
+	output, err := cmd.api.CreatePolicyVersion(context.Background(), input)
 	renv.Log().ExtraVerbosef("iam.CreatePolicyVersion call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13271,21 +13295,21 @@ func (cmd *UpdatePolicy) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateRecord(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateRecord {
+func NewUpdateRecord(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateRecord {
 	cmd := new(UpdateRecord)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = route53.New(sess)
+	if cfg.Region != "" {
+		cmd.api = route53.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateRecord) SetApi(api route53iface.Route53API) {
+func (cmd *UpdateRecord) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
@@ -13344,21 +13368,21 @@ func (cmd *UpdateRecord) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateS3object(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateS3object {
+func NewUpdateS3object(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateS3object {
 	cmd := new(UpdateS3object)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = s3.New(sess)
+	if cfg.Region != "" {
+		cmd.api = s3.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateS3object) SetApi(api s3iface.S3API) {
+func (cmd *UpdateS3object) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
@@ -13385,7 +13409,7 @@ func (cmd *UpdateS3object) run(renv env.Running, params map[string]interface{}) 
 		return nil, fmt.Errorf("cannot inject in s3.PutObjectAclInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutObjectAcl(input)
+	output, err := cmd.api.PutObjectAcl(context.Background(), input)
 	renv.Log().ExtraVerbosef("s3.PutObjectAcl call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13423,21 +13447,21 @@ func (cmd *UpdateS3object) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateScalinggroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateScalinggroup {
+func NewUpdateScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateScalinggroup {
 	cmd := new(UpdateScalinggroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = autoscaling.New(sess)
+	if cfg.Region != "" {
+		cmd.api = autoscaling.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateScalinggroup) SetApi(api autoscalingiface.AutoScalingAPI) {
+func (cmd *UpdateScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
@@ -13464,7 +13488,7 @@ func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]interface
 		return nil, fmt.Errorf("cannot inject in autoscaling.UpdateAutoScalingGroupInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateAutoScalingGroup(input)
+	output, err := cmd.api.UpdateAutoScalingGroup(context.Background(), input)
 	renv.Log().ExtraVerbosef("autoscaling.UpdateAutoScalingGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13502,21 +13526,21 @@ func (cmd *UpdateScalinggroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateSecuritygroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateSecuritygroup {
+func NewUpdateSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateSecuritygroup {
 	cmd := new(UpdateSecuritygroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateSecuritygroup) SetApi(api ec2iface.EC2API) {
+func (cmd *UpdateSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -13571,21 +13595,21 @@ func (cmd *UpdateSecuritygroup) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateStack(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateStack {
+func NewUpdateStack(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateStack {
 	cmd := new(UpdateStack)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = cloudformation.New(sess)
+	if cfg.Region != "" {
+		cmd.api = cloudformation.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateStack) SetApi(api cloudformationiface.CloudFormationAPI) {
+func (cmd *UpdateStack) SetApi(api *cloudformation.Client) {
 	cmd.api = api
 }
 
@@ -13612,7 +13636,7 @@ func (cmd *UpdateStack) run(renv env.Running, params map[string]interface{}) (in
 		return nil, fmt.Errorf("cannot inject in cloudformation.UpdateStackInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateStack(input)
+	output, err := cmd.api.UpdateStack(context.Background(), input)
 	renv.Log().ExtraVerbosef("cloudformation.UpdateStack call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13650,21 +13674,21 @@ func (cmd *UpdateStack) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateSubnet(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateSubnet {
+func NewUpdateSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateSubnet {
 	cmd := new(UpdateSubnet)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = ec2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateSubnet) SetApi(api ec2iface.EC2API) {
+func (cmd *UpdateSubnet) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
@@ -13691,7 +13715,7 @@ func (cmd *UpdateSubnet) run(renv env.Running, params map[string]interface{}) (i
 		return nil, fmt.Errorf("cannot inject in ec2.ModifySubnetAttributeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ModifySubnetAttribute(input)
+	output, err := cmd.api.ModifySubnetAttribute(context.Background(), input)
 	renv.Log().ExtraVerbosef("ec2.ModifySubnetAttribute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13729,21 +13753,21 @@ func (cmd *UpdateSubnet) inject(params map[string]interface{}) error {
 	return structSetter(cmd, params)
 }
 
-func NewUpdateTargetgroup(sess *session.Session, g cloud.GraphAPI, l ...*logger.Logger) *UpdateTargetgroup {
+func NewUpdateTargetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateTargetgroup {
 	cmd := new(UpdateTargetgroup)
 	if len(l) > 0 {
 		cmd.logger = l[0]
 	} else {
 		cmd.logger = logger.DiscardLogger
 	}
-	if sess != nil {
-		cmd.api = elbv2.New(sess)
+	if cfg.Region != "" {
+		cmd.api = elbv2.NewFromConfig(cfg)
 	}
 	cmd.graph = g
 	return cmd
 }
 
-func (cmd *UpdateTargetgroup) SetApi(api elbv2iface.ELBV2API) {
+func (cmd *UpdateTargetgroup) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 

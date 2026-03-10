@@ -22,10 +22,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
-	"github.com/aws/aws-sdk-go/aws/session"
+	"context"
+
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/spf13/cobra"
-	"github.com/wallix/awless/aws/services"
+
+	awsservices "github.com/wallix/awless/aws/services"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/config"
 	"github.com/wallix/awless/database"
@@ -249,15 +251,13 @@ func migrationActionsAndExtraMessages(current string) {
 }
 
 func hasEmbeddedRegionInSharedConfigForProfile(profile string) (string, bool, error) {
-	s, err := session.NewSessionWithOptions(session.Options{
-		AssumeRoleTokenProvider: stscreds.StdinTokenProvider,
-		SharedConfigState:       session.SharedConfigEnable,
-		Profile:                 profile,
-	})
+	cfg, err := awsconfig.LoadDefaultConfig(context.Background(),
+		awsconfig.WithSharedConfigProfile(profile),
+	)
 	if err != nil {
 		return "", false, fmt.Errorf("cannot check profile '%s' has embedded region in shared config file: %s", profile, err)
 	}
-	region := *s.Config.Region
+	region := cfg.Region
 	return region, len(region) > 0, nil
 }
 

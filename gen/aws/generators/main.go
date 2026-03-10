@@ -1,4 +1,4 @@
-//go:generate go run $GOFILE properties.go paramsdoc.go mocks.go fetchers.go services.go commands.go acceptance_mocks.go
+//go:generate go run $GOFILE properties.go mocks.go fetchers.go services.go commands.go acceptance_mocks.go
 
 //go:generate gofmt -s -w ../../../aws
 //go:generate goimports -w ../../../aws
@@ -26,8 +26,8 @@ package main
 import (
 	"bytes"
 	"flag"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 
 	"text/template"
@@ -40,7 +40,6 @@ var (
 	SERVICES_DIR         = filepath.Join(ROOT_DIR, "aws", "services")
 	SPEC_DIR             = filepath.Join(ROOT_DIR, "aws", "spec")
 	AWSAT_DIR            = filepath.Join(ROOT_DIR, "acceptance", "aws")
-	DOC_DIR              = filepath.Join(ROOT_DIR, "aws", "doc")
 	CLOUD_PROPERTIES_DIR = filepath.Join(ROOT_DIR, "cloud", "properties")
 	CLOUD_RDF_DIR        = filepath.Join(ROOT_DIR, "cloud", "rdf")
 )
@@ -65,9 +64,6 @@ func main() {
 	// properties
 	generateProperties()
 	generateRDFProperties()
-
-	// doc
-	generateParamsDocLookup()
 }
 
 func writeTemplateToFile(templ *template.Template, data interface{}, dir, filename string) {
@@ -76,7 +72,7 @@ func writeTemplateToFile(templ *template.Template, data interface{}, dir, filena
 		log.Fatal(err)
 	}
 	path := filepath.Join(dir, filename)
-	if err := ioutil.WriteFile(path, buff.Bytes(), 0666); err != nil {
+	if err := os.WriteFile(path, buff.Bytes(), 0666); err != nil {
 		log.Fatal(err)
 	}
 

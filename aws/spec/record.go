@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -26,8 +27,9 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/aws/aws-sdk-go/service/route53/route53iface"
+	"github.com/aws/aws-sdk-go-v2/service/route53"
+	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -35,7 +37,7 @@ type CreateRecord struct {
 	_       string `action:"create" entity:"record" awsAPI:"route53"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     route53iface.Route53API
+	api     *route53.Client
 	Zone    *string   `templateName:"zone"`
 	Name    *string   `templateName:"name"`
 	Type    *string   `templateName:"type"`
@@ -67,7 +69,7 @@ type UpdateRecord struct {
 	_      string `action:"update" entity:"record" awsAPI:"route53"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    route53iface.Route53API
+	api    *route53.Client
 	Zone   *string   `templateName:"zone"`
 	Name   *string   `templateName:"name"`
 	Type   *string   `templateName:"type"`
@@ -96,7 +98,7 @@ type DeleteRecord struct {
 	_      string `action:"delete" entity:"record" awsAPI:"route53"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    route53iface.Route53API
+	api    *route53.Client
 	Zone   *string   `templateName:"zone"`
 	Name   *string   `templateName:"name"`
 	Type   *string   `templateName:"type"`
@@ -163,7 +165,7 @@ func (cmd *DeleteRecord) ExtractResult(i interface{}) string {
 	return StringValue(i.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo.Id)
 }
 
-func changeResourceRecordSets(api route53iface.Route53API, action, zone, name, recordType *string, values []*string, comment *string, ttl *int64) (*route53.ChangeResourceRecordSetsOutput, error) {
+func changeResourceRecordSets(api *route53.Client, action, zone, name, recordType *string, values []*string, comment *string, ttl *int64) (*route53.ChangeResourceRecordSetsOutput, error) {
 	input := &route53.ChangeResourceRecordSetsInput{}
 	var err error
 	// Required params
@@ -171,8 +173,7 @@ func changeResourceRecordSets(api route53iface.Route53API, action, zone, name, r
 	if err != nil {
 		return nil, err
 	}
-	change := &route53.Change{ResourceRecordSet: &route53.ResourceRecordSet{}}
-	input.ChangeBatch = &route53.ChangeBatch{Changes: []*route53.Change{change}}
+	change := &route53types.Change{ResourceRecordSet: &route53types.ResourceRecordSet{}}
 	if err = setFieldWithType(action, change, "Action", awsstr); err != nil {
 		return nil, err
 	}
@@ -186,12 +187,14 @@ func changeResourceRecordSets(api route53iface.Route53API, action, zone, name, r
 		return nil, err
 	}
 	for _, value := range values {
-		resourceRecord := &route53.ResourceRecord{}
+		resourceRecord := &route53types.ResourceRecord{}
 		if err = setFieldWithType(value, resourceRecord, "Value", awsstr); err != nil {
 			return nil, err
 		}
-		change.ResourceRecordSet.ResourceRecords = append(change.ResourceRecordSet.ResourceRecords, resourceRecord)
+		change.ResourceRecordSet.ResourceRecords = append(change.ResourceRecordSet.ResourceRecords, *resourceRecord)
 	}
+
+	input.ChangeBatch = &route53types.ChangeBatch{Changes: []route53types.Change{*change}}
 
 	// Extra params
 	if comment != nil {
@@ -200,7 +203,7 @@ func changeResourceRecordSets(api route53iface.Route53API, action, zone, name, r
 		}
 	}
 
-	return api.ChangeResourceRecordSets(input)
+	return api.ChangeResourceRecordSets(context.Background(), input)
 }
 
 func valueToValues(values map[string]interface{}) (map[string]interface{}, error) {

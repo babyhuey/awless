@@ -16,7 +16,8 @@ limitations under the License.
 package awsspec
 
 import (
-	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -26,7 +27,7 @@ type CreateLaunchconfiguration struct {
 	_              string `action:"create" entity:"launchconfiguration" awsAPI:"autoscaling" awsCall:"CreateLaunchConfiguration" awsInput:"autoscaling.CreateLaunchConfigurationInput" awsOutput:"autoscaling.CreateLaunchConfigurationOutput"`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            autoscalingiface.AutoScalingAPI
+	api            *autoscaling.Client
 	Image          *string   `awsName:"ImageId" awsType:"awsstr" templateName:"image"`
 	Type           *string   `awsName:"InstanceType" awsType:"awsstr" templateName:"type"`
 	Name           *string   `awsName:"LaunchConfigurationName" awsType:"awsstr" templateName:"name"`
@@ -60,7 +61,7 @@ type DeleteLaunchconfiguration struct {
 	_      string `action:"delete" entity:"launchconfiguration" awsAPI:"autoscaling" awsCall:"DeleteLaunchConfiguration" awsInput:"autoscaling.DeleteLaunchConfigurationInput" awsOutput:"autoscaling.DeleteLaunchConfigurationOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    autoscalingiface.AutoScalingAPI
+	api    *autoscaling.Client
 	Name   *string `awsName:"LaunchConfigurationName" awsType:"awsstr" templateName:"name"`
 }
 

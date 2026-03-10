@@ -2,14 +2,13 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
 )
 
 func TestDefaults(t *testing.T) {
-	f, e := ioutil.TempDir(".", "test")
+	f, e := os.MkdirTemp(".", "test")
 	if e != nil {
 		t.Fatal(e)
 	}

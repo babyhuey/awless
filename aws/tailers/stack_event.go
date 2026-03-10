@@ -2,16 +2,19 @@ package awstailers
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"strings"
 	"text/tabwriter"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/configservice"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	"github.com/fatih/color"
-	"github.com/wallix/awless/aws/services"
+
+	awsservices "github.com/wallix/awless/aws/services"
 )
 
 const (
@@ -22,7 +25,6 @@ const (
 	StackEventType         = "type"
 
 	// valid stack status codes
-	// http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-describing-stacks.html#w2ab2c15c15c17c11
 	StackEventComplete   = "COMPLETE"
 	StackEventFailed     = "FAILED"
 	StackEventInProgress = "IN_PROGRESS"
@@ -43,7 +45,7 @@ type stackEventTailer struct {
 }
 
 type stackEvent struct {
-	*cloudformation.StackEvent
+	cloudformationtypes.StackEvent
 }
 
 type stackEvents []stackEvent
@@ -143,7 +145,7 @@ func (t *stackEventTailer) Tail(w io.Writer) error {
 					t.deploymentStatus.failedEvents.printReverse(errTab, f)
 					errTab.Flush()
 
-					return fmt.Errorf(errBuf.String())
+					return fmt.Errorf("%s", errBuf.String())
 				}
 				return nil
 			}
@@ -160,7 +162,7 @@ func (t *stackEventTailer) getLatestEvents(cfn *awsservices.Cloudformation) (sta
 	var stEvents stackEvents
 
 	for {
-		resp, err := cfn.DescribeStackEvents(params)
+		resp, err := cfn.CloudformationClient.DescribeStackEvents(context.Background(), params)
 		if err != nil {
 			return nil, err
 		}
@@ -172,7 +174,7 @@ func (t *stackEventTailer) getLatestEvents(cfn *awsservices.Cloudformation) (sta
 			}
 
 			// if lastEventID found, then take all unseen events
-			if t.lastEventID != nil && *e.EventId == *t.lastEventID {
+			if t.lastEventID != nil && aws.ToString(e.EventId) == *t.lastEventID {
 				return stEvents, nil
 			}
 			stEvents = append(stEvents, stackEvent{e})
@@ -201,7 +203,7 @@ func (t *stackEventTailer) displayLastEvents(cfn *awsservices.Cloudformation, w 
 }
 
 func (t *stackEventTailer) isStackBeingDeployed(cfn *awsservices.Cloudformation) (bool, error) {
-	stacks, err := cfn.DescribeStacks(&cloudformation.DescribeStacksInput{StackName: &t.stackName})
+	stacks, err := cfn.CloudformationClient.DescribeStacks(context.Background(), &cloudformation.DescribeStacksInput{StackName: &t.stackName})
 	if err != nil {
 		return false, err
 	}
@@ -210,7 +212,7 @@ func (t *stackEventTailer) isStackBeingDeployed(cfn *awsservices.Cloudformation)
 		return false, fmt.Errorf("Stack not found")
 	}
 
-	return strings.HasSuffix(*stacks.Stacks[0].StackStatus, StackEventInProgress), nil
+	return strings.HasSuffix(string(stacks.Stacks[0].StackStatus), StackEventInProgress), nil
 }
 
 type deploymentStatus struct {
@@ -224,10 +226,9 @@ func (t *stackEventTailer) getRelevantEvents(cfn *awsservices.Cloudformation) (s
 		StackName: &t.stackName,
 	}
 
-	var resp *cloudformation.DescribeStackEventsOutput
-
 	for {
-		resp, err = cfn.DescribeStackEvents(params)
+		var resp *cloudformation.DescribeStackEventsOutput
+		resp, err = cfn.CloudformationClient.DescribeStackEvents(context.Background(), params)
 		if err != nil {
 			return nil, err
 		}
@@ -235,8 +236,8 @@ func (t *stackEventTailer) getRelevantEvents(cfn *awsservices.Cloudformation) (s
 		for _, e := range resp.StackEvents {
 			event := stackEvent{e}
 			// if lastEventID == nil then it's first run of this method
-			// if lastEventID == nil then it's not first run and print only new messages
-			if t.lastEventID != nil && *e.EventId == *t.lastEventID {
+			// if lastEventID != nil then it's not first run and print only new messages
+			if t.lastEventID != nil && aws.ToString(e.EventId) == *t.lastEventID {
 				return stEvents, nil
 			}
 			stEvents = append(stEvents, event)
@@ -285,8 +286,8 @@ func (t *stackEventTailer) displayRelevantEvents(cfn *awsservices.Cloudformation
 func coloredResourceStatus(str string) string {
 	switch {
 	case strings.HasSuffix(str, StackEventFailed),
-		str == cloudformation.StackStatusUpdateRollbackInProgress,
-		str == cloudformation.StackStatusRollbackInProgress:
+		str == string(cloudformationtypes.StackStatusUpdateRollbackInProgress),
+		str == string(cloudformationtypes.StackStatusRollbackInProgress):
 		return color.New(color.FgRed).SprintFunc()(str)
 	case strings.HasSuffix(str, StackEventInProgress):
 		return color.New(color.FgYellow).SprintFunc()(str)
@@ -330,7 +331,7 @@ func (f filters) header() []byte {
 
 	// with "\n" formatted with bold, tabwriter somehow shift lines
 	// so we need to add "\n" after string being bolded
-	return []byte(color.New(color.Bold).Sprintf(buf.String()) + "\n")
+	return []byte(color.New(color.Bold).Sprintf("%s", buf.String()) + "\n")
 }
 
 func (e *stackEvent) filter(filters []string) (out []byte) {
@@ -342,8 +343,8 @@ func (e *stackEvent) filter(filters []string) (out []byte) {
 			buf.WriteString(*e.LogicalResourceId)
 		case f == StackEventTimestamp && e.Timestamp != nil:
 			buf.WriteString(e.Timestamp.Format(time.RFC3339))
-		case f == StackEventStatus && e.ResourceStatus != nil:
-			buf.WriteString(coloredResourceStatus(*e.ResourceStatus))
+		case f == StackEventStatus && e.ResourceStatus != "":
+			buf.WriteString(coloredResourceStatus(string(e.ResourceStatus)))
 		case f == StackEventStatusReason && e.ResourceStatusReason != nil:
 			buf.WriteString(*e.ResourceStatusReason)
 		case f == StackEventType && e.ResourceType != nil:
@@ -361,27 +362,27 @@ func (e *stackEvent) filter(filters []string) (out []byte) {
 	return buf.Bytes()
 }
 
+const cfnStackResourceType = "AWS::CloudFormation::Stack"
+
 func (s *stackEvent) isDeploymentStart() bool {
-	return (s.ResourceType != nil && *s.ResourceType == configservice.ResourceTypeAwsCloudFormationStack) &&
-		(s.ResourceStatus != nil &&
-			*s.ResourceStatus == cloudformation.ResourceStatusCreateInProgress ||
-			*s.ResourceStatus == cloudformation.ResourceStatusDeleteInProgress ||
-			*s.ResourceStatus == cloudformation.ResourceStatusUpdateInProgress)
+	return (s.ResourceType != nil && *s.ResourceType == cfnStackResourceType) &&
+		(s.ResourceStatus == cloudformationtypes.ResourceStatusCreateInProgress ||
+			s.ResourceStatus == cloudformationtypes.ResourceStatusDeleteInProgress ||
+			s.ResourceStatus == cloudformationtypes.ResourceStatusUpdateInProgress)
 }
 
 func (s *stackEvent) isDeploymentFinished() bool {
-	return (s.ResourceType != nil && *s.ResourceType == configservice.ResourceTypeAwsCloudFormationStack) &&
-		(s.ResourceStatus != nil &&
-			strings.HasSuffix(*s.ResourceStatus, StackEventComplete) ||
-			strings.HasSuffix(*s.ResourceStatus, StackEventFailed))
+	return (s.ResourceType != nil && *s.ResourceType == cfnStackResourceType) &&
+		(strings.HasSuffix(string(s.ResourceStatus), StackEventComplete) ||
+			strings.HasSuffix(string(s.ResourceStatus), StackEventFailed))
 }
 
 func (s *stackEvent) isFailed() bool {
-	return (s.ResourceStatus != nil && (strings.HasSuffix(*s.ResourceStatus, StackEventFailed) || *s.ResourceStatus == cloudformation.StackStatusUpdateRollbackInProgress))
+	return strings.HasSuffix(string(s.ResourceStatus), StackEventFailed) || s.ResourceStatus == cloudformationtypes.ResourceStatusUpdateRollbackInProgress
 }
 
 func (s *stackEventTailer) cancelStackUpdate(cfn *awsservices.Cloudformation) error {
 	inp := &cloudformation.CancelUpdateStackInput{StackName: &s.stackName}
-	_, err := cfn.CancelUpdateStack(inp)
+	_, err := cfn.CloudformationClient.CancelUpdateStack(context.Background(), inp)
 	return err
 }

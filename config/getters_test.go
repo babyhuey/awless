@@ -1,14 +1,13 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
 )
 
 func TestGetSyncEnabled(t *testing.T) {
-	f, e := ioutil.TempDir(".", "test")
+	f, e := os.MkdirTemp(".", "test")
 	if e != nil {
 		t.Fatal(e)
 	}

@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ecs"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateContainercluster struct {
 	_      string `action:"create" entity:"containercluster" awsAPI:"ecs" awsCall:"CreateCluster" awsInput:"ecs.CreateClusterInput" awsOutput:"ecs.CreateClusterOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ecsiface.ECSAPI
+	api    *ecs.Client
 	Name   *string `awsName:"ClusterName" awsType:"awsstr" templateName:"name"`
 }
 
@@ -37,14 +37,14 @@ func (cmd *CreateContainercluster) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateContainercluster) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ecs.CreateClusterOutput).Cluster.ClusterArn)
+	return awssdk.ToString(i.(*ecs.CreateClusterOutput).Cluster.ClusterArn)
 }
 
 type DeleteContainercluster struct {
 	_      string `action:"delete" entity:"containercluster" awsAPI:"ecs" awsCall:"DeleteCluster" awsInput:"ecs.DeleteClusterInput" awsOutput:"ecs.DeleteClusterOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ecsiface.ECSAPI
+	api    *ecs.Client
 	Id     *string `awsName:"Cluster" awsType:"awsstr" templateName:"id"`
 }
 

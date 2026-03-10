@@ -18,7 +18,7 @@ package awsspec
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path"
 	"sort"
 	"strings"
@@ -27,17 +27,17 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
-	"github.com/wallix/awless/logger"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"gopkg.in/yaml.v2"
+
+	"github.com/wallix/awless/logger"
 )
 
 type CreateStack struct {
 	_                     string `action:"create" entity:"stack" awsAPI:"cloudformation" awsCall:"CreateStack" awsInput:"cloudformation.CreateStackInput" awsOutput:"cloudformation.CreateStackOutput"`
 	logger                *logger.Logger
 	graph                 cloud.GraphAPI
-	api                   cloudformationiface.CloudFormationAPI
+	api                   *cloudformation.Client
 	Name                  *string   `awsName:"StackName" awsType:"awsstr" templateName:"name"`
 	TemplateFile          *string   `awsName:"TemplateBody" awsType:"awsfiletostring" templateName:"template-file"`
 	Capabilities          []*string `awsName:"Capabilities" awsType:"awsstringslice" templateName:"capabilities"`
@@ -79,7 +79,7 @@ type UpdateStack struct {
 	_                     string `action:"update" entity:"stack" awsAPI:"cloudformation" awsCall:"UpdateStack" awsInput:"cloudformation.UpdateStackInput" awsOutput:"cloudformation.UpdateStackOutput"`
 	logger                *logger.Logger
 	graph                 cloud.GraphAPI
-	api                   cloudformationiface.CloudFormationAPI
+	api                   *cloudformation.Client
 	Name                  *string   `awsName:"StackName" awsType:"awsstr" templateName:"name"`
 	Capabilities          []*string `awsName:"Capabilities" awsType:"awsstringslice" templateName:"capabilities"`
 	Notifications         []*string `awsName:"NotificationARNs" awsType:"awsstringslice" templateName:"notifications"`
@@ -152,7 +152,7 @@ func processStackFile(stackFilePath, policyFile *string, parameters, tags []*str
 
 func readStackFile(p string) (sf *stackFile, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(p)
+	file, err = os.ReadFile(p)
 	if err != nil {
 		return nil, err
 	}
@@ -188,15 +188,20 @@ func readStackFile(p string) (sf *stackFile, err error) {
 // supplied with CLI and StackFile with higher priority for values passed via CLI
 // example:
 // via cli passed next parameters:
-//   Test1=a
-//   Test2=b
+//
+//	Test1=a
+//	Test2=b
+//
 // via StackFile passed next parameters:
-//   Test2=x
-//   Test3=y
+//
+//	Test2=x
+//	Test3=y
+//
 // after merge result will be:
-//   Test1=a
-//   Test2=b
-//   Test3=y
+//
+//	Test1=a
+//	Test2=b
+//	Test3=y
 func mergeCliAndFileValues(valMap map[string]string, valSlice []*string) (resSlice []*string) {
 	// if values map are absent in StackFile
 	// just return slice of CLI values
@@ -242,7 +247,7 @@ type DeleteStack struct {
 	_               string `action:"delete" entity:"stack" awsAPI:"cloudformation" awsCall:"DeleteStack" awsInput:"cloudformation.DeleteStackInput" awsOutput:"cloudformation.DeleteStackOutput"`
 	logger          *logger.Logger
 	graph           cloud.GraphAPI
-	api             cloudformationiface.CloudFormationAPI
+	api             *cloudformation.Client
 	Name            *string   `awsName:"StackName" awsType:"awsstr" templateName:"name"`
 	RetainResources []*string `awsName:"RetainResources" awsType:"awsstringslice" templateName:"retain-resources"`
 }

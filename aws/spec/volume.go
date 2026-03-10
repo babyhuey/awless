@@ -1,10 +1,11 @@
-/* Copyright 2017 WALLIX
+/*
+	Copyright 2017 WALLIX
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -22,10 +24,10 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -33,7 +35,7 @@ type CreateVolume struct {
 	_                string `action:"create" entity:"volume" awsAPI:"ec2" awsCall:"CreateVolume" awsInput:"ec2.CreateVolumeInput" awsOutput:"ec2.Volume" awsDryRun:""`
 	logger           *logger.Logger
 	graph            cloud.GraphAPI
-	api              ec2iface.EC2API
+	api              *ec2.Client
 	Availabilityzone *string `awsName:"AvailabilityZone" awsType:"awsstr" templateName:"availabilityzone"`
 	Size             *int64  `awsName:"Size" awsType:"awsint64" templateName:"size"`
 }
@@ -43,14 +45,14 @@ func (cmd *CreateVolume) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateVolume) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.Volume).VolumeId)
+	return awssdk.ToString(i.(*ec2.CreateVolumeOutput).VolumeId)
 }
 
 type CheckVolume struct {
 	_       string `action:"check" entity:"volume" awsAPI:"ec2"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     ec2iface.EC2API
+	api     *ec2.Client
 	Id      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -66,17 +68,17 @@ func (cmd *CheckVolume) ParamsSpec() params.Spec {
 }
 
 func (cmd *CheckVolume) ManualRun(renv env.Running) (interface{}, error) {
-	input := &ec2.DescribeVolumesInput{VolumeIds: []*string{cmd.Id}}
+	input := &ec2.DescribeVolumesInput{VolumeIds: []string{awssdk.ToString(cmd.Id)}}
 
 	c := &checker{
 		description: fmt.Sprintf("volume %s", StringValue(cmd.Id)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeVolumes(input)
+			output, err := cmd.api.DescribeVolumes(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(awserr.Error); ok {
-					if awserr.Code() == "VolumeNotFound" {
+				if awserr, ok := err.(smithy.APIError); ok {
+					if awserr.ErrorCode() == "VolumeNotFound" {
 						return notFoundState, nil
 					}
 				} else {
@@ -85,7 +87,7 @@ func (cmd *CheckVolume) ManualRun(renv env.Running) (interface{}, error) {
 			} else {
 				for _, vol := range output.Volumes {
 					if StringValue(vol.VolumeId) == StringValue(cmd.Id) {
-						return StringValue(vol.State), nil
+						return string(vol.State), nil
 					}
 				}
 			}
@@ -101,7 +103,7 @@ type DeleteVolume struct {
 	_      string `action:"delete" entity:"volume" awsAPI:"ec2" awsCall:"DeleteVolume" awsInput:"ec2.DeleteVolumeInput" awsOutput:"ec2.DeleteVolumeOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
 }
 
@@ -113,7 +115,7 @@ type AttachVolume struct {
 	_        string `action:"attach" entity:"volume" awsAPI:"ec2" awsCall:"AttachVolume" awsInput:"ec2.AttachVolumeInput" awsOutput:"ec2.VolumeAttachment" awsDryRun:""`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      ec2iface.EC2API
+	api      *ec2.Client
 	Device   *string `awsName:"Device" awsType:"awsstr" templateName:"device"`
 	Id       *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
 	Instance *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
@@ -123,14 +125,14 @@ func (cmd *AttachVolume) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("device"), params.Key("id"), params.Key("instance")))
 }
 func (cmd *AttachVolume) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.VolumeAttachment).VolumeId)
+	return awssdk.ToString(i.(*ec2.AttachVolumeOutput).VolumeId)
 }
 
 type DetachVolume struct {
 	_        string `action:"detach" entity:"volume" awsAPI:"ec2" awsCall:"DetachVolume" awsInput:"ec2.DetachVolumeInput" awsOutput:"ec2.VolumeAttachment" awsDryRun:""`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      ec2iface.EC2API
+	api      *ec2.Client
 	Device   *string `awsName:"Device" awsType:"awsstr" templateName:"device"`
 	Id       *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
 	Instance *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
@@ -144,5 +146,5 @@ func (cmd *DetachVolume) ParamsSpec() params.Spec {
 }
 
 func (cmd *DetachVolume) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.VolumeAttachment).VolumeId)
+	return awssdk.ToString(i.(*ec2.DetachVolumeOutput).VolumeId)
 }

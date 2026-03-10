@@ -16,15 +16,18 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"time"
+
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/service/autoscaling"
-	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -32,7 +35,7 @@ type CreateScalinggroup struct {
 	_                      string `action:"create" entity:"scalinggroup" awsAPI:"autoscaling" awsCall:"CreateAutoScalingGroup" awsInput:"autoscaling.CreateAutoScalingGroupInput" awsOutput:"autoscaling.CreateAutoScalingGroupOutput"`
 	logger                 *logger.Logger
 	graph                  cloud.GraphAPI
-	api                    autoscalingiface.AutoScalingAPI
+	api                    *autoscaling.Client
 	Name                   *string   `awsName:"AutoScalingGroupName" awsType:"awsstr" templateName:"name"`
 	Launchconfiguration    *string   `awsName:"LaunchConfigurationName" awsType:"awsstr" templateName:"launchconfiguration"`
 	MaxSize                *int64    `awsName:"MaxSize" awsType:"awsint64" templateName:"max-size"`
@@ -60,7 +63,7 @@ type UpdateScalinggroup struct {
 	_                      string `action:"update" entity:"scalinggroup" awsAPI:"autoscaling" awsCall:"UpdateAutoScalingGroup" awsInput:"autoscaling.UpdateAutoScalingGroupInput" awsOutput:"autoscaling.UpdateAutoScalingGroupOutput"`
 	logger                 *logger.Logger
 	graph                  cloud.GraphAPI
-	api                    autoscalingiface.AutoScalingAPI
+	api                    *autoscaling.Client
 	Name                   *string   `awsName:"AutoScalingGroupName" awsType:"awsstr" templateName:"name"`
 	Cooldown               *int64    `awsName:"DefaultCooldown" awsType:"awsint64" templateName:"cooldown"`
 	DesiredCapacity        *int64    `awsName:"DesiredCapacity" awsType:"awsint64" templateName:"desired-capacity"`
@@ -83,7 +86,7 @@ type DeleteScalinggroup struct {
 	_      string `action:"delete" entity:"scalinggroup" awsAPI:"autoscaling" awsCall:"DeleteAutoScalingGroup" awsInput:"autoscaling.DeleteAutoScalingGroupInput" awsOutput:"autoscaling.DeleteAutoScalingGroupOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    autoscalingiface.AutoScalingAPI
+	api    *autoscaling.Client
 	Name   *string `awsName:"AutoScalingGroupName" awsType:"awsstr" templateName:"name"`
 	Force  *bool   `awsName:"ForceDelete" awsType:"awsbool" templateName:"force"`
 }
@@ -98,7 +101,7 @@ type CheckScalinggroup struct {
 	_       string `action:"check" entity:"scalinggroup" awsAPI:"autoscaling"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     autoscalingiface.AutoScalingAPI
+	api     *autoscaling.Client
 	Name    *string `templateName:"name"`
 	Count   *int64  `templateName:"count"`
 	Timeout *int64  `templateName:"timeout"`
@@ -110,7 +113,7 @@ func (cmd *CheckScalinggroup) ParamsSpec() params.Spec {
 
 func (sg *CheckScalinggroup) ManualRun(renv env.Running) (interface{}, error) {
 	input := &autoscaling.DescribeAutoScalingGroupsInput{
-		AutoScalingGroupNames: []*string{sg.Name},
+		AutoScalingGroupNames: []string{awssdk.ToString(sg.Name)},
 	}
 
 	sgName := StringValue(sg.Name)
@@ -121,7 +124,7 @@ func (sg *CheckScalinggroup) ManualRun(renv env.Running) (interface{}, error) {
 		frequency:   5 * time.Second,
 		checkName:   "count",
 		fetchFunc: func() (string, error) {
-			output, err := sg.api.DescribeAutoScalingGroups(input)
+			output, err := sg.api.DescribeAutoScalingGroups(context.Background(), input)
 			if err != nil {
 				return "", err
 			}

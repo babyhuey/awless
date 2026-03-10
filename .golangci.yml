@@ -1,0 +1,35 @@
+linters:
+  disable-all: true
+  enable:
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - gosimple
+    - gofmt
+    - goimports
+    - misspell
+    - unconvert
+
+linters-settings:
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+      - shadow
+  goimports:
+    local-prefixes: github.com/wallix/awless
+  misspell:
+    locale: US
+  staticcheck:
+    checks:
+      - all
+      - -SA1019  # deprecated usage - too noisy for a migration
+
+issues:
+  exclude-dirs:
+    - vendor
+  exclude-files:
+    - "gen_.*\\.go$"
+  max-issues-per-linter: 50
+  max-same-issues: 5

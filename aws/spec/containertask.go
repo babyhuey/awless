@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -25,10 +26,11 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -36,7 +38,7 @@ type StartContainertask struct {
 	_                         string `action:"start" entity:"containertask" awsAPI:"ecs"`
 	logger                    *logger.Logger
 	graph                     cloud.GraphAPI
-	api                       ecsiface.ECSAPI
+	api                       *ecs.Client
 	Cluster                   *string `templateName:"cluster"`
 	DesiredCount              *int64  `templateName:"desired-count"`
 	Name                      *string `templateName:"name"`
@@ -113,7 +115,7 @@ func (cmd *StartContainertask) ManualRun(renv env.Running) (interface{}, error) 
 			return nil, err
 		}
 		if len(output.(*ecs.RunTaskOutput).Failures) > 0 {
-			return nil, fmt.Errorf("fail to run task: %s", aws.StringValue(output.(*ecs.RunTaskOutput).Failures[0].Reason))
+			return nil, fmt.Errorf("fail to run task: %s", aws.ToString(output.(*ecs.RunTaskOutput).Failures[0].Reason))
 		}
 		if len(output.(*ecs.RunTaskOutput).Tasks) > 0 {
 			return output, nil
@@ -138,7 +140,7 @@ type StopContainertask struct {
 	_              string `action:"stop" entity:"containertask" awsAPI:"ecs"`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            ecsiface.ECSAPI
+	api            *ecs.Client
 	Cluster        *string `templateName:"cluster"`
 	Type           *string `templateName:"type"`
 	DeploymentName *string `templateName:"deployment-name"`
@@ -200,7 +202,7 @@ type UpdateContainertask struct {
 	_              string `action:"update" entity:"containertask" awsAPI:"ecs" awsCall:"UpdateService" awsInput:"ecs.UpdateServiceInput" awsOutput:"ecs.UpdateServiceOutput"`
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
-	api            ecsiface.ECSAPI
+	api            *ecs.Client
 	Cluster        *string `awsName:"Cluster" awsType:"awsstr" templateName:"cluster"`
 	DeploymentName *string `awsName:"Service" awsType:"awsstr" templateName:"deployment-name"`
 	DesiredCount   *int64  `awsName:"DesiredCount" awsType:"awsint64" templateName:"desired-count"`
@@ -217,7 +219,7 @@ type AttachContainertask struct {
 	_               string `action:"attach" entity:"containertask" awsAPI:"ecs"`
 	logger          *logger.Logger
 	graph           cloud.GraphAPI
-	api             ecsiface.ECSAPI
+	api             *ecs.Client
 	Name            *string   `templateName:"name"`
 	ContainerName   *string   `templateName:"container-name"`
 	Image           *string   `templateName:"image"`
@@ -239,11 +241,11 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (interface{}, error)
 	var taskDefinitionInput *ecs.RegisterTaskDefinitionInput
 	taskDefinitionName := StringValue(cmd.Name)
 
-	taskdefOutput, err := cmd.api.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
+	taskdefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: cmd.Name,
 	})
-	if awserr, ok := err.(awserr.Error); err != nil && ok {
-		if awserr.Code() == "ClientException" && strings.Contains(strings.ToLower(awserr.Message()), "unable to describe task definition") {
+	if awserr, ok := err.(smithy.APIError); err != nil && ok {
+		if awserr.ErrorCode() == "ClientException" && strings.Contains(strings.ToLower(awserr.ErrorMessage()), "unable to describe task definition") {
 			cmd.logger.Verbosef("service %s does not exist: creating service", taskDefinitionName)
 			taskDefinitionInput = &ecs.RegisterTaskDefinitionInput{
 				Family: aws.String(taskDefinitionName),
@@ -264,7 +266,7 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (interface{}, error)
 		}
 	}
 
-	container := &ecs.ContainerDefinition{}
+	container := &ecstypes.ContainerDefinition{}
 	if err = setFieldWithType(cmd.ContainerName, container, "Name", awsstr); err != nil {
 		return nil, err
 	}
@@ -307,11 +309,11 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (interface{}, error)
 		}
 	}
 
-	taskDefinitionInput.ContainerDefinitions = append(taskDefinitionInput.ContainerDefinitions, container)
+	taskDefinitionInput.ContainerDefinitions = append(taskDefinitionInput.ContainerDefinitions, *container)
 
 	start := time.Now()
 
-	taskDefOutput, err := cmd.api.RegisterTaskDefinition(taskDefinitionInput)
+	taskDefOutput, err := cmd.api.RegisterTaskDefinition(context.Background(), taskDefinitionInput)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +329,7 @@ type DetachContainertask struct {
 	_             string `action:"detach" entity:"containertask" awsAPI:"ecs"`
 	logger        *logger.Logger
 	graph         cloud.GraphAPI
-	api           ecsiface.ECSAPI
+	api           *ecs.Client
 	Name          *string `templateName:"name"`
 	ContainerName *string `templateName:"container-name"`
 }
@@ -337,20 +339,20 @@ func (cmd *DetachContainertask) ParamsSpec() params.Spec {
 }
 
 func (cmd *DetachContainertask) ManualRun(renv env.Running) (interface{}, error) {
-	taskdefOutput, err := cmd.api.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
+	taskdefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: cmd.Name,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var containerDefinitions []*ecs.ContainerDefinition
+	var containerDefinitions []ecstypes.ContainerDefinition
 	var found bool
 	var containerNames []string
 	for _, def := range taskdefOutput.TaskDefinition.ContainerDefinitions {
-		name := aws.StringValue(def.Name)
+		name := aws.ToString(def.Name)
 		containerNames = append(containerNames, name)
-		if name == StringValue(cmd.ContainerName) || aws.StringValue(def.Image) == StringValue(cmd.ContainerName) {
+		if name == StringValue(cmd.ContainerName) || aws.ToString(def.Image) == StringValue(cmd.ContainerName) {
 			found = true
 		} else {
 			containerDefinitions = append(containerDefinitions, def)
@@ -371,7 +373,7 @@ func (cmd *DetachContainertask) ManualRun(renv env.Running) (interface{}, error)
 		}
 		start := time.Now()
 
-		if _, err := cmd.api.RegisterTaskDefinition(taskDefinitionInput); err != nil {
+		if _, err := cmd.api.RegisterTaskDefinition(context.Background(), taskDefinitionInput); err != nil {
 			return nil, err
 		}
 		cmd.logger.ExtraVerbosef("ecs.RegisterTaskDefinition call took %s", time.Since(start))
@@ -383,7 +385,7 @@ func (cmd *DetachContainertask) ManualRun(renv env.Running) (interface{}, error)
 		}
 		start := time.Now()
 
-		if _, err := cmd.api.DeregisterTaskDefinition(taskDefinitionInput); err != nil {
+		if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), taskDefinitionInput); err != nil {
 			return nil, err
 		}
 		cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))
@@ -396,7 +398,7 @@ type DeleteContainertask struct {
 	_           string `action:"delete" entity:"containertask" awsAPI:"ecs" awsDryRun:"manual"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         ecsiface.ECSAPI
+	api         *ecs.Client
 	Name        *string `templateName:"name"`
 	AllVersions *bool   `templateName:"all-versions"`
 }
@@ -413,7 +415,7 @@ func (cmd *DeleteContainertask) dryRun(renv env.Running, params map[string]inter
 	}
 	taskDefinitionName := StringValue(cmd.Name)
 
-	taskDefOutput, err := cmd.api.ListTaskDefinitions(&ecs.ListTaskDefinitionsInput{
+	taskDefOutput, err := cmd.api.ListTaskDefinitions(context.Background(), &ecs.ListTaskDefinitionsInput{
 		FamilyPrefix: cmd.Name,
 	})
 	if err != nil {
@@ -423,13 +425,13 @@ func (cmd *DeleteContainertask) dryRun(renv env.Running, params map[string]inter
 	case 0:
 		return nil, fmt.Errorf("no containertask found with name '%s'", taskDefinitionName)
 	case 1:
-		cmd.logger.Verbosef("only one version found for containertask '%s', will delete '%s'.", taskDefinitionName, aws.StringValue(taskDefOutput.TaskDefinitionArns[0]))
+		cmd.logger.Verbosef("only one version found for containertask '%s', will delete '%s'.", taskDefinitionName, taskDefOutput.TaskDefinitionArns[0])
 	default:
 		if BoolValue(cmd.AllVersions) {
-			cmd.logger.Warningf("multiple versions found for containertask '%s'. Will delete '%s'", taskDefinitionName, strings.Join(aws.StringValueSlice(taskDefOutput.TaskDefinitionArns), "','"))
+			cmd.logger.Warningf("multiple versions found for containertask '%s'. Will delete '%s'", taskDefinitionName, strings.Join(taskDefOutput.TaskDefinitionArns, "','"))
 		} else {
 			cmd.logger.Infof("multiple versions found for containertask '%s'", taskDefinitionName)
-			cmd.logger.Warningf("will delete only latest version: '%s'. Add param `all-versions=true` to delete all versions", aws.StringValue(taskDefOutput.TaskDefinitionArns[len(taskDefOutput.TaskDefinitionArns)-1]))
+			cmd.logger.Warningf("will delete only latest version: '%s'. Add param `all-versions=true` to delete all versions", taskDefOutput.TaskDefinitionArns[len(taskDefOutput.TaskDefinitionArns)-1])
 		}
 	}
 	return nil, nil
@@ -439,30 +441,30 @@ func (cmd *DeleteContainertask) ManualRun(renv env.Running) (interface{}, error)
 	taskDefinitionName := StringValue(cmd.Name)
 
 	if BoolValue(cmd.AllVersions) {
-		taskDefOutput, err := cmd.api.ListTaskDefinitions(&ecs.ListTaskDefinitionsInput{
+		taskDefOutput, err := cmd.api.ListTaskDefinitions(context.Background(), &ecs.ListTaskDefinitionsInput{
 			FamilyPrefix: aws.String(taskDefinitionName),
 		})
 		if err != nil {
 			return nil, err
 		}
 		for _, task := range taskDefOutput.TaskDefinitionArns {
-			cmd.logger.ExtraVerbosef("deleting '%s'", aws.StringValue(task))
+			cmd.logger.ExtraVerbosef("deleting '%s'", task)
 			start := time.Now()
-			if _, err := cmd.api.DeregisterTaskDefinition(&ecs.DeregisterTaskDefinitionInput{TaskDefinition: task}); err != nil {
+			if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: aws.String(task)}); err != nil {
 				return nil, fmt.Errorf("deregister task definition: %s", err)
 			}
 			cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))
 		}
 	} else {
-		taskDefOutput, err := cmd.api.DescribeTaskDefinition(&ecs.DescribeTaskDefinitionInput{
+		taskDefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
 			TaskDefinition: aws.String(taskDefinitionName),
 		})
 		if err != nil {
 			return nil, err
 		}
-		cmd.logger.ExtraVerbosef("deleting '%s'", aws.StringValue(taskDefOutput.TaskDefinition.TaskDefinitionArn))
+		cmd.logger.ExtraVerbosef("deleting '%s'", aws.ToString(taskDefOutput.TaskDefinition.TaskDefinitionArn))
 		start := time.Now()
-		if _, err := cmd.api.DeregisterTaskDefinition(&ecs.DeregisterTaskDefinitionInput{TaskDefinition: taskDefOutput.TaskDefinition.TaskDefinitionArn}); err != nil {
+		if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: taskDefOutput.TaskDefinition.TaskDefinitionArn}); err != nil {
 			return nil, fmt.Errorf("deregister task definition: %s", err)
 		}
 		cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))

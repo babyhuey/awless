@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,10 +36,11 @@ import (
 
 	"github.com/chzyer/readline"
 	"github.com/spf13/cobra"
+
 	"github.com/wallix/awless-scheduler/client"
-	"github.com/wallix/awless/aws/doc"
-	"github.com/wallix/awless/aws/services"
-	"github.com/wallix/awless/aws/spec"
+	awsdoc "github.com/wallix/awless/aws/doc"
+	awsservices "github.com/wallix/awless/aws/services"
+	awsspec "github.com/wallix/awless/aws/spec"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/cloud/match"
 	"github.com/wallix/awless/cloud/properties"
@@ -371,7 +371,7 @@ func runSyncFor(tplExec *template.TemplateExecution) {
 		}()
 	}
 	if _, err := sync.DefaultSyncer.Sync(services...); err != nil {
-		logger.ExtraVerbosef(err.Error())
+		logger.ExtraVerbosef("%s", err.Error())
 	}
 }
 
@@ -432,7 +432,7 @@ func resolveAliasFunc(paramPath, alias string) string {
 
 func availableActionsForEntity(entity string) string {
 	var out []string
-	for actionentity, _ := range awsspec.APIPerTemplateDefName {
+	for actionentity := range awsspec.APIPerTemplateDefName {
 		if strings.HasSuffix(actionentity, entity) {
 			index := strings.Index(actionentity, entity)
 			out = append(out, fmt.Sprintf("  %s %s", actionentity[:index], actionentity[index:]))
@@ -487,7 +487,7 @@ func getTemplateText(path string) (content []byte, expanded string, err error) {
 		if perr != nil {
 			expanded = path
 		}
-		content, err = ioutil.ReadAll(f)
+		content, err = io.ReadAll(f)
 	}
 
 	if err != nil {
@@ -571,7 +571,7 @@ func readHttpContent(path string) ([]byte, error) {
 		return nil, fmt.Errorf("'%s' when fetching '%s'", resp.Status, path)
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 func isQuoted(s string) bool {

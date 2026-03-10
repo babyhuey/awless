@@ -23,7 +23,7 @@ import (
 
 	"strconv"
 
-	"github.com/wallix/awless/aws/services"
+	awsservices "github.com/wallix/awless/aws/services"
 	"github.com/wallix/awless/database"
 )
 
@@ -50,7 +50,7 @@ func InitAwlessEnv() error {
 	os.MkdirAll(KeysDir, 0700)
 
 	if AwlessFirstInstall {
-		fmt.Fprintln(os.Stderr, AWLESS_ASCII_LOGO)
+		fmt.Fprint(os.Stderr, AWLESS_ASCII_LOGO)
 		fmt.Fprintln(os.Stderr, "Welcome! Resolving environment data...")
 		fmt.Fprintln(os.Stderr)
 

@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateGroup struct {
 	_      string `action:"create" entity:"group" awsAPI:"iam" awsCall:"CreateGroup" awsInput:"iam.CreateGroupInput" awsOutput:"iam.CreateGroupOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `awsName:"GroupName" awsType:"awsstr" templateName:"name"`
 }
 
@@ -37,14 +37,14 @@ func (cmd *CreateGroup) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateGroup) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*iam.CreateGroupOutput).Group.GroupId)
+	return awssdk.ToString(i.(*iam.CreateGroupOutput).Group.GroupId)
 }
 
 type DeleteGroup struct {
 	_      string `action:"delete" entity:"group" awsAPI:"iam" awsCall:"DeleteGroup" awsInput:"iam.DeleteGroupInput" awsOutput:"iam.DeleteGroupOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `awsName:"GroupName" awsType:"awsstr" templateName:"name"`
 }
 

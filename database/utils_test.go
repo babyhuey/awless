@@ -17,12 +17,11 @@ limitations under the License.
 package database
 
 import (
-	"io/ioutil"
 	"os"
 )
 
 func newTestDb() (*DB, func()) {
-	f, e := ioutil.TempDir(".", "test")
+	f, e := os.MkdirTemp(".", "test")
 	if e != nil {
 		panic(e)
 	}

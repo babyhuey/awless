@@ -1,6 +1,7 @@
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -8,9 +9,11 @@ import (
 
 	"sync"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/wallix/awless/aws/doc"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+
+	awsdoc "github.com/wallix/awless/aws/doc"
 )
 
 // Image resolving allows to find AWS AMIs identifiers specifying what you want instead
@@ -40,7 +43,7 @@ import (
 // - centos:centos
 //
 // The default values are: Arch="x86_64", Virt="hvm", Store="ebs"
-type ImageResolver func(*ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error)
+type ImageResolver func(context.Context, *ec2.DescribeImagesInput, ...func(*ec2.Options)) (*ec2.DescribeImagesOutput, error)
 
 func EC2ImageResolver() ImageResolver {
 	factory := CommandFactory.Build("createinstance")
@@ -130,74 +133,74 @@ func (resolv ImageResolver) Resolve(q ImageQuery) ([]*AwsImage, bool, error) {
 
 	results := make([]*AwsImage, 0) // json empty array friendly
 
-	var filters []*ec2.Filter
+	var filters []ec2types.Filter
 	filters = append(filters,
-		&ec2.Filter{
+		ec2types.Filter{
 			Name:   awssdk.String("state"),
-			Values: []*string{awssdk.String("available")},
+			Values: []string{"available"},
 		},
-		&ec2.Filter{
+		ec2types.Filter{
 			Name:   awssdk.String("is-public"),
-			Values: []*string{awssdk.String("true")},
+			Values: []string{"true"},
 		},
 	)
 
 	filters = append(filters,
-		&ec2.Filter{
+		ec2types.Filter{
 			Name:   awssdk.String("owner-id"),
-			Values: []*string{awssdk.String(q.Platform.Id)},
+			Values: []string{q.Platform.Id},
 		},
 	)
 
 	filters = append(filters,
-		&ec2.Filter{
+		ec2types.Filter{
 			Name:   awssdk.String("virtualization-type"),
-			Values: []*string{awssdk.String(q.Distro.Virt)},
+			Values: []string{q.Distro.Virt},
 		},
 	)
 
 	filters = append(filters,
-		&ec2.Filter{
+		ec2types.Filter{
 			Name:   awssdk.String("architecture"),
-			Values: []*string{awssdk.String(q.Distro.Arch)},
+			Values: []string{q.Distro.Arch},
 		},
 	)
 
 	filters = append(filters,
-		&ec2.Filter{
+		ec2types.Filter{
 			Name:   awssdk.String("root-device-type"),
-			Values: []*string{awssdk.String(q.Distro.Store)},
+			Values: []string{q.Distro.Store},
 		},
 	)
 
 	params := &ec2.DescribeImagesInput{
-		ExecutableUsers: []*string{awssdk.String("all")},
+		ExecutableUsers: []string{"all"},
 		Filters:         filters,
 	}
 
-	amis, err := resolv(params)
+	amis, err := resolv(context.Background(), params)
 	if err != nil {
 		return results, false, err
 	}
 
 	for _, ami := range amis.Images {
-		if !q.Platform.MatchFunc(strings.ToLower(awssdk.StringValue(ami.Name)), q.Distro) {
+		if !q.Platform.MatchFunc(strings.ToLower(awssdk.ToString(ami.Name)), q.Distro) {
 			continue
 		}
 
 		img := &AwsImage{
-			Id:                 awssdk.StringValue(ami.ImageId),
+			Id:                 awssdk.ToString(ami.ImageId),
 			Owner:              q.Platform.Id,
-			Location:           awssdk.StringValue(ami.ImageLocation),
-			Type:               awssdk.StringValue(ami.ImageType),
-			Architecture:       awssdk.StringValue(ami.Architecture),
-			VirtualizationType: awssdk.StringValue(ami.VirtualizationType),
-			Name:               awssdk.StringValue(ami.Name),
-			Hypervisor:         awssdk.StringValue(ami.Hypervisor),
-			Store:              awssdk.StringValue(ami.RootDeviceType),
+			Location:           awssdk.ToString(ami.ImageLocation),
+			Type:               string(ami.ImageType),
+			Architecture:       string(ami.Architecture),
+			VirtualizationType: string(ami.VirtualizationType),
+			Name:               awssdk.ToString(ami.Name),
+			Hypervisor:         string(ami.Hypervisor),
+			Store:              string(ami.RootDeviceType),
 		}
 
-		img.Created, _ = time.Parse(time.RFC3339, awssdk.StringValue(ami.CreationDate))
+		img.Created, _ = time.Parse(time.RFC3339, awssdk.ToString(ami.CreationDate))
 
 		results = append(results, img)
 	}

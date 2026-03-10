@@ -16,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -28,7 +28,7 @@ type CreateDbsubnetgroup struct {
 	_           string `action:"create" entity:"dbsubnetgroup" awsAPI:"rds" awsCall:"CreateDBSubnetGroup" awsInput:"rds.CreateDBSubnetGroupInput" awsOutput:"rds.CreateDBSubnetGroupOutput"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         rdsiface.RDSAPI
+	api         *rds.Client
 	Name        *string   `awsName:"DBSubnetGroupName" awsType:"awsstr" templateName:"name"`
 	Description *string   `awsName:"DBSubnetGroupDescription" awsType:"awsstr" templateName:"description"`
 	Subnets     []*string `awsName:"SubnetIds" awsType:"awsstringslice" templateName:"subnets"`
@@ -39,14 +39,14 @@ func (cmd *CreateDbsubnetgroup) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateDbsubnetgroup) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*rds.CreateDBSubnetGroupOutput).DBSubnetGroup.DBSubnetGroupName)
+	return awssdk.ToString(i.(*rds.CreateDBSubnetGroupOutput).DBSubnetGroup.DBSubnetGroupName)
 }
 
 type DeleteDbsubnetgroup struct {
 	_      string `action:"delete" entity:"dbsubnetgroup" awsAPI:"rds" awsCall:"DeleteDBSubnetGroup" awsInput:"rds.DeleteDBSubnetGroupInput" awsOutput:"rds.DeleteDBSubnetGroupOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    rdsiface.RDSAPI
+	api    *rds.Client
 	Name   *string `awsName:"DBSubnetGroupName" awsType:"awsstr" templateName:"name"`
 }
 

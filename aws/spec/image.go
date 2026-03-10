@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -24,10 +25,10 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -35,7 +36,7 @@ type CreateImage struct {
 	_           string `action:"create" entity:"image" awsAPI:"ec2" awsCall:"CreateImage" awsInput:"ec2.CreateImageInput" awsOutput:"ec2.CreateImageOutput" awsDryRun:"true"`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         ec2iface.EC2API
+	api         *ec2.Client
 	Name        *string `awsName:"Name" awsType:"awsstr" templateName:"name"`
 	Instance    *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
 	Reboot      *bool   `awsName:"NoReboot" awsType:"awsbool" templateName:"reboot"`
@@ -60,14 +61,14 @@ func (cmd *CreateImage) BeforeRun(renv env.Running) error {
 }
 
 func (cmd *CreateImage) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.CreateImageOutput).ImageId)
+	return awssdk.ToString(i.(*ec2.CreateImageOutput).ImageId)
 }
 
 type UpdateImage struct {
 	_            string `action:"update" entity:"image" awsAPI:"ec2" awsDryRun:"manual"`
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
-	api          ec2iface.EC2API
+	api          *ec2.Client
 	Id           *string   `awsName:"ImageId" awsType:"awsstr" templateName:"id"`
 	Groups       []*string `awsName:"UserGroups" awsType:"awsstringslice" templateName:"groups"`
 	Accounts     []*string `awsName:"UserIds" awsType:"awsstringslice" templateName:"accounts"`
@@ -88,13 +89,13 @@ func (cmd *UpdateImage) prepareImageAttributeInput(ctx map[string]interface{}) (
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %s", err)
 	}
 	if cmd.Accounts != nil || cmd.Groups != nil {
-		input.SetAttribute("launchPermission")
+		input.Attribute = awssdk.String("launchPermission")
 	}
 	if cmd.ProductCodes != nil {
-		input.SetAttribute("productCodes")
+		input.Attribute = awssdk.String("productCodes")
 	}
 	if cmd.Description != nil {
-		input.SetAttribute("description")
+		input.Attribute = awssdk.String("description")
 	}
 	return input, nil
 }
@@ -108,7 +109,7 @@ func (cmd *UpdateImage) ManualRun(renv env.Running) (interface{}, error) {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %s", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ModifyImageAttribute(input)
+	output, err := cmd.api.ModifyImageAttribute(context.Background(), input)
 	cmd.logger.ExtraVerbosef("ec2.ModifyImageAttributeInput call took %s", time.Since(start))
 	return output, err
 }
@@ -121,16 +122,16 @@ func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]interface{}) 
 	if err != nil {
 		return nil, err
 	}
-	input.SetDryRun(true)
+	input.DryRun = awssdk.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("dry run: cannot inject in ec2.ModifyImageAttributeInput: %s", err)
 	}
 
 	start := time.Now()
-	_, err = cmd.api.ModifyImageAttribute(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
-		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.Message(), "Invalid IAM Instance Profile name"):
+	_, err = cmd.api.ModifyImageAttribute(context.Background(), input)
+	if awsErr, ok := err.(smithy.APIError); ok {
+		switch code := awsErr.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			cmd.logger.ExtraVerbosef("dry run: ec2.ec2.ModifyImageAttribute call took %s", time.Since(start))
 			cmd.logger.Verbose("dry run: update image ok")
 			return fakeDryRunId("image"), nil
@@ -144,7 +145,7 @@ type CopyImage struct {
 	_            string `action:"copy" entity:"image" awsAPI:"ec2" awsCall:"CopyImage" awsInput:"ec2.CopyImageInput" awsOutput:"ec2.CopyImageOutput" awsDryRun:""`
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
-	api          ec2iface.EC2API
+	api          *ec2.Client
 	Name         *string `awsName:"Name" awsType:"awsstr" templateName:"name"`
 	SourceId     *string `awsName:"SourceImageId" awsType:"awsstr" templateName:"source-id"`
 	SourceRegion *string `awsName:"SourceRegion" awsType:"awsstr" templateName:"source-region"`
@@ -159,14 +160,14 @@ func (cmd *CopyImage) ParamsSpec() params.Spec {
 }
 
 func (cmd *CopyImage) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.CopyImageOutput).ImageId)
+	return awssdk.ToString(i.(*ec2.CopyImageOutput).ImageId)
 }
 
 type ImportImage struct {
 	_            string `action:"import" entity:"image" awsAPI:"ec2" awsCall:"ImportImage" awsInput:"ec2.ImportImageInput" awsOutput:"ec2.ImportImageOutput" awsDryRun:""`
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
-	api          ec2iface.EC2API
+	api          *ec2.Client
 	Architecture *string `awsName:"Architecture" awsType:"awsstr" templateName:"architecture"`
 	Description  *string `awsName:"Description" awsType:"awsstr" templateName:"description"`
 	License      *string `awsName:"LicenseType" awsType:"awsstr" templateName:"license"`
@@ -187,14 +188,14 @@ func (cmd *ImportImage) ParamsSpec() params.Spec {
 }
 
 func (cmd *ImportImage) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.ImportImageOutput).ImportTaskId)
+	return awssdk.ToString(i.(*ec2.ImportImageOutput).ImportTaskId)
 }
 
 type DeleteImage struct {
 	_               string `action:"delete" entity:"image" awsAPI:"ec2" awsDryRun:"manual"`
 	logger          *logger.Logger
 	graph           cloud.GraphAPI
-	api             ec2iface.EC2API
+	api             *ec2.Client
 	Id              *string `templateName:"id"`
 	DeleteSnapshots *bool   `templateName:"delete-snapshots"`
 }
@@ -227,9 +228,9 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]interface{}) 
 		}
 	}
 
-	_, err := cmd.api.DeregisterImage(input)
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
+	_, err := cmd.api.DeregisterImage(context.Background(), input)
+	if awsErr, ok := err.(smithy.APIError); ok {
+		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			id := fakeDryRunId("image")
 			cmd.logger.Verbose("dry run: delete image ok")
@@ -257,7 +258,7 @@ func (cmd *DeleteImage) ManualRun(renv env.Running) (interface{}, error) {
 
 	start := time.Now()
 	var output *ec2.DeregisterImageOutput
-	if output, err = cmd.api.DeregisterImage(input); err != nil {
+	if output, err = cmd.api.DeregisterImage(context.Background(), input); err != nil {
 		return nil, err
 	}
 	cmd.logger.ExtraVerbosef("ec2.DeregisterImage call took %s", time.Since(start))
@@ -281,7 +282,7 @@ func (cmd *DeleteImage) ManualRun(renv env.Running) (interface{}, error) {
 
 func (cmd *DeleteImage) imageSnapshots(id string) ([]string, error) {
 	var snapshots []string
-	imgs, err := cmd.api.DescribeImages(&ec2.DescribeImagesInput{ImageIds: []*string{String(id)}})
+	imgs, err := cmd.api.DescribeImages(context.Background(), &ec2.DescribeImagesInput{ImageIds: []string{id}})
 	if err != nil {
 		return snapshots, err
 	}

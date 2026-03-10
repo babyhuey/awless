@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"os"
@@ -27,9 +28,9 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ecr"
-	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ecr"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -37,7 +38,7 @@ type AuthenticateRegistry struct {
 	_                string `action:"authenticate" entity:"registry" awsAPI:"ecr"`
 	logger           *logger.Logger
 	graph            cloud.GraphAPI
-	api              ecriface.ECRAPI
+	api              *ecr.Client
 	Accounts         []*string `templateName:"accounts"`
 	NoConfirm        *bool     `templateName:"no-confirm"`
 	DisableDockerCmd *bool     `templateName:"no-docker-login"`
@@ -60,13 +61,13 @@ func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (interface{}, error
 	}
 
 	start := time.Now()
-	output, err := cmd.api.GetAuthorizationToken(input)
+	output, err := cmd.api.GetAuthorizationToken(context.Background(), input)
 	if err != nil {
 		return nil, err
 	}
 	cmd.logger.ExtraVerbosef("ecr.GetAuthorizationToken call took %s", time.Since(start))
 	for _, auth := range output.AuthorizationData {
-		token := aws.StringValue(auth.AuthorizationToken)
+		token := aws.ToString(auth.AuthorizationToken)
 		decoded, err := base64.StdEncoding.DecodeString(token)
 		if err != nil {
 			return nil, err

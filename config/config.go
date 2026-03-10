@@ -8,8 +8,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/wallix/awless/aws/config"
-	"github.com/wallix/awless/aws/spec"
+	awsconfig "github.com/wallix/awless/aws/config"
+	awsspec "github.com/wallix/awless/aws/spec"
 	"github.com/wallix/awless/database"
 )
 

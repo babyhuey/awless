@@ -1,30 +1,33 @@
 package awsservices
 
 import (
-	"io/ioutil"
+	"context"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+
 	"github.com/wallix/awless/logger"
 )
 
 func TestFileCacheProvider(t *testing.T) {
-	name, err := ioutil.TempDir(".", "cache")
+	name, err := os.MkdirTemp(".", "cache")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(name)
 	os.Setenv("__AWLESS_CACHE", name)
 
-	mock := &mockCredWithExpirationProvider{value: credentials.Value{SecretAccessKey: "my valid secret string", ProviderName: stscreds.ProviderName}}
-	creds := credentials.NewCredentials(mock)
-	stscreds.DefaultDuration = 30 * time.Millisecond //Force cached credential expiration after 20 millisecond
+	cacheDuration := 30 * time.Millisecond
+	stsCacheDuration = cacheDuration // Force cached credential expiration after 30 milliseconds
 
-	provider := fileCacheProvider{creds: creds, profile: "default", log: logger.DiscardLogger}
-	retrievedCredential, err := provider.Retrieve()
+	mock := &mockCredWithExpirationProvider{value: aws.Credentials{SecretAccessKey: "my valid secret string", Source: stscreds.ProviderName}}
+
+	provider := fileCacheProvider{creds: mock, profile: "default", log: logger.DiscardLogger}
+	ctx := context.Background()
+	retrievedCredential, err := provider.Retrieve(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +37,7 @@ func TestFileCacheProvider(t *testing.T) {
 	if got, want := mock.accessCount, 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	retrievedCredential, err = provider.Retrieve()
+	retrievedCredential, err = provider.Retrieve(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,9 +47,9 @@ func TestFileCacheProvider(t *testing.T) {
 	if got, want := mock.accessCount, 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	time.Sleep(stscreds.DefaultDuration)
+	time.Sleep(cacheDuration)
 
-	retrievedCredential, err = provider.Retrieve()
+	retrievedCredential, err = provider.Retrieve(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,14 +63,10 @@ func TestFileCacheProvider(t *testing.T) {
 
 type mockCredWithExpirationProvider struct {
 	accessCount int
-	value       credentials.Value
+	value       aws.Credentials
 }
 
-func (m *mockCredWithExpirationProvider) Retrieve() (credentials.Value, error) {
+func (m *mockCredWithExpirationProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 	m.accessCount++
 	return m.value, nil
-}
-
-func (m *mockCredWithExpirationProvider) IsExpired() bool {
-	return false
 }

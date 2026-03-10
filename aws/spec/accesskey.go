@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -27,11 +28,10 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
-	"github.com/wallix/awless/aws/config"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+
+	awsconfig "github.com/wallix/awless/aws/config"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/cloud/properties"
 	"github.com/wallix/awless/logger"
@@ -41,7 +41,7 @@ type CreateAccesskey struct {
 	_      string `action:"create" entity:"accesskey" awsAPI:"iam" awsCall:"CreateAccessKey" awsInput:"iam.CreateAccessKeyInput" awsOutput:"iam.CreateAccessKeyOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	User   *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 	Save   *bool   `templateName:"save"`
 }
@@ -70,11 +70,11 @@ func (cmd *CreateAccesskey) ParamsSpec() params.Spec {
 func (cmd *CreateAccesskey) AfterRun(renv env.Running, output interface{}) error {
 	accessKey := output.(*iam.CreateAccessKeyOutput).AccessKey
 	if !BoolValue(cmd.Save) {
-		cmd.logger.Infof("Access key created. Here are the crendentials for user %s:", aws.StringValue(accessKey.UserName))
+		cmd.logger.Infof("Access key created. Here are the crendentials for user %s:", aws.ToString(accessKey.UserName))
 		fmt.Fprintln(os.Stderr)
 		fmt.Fprintln(os.Stderr, strings.Repeat("*", 64))
-		fmt.Fprintf(os.Stderr, "aws_access_key_id = %s\n", aws.StringValue(accessKey.AccessKeyId))
-		fmt.Fprintf(os.Stderr, "aws_secret_access_key = %s\n", aws.StringValue(accessKey.SecretAccessKey))
+		fmt.Fprintf(os.Stderr, "aws_access_key_id = %s\n", aws.ToString(accessKey.AccessKeyId))
+		fmt.Fprintf(os.Stderr, "aws_secret_access_key = %s\n", aws.ToString(accessKey.SecretAccessKey))
 		fmt.Fprintln(os.Stderr, strings.Repeat("*", 64))
 		fmt.Fprintln(os.Stderr)
 		cmd.logger.Warning("This is your only opportunity to view the secret access keys.")
@@ -94,8 +94,8 @@ func (cmd *CreateAccesskey) AfterRun(renv env.Running, output interface{}) error
 	}
 
 	creds := NewCredsPrompter(profile)
-	creds.Val.AccessKeyID = aws.StringValue(accessKey.AccessKeyId)
-	creds.Val.SecretAccessKey = aws.StringValue(accessKey.SecretAccessKey)
+	creds.Val.AccessKeyID = aws.ToString(accessKey.AccessKeyId)
+	creds.Val.SecretAccessKey = aws.ToString(accessKey.SecretAccessKey)
 	created, err := creds.Store()
 	if err != nil {
 		logger.Errorf("cannot store access keys: %s", err)
@@ -117,7 +117,7 @@ type DeleteAccesskey struct {
 	_      string `action:"delete" entity:"accesskey" awsAPI:"iam" awsCall:"DeleteAccessKey" awsInput:"iam.DeleteAccessKeyInput" awsOutput:"iam.DeleteAccessKeyOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Id     *string `awsName:"AccessKeyId" awsType:"awsstr" templateName:"id"`
 	User   *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 }
@@ -137,7 +137,7 @@ func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 					values["user"] = keyUser
 				}
 			} else if hasUser && !hasId {
-				keys, err := cmd.api.ListAccessKeys(&iam.ListAccessKeysInput{
+				keys, err := cmd.api.ListAccessKeys(context.Background(), &iam.ListAccessKeysInput{
 					UserName: String(user),
 				})
 				if err != nil {
@@ -151,7 +151,7 @@ func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 				default:
 					var keysStr []string
 					for _, k := range keys.AccessKeyMetadata {
-						keysStr = append(keysStr, fmt.Sprintf("%s (created on %s)", StringValue(k.AccessKeyId), aws.TimeValue(k.CreateDate).Format("2006/01/02 15:04:05")))
+						keysStr = append(keysStr, fmt.Sprintf("%s (created on %s)", StringValue(k.AccessKeyId), aws.ToTime(k.CreateDate).Format("2006/01/02 15:04:05")))
 					}
 					return values, fmt.Errorf("multiple access keys found for %s: %s", user, strings.Join(keysStr, ", "))
 				}
@@ -170,7 +170,7 @@ var (
 
 type credentialsPrompter struct {
 	Profile               string
-	Val                   credentials.Value
+	Val                   aws.Credentials
 	ProfileSetterCallback func(string) error
 }
 
@@ -238,7 +238,7 @@ func appendToAwsFile(content string, awsFilePath string) (bool, error) {
 		return created, fmt.Errorf("appending to '%s': %s", awsFilePath, err)
 	}
 
-	if _, err := fmt.Fprintf(f, content); err != nil {
+	if _, err := fmt.Fprintf(f, "%s", content); err != nil {
 		return created, err
 	}
 

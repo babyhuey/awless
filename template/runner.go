@@ -66,7 +66,7 @@ func (ru *Runner) Run() error {
 		case *Errors:
 			errs, _ := t.Errors()
 			for _, e := range errs {
-				logger.Errorf(e.Error())
+				logger.Errorf("%s", e.Error())
 			}
 		default:
 			logger.Error(err)

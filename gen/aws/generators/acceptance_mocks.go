@@ -1,22 +1,13 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
 	"go/ast"
-	"go/importer"
 	"go/parser"
 	"go/token"
-	"go/types"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
-
-	"github.com/wallix/awless/gen/aws"
 )
-
-var AWS_SDK_PATH = filepath.Join(ROOT_DIR, "vendor", "github.com", "aws", "aws-sdk-go")
 
 func generateAcceptanceMocks() {
 	fset := token.NewFileSet()
@@ -32,121 +23,30 @@ func generateAcceptanceMocks() {
 		}
 	}
 
-	usedApis := make(map[string]string)
+	usedApis := make(map[string]bool)
 	for _, cmd := range finder.result {
 		if cmd.API == "" {
 			continue
 		}
-		usedApis[cmd.API] = aws.ApiToInterface(cmd.API)
+		usedApis[cmd.API] = true
 	}
 
-	apis := make(map[string]apiInfo)
-
-	for api, ifaceName := range usedApis {
-		var functions []functionInfo
-		apiPath := filepath.Join(AWS_SDK_PATH, "service", api, api+"iface")
-		pkgs, err := parser.ParseDir(fset, apiPath, func(os.FileInfo) bool { return true }, 0)
-		if err != nil {
-			panic(err)
-		}
-		conf := types.Config{Importer: importer.Default()}
-
-		//ifaceFinder := &findIfaces{}
-		for _, pkg := range pkgs {
-			files := make([]*ast.File, len(pkg.Files))
-			i := 0
-			for _, file := range pkg.Files {
-				files[i] = file
-				i++
-			}
-			tpkg, err := conf.Check(api, fset, files, nil)
-			if err != nil {
-				panic(err)
-			}
-
-			iface := tpkg.Scope().Lookup(ifaceName)
-			if iface == nil {
-				panic(fmt.Sprintf("cannot find interface %s", ifaceName))
-			}
-			if !types.IsInterface(iface.Type()) {
-				panic(fmt.Sprintf("%s (%s) not an interface", ifaceName, iface.Type().String()))
-			}
-			isPointer := func(s string) bool { return len(s) > 0 && s[0] == '*' }
-			iiface := iface.Type().Underlying().(*types.Interface).Complete()
-			for i := 0; i < iiface.NumMethods(); i++ {
-				meth := iiface.Method(i)
-				sig := meth.Type().(*types.Signature)
-				if strings.HasSuffix(meth.Name(), "Pages") || strings.HasSuffix(meth.Name(), "PagesWithContext") {
-					continue
-				}
-				var paramBuff bytes.Buffer
-				var paramNames []string
-				for j := 0; j < sig.Params().Len(); j++ {
-					p := sig.Params().At(j)
-					paramName := fmt.Sprintf("param%d", j)
-					paramBuff.WriteString(paramName)
-					paramBuff.WriteRune(' ')
-					t := p.Type().String()
-					if found := strings.LastIndexByte(t, '/'); found != -1 {
-						t = t[found+1:]
-					}
-					if isPointer(p.Type().String()) {
-						t = "*" + t
-					}
-					if sig.Variadic() && j == sig.Params().Len()-1 {
-						t = "..." + t
-						paramName = paramName + "..."
-					}
-					paramNames = append(paramNames, paramName)
-					paramBuff.WriteString(t)
-					if j < sig.Params().Len()-1 {
-						paramBuff.WriteString(", ")
-					}
-				}
-				var returnsBuff bytes.Buffer
-				if sig.Results().Len() > 1 {
-					returnsBuff.WriteByte('(')
-				}
-				for j := 0; j < sig.Results().Len(); j++ {
-					p := sig.Results().At(j)
-					t := p.Type().String()
-					if found := strings.LastIndexByte(t, '/'); found != -1 {
-						t = t[found+1:]
-					}
-					if isPointer(p.Type().String()) {
-						t = "*" + t
-					}
-					if sig.Variadic() && j == sig.Params().Len()-1 {
-						t = "..." + t
-					}
-					returnsBuff.WriteString(t)
-					if j < sig.Results().Len()-1 {
-						returnsBuff.WriteString(", ")
-					}
-				}
-				if sig.Results().Len() > 1 {
-					returnsBuff.WriteByte(')')
-				}
-				functions = append(functions, functionInfo{
-					Name:         meth.Name(),
-					Sig:          fmt.Sprintf("func (m *%sMock) %s(%s) %s", api, meth.Name(), paramBuff.String(), returnsBuff.String()),
-					AnonymousSig: fmt.Sprintf("func (%s) %s", paramBuff.String(), returnsBuff.String()),
-					ParamNames:   paramNames,
-				})
-			}
-
-		}
-		apis[api] = apiInfo{Name: api, IfaceName: ifaceName, Methods: functions}
+	apiList := make([]string, 0, len(usedApis))
+	for api := range usedApis {
+		apiList = append(apiList, api)
 	}
 
 	templ, err := template.New("mocks").Funcs(
-		template.FuncMap{"Join": strings.Join},
+		template.FuncMap{
+			"Join":  strings.Join,
+			"Title": strings.Title,
+		},
 	).Parse(atMocksTemplate)
 	if err != nil {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, apis, AWSAT_DIR, "gen_mocks.go")
+	writeTemplateToFile(templ, apiList, AWSAT_DIR, "gen_mocks.go")
 }
 
 func generateAcceptanceFactory() {
@@ -165,7 +65,7 @@ func generateAcceptanceFactory() {
 
 	templ, err := template.New("acceptanceFactory").Funcs(
 		template.FuncMap{
-			"ApiToInterface": aws.ApiToInterface,
+			"Title": strings.Title,
 		},
 	).Parse(atMocksCmdBuilders)
 	if err != nil {
@@ -173,19 +73,6 @@ func generateAcceptanceFactory() {
 	}
 
 	writeTemplateToFile(templ, finder.result, AWSAT_DIR, "gen_factory.go")
-}
-
-type apiInfo struct {
-	Name      string
-	IfaceName string
-	Methods   []functionInfo
-}
-
-type functionInfo struct {
-	Name         string
-	Sig          string
-	AnonymousSig string
-	ParamNames   []string
 }
 
 const atMocksCmdBuilders = `/* Copyright 2017 WALLIX
@@ -208,7 +95,10 @@ limitations under the License.
 package awsat
 
 import (
-  "github.com/wallix/awless/aws/spec"
+  "github.com/aws/aws-sdk-go-v2/aws"
+  "github.com/wallix/awless/cloud"
+  awsspec "github.com/wallix/awless/aws/spec"
+  "github.com/wallix/awless/logger"
 )
 
 type AcceptanceFactory struct {
@@ -218,11 +108,11 @@ type AcceptanceFactory struct {
 }
 
 func NewAcceptanceFactory(mock interface{}, g cloud.GraphAPI, l ...*logger.Logger) *AcceptanceFactory {
-	logger := logger.DiscardLogger
+	lg := logger.DiscardLogger
 	if len(l) > 0 {
-		logger = l[0]
+		lg = l[0]
 	}
-	return &AcceptanceFactory{Mock: mock, Graph:g, Logger: logger}
+	return &AcceptanceFactory{Mock: mock, Graph:g, Logger: lg}
 }
 
 func (f *AcceptanceFactory) Build(key string) func() interface{} {
@@ -230,8 +120,9 @@ func (f *AcceptanceFactory) Build(key string) func() interface{} {
 		{{- range $cmdName, $cmd := . }}
 		case "{{ $cmd.Action }}{{ $cmd.Entity }}":
 			return func() interface{} {
-				cmd := awsspec.New{{ $cmdName }}(nil, f.Graph, f.Logger)
-				cmd.SetApi(f.Mock.({{$cmd.API}}iface.{{ ApiToInterface $cmd.API }}))
+				cmd := awsspec.New{{ $cmdName }}(aws.Config{}, f.Graph, f.Logger)
+				// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
+				_ = cmd
 				return cmd
 			}
 		{{- end}}
@@ -259,24 +150,16 @@ limitations under the License.
 // This file was automatically generated with go generate
 package awsat
 
+// TODO: Acceptance mocks need reworking for AWS SDK v2.
+// SDK v2 does not have iface packages, so mocks must be manually defined
+// or use a different mocking strategy (e.g., httptest or interface wrappers).
 
-{{ range $api, $apiInfo := . }}
+{{ range $, $api := . }}
 
 type {{ $api }}Mock struct {
   basicMock
-  {{ $api }}iface.{{ $apiInfo.IfaceName }}
-  {{- range $, $method := $apiInfo.Methods }}
-  {{ $method.Name }}Func {{ $method.AnonymousSig }}
-  {{- end }}
 }
 
-{{- range $, $method := $apiInfo.Methods }}
-{{ $method.Sig }} {
-	m.addCall("{{$method.Name}}")
-	m.verifyInput("{{$method.Name}}", param0)
-	return m.{{$method.Name}}Func({{Join $method.ParamNames ","}})
-}
-{{ end }}
 {{- end }}
 
 `

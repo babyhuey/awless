@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -25,9 +26,10 @@ import (
 
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -35,7 +37,7 @@ type CreateInstanceprofile struct {
 	_      string `action:"create" entity:"instanceprofile" awsAPI:"iam" awsCall:"CreateInstanceProfile" awsInput:"iam.CreateInstanceProfileInput" awsOutput:"iam.CreateInstanceProfileOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `awsName:"InstanceProfileName" awsType:"awsstr" templateName:"name"`
 }
 
@@ -47,7 +49,7 @@ type DeleteInstanceprofile struct {
 	_      string `action:"delete" entity:"instanceprofile" awsAPI:"iam" awsCall:"DeleteInstanceProfile" awsInput:"iam.DeleteInstanceProfileInput" awsOutput:"iam.DeleteInstanceProfileOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    iamiface.IAMAPI
+	api    *iam.Client
 	Name   *string `awsName:"InstanceProfileName" awsType:"awsstr" templateName:"name"`
 }
 
@@ -59,7 +61,7 @@ type AttachInstanceprofile struct {
 	_        string `action:"attach" entity:"instanceprofile" awsAPI:"ec2" awsDryRun:"manual"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      ec2iface.EC2API
+	api      *ec2.Client
 	Instance *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
 	Name     *string `awsName:"IamInstanceProfile.Name" awsType:"awsstr" templateName:"name"`
 	Replace  *bool   `templateName:"replace"`
@@ -77,17 +79,17 @@ func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]int
 	}
 	if BoolValue(cmd.Replace) {
 		in := &ec2.DescribeIamInstanceProfileAssociationsInput{
-			Filters: []*ec2.Filter{
-				{Name: String("instance-id"), Values: []*string{cmd.Instance}},
+			Filters: []ec2types.Filter{
+				{Name: String("instance-id"), Values: []string{StringValue(cmd.Instance)}},
 			},
 		}
-		out, err := cmd.api.DescribeIamInstanceProfileAssociations(in)
+		out, err := cmd.api.DescribeIamInstanceProfileAssociations(context.Background(), in)
 		if err != nil {
 			return nil, fmt.Errorf("replace mode on: cannot get: %s", err)
 		}
 		if assocs := out.IamInstanceProfileAssociations; len(assocs) > 0 {
 			for _, ass := range assocs {
-				cmd.logger.ExtraVerbosef("dry run: attach instanceprofile: existing instanceprofile %s (state: %s) on instance %s", StringValue(ass.IamInstanceProfile.Id), StringValue(ass.State), StringValue(cmd.Instance))
+				cmd.logger.ExtraVerbosef("dry run: attach instanceprofile: existing instanceprofile %s (state: %s) on instance %s", StringValue(ass.IamInstanceProfile.Id), string(ass.State), StringValue(cmd.Instance))
 			}
 		}
 	}
@@ -100,11 +102,11 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 	profileName := StringValue(cmd.Name)
 
 	if BoolValue(cmd.Replace) {
-		out, err := cmd.api.DescribeIamInstanceProfileAssociations(
+		out, err := cmd.api.DescribeIamInstanceProfileAssociations(context.Background(),
 			&ec2.DescribeIamInstanceProfileAssociationsInput{
-				Filters: []*ec2.Filter{
-					{Name: String("instance-id"), Values: []*string{String(instanceId)}},
-					{Name: String("state"), Values: []*string{String("associated")}},
+				Filters: []ec2types.Filter{
+					{Name: String("instance-id"), Values: []string{instanceId}},
+					{Name: String("state"), Values: []string{"associated"}},
 				},
 			})
 		if err != nil {
@@ -118,10 +120,10 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 			oldProfileArn := StringValue(assoc[0].IamInstanceProfile.Arn)
 			cmd.logger.ExtraVerbosef("attach profile: found existing profile to replace with %s", profileName)
 			if assocInstId == instanceId {
-				out, err := cmd.api.ReplaceIamInstanceProfileAssociation(
+				out, err := cmd.api.ReplaceIamInstanceProfileAssociation(context.Background(),
 					&ec2.ReplaceIamInstanceProfileAssociationInput{
 						AssociationId: String(assocId),
-						IamInstanceProfile: &ec2.IamInstanceProfileSpecification{
+						IamInstanceProfile: &ec2types.IamInstanceProfileSpecification{
 							Name: String(profileName),
 						},
 					})
@@ -146,7 +148,7 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 	}
 
 	start := time.Now()
-	output, err := cmd.api.AssociateIamInstanceProfile(input)
+	output, err := cmd.api.AssociateIamInstanceProfile(context.Background(), input)
 	cmd.logger.ExtraVerbosef("ec2.AssociateIamInstanceProfile call took %s", time.Since(start))
 	return output, err
 }
@@ -155,7 +157,7 @@ type DetachInstanceprofile struct {
 	_        string `action:"detach" entity:"instanceprofile" awsAPI:"ec2"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      ec2iface.EC2API
+	api      *ec2.Client
 	Instance *string `templateName:"instance"`
 	Name     *string `templateName:"name"`
 }
@@ -168,10 +170,10 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 	instanceId := StringValue(cmd.Instance)
 	profileName := StringValue(cmd.Name)
 
-	out, err := cmd.api.DescribeIamInstanceProfileAssociations(
+	out, err := cmd.api.DescribeIamInstanceProfileAssociations(context.Background(),
 		&ec2.DescribeIamInstanceProfileAssociationsInput{
-			Filters: []*ec2.Filter{
-				{Name: String("instance-id"), Values: []*string{String(instanceId)}},
+			Filters: []ec2types.Filter{
+				{Name: String("instance-id"), Values: []string{instanceId}},
 			},
 		})
 	if err != nil {
@@ -192,7 +194,7 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 			}
 
 			start := time.Now()
-			output, err := cmd.api.DisassociateIamInstanceProfile(input)
+			output, err := cmd.api.DisassociateIamInstanceProfile(context.Background(), input)
 			if err != nil {
 				return nil, err
 			}

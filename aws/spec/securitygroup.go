@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -26,10 +27,11 @@ import (
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/params"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/aws/smithy-go"
+
 	"github.com/wallix/awless/logger"
 )
 
@@ -37,7 +39,7 @@ type CreateSecuritygroup struct {
 	_           string `action:"create" entity:"securitygroup" awsAPI:"ec2" awsCall:"CreateSecurityGroup" awsInput:"ec2.CreateSecurityGroupInput" awsOutput:"ec2.CreateSecurityGroupOutput" awsDryRun:""`
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
-	api         ec2iface.EC2API
+	api         *ec2.Client
 	Name        *string `awsName:"GroupName" awsType:"awsstr" templateName:"name"`
 	Vpc         *string `awsName:"VpcId" awsType:"awsstr" templateName:"vpc"`
 	Description *string `awsName:"Description" awsType:"awsstr" templateName:"description"`
@@ -48,14 +50,14 @@ func (cmd *CreateSecuritygroup) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateSecuritygroup) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*ec2.CreateSecurityGroupOutput).GroupId)
+	return awssdk.ToString(i.(*ec2.CreateSecurityGroupOutput).GroupId)
 }
 
 type UpdateSecuritygroup struct {
 	_             string `action:"update" entity:"securitygroup" awsAPI:"ec2" awsDryRun:"manual"`
 	logger        *logger.Logger
 	graph         cloud.GraphAPI
-	api           ec2iface.EC2API
+	api           *ec2.Client
 	Id            *string `templateName:"id"`
 	Protocol      *string `templateName:"protocol"`
 	CIDR          *string `templateName:"cidr"`
@@ -118,16 +120,16 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]inter
 
 	switch ii := input.(type) {
 	case *ec2.AuthorizeSecurityGroupIngressInput:
-		_, err = cmd.api.AuthorizeSecurityGroupIngress(ii)
+		_, err = cmd.api.AuthorizeSecurityGroupIngress(context.Background(), ii)
 	case *ec2.RevokeSecurityGroupIngressInput:
-		_, err = cmd.api.RevokeSecurityGroupIngress(ii)
+		_, err = cmd.api.RevokeSecurityGroupIngress(context.Background(), ii)
 	case *ec2.AuthorizeSecurityGroupEgressInput:
-		_, err = cmd.api.AuthorizeSecurityGroupEgress(ii)
+		_, err = cmd.api.AuthorizeSecurityGroupEgress(context.Background(), ii)
 	case *ec2.RevokeSecurityGroupEgressInput:
-		_, err = cmd.api.RevokeSecurityGroupEgress(ii)
+		_, err = cmd.api.RevokeSecurityGroupEgress(context.Background(), ii)
 	}
-	if awsErr, ok := err.(awserr.Error); ok {
-		switch code := awsErr.Code(); {
+	if awsErr, ok := err.(smithy.APIError); ok {
+		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			cmd.logger.Verbose("dry run: update securitygroup ok")
 			return nil, nil
@@ -176,16 +178,16 @@ func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (interface{}, error)
 	start := time.Now()
 	switch ii := input.(type) {
 	case *ec2.AuthorizeSecurityGroupIngressInput:
-		output, err = cmd.api.AuthorizeSecurityGroupIngress(ii)
+		output, err = cmd.api.AuthorizeSecurityGroupIngress(context.Background(), ii)
 		cmd.logger.ExtraVerbosef("ec2.AuthorizeSecurityGroupIngress call took %s", time.Since(start))
 	case *ec2.RevokeSecurityGroupIngressInput:
-		output, err = cmd.api.RevokeSecurityGroupIngress(ii)
+		output, err = cmd.api.RevokeSecurityGroupIngress(context.Background(), ii)
 		cmd.logger.ExtraVerbosef("ec2.RevokeSecurityGroupIngress call took %s", time.Since(start))
 	case *ec2.AuthorizeSecurityGroupEgressInput:
-		output, err = cmd.api.AuthorizeSecurityGroupEgress(ii)
+		output, err = cmd.api.AuthorizeSecurityGroupEgress(context.Background(), ii)
 		cmd.logger.ExtraVerbosef("ec2.AuthorizeSecurityGroupEgress call took %s", time.Since(start))
 	case *ec2.RevokeSecurityGroupEgressInput:
-		output, err = cmd.api.RevokeSecurityGroupEgress(ii)
+		output, err = cmd.api.RevokeSecurityGroupEgress(context.Background(), ii)
 		cmd.logger.ExtraVerbosef("ec2.RevokeSecurityGroupEgress call took %s", time.Since(start))
 	}
 
@@ -196,7 +198,7 @@ type DeleteSecuritygroup struct {
 	_      string `action:"delete" entity:"securitygroup" awsAPI:"ec2" awsCall:"DeleteSecurityGroup" awsInput:"ec2.DeleteSecurityGroupInput" awsOutput:"ec2.DeleteSecurityGroupOutput" awsDryRun:""`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    ec2iface.EC2API
+	api    *ec2.Client
 	Id     *string `awsName:"GroupId" awsType:"awsstr" templateName:"id"`
 }
 
@@ -208,7 +210,7 @@ type CheckSecuritygroup struct {
 	_       string `action:"check" entity:"securitygroup" awsAPI:"ec2"`
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
-	api     ec2iface.EC2API
+	api     *ec2.Client
 	Id      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
@@ -224,8 +226,8 @@ func (cmd *CheckSecuritygroup) ParamsSpec() params.Spec {
 
 func (cmd *CheckSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
 	input := &ec2.DescribeNetworkInterfacesInput{
-		Filters: []*ec2.Filter{
-			{Name: String("group-id"), Values: []*string{cmd.Id}},
+		Filters: []ec2types.Filter{
+			{Name: String("group-id"), Values: []string{awssdk.ToString(cmd.Id)}},
 		},
 	}
 
@@ -234,7 +236,7 @@ func (cmd *CheckSecuritygroup) ManualRun(renv env.Running) (interface{}, error) 
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeNetworkInterfaces(input)
+			output, err := cmd.api.DescribeNetworkInterfaces(context.Background(), input)
 			if err != nil {
 				return "", err
 			}
@@ -257,7 +259,7 @@ type AttachSecuritygroup struct {
 	_        string `action:"attach" entity:"securitygroup" awsAPI:"ec2"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      ec2iface.EC2API
+	api      *ec2.Client
 	Id       *string `templateName:"id"`
 	Instance *string `templateName:"instance"`
 }
@@ -289,7 +291,7 @@ type DetachSecuritygroup struct {
 	_        string `action:"detach" entity:"securitygroup" awsAPI:"ec2"`
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
-	api      ec2iface.EC2API
+	api      *ec2.Client
 	Id       *string `templateName:"id"`
 	Instance *string `templateName:"instance"`
 }
@@ -320,22 +322,22 @@ func (cmd *DetachSecuritygroup) ManualRun(renv env.Running) (interface{}, error)
 	return call.execute(&ec2.ModifyInstanceAttributeInput{})
 }
 
-func (cmd *UpdateSecuritygroup) buildIpPermissions() ([]*ec2.IpPermission, error) {
-	ipPerm := &ec2.IpPermission{}
+func (cmd *UpdateSecuritygroup) buildIpPermissions() ([]ec2types.IpPermission, error) {
+	ipPerm := ec2types.IpPermission{}
 	if cidr := cmd.CIDR; cidr != nil {
-		ipPerm.IpRanges = []*ec2.IpRange{{CidrIp: cidr}}
+		ipPerm.IpRanges = []ec2types.IpRange{{CidrIp: cidr}}
 	} else if secgroup := cmd.Securitygroup; secgroup != nil {
-		ipPerm.UserIdGroupPairs = []*ec2.UserIdGroupPair{{GroupId: secgroup}}
+		ipPerm.UserIdGroupPairs = []ec2types.UserIdGroupPair{{GroupId: secgroup}}
 	} else {
 		return nil, errors.New("missing either 'cidr' or 'securitygroup' parameter")
 	}
 
 	p := StringValue(cmd.Protocol)
 	if strings.Contains("any", p) {
-		ipPerm.FromPort = Int64(-1)
-		ipPerm.ToPort = Int64(-1)
+		ipPerm.FromPort = awssdk.Int32(-1)
+		ipPerm.ToPort = awssdk.Int32(-1)
 		ipPerm.IpProtocol = String("-1")
-		return []*ec2.IpPermission{ipPerm}, nil
+		return []ec2types.IpPermission{ipPerm}, nil
 	}
 	ipPerm.IpProtocol = String(p)
 
@@ -344,46 +346,46 @@ func (cmd *UpdateSecuritygroup) buildIpPermissions() ([]*ec2.IpPermission, error
 		switch {
 		case strings.Contains(ports, "any"):
 			if isTCPorUDP(p) {
-				ipPerm.FromPort = Int64(int64(0))
-				ipPerm.ToPort = Int64(int64(65535))
+				ipPerm.FromPort = awssdk.Int32(0)
+				ipPerm.ToPort = awssdk.Int32(65535)
 			} else {
-				ipPerm.FromPort = Int64(int64(-1))
-				ipPerm.ToPort = Int64(int64(-1))
+				ipPerm.FromPort = awssdk.Int32(-1)
+				ipPerm.ToPort = awssdk.Int32(-1)
 			}
 		case strings.Contains(ports, "-"):
-			from, err := strconv.ParseInt(strings.SplitN(ports, "-", 2)[0], 10, 64)
+			from, err := strconv.ParseInt(strings.SplitN(ports, "-", 2)[0], 10, 32)
 			if err != nil {
 				return nil, err
 			}
-			to, err := strconv.ParseInt(strings.SplitN(ports, "-", 2)[1], 10, 64)
+			to, err := strconv.ParseInt(strings.SplitN(ports, "-", 2)[1], 10, 32)
 			if err != nil {
 				return nil, err
 			}
-			ipPerm.FromPort = Int64(from)
-			ipPerm.ToPort = Int64(to)
+			ipPerm.FromPort = awssdk.Int32(int32(from))
+			ipPerm.ToPort = awssdk.Int32(int32(to))
 		default:
-			port, err := strconv.ParseInt(ports, 10, 64)
+			port, err := strconv.ParseInt(ports, 10, 32)
 			if err != nil {
 				return nil, err
 			}
-			ipPerm.FromPort = Int64(port)
-			ipPerm.ToPort = Int64(port)
+			ipPerm.FromPort = awssdk.Int32(int32(port))
+			ipPerm.ToPort = awssdk.Int32(int32(port))
 		}
 	}
 
-	return []*ec2.IpPermission{ipPerm}, nil
+	return []ec2types.IpPermission{ipPerm}, nil
 }
 
 func isTCPorUDP(p string) bool {
 	return strings.ToLower(p) == "tcp" || strings.ToLower(p) == "udp"
 }
 
-func fetchInstanceSecurityGroups(api ec2iface.EC2API, id string) ([]string, error) {
+func fetchInstanceSecurityGroups(api *ec2.Client, id string) ([]string, error) {
 	params := &ec2.DescribeInstanceAttributeInput{
-		Attribute:  String("groupSet"),
+		Attribute:  ec2types.InstanceAttributeNameGroupSet,
 		InstanceId: String(id),
 	}
-	resp, err := api.DescribeInstanceAttribute(params)
+	resp, err := api.DescribeInstanceAttribute(context.Background(), params)
 	if err != nil {
 		return nil, err
 	}

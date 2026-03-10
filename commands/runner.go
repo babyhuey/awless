@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/wallix/awless/aws/services"
-	"github.com/wallix/awless/aws/spec"
+	awsservices "github.com/wallix/awless/aws/services"
+	awsspec "github.com/wallix/awless/aws/spec"
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/config"
 	"github.com/wallix/awless/database"

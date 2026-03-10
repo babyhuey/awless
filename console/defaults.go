@@ -18,6 +18,7 @@ package console
 
 import (
 	"github.com/fatih/color"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/cloud/properties"
 )
@@ -42,7 +43,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.ClassicLoadBalancer: {properties.Name, properties.Vpc, properties.PublicDNS, properties.Instances, properties.Ports, properties.Created, properties.Scheme},
 	cloud.TargetGroup:         {properties.Name, properties.Vpc, properties.CheckHTTPCode, properties.Port, properties.Protocol, properties.CheckInterval, properties.CheckPath, properties.CheckPort, properties.CheckProtocol},
 	cloud.Listener:            {properties.ID, properties.Protocol, properties.Port, properties.LoadBalancer, properties.TargetGroups, properties.AlarmActions},
-	cloud.Database:            {properties.ID, properties.Name, properties.AvailabilityZone, properties.Class, properties.State, properties.Storage, properties.Port, properties.Username, properties.Public, properties.ReplicaOf, properties.Engine, properties.EngineVersion, properties.Created},
+	cloud.Database:            {properties.ID, properties.Name, properties.AvailabilityZone, properties.Class, properties.State, properties.Storage, properties.Port, properties.Username, properties.Public, properties.PublicDNS, properties.ReplicaOf, properties.Engine, properties.EngineVersion, properties.Created},
 	cloud.DbSubnetGroup:       {properties.ID, properties.State, properties.Vpc, properties.Subnets, properties.Description},
 	cloud.LaunchConfiguration: {properties.Name, properties.Type, properties.Created, properties.KeyPair},
 	cloud.ScalingGroup:        {properties.Name, properties.LaunchConfigurationName, properties.DesiredCapacity, properties.State, properties.Created, properties.NewInstancesProtected},
@@ -72,6 +73,17 @@ var ColumnsInListing = map[string][]string{
 	cloud.Alarm:               {properties.Name, properties.Namespace, properties.MetricName, properties.Description, properties.State, properties.Updated, properties.Dimensions},
 	cloud.Distribution:        {properties.ID, properties.PublicDNS, properties.Enabled, properties.State, properties.Modified, properties.Aliases, properties.SSLSupportMethod, properties.Origins},
 	cloud.Stack:               {properties.ID, properties.Name, properties.State, properties.Created, properties.Modified},
+	cloud.EKSCluster:          {properties.Name, properties.State, properties.KubernetesVersion, properties.PlatformVersion, properties.Endpoint, properties.Created},
+	cloud.EKSNodeGroup:        {properties.Name, properties.Cluster, properties.State, properties.ScalingConfig, properties.Type, properties.Created},
+	cloud.DynamoDBTable:       {properties.Name, properties.State, properties.ItemCount, properties.SizeBytes, properties.KeySchema, properties.Created},
+	cloud.Secret:              {properties.Name, properties.Description, properties.Created, properties.Modified, properties.LastAccessed, properties.RotationEnabled},
+	cloud.Key:                 {properties.ID, properties.Name, properties.State, properties.KeyManager, properties.KeyUsage, properties.Origin, properties.Created},
+	cloud.ApiGateway:          {properties.ID, properties.Name, properties.ApiProtocol, properties.Endpoint, properties.Description, properties.Created},
+	cloud.ApiGatewayRoute:     {properties.ID, properties.RouteKey, properties.Target},
+	cloud.ApiGatewayStage:     {properties.Name, properties.DeploymentID, properties.AutoDeploy, properties.Created, properties.Modified},
+	cloud.SSMParameter:        {properties.Name, properties.ParameterType, properties.DataType, properties.Tier, properties.Version, properties.Modified},
+	cloud.FileSystem:          {properties.ID, properties.Name, properties.State, properties.SizeBytes, properties.PerformanceMode, properties.ThroughputMode, properties.Encrypted, properties.Created},
+	cloud.MountTarget:         {properties.ID, properties.Subnet, properties.Vpc, properties.IPAddress, properties.LifecycleState},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -268,6 +280,7 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		ColoredValueColumnDefinition{
 			StringColumnDefinition: StringColumnDefinition{Prop: properties.Public},
 			ColoredValues:          map[string]color.Attribute{"true": color.FgYellow}},
+		StringColumnDefinition{Prop: properties.PublicDNS, Friendly: "Endpoint"},
 		StringColumnDefinition{Prop: properties.ReplicaOf, Friendly: "Replica Of"},
 		StringColumnDefinition{Prop: properties.Engine},
 		StringColumnDefinition{Prop: properties.EngineVersion, Friendly: "Version"},
@@ -490,5 +503,99 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.State},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Modified}},
+	},
+	// EKS
+	cloud.EKSCluster: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.KubernetesVersion, Friendly: "K8s Version"},
+		StringColumnDefinition{Prop: properties.PlatformVersion, Friendly: "Platform"},
+		StringColumnDefinition{Prop: properties.Endpoint},
+		StringColumnDefinition{Prop: properties.RoleArn, Friendly: "Role"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.EKSNodeGroup: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Cluster},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.ScalingConfig, Friendly: "Scaling"},
+		SliceColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Type, Friendly: "Instance Types"}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	// DynamoDB
+	cloud.DynamoDBTable: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.ItemCount, Friendly: "Items"},
+		StringColumnDefinition{Prop: properties.SizeBytes, Friendly: "Size (bytes)"},
+		SliceColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.KeySchema, Friendly: "Key Schema"}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	// Secrets Manager
+	cloud.Secret: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Modified}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.LastAccessed, Friendly: "Last Accessed"}},
+		StringColumnDefinition{Prop: properties.RotationEnabled, Friendly: "Rotation"},
+	},
+	// KMS
+	cloud.Key: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name, Friendly: "Description"},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.KeyManager, Friendly: "Manager"},
+		StringColumnDefinition{Prop: properties.KeyUsage, Friendly: "Usage"},
+		StringColumnDefinition{Prop: properties.Origin},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	// API Gateway
+	cloud.ApiGateway: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.ApiProtocol, Friendly: "Protocol"},
+		StringColumnDefinition{Prop: properties.Endpoint},
+		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.ApiGatewayRoute: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.RouteKey, Friendly: "Route Key"},
+		StringColumnDefinition{Prop: properties.Target},
+	},
+	cloud.ApiGatewayStage: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.DeploymentID, Friendly: "Deployment"},
+		StringColumnDefinition{Prop: properties.AutoDeploy, Friendly: "Auto Deploy"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Modified}},
+	},
+	// SSM
+	cloud.SSMParameter: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.ParameterType, Friendly: "Type"},
+		StringColumnDefinition{Prop: properties.DataType, Friendly: "Data Type"},
+		StringColumnDefinition{Prop: properties.Tier},
+		StringColumnDefinition{Prop: properties.Version},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Modified}},
+	},
+	// EFS
+	cloud.FileSystem: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.SizeBytes, Friendly: "Size (bytes)"},
+		StringColumnDefinition{Prop: properties.PerformanceMode, Friendly: "Performance"},
+		StringColumnDefinition{Prop: properties.ThroughputMode, Friendly: "Throughput"},
+		StringColumnDefinition{Prop: properties.Encrypted},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.MountTarget: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Subnet},
+		StringColumnDefinition{Prop: properties.Vpc},
+		StringColumnDefinition{Prop: properties.IPAddress, Friendly: "IP Address"},
+		StringColumnDefinition{Prop: properties.LifecycleState, Friendly: "State"},
 	},
 }

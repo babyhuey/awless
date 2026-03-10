@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func agentAuth() (ssh.AuthMethod, error) {
@@ -33,7 +33,7 @@ func privateKeyAuth(priv privateKey) (ssh.AuthMethod, error) {
 
 func encryptedPrivKeyAuth(priv privateKey) (ssh.AuthMethod, error) {
 	fmt.Fprintf(os.Stderr, "This SSH key is encrypted. Please enter passphrase for key '%s':", priv.path)
-	passphrase, err := terminal.ReadPassword(int(syscall.Stdin))
+	passphrase, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return nil, err
 	}

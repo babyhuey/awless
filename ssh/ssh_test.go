@@ -2,7 +2,6 @@ package ssh
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -14,7 +13,7 @@ import (
 
 func TestInitClient(t *testing.T) {
 	//Create env
-	f, err := ioutil.TempDir("", "test")
+	f, err := os.MkdirTemp("", "test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,7 +44,7 @@ H3GpnLFThj3dhdyhCwJAcYdeLp39POwN0d4Dwf7Bu0sMRZIZrQpSbtO7ypOBwi3j
 hTSx5geAH2W73IyiTK8zIdgPMJPh69//5OhFzhQ8Ug==
 -----END RSA PRIVATE KEY-----`
 
-	ioutil.WriteFile(keypath1, []byte(rawkey), 0644)
+	os.WriteFile(keypath1, []byte(rawkey), 0644)
 
 	awlessKeysPath := filepath.Join(f, ".awless-keys")
 	err = os.MkdirAll(awlessKeysPath, 0755)
@@ -53,7 +52,7 @@ hTSx5geAH2W73IyiTK8zIdgPMJPh69//5OhFzhQ8Ug==
 		t.Fatal(err)
 	}
 	keypath2 := filepath.Join(awlessKeysPath, "mysecondkey.pem")
-	ioutil.WriteFile(keypath2, []byte(rawkey), 0644)
+	os.WriteFile(keypath2, []byte(rawkey), 0644)
 
 	tcases := []struct {
 		keyname    string
@@ -87,7 +86,7 @@ hTSx5geAH2W73IyiTK8zIdgPMJPh69//5OhFzhQ8Ug==
 
 func TestCheckHostKey(t *testing.T) {
 	//Create env
-	f, err := ioutil.TempDir("", "test")
+	f, err := os.MkdirTemp("", "test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +104,7 @@ func TestCheckHostKey(t *testing.T) {
 4.5.6.7 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBKl6fXNb/yA0w7brzqNuOCwLJ/aPEMerl7/lsF0Y/1oafD2bxzj+QsEZo4XK/kvwCjqQArFO5nET+Tz015C6Kk=
 `
 	knowHostsFile := filepath.Join(f, ".ssh", "known_hosts")
-	err = ioutil.WriteFile(knowHostsFile, []byte(knownHostsFileContent), 0644)
+	err = os.WriteFile(knowHostsFile, []byte(knownHostsFileContent), 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +172,7 @@ To get rid of this message, update '%[1]s:2'`, knowHostsFile)},
 		t.Fatalf("got %#v, want %#v", got, want)
 	}
 
-	knownHostContent, err := ioutil.ReadFile(knowHostsFile)
+	knownHostContent, err := os.ReadFile(knowHostsFile)
 	if err != nil {
 		t.Fatal(err)
 	}

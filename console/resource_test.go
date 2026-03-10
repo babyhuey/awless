@@ -46,7 +46,7 @@ func TestResourceDisplay(t *testing.T) {
 		WithFormat("table"),
 	).SetSource(r).Build()
 
-	expected := `| PROPERTY ▲ |   VALUE    |
+	expected := `| Property ▲ |   Value    |
 |------------|------------|
 | ID         | inst_1     |
 | Name       | instance 1 |

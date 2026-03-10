@@ -98,6 +98,23 @@ const (
 	//application autoscaling
 	AppScalingTarget string = "appscalingtarget"
 	AppScalingPolicy string = "appscalingpolicy"
+	//eks
+	EKSCluster   string = "ekscluster"
+	EKSNodeGroup string = "eksnodegroup"
+	//dynamodb
+	DynamoDBTable string = "dynamodbtable"
+	//secrets & encryption
+	Secret string = "secret"
+	Key    string = "key"
+	//api gateway
+	ApiGateway      string = "apigateway"
+	ApiGatewayRoute string = "apigatewayroute"
+	ApiGatewayStage string = "apigatewaystage"
+	//ssm
+	SSMParameter string = "ssmparameter"
+	//efs
+	FileSystem  string = "filesystem"
+	MountTarget string = "mounttarget"
 )
 
 type Service interface {

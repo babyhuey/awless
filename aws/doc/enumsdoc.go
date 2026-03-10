@@ -94,7 +94,8 @@ var EnumDoc = map[string][]string{
 
 	"create.instance.distro":   distros,
 	"create.instance.type":     instanceTypes,
-	"create.instance.lock":     boolean,
+	"create.instance.lock":          boolean,
+	"create.instance.ebs-optimized": boolean,
 	"create.instance.userdata": {""},
 
 	"create.image.reboot": boolean,

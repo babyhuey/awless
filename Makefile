@@ -1,11 +1,27 @@
+.PHONY: build test lint fmt generate clean check
+
+build:
+	@echo Building application binary
+	@go build -o awless .
+
 test:
-	@echo Running tests (with -race flag on) 
-	@go test ./... -race
+	@echo Running tests
+	@go test ./...
+
+lint:
+	@echo Running linters
+	@golangci-lint run ./...
+
+fmt:
+	@echo Formatting code
+	@goimports -w -local github.com/wallix/awless .
+	@gofmt -w -s .
 
 generate:
 	@echo Generating commands code: runtime, doc, etc.
-	@go generate gen/aws/generators/main.go
+	@cd gen/aws/generators && go run *.go
 
-build: generate test
-	@echo Building application binary
-	@go build
+clean:
+	@rm -f awless
+
+check: fmt lint test

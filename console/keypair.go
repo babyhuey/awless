@@ -27,18 +27,18 @@ import (
 	"syscall"
 
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 var askPasswordFunc func() ([]byte, error) = func() ([]byte, error) {
 	fmt.Fprint(os.Stderr, "This SSH key will be encrypted. Please enter new password:")
 	for {
-		pass, err := terminal.ReadPassword(int(syscall.Stdin))
+		pass, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			return pass, err
 		}
 		fmt.Fprint(os.Stderr, "\nConfirm password:")
-		pass2, err := terminal.ReadPassword(int(syscall.Stdin))
+		pass2, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			return pass, err
 		}

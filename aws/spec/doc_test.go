@@ -3,7 +3,7 @@ package awsspec
 import (
 	"testing"
 
-	"github.com/wallix/awless/aws/doc"
+	awsdoc "github.com/wallix/awless/aws/doc"
 	"github.com/wallix/awless/template/params"
 )
 

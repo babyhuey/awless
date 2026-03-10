@@ -19,34 +19,34 @@ package awsspec
 import (
 	"encoding/base64"
 	"errors"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/elb"
-	"github.com/aws/aws-sdk-go/service/elbv2"
-
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/applicationautoscaling"
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/cloudwatch"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	applicationautoscalingtypes "github.com/aws/aws-sdk-go-v2/service/applicationautoscaling/types"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	"github.com/aws/aws-sdk-go-v2/service/lambda"
 )
 
 func TestGoTemplatingInUserdata(t *testing.T) {
 	text := []byte("file content {{ .name }}")
-	f, err := ioutil.TempFile("", "")
+	f, err := os.CreateTemp("", "")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.Remove(f.Name())
 
 	finfo, _ := f.Stat()
-	err = ioutil.WriteFile(f.Name(), text, finfo.Mode().Perm())
+	err = os.WriteFile(f.Name(), text, finfo.Mode().Perm())
 	if err != nil {
 		t.Fatal(f)
 	}
@@ -58,21 +58,21 @@ func TestGoTemplatingInUserdata(t *testing.T) {
 		t.Fatal(err)
 	}
 	expText := []byte("file content johndoe")
-	if got, want := awssdk.StringValue(awsparams.UserData), base64.StdEncoding.EncodeToString(expText); got != want {
+	if got, want := aws.ToString(awsparams.UserData), base64.StdEncoding.EncodeToString(expText); got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 }
 
 func TestSetFieldWithTypeAWSFile(t *testing.T) {
 	text := []byte("file content")
-	f, err := ioutil.TempFile("", "")
+	f, err := os.CreateTemp("", "")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.Remove(f.Name())
 
 	finfo, _ := f.Stat()
-	err = ioutil.WriteFile(f.Name(), text, finfo.Mode().Perm())
+	err = os.WriteFile(f.Name(), text, finfo.Mode().Perm())
 	if err != nil {
 		t.Fatal(f)
 	}
@@ -84,7 +84,7 @@ func TestSetFieldWithTypeAWSFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got, want := awssdk.StringValue(awsparams.UserData), base64.StdEncoding.EncodeToString(text); got != want {
+	if got, want := aws.ToString(awsparams.UserData), base64.StdEncoding.EncodeToString(text); got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
@@ -106,7 +106,7 @@ func TestSetFieldWithTypeAWSFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got, want := awssdk.StringValue(stackInput.TemplateBody), string(text); got != want {
+	if got, want := aws.ToString(stackInput.TemplateBody), string(text); got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 }
@@ -131,16 +131,16 @@ func TestSetFieldsOnAwsStruct(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got, want := awssdk.StringValue(awsparams.ImageId), "ami"; got != want {
+	if got, want := aws.ToString(awsparams.ImageId), "ami"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := awssdk.StringValue(awsparams.InstanceType), "t2.micro"; got != want {
+	if got, want := string(awsparams.InstanceType), "t2.micro"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := awssdk.Int64Value(awsparams.MaxCount), int64(5); got != want {
+	if got, want := aws.ToInt32(awsparams.MaxCount), int32(5); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := awssdk.Int64Value(awsparams.MinCount), int64(3); got != want {
+	if got, want := aws.ToInt32(awsparams.MinCount), int32(3); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 }
@@ -154,10 +154,10 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		BoolField           bool
 		StringArrayField    []*string
 		Int64ArrayField     []*int64
-		BooleanValueField   *ec2.AttributeBooleanValue
-		StringValueField    *ec2.AttributeValue
-		DimensionSliceField []*cloudwatch.Dimension
-		KeyValueSliceField  []*ecs.KeyValuePair
+		BooleanValueField   *ec2types.AttributeBooleanValue
+		StringValueField    *ec2types.AttributeValue
+		DimensionSliceField []cloudwatchtypes.Dimension
+		KeyValueSliceField  []ecstypes.KeyValuePair
 		StructAttribute     struct {
 			Str  *string
 			Bool *bool
@@ -168,15 +168,15 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		}
 		MapAttribute          map[string]*string
 		EmptyMapAttribute     map[string]*string
-		ParameterList         []*cloudformation.Parameter
-		PortMappings          []*ecs.PortMapping
-		SubnetMappings        []*elbv2.SubnetMapping
-		LoadBalancerListeners []*elb.Listener
-		StepAdjustments       []*applicationautoscaling.StepAdjustment
+		ParameterList         []cloudformationtypes.Parameter
+		PortMappings          []ecstypes.PortMapping
+		SubnetMappings        []elbv2types.SubnetMapping
+		LoadBalancerListeners []elbtypes.Listener
+		StepAdjustments       []applicationautoscalingtypes.StepAdjustment
 		CSVString             *string
 		SixDigitsString       *string
 		ByteSlice             []byte
-	}{Field: "initial", MapAttribute: map[string]*string{"test": awssdk.String("1234")}}
+	}{Field: "initial", MapAttribute: map[string]*string{"test": aws.String("1234")}}
 
 	err := setFieldWithType("expected", &any, "Field", awsstr)
 	if err != nil {
@@ -225,7 +225,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := len(any.StringArrayField), 1; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := awssdk.StringValue(any.StringArrayField[0]), "first"; got != want {
+	if got, want := aws.ToString(any.StringArrayField[0]), "first"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
@@ -236,13 +236,13 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := len(any.StringArrayField), 3; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := awssdk.StringValue(any.StringArrayField[0]), "one"; got != want {
+	if got, want := aws.ToString(any.StringArrayField[0]), "one"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := awssdk.StringValue(any.StringArrayField[1]), "two"; got != want {
+	if got, want := aws.ToString(any.StringArrayField[1]), "two"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := awssdk.StringValue(any.StringArrayField[2]), "three"; got != want {
+	if got, want := aws.ToString(any.StringArrayField[2]), "three"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
@@ -253,10 +253,10 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := len(any.StringArrayField), 2; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := awssdk.StringValue(any.StringArrayField[0]), "four"; got != want {
+	if got, want := aws.ToString(any.StringArrayField[0]), "four"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := awssdk.StringValue(any.StringArrayField[1]), "five"; got != want {
+	if got, want := aws.ToString(any.StringArrayField[1]), "five"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
@@ -267,7 +267,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := len(any.Int64ArrayField), 1; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := awssdk.Int64Value(any.Int64ArrayField[0]), int64(321); got != want {
+	if got, want := aws.ToInt64(any.Int64ArrayField[0]), int64(321); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
@@ -278,7 +278,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := len(any.Int64ArrayField), 1; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := awssdk.Int64Value(any.Int64ArrayField[0]), int64(567); got != want {
+	if got, want := aws.ToInt64(any.Int64ArrayField[0]), int64(567); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
@@ -291,21 +291,21 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := awssdk.BoolValue(any.BooleanValueField.Value), true; got != want {
+	if got, want := aws.ToBool(any.BooleanValueField.Value), true; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
 	err = setFieldWithType(nil, &any, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := awssdk.BoolValue(any.BooleanValueField.Value), true; got != want {
+	if got, want := aws.ToBool(any.BooleanValueField.Value), true; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
 	err = setFieldWithType(false, &any, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := awssdk.BoolValue(any.BooleanValueField.Value), false; got != want {
+	if got, want := aws.ToBool(any.BooleanValueField.Value), false; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
 
@@ -313,7 +313,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if err == nil {
 		t.Fatalf("expected error got nil")
 	}
-	if got, want := err.Error(), "reflect.Set: value of type bool is not assignable to type ec2.AttributeBooleanValue"; !strings.HasSuffix(got, want) {
+	if got, want := err.Error(), "value of type bool"; !strings.Contains(got, want) || !strings.Contains(got, "types.AttributeBooleanValue") {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
@@ -321,14 +321,14 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := awssdk.StringValue(any.StringValueField.Value), "abcd"; got != want {
+	if got, want := aws.ToString(any.StringValueField.Value), "abcd"; got != want {
 		t.Fatalf("len: got %s, want %s", got, want)
 	}
 	err = setFieldWithType(nil, &any, "StringValueField", awsstringattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := awssdk.StringValue(any.StringValueField.Value), "abcd"; got != want {
+	if got, want := aws.ToString(any.StringValueField.Value), "abcd"; got != want {
 		t.Fatalf("len: got %s, want %s", got, want)
 	}
 
@@ -526,22 +526,22 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := len(any.PortMappings), 3; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[0].HostPort, int64(80); got != want {
+	if got, want := *any.PortMappings[0].HostPort, int32(80); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[0].ContainerPort, int64(8080); got != want {
+	if got, want := *any.PortMappings[0].ContainerPort, int32(8080); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[1].ContainerPort, int64(8082); got != want {
+	if got, want := *any.PortMappings[1].ContainerPort, int32(8082); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[2].HostPort, int64(1234); got != want {
+	if got, want := *any.PortMappings[2].HostPort, int32(1234); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[2].ContainerPort, int64(8083); got != want {
+	if got, want := *any.PortMappings[2].ContainerPort, int32(8083); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[2].Protocol, "udp"; got != want {
+	if got, want := string(any.PortMappings[2].Protocol), "udp"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
@@ -575,25 +575,25 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *any.LoadBalancerListeners[0].Protocol, "HTTP"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[0].LoadBalancerPort, int64(80); got != want {
+	if got, want := any.LoadBalancerListeners[0].LoadBalancerPort, int32(80); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 	if got, want := *any.LoadBalancerListeners[0].InstanceProtocol, "UDP"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[0].InstancePort, int64(8080); got != want {
+	if got, want := *any.LoadBalancerListeners[0].InstancePort, int32(8080); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 	if got, want := *any.LoadBalancerListeners[1].Protocol, "HTTPS"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[1].LoadBalancerPort, int64(443); got != want {
+	if got, want := any.LoadBalancerListeners[1].LoadBalancerPort, int32(443); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 	if got, want := *any.LoadBalancerListeners[1].InstanceProtocol, "TCP"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[1].InstancePort, int64(12345); got != want {
+	if got, want := *any.LoadBalancerListeners[1].InstancePort, int32(12345); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 
@@ -610,7 +610,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *any.StepAdjustments[0].MetricIntervalUpperBound, float64(0.25); got != want {
 		t.Fatalf("got %f, want %f", got, want)
 	}
-	if got, want := *any.StepAdjustments[0].ScalingAdjustment, int64(-1); got != want {
+	if got, want := *any.StepAdjustments[0].ScalingAdjustment, int32(-1); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 	if got, want := *any.StepAdjustments[1].MetricIntervalLowerBound, float64(0.75); got != want {
@@ -619,7 +619,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *any.StepAdjustments[1].MetricIntervalUpperBound, float64(1); got != want {
 		t.Fatalf("got %f, want %f", got, want)
 	}
-	if got, want := *any.StepAdjustments[1].ScalingAdjustment, int64(+1); got != want {
+	if got, want := *any.StepAdjustments[1].ScalingAdjustment, int32(+1); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 	err = setFieldWithType([]interface{}{"abcdef", "ghijk"}, &any, "CSVString", awscsvstr)
@@ -719,10 +719,10 @@ func TestStructDynamicSetter(t *testing.T) {
 	}
 
 	exp := &TestStruct{
-		FieldStringRequired: awssdk.String("jdoe"),
-		FieldInt64:          awssdk.Int64(345),
-		FieldBool:           awssdk.Bool(true),
-		FieldStringSlice:    awssdk.StringSlice([]string{"one", "two", "3"}),
+		FieldStringRequired: aws.String("jdoe"),
+		FieldInt64:          aws.Int64(345),
+		FieldBool:           aws.Bool(true),
+		FieldStringSlice:    aws.StringSlice([]string{"one", "two", "3"}),
 	}
 
 	if got, want := in, exp; !reflect.DeepEqual(got, want) {
@@ -732,11 +732,11 @@ func TestStructDynamicSetter(t *testing.T) {
 
 func TestStructInjector(t *testing.T) {
 	in := &TestStruct{
-		FieldStringRequired: awssdk.String("jdoe"),
-		FieldInt64:          awssdk.Int64(345),
-		FieldBool:           awssdk.Bool(true),
-		FieldStringSlice:    awssdk.StringSlice([]string{"one", "two", "3"}),
-		MultiCloudField:     awssdk.Int64(12345),
+		FieldStringRequired: aws.String("jdoe"),
+		FieldInt64:          aws.Int64(345),
+		FieldBool:           aws.Bool(true),
+		FieldStringSlice:    aws.StringSlice([]string{"one", "two", "3"}),
+		MultiCloudField:     aws.Int64(12345),
 	}
 
 	type embStruct struct {
@@ -758,12 +758,12 @@ func TestStructInjector(t *testing.T) {
 	}
 
 	exp := &outStruct{
-		CloudStringRequired: awssdk.String("jdoe"),
-		CloudInt64:          awssdk.Int64(345),
-		Embedded:            &embStruct{CloudBool: awssdk.Bool(true)},
-		CloudStringSlice:    awssdk.StringSlice([]string{"one", "two", "3"}),
-		CloudField1:         awssdk.Int64(12345),
-		CloudField2:         awssdk.Int64(12345),
+		CloudStringRequired: aws.String("jdoe"),
+		CloudInt64:          aws.Int64(345),
+		Embedded:            &embStruct{CloudBool: aws.Bool(true)},
+		CloudStringSlice:    aws.StringSlice([]string{"one", "two", "3"}),
+		CloudField1:         aws.Int64(12345),
+		CloudField2:         aws.Int64(12345),
 	}
 
 	if got, want := out, exp; !reflect.DeepEqual(got, want) {

@@ -25,10 +25,10 @@ import (
 
 func generateFetcherFuncs() {
 	templ, err := template.New("funcs").Funcs(template.FuncMap{
-		"Title":          strings.Title,
-		"ToUpper":        strings.ToUpper,
-		"Join":           strings.Join,
-		"ApiToInterface": aws.ApiToInterface,
+		"Title":         strings.Title,
+		"ToUpper":       strings.ToUpper,
+		"Join":          strings.Join,
+		"SdkModulePath": aws.SdkModulePath,
 	}).Parse(fetchersTempl)
 
 	if err != nil {
@@ -62,19 +62,16 @@ package awsfetch
 
 import (
   "context"
- 
-  awssdk "github.com/aws/aws-sdk-go/aws"
-  "github.com/aws/aws-sdk-go/aws/awserr"
-  "github.com/aws/aws-sdk-go/aws/session"
+
   {{- range $index, $service := . }}
-  {{- range $, $api := $service.Api }}
-  "github.com/aws/aws-sdk-go/service/{{ $api }}"
-  "github.com/aws/aws-sdk-go/service/{{ $api }}/{{ $api }}iface"
+  {{- range $, $api := $service.AutoFetcherAPIs }}
+  {{ $api }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}"
+  {{ $api }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}/types"
   {{- end }}
   {{- end }}
   "github.com/wallix/awless/fetch"
   "github.com/wallix/awless/graph"
-  "github.com/wallix/awless/aws/conv"
+  awsconv "github.com/wallix/awless/aws/conv"
 )
 
 {{- range $index, $service := . }}
@@ -82,50 +79,47 @@ func Build{{ Title $service.Name }}FetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
 	addManual{{ Title $service.Name }}FetchFuncs(conf, funcs)
-	
+
 {{- range $index, $fetcher := $service.Fetchers }}
 	{{- if not $fetcher.ManualFetcher }}
 
 	funcs["{{ $fetcher.ResourceType }}"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
-		var objects []*{{ $fetcher.AWSType }}
+		var objects []{{ $fetcher.AWSType }}
 
 		if !conf.getBoolDefaultTrue("aws.{{ $service.Name }}.{{ $fetcher.ResourceType }}.sync") && !getBoolFromContext(ctx, "force") {
 			conf.Log.Verbose("sync: *disabled* for resource {{ $service.Name }}[{{ $fetcher.ResourceType }}]")
 			return resources, objects, nil
 		}
-		
+
 		{{- if $fetcher.Multipage }}
-		var badResErr error
-		err := conf.APIs.{{ Title $fetcher.Api}}.{{ $fetcher.ApiMethod }}(&{{ $fetcher.Input }},
-			func(out *{{ $fetcher.Output }}, lastPage bool) (shouldContinue bool) {
-				{{- if ne $fetcher.OutputsContainers "" }}
-				for _, all := range out.{{ $fetcher.OutputsContainers }} {
-				{{- end }}
-					for _, output := range {{ if ne $fetcher.OutputsContainers "" }}all{{ else }}out{{ end }}.{{ $fetcher.OutputsExtractor }} {
-						if badResErr != nil {
-							return false
-						}
-						objects = append(objects, output)
-						var res *graph.Resource
-						if res, badResErr = awsconv.NewResource(output); badResErr != nil {
-							return false
-						}
-						resources = append(resources, res)
+		paginator := {{ $fetcher.Api }}.New{{ $fetcher.ApiMethod }}Paginator(conf.APIs.{{ Title $fetcher.Api}}, &{{ $fetcher.Input }})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			{{- if ne $fetcher.OutputsContainers "" }}
+			for _, all := range out.{{ $fetcher.OutputsContainers }} {
+			{{- end }}
+				for _, output := range {{ if ne $fetcher.OutputsContainers "" }}all{{ else }}out{{ end }}.{{ $fetcher.OutputsExtractor }} {
+					objects = append(objects, output)
+					var res *graph.Resource
+					res, err = awsconv.NewResource(output)
+					if err != nil {
+						return resources, objects, err
 					}
-				{{- if ne $fetcher.OutputsContainers "" }}
+					resources = append(resources, res)
 				}
-				{{- end }}
-				return out.{{ $fetcher.NextPageMarker }} != nil
-			})
-		if err != nil {
-			return resources, objects, err
+			{{- if ne $fetcher.OutputsContainers "" }}
+			}
+			{{- end }}
 		}
 
-		return resources, objects, badResErr
+		return resources, objects, nil
 		{{- else }}
-		
-		out, err := conf.APIs.{{ Title $fetcher.Api}}.{{ $fetcher.ApiMethod }}(&{{ $fetcher.Input }})
+
+		out, err := conf.APIs.{{ Title $fetcher.Api}}.{{ $fetcher.ApiMethod }}(ctx, &{{ $fetcher.Input }})
 		if err != nil {
 			return resources, objects, err
 		}
@@ -138,7 +132,7 @@ func Build{{ Title $service.Name }}FetchFuncs(conf *Config) fetch.Funcs {
 			}
 			resources = append(resources, res)
 		}
-			
+
 		return resources, objects, nil{{ end }}
 	}
 {{- end }}

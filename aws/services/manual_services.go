@@ -17,12 +17,15 @@ limitations under the License.
 package awsservices
 
 import (
+	"context"
 	"regexp"
 	"strings"
 	"sync"
 
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+
 	"github.com/wallix/awless/cloud"
 )
 
@@ -79,15 +82,15 @@ func (i *Identity) IsUserType() bool {
 }
 
 func (s *Access) GetIdentity() (*Identity, error) {
-	resp, err := s.STSAPI.GetCallerIdentity(nil)
+	resp, err := s.StsClient.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
 	if err != nil {
 		return nil, err
 	}
 
 	ident := &Identity{
-		Account: awssdk.StringValue(resp.Account),
-		Arn:     awssdk.StringValue(resp.Arn),
-		UserId:  awssdk.StringValue(resp.UserId),
+		Account: aws.ToString(resp.Account),
+		Arn:     aws.ToString(resp.Arn),
+		UserId:  aws.ToString(resp.UserId),
 	}
 
 	splits := strings.Split(ident.Arn, ":")
@@ -128,8 +131,8 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		policies, err := s.ListUserPolicies(&iam.ListUserPoliciesInput{
-			UserName: awssdk.String(username),
+		policies, err := s.IamClient.ListUserPolicies(context.Background(), &iam.ListUserPoliciesInput{
+			UserName: aws.String(username),
 		})
 		if err != nil {
 			errc <- err
@@ -137,15 +140,15 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 		}
 
 		for _, name := range policies.PolicyNames {
-			all.Inlined = append(all.Inlined, awssdk.StringValue(name))
+			all.Inlined = append(all.Inlined, name)
 		}
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		attached, err := s.ListAttachedUserPolicies(&iam.ListAttachedUserPoliciesInput{
-			UserName: awssdk.String(username),
+		attached, err := s.IamClient.ListAttachedUserPolicies(context.Background(), &iam.ListAttachedUserPoliciesInput{
+			UserName: aws.String(username),
 		})
 		if err != nil {
 			errc <- err
@@ -153,15 +156,15 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 		}
 
 		for _, pol := range attached.AttachedPolicies {
-			all.Attached = append(all.Attached, awssdk.StringValue(pol.PolicyName))
+			all.Attached = append(all.Attached, aws.ToString(pol.PolicyName))
 		}
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		groups, err := s.ListGroupsForUser(&iam.ListGroupsForUserInput{
-			UserName: awssdk.String(username),
+		groups, err := s.IamClient.ListGroupsForUser(context.Background(), &iam.ListGroupsForUserInput{
+			UserName: aws.String(username),
 		})
 		if err != nil {
 			errc <- err
@@ -178,17 +181,17 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 			go func(name string) {
 				defer wgg.Done()
 
-				output, err := s.ListAttachedGroupPolicies(&iam.ListAttachedGroupPoliciesInput{
-					GroupName: awssdk.String(name),
+				output, err := s.IamClient.ListAttachedGroupPolicies(context.Background(), &iam.ListAttachedGroupPoliciesInput{
+					GroupName: aws.String(name),
 				})
 				if err != nil {
 					errc <- err
 					return
 				}
 				for _, pol := range output.AttachedPolicies {
-					resultC <- result{group: name, policy: awssdk.StringValue(pol.PolicyName)}
+					resultC <- result{group: name, policy: aws.ToString(pol.PolicyName)}
 				}
-			}(awssdk.StringValue(group.GroupName))
+			}(aws.ToString(group.GroupName))
 		}
 
 		go func() {

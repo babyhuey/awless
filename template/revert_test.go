@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wallix/awless/aws/spec"
+	awsspec "github.com/wallix/awless/aws/spec"
 	"github.com/wallix/awless/template/internal/ast"
 )
 

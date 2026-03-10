@@ -1,10 +1,11 @@
-/* Copyright 2017 WALLIX
+/*
+	Copyright 2017 WALLIX
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +16,9 @@ limitations under the License.
 package awsspec
 
 import (
-	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/aws/aws-sdk-go/service/route53/route53iface"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/route53"
+
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/template/params"
@@ -27,7 +28,7 @@ type CreateZone struct {
 	_               string `action:"create" entity:"zone" awsAPI:"route53" awsCall:"CreateHostedZone" awsInput:"route53.CreateHostedZoneInput" awsOutput:"route53.CreateHostedZoneOutput"`
 	logger          *logger.Logger
 	graph           cloud.GraphAPI
-	api             route53iface.Route53API
+	api             *route53.Client
 	Callerreference *string `awsName:"CallerReference" awsType:"awsstr" templateName:"callerreference"`
 	Name            *string `awsName:"Name" awsType:"awsstr" templateName:"name"`
 	Delegationsetid *string `awsName:"DelegationSetId" awsType:"awsstr" templateName:"delegationsetid"`
@@ -44,14 +45,14 @@ func (cmd *CreateZone) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateZone) ExtractResult(i interface{}) string {
-	return awssdk.StringValue(i.(*route53.CreateHostedZoneOutput).HostedZone.Id)
+	return awssdk.ToString(i.(*route53.CreateHostedZoneOutput).HostedZone.Id)
 }
 
 type DeleteZone struct {
 	_      string `action:"delete" entity:"zone" awsAPI:"route53" awsCall:"DeleteHostedZone" awsInput:"route53.DeleteHostedZoneInput" awsOutput:"route53.DeleteHostedZoneOutput"`
 	logger *logger.Logger
 	graph  cloud.GraphAPI
-	api    route53iface.Route53API
+	api    *route53.Client
 	Id     *string `awsName:"Id" awsType:"awsstr" templateName:"id"`
 }
 

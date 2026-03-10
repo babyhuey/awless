@@ -17,18 +17,17 @@ package awsspec
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/wallix/awless/aws/config"
+	awsconfig "github.com/wallix/awless/aws/config"
 )
 
 func TestCredentialsPrompter(t *testing.T) {
-	tmpAWSDir, err := ioutil.TempDir("", "testAWS")
+	tmpAWSDir, err := os.MkdirTemp("", "testAWS")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +71,7 @@ func TestCredentialsPrompter(t *testing.T) {
 		if got, want := created, false; got != want {
 			t.Fatalf("%d: got %t, want %t", i+1, got, want)
 		}
-		credentials, err := ioutil.ReadFile(AWSCredFilepath)
+		credentials, err := os.ReadFile(AWSCredFilepath)
 		if err != nil {
 			t.Fatalf("%d: %s", i+1, err)
 		}

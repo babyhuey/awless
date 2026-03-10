@@ -3,19 +3,16 @@ package sync
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/wallix/awless/cloud"
-
-	"io/ioutil"
-
-	"path/filepath"
 
 	"github.com/wallix/awless/graph"
 )
 
 func TestSyncTripleFiles(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "awlessunittest_")
+	tmpDir, err := os.MkdirTemp("", "awlessunittest_")
 	if err != nil {
 		t.Fatal(err)
 	}

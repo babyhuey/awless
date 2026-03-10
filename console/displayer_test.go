@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+
 	p "github.com/wallix/awless/cloud/properties"
 	"github.com/wallix/awless/graph"
 	"github.com/wallix/awless/graph/resourcetest"
@@ -178,7 +179,7 @@ func TestTabularDisplays(t *testing.T) {
 		WithColumns(columns),
 	).SetSource(g).Build()
 
-	expected = `|  ID ▲  |  NAME  |  STATE  |   TYPE    | PUBLIC IP |
+	expected = `|  ID ▲  |  Name  |  State  |   Type    | Public IP |
 |--------|--------|---------|-----------|-----------|
 | inst_1 | redis  | running | t2.micro  | 1.2.3.4   |
 | inst_2 | django | stopped | t2.medium |           |
@@ -198,7 +199,7 @@ func TestTabularDisplays(t *testing.T) {
 		WithSortBy("state", "id"),
 	).SetSource(g).Build()
 
-	expected = `|   ID   |  NAME  | STATE ▲ |   TYPE    | PUBLIC IP |
+	expected = `|   ID   |  Name  | State ▲ |   Type    | Public IP |
 |--------|--------|---------|-----------|-----------|
 | inst_1 | redis  | running | t2.micro  | 1.2.3.4   |
 | inst_3 | apache | running | t2.xlarge |           |
@@ -218,7 +219,7 @@ func TestTabularDisplays(t *testing.T) {
 		WithSortBy("state", "name"),
 	).SetSource(g).Build()
 
-	expected = `|   ID   |  NAME  | STATE ▲ |   TYPE    | PUBLIC IP |
+	expected = `|   ID   |  Name  | State ▲ |   Type    | Public IP |
 |--------|--------|---------|-----------|-----------|
 | inst_3 | apache | running | t2.xlarge |           |
 | inst_1 | redis  | running | t2.micro  | 1.2.3.4   |
@@ -263,7 +264,7 @@ func TestMultiResourcesDisplays(t *testing.T) {
 		WithFormat("table"),
 	).SetSource(g).Build()
 
-	expected := `|  TYPE ▲  |  NAME/ID  | PROPERTY  |   VALUE   |
+	expected := `|  Type ▲  |  Name/Id  | Property  |   Value   |
 |----------|-----------|-----------|-----------|
 | instance | apache    | ID        | inst_3    |
 |          |           | Name      | apache    |
@@ -352,7 +353,7 @@ func TestDiffDisplay(t *testing.T) {
 		WithRootNode(rootNode),
 	).SetSource(diff).Build()
 
-	expected := `|  TYPE ▲  |   NAME/ID    | PROPERTY |  VALUE   |
+	expected := `|  Type ▲  |   Name/Id    | Property |  Value   |
 |----------|--------------|----------|----------|
 | instance | + inst_4     |          |          |
 |          | + inst_5     |          |          |
@@ -413,7 +414,7 @@ func TestDateLists(t *testing.T) {
 		WithColumns(columns),
 	).SetSource(g).Build()
 
-	expected := `| ID ▲  |     NAME      | PASSWORDLASTUSED |
+	expected := `| ID ▲  |     Name      | PasswordLastUsed |
 |-------|---------------|------------------|
 | user1 | my_username_1 |                  |
 | user2 | my_username_2 | 9 months         |
@@ -433,7 +434,7 @@ func TestDateLists(t *testing.T) {
 		WithSortBy("passwordlastused"),
 	).SetSource(g).Build()
 
-	expected = `|  ID   |     NAME      | PASSWORDLASTUSED ▲ |
+	expected = `|  ID   |     Name      | PasswordLastUsed ▲ |
 |-------|---------------|--------------------|
 | user1 | my_username_1 |                    |
 | user2 | my_username_2 | 9 months           |
@@ -459,7 +460,7 @@ func TestMaxWidth(t *testing.T) {
 		WithMaxWidth(55),
 	).SetSource(g).Build()
 
-	expected := `|   ID   |  NAME  | STATE ▲ |   TYPE    | PUBLIC IP |
+	expected := `|   ID   |  Name  | State ▲ |   Type    | Public IP |
 |--------|--------|---------|-----------|-----------|
 | inst_3 | apache | running | t2.xlarge |           |
 | inst_1 | redis  | running | t2.micro  | 1.2.3.4   |
@@ -484,17 +485,17 @@ func TestMaxWidth(t *testing.T) {
 		WithMaxWidth(45),
 	).SetSource(g).Build()
 
-	expected = `|  ID  | NAME | STATE ▲ | TYPE | PUBLIC IP |
-|------|------|------|------|------|
-| inst | apac | runn | t2.  |      |
-| _3   | he   | ing  | xlar |      |
-|      |      |      | ge   |      |
-| inst | redi | runn | t2.  | 1.2. |
-| _1   | s    | ing  | micr | 3.4  |
-|      |      |      | o    |      |
-| inst | djan | stop | t2.  |      |
-| _2   | go   | ped  | medi |      |
-|      |      |      | um   |      |
+	expected = `|  ID  | Name | State ▲ | Type | Public IP |
+|------|------|---------|------|-----------|
+| inst | apac | runn    | t2.  |           |
+| _3   | he   | ing     | xlar |           |
+|      |      |         | ge   |           |
+| inst | redi | runn    | t2.  | 1.2.      |
+| _1   | s    | ing     | micr | 3.4       |
+|      |      |         | o    |           |
+| inst | djan | stop    | t2.  |           |
+| _2   | go   | ped     | medi |           |
+|      |      |         | um   |           |
 `
 	w.Reset()
 	if err := displayer.Print(&w); err != nil {
@@ -511,11 +512,11 @@ func TestMaxWidth(t *testing.T) {
 		WithMaxWidth(70),
 	).SetSource(g).Build()
 
-	expected = `|   ID   |  NAME  | STATE ▲ |   TYPE    | PUBLIC IP |
-|--------|--------|---------|-----------|---------|
-| inst_3 | apache | running | t2.xlarge |         |
-| inst_1 | redis  | running | t2.micro  | 1.2.3.4 |
-| inst_2 | django | stopped | t2.medium |         |
+	expected = `|   ID   |  Name  | State ▲ |   Type    | Public IP |
+|--------|--------|---------|-----------|-----------|
+| inst_3 | apache | running | t2.xlarge |           |
+| inst_1 | redis  | running | t2.micro  | 1.2.3.4   |
+| inst_2 | django | stopped | t2.medium |           |
 `
 	w.Reset()
 	if err := displayer.Print(&w); err != nil {
