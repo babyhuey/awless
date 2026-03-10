@@ -80,7 +80,23 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:               "list",
 	Aliases:           []string{"ls"},
-	Example:           "  awless list instances --sort uptime\n  awless list users --format csv\n  awless list volumes --filter state=use --filter type=gp2\n  awless list volumes --tag-value Purchased\n  awless list vpcs --tag-key Dept --tag-key Internal\n  awless list instances --tag Env=Production,Dept=Marketing\n  awless list instances --filter state=running,type=micro\n  awless list s3objects --filter bucket=pdf-bucket ",
+	Example: `  awless list instances --sort uptime
+  awless list users --format csv
+  awless list volumes --filter state=in-use --filter type=gp2
+  awless list volumes --tag-value Purchased
+  awless list vpcs --tag-key Dept --tag-key Internal
+  awless list instances --tag Env=Production,Dept=Marketing
+  awless list instances --filter state=running,type=t2.micro
+  awless list s3objects --filter bucket=pdf-bucket
+  awless list loggroups --sort created --reverse
+  awless list loggroups --format json
+  awless list trails
+  awless list eksclusters
+  awless list dynamodbtables
+  awless list secrets
+  awless list ssmparameters
+  awless list filesystems
+  awless list apigateways`,
 	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
 	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 	Short:             "List resources: sorting, filtering via tag/properties, output formatting, etc...",
