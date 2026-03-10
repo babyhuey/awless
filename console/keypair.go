@@ -33,12 +33,12 @@ import (
 var askPasswordFunc func() ([]byte, error) = func() ([]byte, error) {
 	fmt.Fprint(os.Stderr, "This SSH key will be encrypted. Please enter new password:")
 	for {
-		pass, err := term.ReadPassword(syscall.Stdin)
+		pass, err := term.ReadPassword(int(syscall.Stdin)) //nolint:unconvert // needed for Windows where syscall.Stdin is uintptr
 		if err != nil {
 			return pass, err
 		}
 		fmt.Fprint(os.Stderr, "\nConfirm password:")
-		pass2, err := term.ReadPassword(syscall.Stdin)
+		pass2, err := term.ReadPassword(int(syscall.Stdin)) //nolint:unconvert // needed for Windows where syscall.Stdin is uintptr
 		if err != nil {
 			return pass, err
 		}
