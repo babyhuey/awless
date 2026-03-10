@@ -1,8 +1,16 @@
 package graph
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
+	"strings"
 	"testing"
+
+	tstore "github.com/wallix/triplestore"
+
+	"github.com/wallix/awless/cloud"
+	"github.com/wallix/awless/cloud/rdf"
 )
 
 func TestInitResource(t *testing.T) {
@@ -431,6 +439,592 @@ func TestMarshalMustMarshalRoundtrip(t *testing.T) {
 		t.Fatal(err)
 	}
 	if got, want := res.Properties()["Name"], "test"; got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+}
+
+func TestMarshalTo(t *testing.T) {
+	g := NewGraph()
+	g.AddResource(instResource("i1").prop("Name", "test-marshal").build())
+
+	var buf bytes.Buffer
+	if err := g.MarshalTo(&buf); err != nil {
+		t.Fatal(err)
+	}
+	if buf.Len() == 0 {
+		t.Fatal("expected non-empty output from MarshalTo")
+	}
+
+	// Verify we can unmarshal what was written
+	g2 := NewGraph()
+	if err := g2.Unmarshal(buf.Bytes()); err != nil {
+		t.Fatal(err)
+	}
+	res, err := g2.GetResource("instance", "i1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := res.Properties()["Name"], "test-marshal"; got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+}
+
+func TestVisitRelations(t *testing.T) {
+	g := NewGraph()
+	v1 := InitResource("vpc", "vpc_1")
+	s1 := InitResource("subnet", "sub_1")
+	s2 := InitResource("subnet", "sub_2")
+	i1 := InitResource("instance", "inst_1")
+	sg1 := InitResource("securitygroup", "secgroup_1")
+	g.AddResource(v1, s1, s2, i1, sg1)
+	g.AddParentRelation(v1, s1)
+	g.AddParentRelation(v1, s2)
+	g.AddParentRelation(s1, i1)
+	g.AddAppliesOnRelation(sg1, i1)
+
+	t.Run("ChildrenOfRel", func(t *testing.T) {
+		var collected []string
+		err := g.VisitRelations(v1, rdf.ChildrenOfRel, false, func(r cloud.Resource, depth int) error {
+			collected = append(collected, r.Id())
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(collected) == 0 {
+			t.Fatal("expected children to be visited")
+		}
+	})
+
+	t.Run("ChildrenOfRel with IncludeFrom", func(t *testing.T) {
+		var collected []string
+		err := g.VisitRelations(v1, rdf.ChildrenOfRel, true, func(r cloud.Resource, depth int) error {
+			collected = append(collected, r.Id())
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		foundRoot := false
+		for _, id := range collected {
+			if id == "vpc_1" {
+				foundRoot = true
+			}
+		}
+		if !foundRoot {
+			t.Fatal("expected root to be included when IncludeFrom=true")
+		}
+	})
+
+	t.Run("DependingOnRel", func(t *testing.T) {
+		var collected []string
+		err := g.VisitRelations(i1, rdf.DependingOnRel, false, func(r cloud.Resource, depth int) error {
+			collected = append(collected, r.Id())
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(collected) != 1 || collected[0] != "secgroup_1" {
+			t.Fatalf("expected [secgroup_1], got %v", collected)
+		}
+	})
+
+	t.Run("ApplyOn", func(t *testing.T) {
+		var collected []string
+		err := g.VisitRelations(sg1, rdf.ApplyOn, false, func(r cloud.Resource, depth int) error {
+			collected = append(collected, r.Id())
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(collected) != 1 || collected[0] != "inst_1" {
+			t.Fatalf("expected [inst_1], got %v", collected)
+		}
+	})
+
+	t.Run("default relation (ParentOf)", func(t *testing.T) {
+		var collected []string
+		err := g.VisitRelations(i1, rdf.ParentOf, false, func(r cloud.Resource, depth int) error {
+			collected = append(collected, r.Id())
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(collected) == 0 {
+			t.Fatal("expected parents to be visited")
+		}
+	})
+}
+
+func TestListResourcesDependingOn(t *testing.T) {
+	g := NewGraph()
+	inst := InitResource("instance", "inst_1")
+	sg1 := InitResource("securitygroup", "sg_1")
+	sg2 := InitResource("securitygroup", "sg_2")
+	g.AddResource(inst, sg1, sg2)
+	g.AddAppliesOnRelation(sg1, inst)
+	g.AddAppliesOnRelation(sg2, inst)
+
+	resources, err := g.ListResourcesDependingOn(inst)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(resources), 2; got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
+	ids := map[string]bool{}
+	for _, r := range resources {
+		ids[r.Id()] = true
+	}
+	if !ids["sg_1"] || !ids["sg_2"] {
+		t.Fatalf("expected sg_1 and sg_2 in results, got %v", ids)
+	}
+}
+
+func TestListResourcesAppliedOn(t *testing.T) {
+	g := NewGraph()
+	sg := InitResource("securitygroup", "sg_1")
+	inst1 := InitResource("instance", "inst_1")
+	inst2 := InitResource("instance", "inst_2")
+	g.AddResource(sg, inst1, inst2)
+	g.AddAppliesOnRelation(sg, inst1)
+	g.AddAppliesOnRelation(sg, inst2)
+
+	resources, err := g.ListResourcesAppliedOn(sg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(resources), 2; got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
+	ids := map[string]bool{}
+	for _, r := range resources {
+		ids[r.Id()] = true
+	}
+	if !ids["inst_1"] || !ids["inst_2"] {
+		t.Fatalf("expected inst_1 and inst_2 in results, got %v", ids)
+	}
+}
+
+func TestMergeWithNonGraphType(t *testing.T) {
+	g := NewGraph()
+	err := g.Merge(nil)
+	if err == nil {
+		t.Fatal("expected error when merging nil")
+	}
+}
+
+func TestFindWithNoResourceType(t *testing.T) {
+	g := NewGraph()
+	g.AddResource(instResource("i1").build())
+
+	_, err := g.Find(cloud.Query{})
+	if err == nil {
+		t.Fatal("expected error for query with no resource type")
+	}
+	if !strings.Contains(err.Error(), "at least one resource type") {
+		t.Fatalf("unexpected error: %s", err)
+	}
+}
+
+func TestFindWithMultipleTypesAndMatcher(t *testing.T) {
+	g := NewGraph()
+	g.AddResource(instResource("i1").build())
+
+	// Multiple resource types + matcher should error
+	q := cloud.Query{ResourceType: []string{"instance", "subnet"}}
+	// First verify no matcher works fine
+	res, err := g.Find(q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res) != 1 {
+		t.Fatalf("expected 1, got %d", len(res))
+	}
+}
+
+func TestFilterGraphWithInvalidQuery(t *testing.T) {
+	g := NewGraph()
+	// Query with no resource types
+	_, err := g.FilterGraph(cloud.Query{})
+	if err == nil {
+		t.Fatal("expected error for empty resource type")
+	}
+
+	// Query with multiple resource types
+	_, err = g.FilterGraph(cloud.Query{ResourceType: []string{"instance", "subnet"}})
+	if err == nil {
+		t.Fatal("expected error for multiple resource types")
+	}
+}
+
+func TestAddResourceWithChildrenRelation(t *testing.T) {
+	g := NewGraph()
+	parent := InitResource("vpc", "vpc_1")
+	child := InitResource("subnet", "sub_1")
+	parent.AddRelation(rdf.ChildrenOfRel, child)
+	err := g.AddResource(parent, child)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The child should be added and the parent relation created
+	snap := g.store.Snapshot()
+	triples := snap.WithSubjPred(child.Id(), rdf.ParentOf)
+	if len(triples) != 1 {
+		t.Fatalf("expected 1 parent relation, got %d", len(triples))
+	}
+}
+
+func TestAddResourceWithDependingOnRelation(t *testing.T) {
+	g := NewGraph()
+	sg := InitResource("securitygroup", "sg_1")
+	inst := InitResource("instance", "inst_1")
+	sg.AddRelation(rdf.DependingOnRel, inst)
+	err := g.AddResource(sg, inst)
+	if err != nil {
+		t.Fatal(err)
+	}
+	snap := g.store.Snapshot()
+	triples := snap.WithSubjPred(inst.Id(), rdf.ApplyOn)
+	if len(triples) != 1 {
+		t.Fatalf("expected 1 apply-on relation, got %d", len(triples))
+	}
+}
+
+func TestFindResourceMultipleWithSameId(t *testing.T) {
+	g := NewGraph()
+	// Add two instances with the same ID property value
+	i1 := instResource("inst_a").prop("Name", "same").build()
+	i2 := instResource("inst_b").prop("Name", "same").build()
+	g.AddResource(i1, i2)
+
+	// FindResourcesByProperty with Name should find both
+	res, err := g.FindResourcesByProperty("Name", "same")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(res), 2; got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
+}
+
+func TestTrimNS(t *testing.T) {
+	tcases := []struct {
+		input, expect string
+	}{
+		{"cloud-owl:Instance", "Instance"},
+		{"Instance", "Instance"},
+		{"a:b:c", "c"},
+		{"", ""},
+	}
+	for _, tc := range tcases {
+		if got := trimNS(tc.input); got != tc.expect {
+			t.Fatalf("trimNS(%q): got %q, want %q", tc.input, got, tc.expect)
+		}
+	}
+}
+
+func TestLowerFirstLetter(t *testing.T) {
+	tcases := []struct {
+		input, expect string
+	}{
+		{"Instance", "instance"},
+		{"Subnet", "subnet"},
+		{"a", "a"},
+		{"ABC", "aBC"},
+	}
+	for _, tc := range tcases {
+		if got := lowerFirstLetter(tc.input); got != tc.expect {
+			t.Fatalf("lowerFirstLetter(%q): got %q, want %q", tc.input, got, tc.expect)
+		}
+	}
+}
+
+func TestKeyValueString(t *testing.T) {
+	kv := &KeyValue{KeyName: "mykey", Value: "myval"}
+	expected := "[Key:mykey,Value:myval]"
+	if got := kv.String(); got != expected {
+		t.Fatalf("got %q, want %q", got, expected)
+	}
+}
+
+func TestDistributionOriginString(t *testing.T) {
+	tcases := []struct {
+		origin *DistributionOrigin
+		expect string
+	}{
+		{
+			&DistributionOrigin{ID: "origin1"},
+			"[ID:origin1]",
+		},
+		{
+			&DistributionOrigin{ID: "origin2", PublicDNS: "example.com", PathPrefix: "/path", OriginType: "s3", Config: "cfg"},
+			"[ID:origin2,PublicDNS:example.com,PathPrefix:/path,Type:s3,Config:cfg]",
+		},
+		{
+			&DistributionOrigin{ID: "origin3", PublicDNS: "dns.com"},
+			"[ID:origin3,PublicDNS:dns.com]",
+		},
+	}
+	for i, tc := range tcases {
+		if got := tc.origin.String(); got != tc.expect {
+			t.Fatalf("%d: got %q, want %q", i, got, tc.expect)
+		}
+	}
+}
+
+func TestFirewallRuleString(t *testing.T) {
+	rule := &FirewallRule{
+		PortRange: PortRange{FromPort: 80, ToPort: 80},
+		Protocol:  "tcp",
+	}
+	s := rule.String()
+	if !strings.Contains(s, "Protocol:tcp") {
+		t.Fatalf("expected Protocol:tcp in %q", s)
+	}
+	if !strings.Contains(s, "PortRange:") {
+		t.Fatalf("expected PortRange: in %q", s)
+	}
+}
+
+func TestRouteString(t *testing.T) {
+	route := &Route{
+		DestinationPrefixListId: "pl-123",
+	}
+	s := route.String()
+	if !strings.Contains(s, "DestinationPrefixListId:pl-123") {
+		t.Fatalf("expected DestinationPrefixListId in %q", s)
+	}
+}
+
+func TestGrantString(t *testing.T) {
+	grant := &Grant{
+		Permission: "FULL_CONTROL",
+		Grantee: Grantee{
+			GranteeID:          "user123",
+			GranteeDisplayName: "User",
+			GranteeType:        "CanonicalUser",
+		},
+	}
+	s := grant.String()
+	if !strings.Contains(s, "Permission:FULL_CONTROL") {
+		t.Fatalf("expected Permission in %q", s)
+	}
+	if !strings.Contains(s, "GranteeID:user123") {
+		t.Fatalf("expected GranteeID in %q", s)
+	}
+}
+
+func TestResourceFormatInvalidVerb(t *testing.T) {
+	r := &Resource{id: "test", kind: "instance"}
+	out := r.Format("%z")
+	if !strings.Contains(out, "invalid verb") {
+		t.Fatalf("expected invalid verb error, got %q", out)
+	}
+}
+
+func TestResourceSameNilCases(t *testing.T) {
+	// Both nil
+	var r1 *Resource
+	if !r1.Same(nil) {
+		t.Fatal("expected nil.Same(nil) == true")
+	}
+
+	// One nil, one not
+	r2 := InitResource("instance", "i-1")
+	if r2.Same(nil) {
+		t.Fatal("expected non-nil.Same(nil) == false")
+	}
+}
+
+func TestMarshalUnmarshalKeyValues(t *testing.T) {
+	r := testResource("dist1", "distribution").prop("ID", "dist1").prop(
+		"Dimensions", []*KeyValue{
+			{KeyName: "key1", Value: "value1"},
+			{KeyName: "key2", Value: "value2"},
+		}).build()
+	g := NewGraph()
+	triples, err := r.marshalFullRDF()
+	if err != nil {
+		t.Fatal(err)
+	}
+	g.store.Add(triples...)
+	rawRes := InitResource(r.Type(), r.Id())
+	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
+	if err != nil {
+		t.Fatal(err)
+	}
+	kvs, ok := rawRes.Properties()["Dimensions"].([]*KeyValue)
+	if !ok {
+		t.Fatalf("expected []*KeyValue, got %T", rawRes.Properties()["Dimensions"])
+	}
+	if got, want := len(kvs), 2; got != want {
+		t.Fatalf("got %d key-values, want %d", got, want)
+	}
+}
+
+func TestMarshalUnmarshalDistributionOrigins(t *testing.T) {
+	r := testResource("dist1", "distribution").prop("ID", "dist1").prop(
+		"Origins", []*DistributionOrigin{
+			{ID: "o1", PublicDNS: "example.com", PathPrefix: "/path", OriginType: "s3", Config: "cfg1"},
+			{ID: "o2", PublicDNS: "other.com", PathPrefix: "/", OriginType: "custom", Config: "cfg2"},
+		}).build()
+	g := NewGraph()
+	triples, err := r.marshalFullRDF()
+	if err != nil {
+		t.Fatal(err)
+	}
+	g.store.Add(triples...)
+	rawRes := InitResource(r.Type(), r.Id())
+	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
+	if err != nil {
+		t.Fatal(err)
+	}
+	origins, ok := rawRes.Properties()["Origins"].([]*DistributionOrigin)
+	if !ok {
+		t.Fatalf("expected []*DistributionOrigin, got %T", rawRes.Properties()["Origins"])
+	}
+	if got, want := len(origins), 2; got != want {
+		t.Fatalf("got %d origins, want %d", got, want)
+	}
+}
+
+func TestResourcesMap(t *testing.T) {
+	res := Resources{
+		InitResource("instance", "i1"),
+		InitResource("subnet", "s1"),
+	}
+	ids := res.Map(func(r *Resource) string { return r.Id() })
+	if got, want := len(ids), 2; got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
+	if ids[0] != "i1" || ids[1] != "s1" {
+		t.Fatalf("unexpected ids: %v", ids)
+	}
+}
+
+func TestFirewallRulesSort(t *testing.T) {
+	rules := FirewallRules{
+		{PortRange: PortRange{FromPort: 443, ToPort: 443}, Protocol: "tcp"},
+		{PortRange: PortRange{FromPort: 22, ToPort: 22}, Protocol: "tcp"},
+		{PortRange: PortRange{FromPort: 80, ToPort: 80}, Protocol: "tcp"},
+	}
+	rules.Sort()
+	// After sorting, the order should be by string representation
+	for i := 0; i < len(rules)-1; i++ {
+		if rules[i].String() > rules[i+1].String() {
+			t.Fatalf("rules not sorted: %s > %s", rules[i].String(), rules[i+1].String())
+		}
+	}
+}
+
+func TestRoutesSort(t *testing.T) {
+	routes := Routes{
+		{DestinationPrefixListId: "pl-zzz"},
+		{DestinationPrefixListId: "pl-aaa"},
+	}
+	routes.Sort()
+	if routes[0].DestinationPrefixListId > routes[1].DestinationPrefixListId {
+		t.Fatal("routes not sorted properly")
+	}
+}
+
+func TestGrantsSort(t *testing.T) {
+	grants := Grants{
+		{Permission: "WRITE"},
+		{Permission: "FULL_CONTROL"},
+		{Permission: "READ"},
+	}
+	grants.Sort()
+	for i := 0; i < len(grants)-1; i++ {
+		if grants[i].String() > grants[i+1].String() {
+			t.Fatalf("grants not sorted: %s > %s", grants[i].String(), grants[i+1].String())
+		}
+	}
+}
+
+func TestNamespacedResourceType(t *testing.T) {
+	got := namespacedResourceType("instance")
+	if !strings.Contains(got, "Instance") {
+		t.Fatalf("expected namespaced type to contain 'Instance', got %q", got)
+	}
+	if !strings.HasPrefix(got, fmt.Sprintf("%s:", rdf.CloudOwlNS)) {
+		t.Fatalf("expected prefix %s:, got %q", rdf.CloudOwlNS, got)
+	}
+}
+
+func TestUnmarshalFromReaders(t *testing.T) {
+	g := NewGraph()
+	g.AddResource(instResource("i1").prop("Name", "test").build())
+
+	// Marshal to a buffer
+	var buf bytes.Buffer
+	if err := g.MarshalTo(&buf); err != nil {
+		t.Fatal(err)
+	}
+
+	// Unmarshal from reader
+	g2 := NewGraph()
+	reader := bytes.NewReader(buf.Bytes())
+	if err := g2.UnmarshalFromReaders(reader); err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := g2.GetResource("instance", "i1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := res.Properties()["Name"], "test"; got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+}
+
+func TestResourceMarshalWithDiffMeta(t *testing.T) {
+	r := instResource("i1").build()
+	r.meta["diff"] = "extra"
+
+	triples, err := r.marshalFullRDF()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Should have a meta triple
+	foundMeta := false
+	for _, tri := range triples {
+		if tri.Predicate() == MetaPredicate {
+			foundMeta = true
+		}
+	}
+	if !foundMeta {
+		t.Fatal("expected a meta triple with diff info")
+	}
+}
+
+func TestUnmarshalMeta(t *testing.T) {
+	g := NewGraph()
+	r := instResource("i1").build()
+	r.meta["diff"] = "extra"
+	g.AddResource(r)
+	// Manually add meta triple
+	g.store.Add(
+		tstore.SubjPred("i1", MetaPredicate).StringLiteral("extra"),
+	)
+
+	res := InitResource("instance", "i1")
+	snap := g.store.Snapshot()
+	if err := res.unmarshalFullRdf(snap); err != nil {
+		t.Fatal(err)
+	}
+	if err := res.unmarshalMeta(snap); err != nil {
+		t.Fatal(err)
+	}
+	v, ok := res.Meta("diff")
+	if !ok {
+		t.Fatal("expected diff meta")
+	}
+	if got, want := v, "extra"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }

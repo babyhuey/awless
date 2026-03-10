@@ -18,6 +18,8 @@ package ast
 
 import (
 	"reflect"
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/wallix/awless/template/env"
@@ -83,6 +85,331 @@ func TestIsQuoted(t *testing.T) {
 		if got, want := isQuoted(tcase.in), tcase.out; got != want {
 			t.Fatalf("%d: got %t, want %t", i+1, got, want)
 		}
+	}
+}
+
+func TestCommandNodeString(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{
+			"name": InterfaceNode{i: "myvpc"},
+			"cidr": InterfaceNode{i: "10.0.0.0/16"},
+		},
+		Refs: map[string]interface{}{},
+	}
+	got := cmd.String()
+	if !strings.HasPrefix(got, "create vpc") {
+		t.Fatalf("expected to start with 'create vpc', got %q", got)
+	}
+	if !strings.Contains(got, "name=myvpc") {
+		t.Fatalf("expected 'name=myvpc' in output, got %q", got)
+	}
+	if !strings.Contains(got, "cidr=10.0.0.0/16") {
+		t.Fatalf("expected 'cidr=10.0.0.0/16' in output, got %q", got)
+	}
+}
+
+func TestCommandNodeStringWithRefs(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "subnet",
+		ParamNodes: map[string]interface{}{},
+		Refs:       map[string]interface{}{"vpc": "$myvpc"},
+	}
+	got := cmd.String()
+	if !strings.Contains(got, "vpc=$myvpc") {
+		t.Fatalf("expected ref in output, got %q", got)
+	}
+}
+
+func TestCommandNodeStringWithList(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "securitygroup",
+		ParamNodes: map[string]interface{}{
+			"ports": []interface{}{"80", "443"},
+		},
+		Refs: map[string]interface{}{},
+	}
+	got := cmd.String()
+	// String values that look like integers get quoted
+	if !strings.Contains(got, "ports=[") {
+		t.Fatalf("expected list in output, got %q", got)
+	}
+}
+
+func TestCommandNodeStringWithInterfaceList(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "securitygroup",
+		ParamNodes: map[string]interface{}{
+			"ports": []interface{}{80, 443},
+		},
+		Refs: map[string]interface{}{},
+	}
+	got := cmd.String()
+	if !strings.Contains(got, "ports=[80,443]") {
+		t.Fatalf("expected list in output, got %q", got)
+	}
+}
+
+func TestCommandNodeStringWithNonStringNonList(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{
+			"count": InterfaceNode{i: 5},
+		},
+		Refs: map[string]interface{}{},
+	}
+	got := cmd.String()
+	if !strings.Contains(got, "count=") {
+		t.Fatalf("expected 'count=' in output, got %q", got)
+	}
+}
+
+func TestCommandNodeStringNoParams(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "delete", Entity: "vpc",
+		ParamNodes: map[string]interface{}{},
+		Refs:       map[string]interface{}{},
+	}
+	if got, want := cmd.String(), "delete vpc"; got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+}
+
+func TestCommandNodeKeys(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{"name": InterfaceNode{i: "x"}, "cidr": InterfaceNode{i: "y"}},
+		Refs:       map[string]interface{}{"ref1": "val"},
+	}
+	keys := cmd.Keys()
+	sort.Strings(keys)
+	expected := []string{"cidr", "name", "ref1"}
+	if !reflect.DeepEqual(keys, expected) {
+		t.Fatalf("got %v, want %v", keys, expected)
+	}
+}
+
+func TestCommandNodeResultAndErr(t *testing.T) {
+	cmd := &CommandNode{
+		CmdResult:  "result-value",
+		CmdErr:     nil,
+		ParamNodes: map[string]interface{}{},
+		Refs:       map[string]interface{}{},
+	}
+	if got, want := cmd.Result(), interface{}("result-value"); got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+	if cmd.Err() != nil {
+		t.Fatal("expected nil error")
+	}
+}
+
+func TestCommandNodeClone(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{"name": InterfaceNode{i: "x"}},
+		Refs:       map[string]interface{}{"ref": "val"},
+	}
+	clone := cmd.clone().(*CommandNode)
+	if clone.Action != cmd.Action || clone.Entity != cmd.Entity {
+		t.Fatal("clone action/entity mismatch")
+	}
+	// Mutate clone and ensure original is not affected
+	clone.ParamNodes["new"] = InterfaceNode{i: "y"}
+	if _, ok := cmd.ParamNodes["new"]; ok {
+		t.Fatal("original should not be mutated")
+	}
+}
+
+func TestCommandNodeProcessRefs(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "subnet",
+		ParamNodes: map[string]interface{}{},
+		Refs:       map[string]interface{}{"vpc": RefNode{key: "myvar"}},
+	}
+	cmd.ProcessRefs(map[string]interface{}{"myvar": "vpc-12345"})
+
+	if got, want := cmd.ParamNodes["vpc"], interface{}("vpc-12345"); got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+}
+
+func TestCommandNodeProcessRefsWithList(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "subnet",
+		ParamNodes: map[string]interface{}{},
+		Refs: map[string]interface{}{
+			"ids": ListNode{arr: []interface{}{RefNode{key: "id1"}, InterfaceNode{i: "static"}}},
+		},
+	}
+	cmd.ProcessRefs(map[string]interface{}{"id1": "resolved-id"})
+
+	arr, ok := cmd.ParamNodes["ids"].([]interface{})
+	if !ok {
+		t.Fatalf("expected []interface{}, got %T", cmd.ParamNodes["ids"])
+	}
+	if arr[0] != "resolved-id" {
+		t.Fatalf("expected 'resolved-id', got %v", arr[0])
+	}
+}
+
+func TestCommandNodeToDriverParams(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{
+			"name":  InterfaceNode{i: "myvpc"},
+			"ref":   RefNode{key: "x"},
+			"hole":  HoleNode{key: "y"},
+			"alias": AliasNode{key: "z"},
+			"plain": "plain-value",
+		},
+		Refs: map[string]interface{}{},
+	}
+	params := cmd.ToDriverParams()
+
+	if params["name"] != "myvpc" {
+		t.Fatalf("expected 'myvpc', got %v", params["name"])
+	}
+	if params["plain"] != "plain-value" {
+		t.Fatalf("expected 'plain-value', got %v", params["plain"])
+	}
+	// RefNode, HoleNode, AliasNode should be excluded
+	if _, ok := params["ref"]; ok {
+		t.Fatal("RefNode should be excluded from driver params")
+	}
+	if _, ok := params["hole"]; ok {
+		t.Fatal("HoleNode should be excluded from driver params")
+	}
+	if _, ok := params["alias"]; ok {
+		t.Fatal("AliasNode should be excluded from driver params")
+	}
+}
+
+func TestCommandNodeToFillerParams(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{
+			"name":  InterfaceNode{i: "myvpc"},
+			"alias": AliasNode{key: "z"},
+			"ref":   RefNode{key: "x"},
+		},
+		Refs: map[string]interface{}{},
+	}
+	params := cmd.ToFillerParams()
+
+	if params["name"] != "myvpc" {
+		t.Fatalf("expected 'myvpc', got %v", params["name"])
+	}
+	if _, ok := params["alias"]; !ok {
+		t.Fatal("AliasNode should be included in filler params")
+	}
+	// RefNode should not appear
+	if _, ok := params["ref"]; ok {
+		t.Fatal("RefNode should not be in filler params")
+	}
+}
+
+func TestCommandNodeToFillerParamsWithList(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{
+			"ids": ListNode{arr: []interface{}{InterfaceNode{i: "id1"}, AliasNode{key: "a1"}}},
+		},
+		Refs: map[string]interface{}{},
+	}
+	params := cmd.ToFillerParams()
+	_, ok := params["ids"]
+	if !ok {
+		t.Fatal("expected 'ids' in filler params")
+	}
+}
+
+func TestDeclarationNodeString(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{},
+		Refs:       map[string]interface{}{},
+	}
+	decl := &DeclarationNode{Ident: "myvar", Expr: cmd}
+	got := decl.String()
+	if !strings.HasPrefix(got, "myvar = ") {
+		t.Fatalf("expected to start with 'myvar = ', got %q", got)
+	}
+}
+
+func TestDeclarationNodeClone(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{},
+		Refs:       map[string]interface{}{},
+	}
+	decl := &DeclarationNode{Ident: "myvar", Expr: cmd}
+	clone := decl.clone().(*DeclarationNode)
+	if clone.Ident != decl.Ident {
+		t.Fatal("ident mismatch in clone")
+	}
+}
+
+func TestDeclarationNodeCloneNilExpr(t *testing.T) {
+	decl := &DeclarationNode{Ident: "myvar", Expr: nil}
+	clone := decl.clone().(*DeclarationNode)
+	if clone.Expr != nil {
+		t.Fatal("expected nil Expr in clone")
+	}
+}
+
+func TestStatementClone(t *testing.T) {
+	cmd := &CommandNode{
+		Action: "create", Entity: "vpc",
+		ParamNodes: map[string]interface{}{"k": InterfaceNode{i: "v"}},
+		Refs:       map[string]interface{}{},
+	}
+	stmt := &Statement{Node: cmd}
+	clone := stmt.Clone()
+	clonedCmd := clone.Node.(*CommandNode)
+	clonedCmd.ParamNodes["new"] = InterfaceNode{i: "x"}
+	if _, ok := cmd.ParamNodes["new"]; ok {
+		t.Fatal("original should not be mutated")
+	}
+}
+
+func TestASTString(t *testing.T) {
+	tree := &AST{}
+	tree.Statements = append(tree.Statements,
+		&Statement{Node: &CommandNode{
+			Action: "create", Entity: "vpc",
+			ParamNodes: map[string]interface{}{"name": InterfaceNode{i: "myvpc"}},
+			Refs:       map[string]interface{}{},
+		}},
+		&Statement{Node: &CommandNode{
+			Action: "delete", Entity: "subnet",
+			ParamNodes: map[string]interface{}{},
+			Refs:       map[string]interface{}{},
+		}},
+	)
+	got := tree.String()
+	lines := strings.Split(got, "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected 2 lines, got %d: %q", len(lines), got)
+	}
+}
+
+func TestASTCloneNode(t *testing.T) {
+	tree := &AST{}
+	tree.Statements = append(tree.Statements,
+		&Statement{Node: &CommandNode{
+			Action: "create", Entity: "vpc",
+			ParamNodes: map[string]interface{}{},
+			Refs:       map[string]interface{}{},
+		}},
+	)
+	cloneNode := tree.clone()
+	clone, ok := cloneNode.(*AST)
+	if !ok {
+		t.Fatalf("expected *AST, got %T", cloneNode)
+	}
+	if len(clone.Statements) != 1 {
+		t.Fatalf("expected 1 statement, got %d", len(clone.Statements))
 	}
 }
 

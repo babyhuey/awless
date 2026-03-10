@@ -1,9 +1,14 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
+	"time"
 )
 
 func TestIsSemverUpgradeExtra(t *testing.T) {
@@ -290,4 +295,493 @@ func TestBuildInfoString(t *testing.T) {
 			t.Fatalf("got %s, want %s", got, exp)
 		}
 	})
+
+	t.Run("partial fields sha and date only", func(t *testing.T) {
+		b := BuildInfo{Version: "v2.0.0", Sha: "def456", Date: "2025-06-15"}
+		got := b.String()
+		exp := "version=v2.0.0, commit=def456, build-date=2025-06-15"
+		if got != exp {
+			t.Fatalf("got %s, want %s", got, exp)
+		}
+	})
+
+	t.Run("partial fields arch and os only", func(t *testing.T) {
+		b := BuildInfo{Version: "v3.0.0", Arch: "arm64", OS: "darwin"}
+		got := b.String()
+		exp := "version=v3.0.0, build-arch=arm64, build-os=darwin"
+		if got != exp {
+			t.Fatalf("got %s, want %s", got, exp)
+		}
+	})
+
+	t.Run("for field only", func(t *testing.T) {
+		b := BuildInfo{Version: "v4.0.0", For: "brew"}
+		got := b.String()
+		exp := "version=v4.0.0, build-for=brew"
+		if got != exp {
+			t.Fatalf("got %s, want %s", got, exp)
+		}
+	})
+}
+
+func TestParseBool(t *testing.T) {
+	tcases := []struct {
+		input string
+		exp   interface{}
+		isErr bool
+	}{
+		{"true", true, false},
+		{"false", false, false},
+		{"1", true, false},
+		{"0", false, false},
+		{"TRUE", true, false},
+		{"FALSE", false, false},
+		{"toto", nil, true},
+		{"", nil, true},
+		{"yes", nil, true},
+	}
+	for _, tc := range tcases {
+		got, err := parseBool(tc.input)
+		if tc.isErr {
+			if err == nil {
+				t.Fatalf("parseBool(%q): expected error, got nil", tc.input)
+			}
+		} else {
+			if err != nil {
+				t.Fatalf("parseBool(%q): unexpected error: %v", tc.input, err)
+			}
+			if got != tc.exp {
+				t.Fatalf("parseBool(%q): got %v, want %v", tc.input, got, tc.exp)
+			}
+		}
+	}
+}
+
+func TestParseInt(t *testing.T) {
+	tcases := []struct {
+		input string
+		exp   interface{}
+		isErr bool
+	}{
+		{"0", 0, false},
+		{"1", 1, false},
+		{"-1", -1, false},
+		{"42", 42, false},
+		{"999999", 999999, false},
+		{"abc", nil, true},
+		{"1.5", nil, true},
+		{"", nil, true},
+	}
+	for _, tc := range tcases {
+		got, err := parseInt(tc.input)
+		if tc.isErr {
+			if err == nil {
+				t.Fatalf("parseInt(%q): expected error, got nil", tc.input)
+			}
+		} else {
+			if err != nil {
+				t.Fatalf("parseInt(%q): unexpected error: %v", tc.input, err)
+			}
+			if got != tc.exp {
+				t.Fatalf("parseInt(%q): got %v, want %v", tc.input, got, tc.exp)
+			}
+		}
+	}
+}
+
+func TestGetCheckUpgradeFrequency(t *testing.T) {
+	origConfig := Config
+	defer func() { Config = origConfig }()
+
+	t.Run("default 8 hours when not set", func(t *testing.T) {
+		Config = map[string]interface{}{}
+		got := getCheckUpgradeFrequency()
+		if got != 8*time.Hour {
+			t.Fatalf("got %v, want %v", got, 8*time.Hour)
+		}
+	})
+
+	t.Run("custom value", func(t *testing.T) {
+		Config = map[string]interface{}{"upgrade.checkfrequency": 24}
+		got := getCheckUpgradeFrequency()
+		if got != 24*time.Hour {
+			t.Fatalf("got %v, want %v", got, 24*time.Hour)
+		}
+	})
+
+	t.Run("negative value", func(t *testing.T) {
+		Config = map[string]interface{}{"upgrade.checkfrequency": -1}
+		got := getCheckUpgradeFrequency()
+		if got != -1*time.Hour {
+			t.Fatalf("got %v, want %v", got, -1*time.Hour)
+		}
+	})
+
+	t.Run("wrong type returns default", func(t *testing.T) {
+		Config = map[string]interface{}{"upgrade.checkfrequency": "not-int"}
+		got := getCheckUpgradeFrequency()
+		if got != 8*time.Hour {
+			t.Fatalf("got %v, want %v", got, 8*time.Hour)
+		}
+	})
+}
+
+func TestGetAutosyncLegacyKey(t *testing.T) {
+	origConfig := Config
+	origDefaults := Defaults
+	defer func() {
+		Config = origConfig
+		Defaults = origDefaults
+	}()
+
+	t.Run("from legacy defaults key sync.auto true", func(t *testing.T) {
+		Config = map[string]interface{}{}
+		Defaults = map[string]interface{}{"sync.auto": true}
+		if got := GetAutosync(); !got {
+			t.Fatal("expected true from legacy key")
+		}
+	})
+
+	t.Run("from legacy defaults key sync.auto false", func(t *testing.T) {
+		Config = map[string]interface{}{}
+		Defaults = map[string]interface{}{"sync.auto": false}
+		if got := GetAutosync(); got {
+			t.Fatal("expected false from legacy key")
+		}
+	})
+
+	t.Run("non-bool type in config returns default true", func(t *testing.T) {
+		Config = map[string]interface{}{"autosync": "not-a-bool"}
+		Defaults = map[string]interface{}{}
+		if got := GetAutosync(); !got {
+			t.Fatal("expected default true when type assertion fails")
+		}
+	})
+}
+
+func TestGetAWSProfileLegacyKey(t *testing.T) {
+	origConfig := Config
+	origDefaults := Defaults
+	defer func() {
+		Config = origConfig
+		Defaults = origDefaults
+	}()
+
+	t.Run("from legacy defaults key", func(t *testing.T) {
+		Config = map[string]interface{}{}
+		Defaults = map[string]interface{}{ProfileConfigKey: "legacy-profile"}
+		if got := GetAWSProfile(); got != "legacy-profile" {
+			t.Fatalf("got %s, want legacy-profile", got)
+		}
+	})
+
+	t.Run("config takes priority over defaults", func(t *testing.T) {
+		Config = map[string]interface{}{ProfileConfigKey: "config-profile"}
+		Defaults = map[string]interface{}{ProfileConfigKey: "default-profile"}
+		if got := GetAWSProfile(); got != "config-profile" {
+			t.Fatalf("got %s, want config-profile", got)
+		}
+	})
+
+	t.Run("empty config key falls to defaults", func(t *testing.T) {
+		Config = map[string]interface{}{ProfileConfigKey: ""}
+		Defaults = map[string]interface{}{ProfileConfigKey: "fallback"}
+		if got := GetAWSProfile(); got != "fallback" {
+			t.Fatalf("got %s, want fallback", got)
+		}
+	})
+}
+
+func TestCompareSemverErrors(t *testing.T) {
+	tcases := []struct {
+		a, b string
+	}{
+		{"", ""},
+		{"1.0", "2.0"},
+		{"abc", "def"},
+		{"1.a.0", "1.b.0"},
+		{"1.0.0.0", "2.0.0.0"},
+	}
+	for _, tc := range tcases {
+		_, err := CompareSemver(tc.a, tc.b)
+		if err != SemverInvalidFormatErr {
+			t.Fatalf("CompareSemver(%q, %q): expected SemverInvalidFormatErr, got %v", tc.a, tc.b, err)
+		}
+	}
+}
+
+func TestGetNotFound(t *testing.T) {
+	origConfig := Config
+	origDefaults := Defaults
+	defer func() {
+		Config = origConfig
+		Defaults = origDefaults
+	}()
+
+	Config = map[string]interface{}{}
+	Defaults = map[string]interface{}{}
+
+	_, ok := Get("nonexistent.key")
+	if ok {
+		t.Fatal("expected ok=false for nonexistent key")
+	}
+}
+
+func TestGetFromConfigBeforeDefaults(t *testing.T) {
+	origConfig := Config
+	origDefaults := Defaults
+	defer func() {
+		Config = origConfig
+		Defaults = origDefaults
+	}()
+
+	Config = map[string]interface{}{"shared.key": "from-config"}
+	Defaults = map[string]interface{}{"shared.key": "from-defaults"}
+
+	v, ok := Get("shared.key")
+	if !ok {
+		t.Fatal("expected ok=true")
+	}
+	if got := fmt.Sprint(v); got != "from-config" {
+		t.Fatalf("got %s, want from-config", got)
+	}
+}
+
+func TestGetFromDefaultsWhenNotInConfig(t *testing.T) {
+	origConfig := Config
+	origDefaults := Defaults
+	defer func() {
+		Config = origConfig
+		Defaults = origDefaults
+	}()
+
+	Config = map[string]interface{}{}
+	Defaults = map[string]interface{}{"only.in.defaults": "default-val"}
+
+	v, ok := Get("only.in.defaults")
+	if !ok {
+		t.Fatal("expected ok=true")
+	}
+	if got := fmt.Sprint(v); got != "default-val" {
+		t.Fatalf("got %s, want default-val", got)
+	}
+}
+
+func TestSetProfileCallback(t *testing.T) {
+	f, e := os.MkdirTemp(".", "test")
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer os.RemoveAll(f)
+	os.Setenv("__AWLESS_HOME", f)
+
+	origConfigDefs := configDefinitions
+	origDefaultsDefs := defaultsDefinitions
+	defer func() {
+		configDefinitions = origConfigDefs
+		defaultsDefinitions = origDefaultsDefs
+	}()
+
+	configDefinitions = map[string]*Definition{
+		ProfileConfigKey: {help: "AWS profile", defaultValue: "default"},
+	}
+	defaultsDefinitions = map[string]*Definition{}
+
+	if err := InitConfig(map[string]string{}); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := SetProfileCallback("myprofile"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := GetAWSProfile(); got != "myprofile" {
+		t.Fatalf("got %s, want myprofile", got)
+	}
+}
+
+func TestRunSyncWithUpdatedRegion(t *testing.T) {
+	origConfig := Config
+	origTrigger := TriggerSyncOnConfigUpdate
+	defer func() {
+		Config = origConfig
+		TriggerSyncOnConfigUpdate = origTrigger
+	}()
+
+	t.Run("does not trigger when autosync is false", func(t *testing.T) {
+		Config = map[string]interface{}{"autosync": false}
+		TriggerSyncOnConfigUpdate = false
+		runSyncWithUpdatedRegion("us-east-1")
+		if TriggerSyncOnConfigUpdate {
+			t.Fatal("expected TriggerSyncOnConfigUpdate to remain false when autosync is disabled")
+		}
+	})
+
+	t.Run("does not trigger for invalid region", func(t *testing.T) {
+		Config = map[string]interface{}{"autosync": true}
+		TriggerSyncOnConfigUpdate = false
+		runSyncWithUpdatedRegion("invalid-region-xyz")
+		if TriggerSyncOnConfigUpdate {
+			t.Fatal("expected TriggerSyncOnConfigUpdate to remain false for invalid region")
+		}
+	})
+
+	t.Run("triggers for valid region with autosync", func(t *testing.T) {
+		Config = map[string]interface{}{"autosync": true}
+		TriggerSyncOnConfigUpdate = false
+		runSyncWithUpdatedRegion("us-east-1")
+		if !TriggerSyncOnConfigUpdate {
+			t.Fatal("expected TriggerSyncOnConfigUpdate to be true")
+		}
+	})
+}
+
+func TestSetVolatileWithAWSPrefix(t *testing.T) {
+	f, e := os.MkdirTemp(".", "test")
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer os.RemoveAll(f)
+	os.Setenv("__AWLESS_HOME", f)
+
+	origConfigDefs := configDefinitions
+	origDefaultsDefs := defaultsDefinitions
+	origConfig := Config
+	origDefaults := Defaults
+	defer func() {
+		configDefinitions = origConfigDefs
+		defaultsDefinitions = origDefaultsDefs
+		Config = origConfig
+		Defaults = origDefaults
+	}()
+
+	configDefinitions = map[string]*Definition{}
+	defaultsDefinitions = map[string]*Definition{}
+
+	Config = map[string]interface{}{}
+	Defaults = map[string]interface{}{}
+
+	// Key with "aws." prefix but not in any definition should go to Config
+	if err := SetVolatile("aws.custom.setting", "value"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, ok := Config["aws.custom.setting"]; !ok {
+		t.Fatal("expected key with aws. prefix to be in Config")
+	}
+	if _, ok := Defaults["aws.custom.setting"]; ok {
+		t.Fatal("expected key with aws. prefix NOT to be in Defaults")
+	}
+}
+
+func TestSetVolatileWithoutAWSPrefix(t *testing.T) {
+	f, e := os.MkdirTemp(".", "test")
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer os.RemoveAll(f)
+	os.Setenv("__AWLESS_HOME", f)
+
+	origConfigDefs := configDefinitions
+	origDefaultsDefs := defaultsDefinitions
+	origConfig := Config
+	origDefaults := Defaults
+	defer func() {
+		configDefinitions = origConfigDefs
+		defaultsDefinitions = origDefaultsDefs
+		Config = origConfig
+		Defaults = origDefaults
+	}()
+
+	configDefinitions = map[string]*Definition{}
+	defaultsDefinitions = map[string]*Definition{}
+
+	Config = map[string]interface{}{}
+	Defaults = map[string]interface{}{}
+
+	// Key without "aws." prefix and not in any definition should go to Defaults
+	if err := SetVolatile("custom.setting", "value"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, ok := Defaults["custom.setting"]; !ok {
+		t.Fatal("expected key without aws. prefix to be in Defaults")
+	}
+	if _, ok := Config["custom.setting"]; ok {
+		t.Fatal("expected key without aws. prefix NOT to be in Config")
+	}
+}
+
+func TestNotifyIfUpgradeBrew(t *testing.T) {
+	origBuildFor := BuildFor
+	defer func() { BuildFor = origBuildFor }()
+
+	BuildFor = "brew"
+	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"URL":"https://github.com/wallix/awless/releases/latest","Version":"1000.0.0"}`))
+	}))
+	defer tserver.Close()
+
+	var buff bytes.Buffer
+	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(buff.String(), "brew upgrade awless") {
+		t.Fatalf("expected brew upgrade message, got %s", buff.String())
+	}
+}
+
+func TestNotifyIfUpgradeGoGet(t *testing.T) {
+	origBuildFor := BuildFor
+	defer func() { BuildFor = origBuildFor }()
+
+	BuildFor = "" // default, not brew or zip
+	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"URL":"https://github.com/wallix/awless/releases/latest","Version":"1000.0.0"}`))
+	}))
+	defer tserver.Close()
+
+	var buff bytes.Buffer
+	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(buff.String(), "go get -u") {
+		t.Fatalf("expected go get message, got %s", buff.String())
+	}
+}
+
+func TestNotifyIfUpgradeNoUpgrade(t *testing.T) {
+	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"URL":"","Version":"0.0.0"}`))
+	}))
+	defer tserver.Close()
+
+	var buff bytes.Buffer
+	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+		t.Fatal(err)
+	}
+	if buff.Len() != 0 {
+		t.Fatalf("expected no output for no-upgrade, got %s", buff.String())
+	}
+}
+
+func TestNotifyIfUpgradeInvalidJSON(t *testing.T) {
+	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`not json`))
+	}))
+	defer tserver.Close()
+
+	var buff bytes.Buffer
+	// Should not error even with invalid JSON
+	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+		t.Fatal(err)
+	}
+	if buff.Len() != 0 {
+		t.Fatalf("expected no output for invalid json, got %s", buff.String())
+	}
+}
+
+func TestNotifyIfUpgradeServerDown(t *testing.T) {
+	var buff bytes.Buffer
+	err := notifyIfUpgrade("http://localhost:1", &buff)
+	if err == nil {
+		t.Fatal("expected error for unreachable server")
+	}
 }

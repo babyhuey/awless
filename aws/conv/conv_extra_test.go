@@ -5,21 +5,30 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
+	apigatewayv2types "github.com/aws/aws-sdk-go-v2/service/apigatewayv2/types"
 	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
 	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
 	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
+	ekstypes "github.com/aws/aws-sdk-go-v2/service/eks/types"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
+	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 
 	"github.com/wallix/awless/cloud"
 	"github.com/wallix/awless/cloud/properties"
@@ -353,6 +362,93 @@ func TestInitResource(t *testing.T) {
 			input:        cloudformationtypes.Stack{StackId: awssdk.String("arn:aws:cloudformation:us-east-1:123:stack/my-stack/guid")},
 			expectedType: cloud.Stack,
 			expectedID:   "arn:aws:cloudformation:us-east-1:123:stack/my-stack/guid",
+		},
+		// EKS
+		{
+			name:         "eks Cluster",
+			input:        ekstypes.Cluster{Name: awssdk.String("my-eks-cluster")},
+			expectedType: cloud.EKSCluster,
+			expectedID:   "my-eks-cluster",
+		},
+		{
+			name:         "eks Nodegroup",
+			input:        ekstypes.Nodegroup{NodegroupArn: awssdk.String("arn:aws:eks:us-east-1:123:nodegroup/cluster/ng/id")},
+			expectedType: cloud.EKSNodeGroup,
+			expectedID:   "arn:aws:eks:us-east-1:123:nodegroup/cluster/ng/id",
+		},
+		// DynamoDB
+		{
+			name:         "dynamodb TableDescription",
+			input:        dynamodbtypes.TableDescription{TableName: awssdk.String("my-table")},
+			expectedType: cloud.DynamoDBTable,
+			expectedID:   "my-table",
+		},
+		// Secrets Manager
+		{
+			name:         "secretsmanager SecretListEntry",
+			input:        secretsmanagertypes.SecretListEntry{ARN: awssdk.String("arn:aws:secretsmanager:us-east-1:123:secret:mysecret")},
+			expectedType: cloud.Secret,
+			expectedID:   "arn:aws:secretsmanager:us-east-1:123:secret:mysecret",
+		},
+		// KMS
+		{
+			name:         "kms KeyMetadata",
+			input:        kmstypes.KeyMetadata{KeyId: awssdk.String("key-12345")},
+			expectedType: cloud.Key,
+			expectedID:   "key-12345",
+		},
+		// API Gateway
+		{
+			name:         "apigatewayv2 Api",
+			input:        apigatewayv2types.Api{ApiId: awssdk.String("api-001")},
+			expectedType: cloud.ApiGateway,
+			expectedID:   "api-001",
+		},
+		{
+			name:         "apigatewayv2 Route",
+			input:        apigatewayv2types.Route{RouteId: awssdk.String("route-001")},
+			expectedType: cloud.ApiGatewayRoute,
+			expectedID:   "route-001",
+		},
+		{
+			name:         "apigatewayv2 Stage",
+			input:        apigatewayv2types.Stage{StageName: awssdk.String("prod")},
+			expectedType: cloud.ApiGatewayStage,
+			expectedID:   "prod",
+		},
+		// SSM
+		{
+			name:         "ssm ParameterMetadata",
+			input:        ssmtypes.ParameterMetadata{Name: awssdk.String("/my/param")},
+			expectedType: cloud.SSMParameter,
+			expectedID:   "/my/param",
+		},
+		// EFS
+		{
+			name:         "efs FileSystemDescription",
+			input:        efstypes.FileSystemDescription{FileSystemId: awssdk.String("fs-12345")},
+			expectedType: cloud.FileSystem,
+			expectedID:   "fs-12345",
+		},
+		{
+			name:         "efs MountTargetDescription",
+			input:        efstypes.MountTargetDescription{MountTargetId: awssdk.String("mt-12345")},
+			expectedType: cloud.MountTarget,
+			expectedID:   "mt-12345",
+		},
+		// CloudTrail
+		{
+			name:         "cloudtrail Trail",
+			input:        cloudtrailtypes.Trail{TrailARN: awssdk.String("arn:aws:cloudtrail:us-east-1:123:trail/mytrail")},
+			expectedType: cloud.Trail,
+			expectedID:   "arn:aws:cloudtrail:us-east-1:123:trail/mytrail",
+		},
+		// CloudWatch Logs
+		{
+			name:         "cloudwatchlogs LogGroup",
+			input:        cloudwatchlogstypes.LogGroup{LogGroupName: awssdk.String("/aws/lambda/my-func")},
+			expectedType: cloud.LogGroup,
+			expectedID:   "/aws/lambda/my-func",
 		},
 	}
 

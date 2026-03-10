@@ -246,13 +246,14 @@ func TestResourcesMap(t *testing.T) {
 // --- stubs ---
 
 type stubService struct {
-	name string
+	name          string
+	resourceTypes []string
 }
 
 func (s *stubService) Region() string                            { return "us-east-1" }
 func (s *stubService) Profile() string                           { return "default" }
 func (s *stubService) Name() string                              { return s.name }
-func (s *stubService) ResourceTypes() []string                   { return nil }
+func (s *stubService) ResourceTypes() []string                   { return s.resourceTypes }
 func (s *stubService) IsSyncDisabled() bool                      { return false }
 func (s *stubService) Fetch(_ context.Context) (GraphAPI, error) { return nil, nil }
 func (s *stubService) FetchByType(_ context.Context, _ string) (GraphAPI, error) {
@@ -271,3 +272,112 @@ func (r *stubResource) Properties() map[string]interface{}  { return nil }
 func (r *stubResource) Property(string) (interface{}, bool) { return nil, false }
 func (r *stubResource) Meta(string) (interface{}, bool)     { return nil, false }
 func (r *stubResource) Same(Resource) bool                  { return false }
+
+func TestAllServices(t *testing.T) {
+	// Save and restore the global registry
+	origRegistry := make(map[string]Service)
+	for k, v := range ServiceRegistry {
+		origRegistry[k] = v
+	}
+	defer func() {
+		ServiceRegistry = origRegistry
+	}()
+
+	ServiceRegistry = map[string]Service{
+		"infra":   &stubService{name: "infra", resourceTypes: []string{Instance, Vpc}},
+		"access":  &stubService{name: "access", resourceTypes: []string{User, Role}},
+		"storage": &stubService{name: "storage", resourceTypes: []string{Bucket}},
+	}
+
+	all := AllServices()
+	if len(all) != 3 {
+		t.Fatalf("expected 3 services, got %d", len(all))
+	}
+
+	names := make(map[string]bool)
+	for _, s := range all {
+		names[s.Name()] = true
+	}
+	for _, expected := range []string{"infra", "access", "storage"} {
+		if !names[expected] {
+			t.Fatalf("expected service %q in AllServices result", expected)
+		}
+	}
+}
+
+func TestAllServicesEmpty(t *testing.T) {
+	origRegistry := make(map[string]Service)
+	for k, v := range ServiceRegistry {
+		origRegistry[k] = v
+	}
+	defer func() {
+		ServiceRegistry = origRegistry
+	}()
+
+	ServiceRegistry = map[string]Service{}
+	all := AllServices()
+	if len(all) != 0 {
+		t.Fatalf("expected 0 services, got %d", len(all))
+	}
+}
+
+func TestGetServiceForType(t *testing.T) {
+	origRegistry := make(map[string]Service)
+	for k, v := range ServiceRegistry {
+		origRegistry[k] = v
+	}
+	defer func() {
+		ServiceRegistry = origRegistry
+	}()
+
+	infraSrv := &stubService{name: "infra", resourceTypes: []string{Instance, Vpc, Subnet}}
+	accessSrv := &stubService{name: "access", resourceTypes: []string{User, Role, Policy}}
+
+	ServiceRegistry = map[string]Service{
+		"infra":  infraSrv,
+		"access": accessSrv,
+	}
+
+	t.Run("found in first service", func(t *testing.T) {
+		srv, err := GetServiceForType(Instance)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if srv.Name() != "infra" {
+			t.Fatalf("expected infra service, got %s", srv.Name())
+		}
+	})
+
+	t.Run("found in second service", func(t *testing.T) {
+		srv, err := GetServiceForType(User)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if srv.Name() != "access" {
+			t.Fatalf("expected access service, got %s", srv.Name())
+		}
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		_, err := GetServiceForType("nonexistent")
+		if err == nil {
+			t.Fatal("expected error for nonexistent type")
+		}
+	})
+}
+
+func TestServicesNamesEmpty(t *testing.T) {
+	srvs := Services{}
+	names := srvs.Names()
+	if len(names) != 0 {
+		t.Fatalf("expected 0 names, got %d", len(names))
+	}
+}
+
+func TestResourcesMapEmpty(t *testing.T) {
+	res := Resources{}
+	ids := res.Map(func(r Resource) string { return r.Id() })
+	if len(ids) != 0 {
+		t.Fatalf("expected 0 ids, got %d", len(ids))
+	}
+}

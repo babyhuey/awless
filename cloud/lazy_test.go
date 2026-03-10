@@ -16,6 +16,7 @@ limitations under the License.
 package cloud
 
 import (
+	"bytes"
 	"io"
 	"testing"
 )
@@ -75,4 +76,116 @@ func (g *StubGraph) ResourceSiblings(Resource) ([]Resource, error) {
 
 func (g *StubGraph) Merge(GraphAPI) error {
 	return nil
+}
+
+func newLazyWithStub() (*LazyGraph, *StubGraph) {
+	stub := &StubGraph{}
+	lazy := &LazyGraph{LoadingFunc: func() GraphAPI {
+		return stub
+	}}
+	return lazy, stub
+}
+
+func TestLazyGraphFind(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	res, err := lazy.Find(NewQuery(Instance))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if res != nil {
+		t.Fatalf("expected nil result, got %v", res)
+	}
+}
+
+func TestLazyGraphFindWithProperties(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	res, err := lazy.FindWithProperties(map[string]interface{}{"key": "val"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if res != nil {
+		t.Fatalf("expected nil result, got %v", res)
+	}
+}
+
+func TestLazyGraphFilterGraph(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	g, err := lazy.FilterGraph(NewQuery(Instance))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if g != nil {
+		t.Fatalf("expected nil graph, got %v", g)
+	}
+}
+
+func TestLazyGraphMarshalTo(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	var buf bytes.Buffer
+	err := lazy.MarshalTo(&buf)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestLazyGraphResourceRelations(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	res, err := lazy.ResourceRelations(nil, "parentOf", false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if res != nil {
+		t.Fatalf("expected nil result, got %v", res)
+	}
+}
+
+func TestLazyGraphVisitRelations(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	err := lazy.VisitRelations(nil, "parentOf", false, func(r Resource, depth int) error {
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestLazyGraphResourceSiblings(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	res, err := lazy.ResourceSiblings(nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if res != nil {
+		t.Fatalf("expected nil result, got %v", res)
+	}
+}
+
+func TestLazyGraphMerge(t *testing.T) {
+	lazy, _ := newLazyWithStub()
+	err := lazy.Merge(nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestLazyGraphLoadOnlyOnce(t *testing.T) {
+	var callCount int
+	lazy := &LazyGraph{LoadingFunc: func() GraphAPI {
+		callCount++
+		return &StubGraph{}
+	}}
+
+	// Call multiple different methods
+	lazy.Find(NewQuery(""))
+	lazy.FindWithProperties(nil)
+	lazy.FilterGraph(NewQuery(""))
+	lazy.MarshalTo(io.Discard)
+	lazy.ResourceRelations(nil, "", false)
+	lazy.VisitRelations(nil, "", false, nil)
+	lazy.ResourceSiblings(nil)
+	lazy.Merge(nil)
+
+	if callCount != 1 {
+		t.Fatalf("loading function called %d times, expected 1", callCount)
+	}
 }
