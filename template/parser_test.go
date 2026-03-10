@@ -945,16 +945,15 @@ func extractCommandNode(n ast.Node) *ast.CommandNode {
 	msg := func(i interface{}) string {
 		return fmt.Sprintf("extracting node: want CommandNode, got %T", i)
 	}
-	switch n.(type) {
+	switch nn := n.(type) {
 	case *ast.CommandNode:
-		return n.(*ast.CommandNode)
+		return nn
 	case *ast.DeclarationNode:
-		expr := n.(*ast.DeclarationNode).Expr
-		switch expr.(type) {
+		switch e := nn.Expr.(type) {
 		case *ast.CommandNode:
-			return expr.(*ast.CommandNode)
+			return e
 		default:
-			panic(msg(expr))
+			panic(msg(nn.Expr))
 		}
 	default:
 		panic(msg(n))
@@ -965,16 +964,15 @@ func extractCmdNode(n ast.Node) *ast.CommandNode {
 	msg := func(i interface{}) string {
 		return fmt.Sprintf("extracting node: want ActionNode, got %T", i)
 	}
-	switch n.(type) {
+	switch nn := n.(type) {
 	case *ast.CommandNode:
-		return n.(*ast.CommandNode)
+		return nn
 	case *ast.DeclarationNode:
-		expr := n.(*ast.DeclarationNode).Expr
-		switch expr.(type) {
+		switch e := nn.Expr.(type) {
 		case *ast.CommandNode:
-			return expr.(*ast.CommandNode)
+			return e
 		default:
-			panic(msg(expr))
+			panic(msg(nn.Expr))
 		}
 	default:
 		panic(msg(n))

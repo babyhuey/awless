@@ -30,9 +30,9 @@ import (
 func Parse(text string) (tmpl *Template, err error) {
 	defer func() { // as peg lib does not allow errors in Execute, we use panic to build the AST
 		if rerr := recover(); rerr != nil {
-			switch rerr.(type) {
+			switch rerr := rerr.(type) {
 			case error:
-				err = fmt.Errorf("template parsing: %s", rerr.(error))
+				err = fmt.Errorf("template parsing: %s", rerr)
 			default:
 				panic(rerr)
 			}
@@ -45,7 +45,7 @@ func Parse(text string) (tmpl *Template, err error) {
 
 	tmpl = &Template{}
 
-	p := &ast.Peg{AST: &ast.AST{}, Buffer: string(text)}
+	p := &ast.Peg{AST: &ast.AST{}, Buffer: text}
 	p.Init()
 
 	if err = p.Parse(); err != nil {
@@ -82,9 +82,9 @@ func parseParamsAsCommandNode(text string) (*ast.CommandNode, error) {
 		return nil, fmt.Errorf("parse params: %s", err)
 	}
 
-	switch n.(type) {
+	switch n := n.(type) {
 	case *ast.CommandNode:
-		return (n.(*ast.CommandNode)), nil
+		return n, nil
 	default:
 		return nil, fmt.Errorf("parse params: expected a command node")
 	}

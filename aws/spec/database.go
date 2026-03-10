@@ -167,11 +167,11 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err 
 }
 
 func (cmd *CreateDatabase) ExtractResult(i interface{}) string {
-	switch i.(type) {
+	switch v := i.(type) {
 	case *rds.CreateDBInstanceOutput:
-		return awssdk.ToString(i.(*rds.CreateDBInstanceOutput).DBInstance.DBInstanceIdentifier)
+		return awssdk.ToString(v.DBInstance.DBInstanceIdentifier)
 	case *rds.CreateDBInstanceReadReplicaOutput:
-		return awssdk.ToString(i.(*rds.CreateDBInstanceReadReplicaOutput).DBInstance.DBInstanceIdentifier)
+		return awssdk.ToString(v.DBInstance.DBInstanceIdentifier)
 	default:
 		logger.Errorf("unexpected interface type %T", i)
 		return ""

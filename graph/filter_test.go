@@ -31,10 +31,7 @@ func TestFilterGraph(t *testing.T) {
 	}
 
 	filterFn := func(r *graph.Resource) bool {
-		if r.Properties()[properties.ID] == "inst_1" {
-			return true
-		}
-		return false
+		return r.Properties()[properties.ID] == "inst_1"
 	}
 	filtered, _ = g.Filter("instance", filterFn)
 	instances, _ = filtered.GetAllResources("instance")
@@ -50,16 +47,10 @@ func TestFilterGraph(t *testing.T) {
 	}
 
 	filterOne := func(r *graph.Resource) bool {
-		if r.Properties()[properties.ID] == "inst_2" {
-			return true
-		}
-		return false
+		return r.Properties()[properties.ID] == "inst_2"
 	}
 	filterTwo := func(r *graph.Resource) bool {
-		if r.Properties()[properties.Name] == "redis" {
-			return true
-		}
-		return false
+		return r.Properties()[properties.Name] == "redis"
 	}
 	filtered, _ = g.Filter("instance", filterOne, filterTwo)
 	instances, _ = filtered.GetAllResources("instance")

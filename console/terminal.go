@@ -100,7 +100,7 @@ func InteractiveTerminal(client *ssh.Client) error {
 		close(signalc)
 	}()
 	go propagateSignals(signalc, session, stdin)
-	signal.Notify(signalc, os.Interrupt, os.Kill)
+	signal.Notify(signalc, os.Interrupt)
 	return session.Wait()
 }
 

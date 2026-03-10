@@ -436,7 +436,7 @@ func TestCmdErr(t *testing.T) {
 		{&ast.CommandNode{Action: "create", Entity: "instance"}, "my error with %s %d", []interface{}{"Donald", 1}, errors.New("create instance: my error with Donald 1")},
 	}
 	for i, tcase := range tcases {
-		if got, want := cmdErr(tcase.cmd, tcase.err, tcase.ifaces...), tcase.expErr; !reflect.DeepEqual(got, want) {
+		if got, want := cmdErr(tcase.cmd, tcase.err, tcase.ifaces...), tcase.expErr; !reflect.DeepEqual(got, want) { //nolint:govet
 			t.Fatalf("%d: got %#v, want %#v", i+1, got, want)
 		}
 	}

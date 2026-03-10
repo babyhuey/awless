@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	"unicode"
 
 	"github.com/chzyer/readline"
 
@@ -97,9 +96,7 @@ func holeAutoCompletion(g cloud.GraphAPI, paramPaths []string) readline.AutoComp
 						possibleSuggests = appendWithNameAliases(possibleSuggests, r)
 					}
 				case []string:
-					for _, str := range prop {
-						possibleSuggests = append(possibleSuggests, str)
-					}
+					possibleSuggests = append(possibleSuggests, prop...)
 				case []*graph.KeyValue:
 					for _, kv := range prop {
 						possibleSuggests = append(possibleSuggests, fmt.Sprintf("%s:%s", kv.KeyName, kv.Value))
@@ -137,9 +134,6 @@ func (p *prefixCompleter) Do(line []rune, pos int) (newLine [][]rune, offset int
 }
 
 func doInternal(p *prefixCompleter, line string, pos int, origLine []rune) (newLine []string, offset int) {
-	strings.TrimLeftFunc(line[:pos], func(r rune) bool {
-		return unicode.IsSpace(r)
-	})
 	if p.splitChar != "" {
 		line = splitKeepLast(line, p.splitChar)
 	}
@@ -260,9 +254,8 @@ func appendIfContains(slice []string, value, subst string) []string {
 
 func appendWithNameAliases(slice []string, res cloud.Resource) []string {
 	if val, ok := res.Properties()["Name"]; ok {
-		switch val.(type) {
+		switch name := val.(type) {
 		case string:
-			name := val.(string)
 			if name != "" {
 				slice = append(slice, fmt.Sprintf("@%s", name))
 			}

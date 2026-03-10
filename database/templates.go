@@ -104,7 +104,7 @@ func (db *DB) GetLoadedTemplate(id string) (*LoadedTemplate, error) {
 			terr := tplExec.UnmarshalJSON(content)
 			loadedTpl.TplExec = tplExec
 			loadedTpl.Err = terr
-			loadedTpl.Key = string(id)
+			loadedTpl.Key = id
 			loadedTpl.Raw = string(content)
 			return nil
 		}

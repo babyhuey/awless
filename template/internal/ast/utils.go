@@ -182,7 +182,6 @@ func ProcessAliases(tree Node, aliasFunc func(action, entity string, key string)
 	}
 
 	v.visit(tree)
-	return
 }
 
 type visitor struct {

@@ -12,45 +12,46 @@ type mock interface {
 	SetTesting(*testing.T)
 }
 
-type basicMock struct {
-	t             *testing.T
-	calls         map[string]int
-	expInputs     map[string]interface{}
-	ignoredInputs map[string]struct{}
+type basicMock struct { //nolint:unused // embedded in generated mock types
+	t       *testing.T
+	calls   map[string]int
+	inputs  map[string]interface{}
+	ignored map[string]struct{}
 }
 
-func (m *basicMock) addCall(call string) {
+func (m *basicMock) addCall(call string) { //nolint:unused
 	if m.calls == nil {
 		m.calls = make(map[string]int)
 	}
 	m.calls[call]++
 }
 
-func (m *basicMock) Calls() map[string]int {
+func (m *basicMock) Calls() map[string]int { //nolint:unused
 	return m.calls
 }
 
-func (m *basicMock) SetTesting(t *testing.T) {
+func (m *basicMock) SetTesting(t *testing.T) { //nolint:unused
 	m.t = t
 }
 
-func (m *basicMock) SetInputs(inputs map[string]interface{}) {
-	m.expInputs = inputs
+func (m *basicMock) SetInputs(inputs map[string]interface{}) { //nolint:unused
+	m.inputs = inputs
 }
 
-func (m *basicMock) SetIgnored(ignored map[string]struct{}) {
-	m.ignoredInputs = ignored
+func (m *basicMock) SetIgnored(ignored map[string]struct{}) { //nolint:unused
+	m.ignored = ignored
 }
 
-func (m *basicMock) verifyInput(call string, got interface{}) {
-	m.t.Helper()
-	if m.expInputs == nil {
+func (m *basicMock) verifyInput(call string, got interface{}) { //nolint:unused
+	if m.t == nil {
 		return
 	}
-	if _, isIgnored := m.ignoredInputs[call]; isIgnored {
+	if _, ok := m.ignored[call]; ok {
 		return
 	}
-	if want := m.expInputs[call]; !reflect.DeepEqual(want, got) {
-		m.t.Fatalf("got %#v, want %#v", got, want)
+	if want, ok := m.inputs[call]; ok {
+		if !reflect.DeepEqual(got, want) {
+			m.t.Fatalf("got \n%#v\n\nwant \n%#v\n", got, want)
+		}
 	}
 }

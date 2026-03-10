@@ -113,10 +113,7 @@ func TestTemplateExecutionUnmarshalFromJSON(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	var cmds []*ast.CommandNode
-	for _, cmd := range tplExec.CommandNodesIterator() {
-		cmds = append(cmds, cmd)
-	}
+	cmds := append([]*ast.CommandNode{}, tplExec.CommandNodesIterator()...)
 
 	if got, want := tplExec.ID, "123456"; got != want {
 		t.Fatalf("got %s, want %s", got, want)

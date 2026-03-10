@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -28,7 +27,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 
-	awsspec "github.com/wallix/awless/aws/spec"
 	"github.com/wallix/awless/logger"
 )
 
@@ -122,33 +120,4 @@ func (f *folder) putFileContent(filename string, content []byte) error {
 	}
 
 	return os.WriteFile(filepath.Join(f.path, filename), content, 0600)
-}
-
-type credentialsPrompterProvider struct {
-	profile               string
-	out                   io.Writer
-	profileSetterCallback func(val string) error
-	retrieved             bool
-}
-
-func (c *credentialsPrompterProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
-	c.retrieved = false
-	fmt.Fprintf(c.out, "Cannot resolve AWS credentials for profile '%s' (AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)", c.profile)
-	creds := awsspec.NewCredsPrompter(c.profile)
-	creds.ProfileSetterCallback = c.profileSetterCallback
-	if err := creds.Prompt(); err != nil {
-		return aws.Credentials{}, fmt.Errorf("prompting credentials: %s", err)
-	}
-	created, err := creds.Store()
-	if err != nil {
-		return aws.Credentials{}, fmt.Errorf("storing credentials at '%s': %s", awsspec.AWSCredFilepath, err)
-	}
-	if created {
-		fmt.Fprintf(c.out, "\n\u2713 %s created", awsspec.AWSCredFilepath)
-		fmt.Fprintf(c.out, "\n\u2713 Credentials for profile '%s' stored successfully\n", creds.Profile)
-	} else {
-		fmt.Fprintf(c.out, "\n\u2713 Credentials for profile '%s' stored successfully in %s\n", creds.Profile, awsspec.AWSCredFilepath)
-	}
-	c.retrieved = true
-	return creds.Val, nil
 }

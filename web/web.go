@@ -82,7 +82,7 @@ func (s *server) rdfHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if encErr != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, encErr.Error(), http.StatusInternalServerError)
 		return
 	}
 }

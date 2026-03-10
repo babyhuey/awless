@@ -28,7 +28,7 @@ import (
 
 var (
 	AccessService, InfraService, StorageService, MessagingService, DnsService, LambdaService, MonitoringService, CdnService, CloudformationService cloud.Service
-	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService cloud.Service
+	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService        cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]interface{}, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -85,7 +85,7 @@ func Init(profile, region string, extraConf map[string]interface{}, log *logger.
 		Cfg: cfg,
 		Graph: &cloud.LazyGraph{LoadingFunc: func() cloud.GraphAPI {
 			g, err := sync.LoadLocalGraphs(profile, region)
-			if err != nil || g == nil {
+			if err != nil {
 				g = graph.NewGraph()
 			}
 			return g

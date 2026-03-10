@@ -51,7 +51,7 @@ type CreateDistribution struct {
 	Enable         *bool     `templateName:"enable"`
 	ForwardCookies *string   `templateName:"forward-cookies"`
 	ForwardQueries *bool     `templateName:"forward-queries"`
-	HttpsBehaviour *string   `templateName:"https-behaviour"`
+	HttpsBehaviour *string   `templateName:"https-behaviour"` //nolint:misspell
 	OriginPath     *string   `templateName:"origin-path"`
 	PriceClass     *string   `templateName:"price-class"`
 	MinTtl         *int64    `templateName:"min-ttl"`
@@ -59,7 +59,7 @@ type CreateDistribution struct {
 
 func (cmd *CreateDistribution) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("origin-domain"),
-		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behaviour", "min-ttl", "origin-path", "price-class"),
+		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behaviour", "min-ttl", "origin-path", "price-class"), //nolint:misspell
 	))
 }
 
@@ -211,7 +211,7 @@ type UpdateDistribution struct {
 	Enable         *bool     `templateName:"enable"`
 	ForwardCookies *string   `templateName:"forward-cookies"`
 	ForwardQueries *bool     `templateName:"forward-queries"`
-	HttpsBehaviour *string   `templateName:"https-behaviour"`
+	HttpsBehaviour *string   `templateName:"https-behaviour"` //nolint:misspell
 	OriginPath     *string   `templateName:"origin-path"`
 	PriceClass     *string   `templateName:"price-class"`
 	MinTtl         *int64    `templateName:"min-ttl"`
@@ -219,7 +219,7 @@ type UpdateDistribution struct {
 
 func (cmd *UpdateDistribution) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("id"),
-		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behaviour", "min-ttl", "origin-domain", "origin-path", "price-class"),
+		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behaviour", "min-ttl", "origin-domain", "origin-path", "price-class"), //nolint:misspell
 	))
 }
 

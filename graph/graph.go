@@ -194,7 +194,7 @@ func (g *Graph) Find(q cloud.Query) ([]cloud.Resource, error) {
 		}
 	default:
 		if q.Matcher != nil {
-			return nil, fmt.Errorf("invalid query: can not filter whith multiple resource types")
+			return nil, fmt.Errorf("invalid query: can not filter with multiple resource types")
 		}
 		resources, err = g.GetAllResources(q.ResourceType...)
 		if err != nil {
@@ -386,7 +386,7 @@ func (g *Graph) MustMarshal() string {
 	if err := tstore.NewLenientNTEncoder(&buff).Encode(g.store.CopyTriples()...); err != nil {
 		panic(err)
 	}
-	return string(buff.Bytes())
+	return buff.String()
 }
 
 func (g *Graph) MarshalTo(w io.Writer) error {

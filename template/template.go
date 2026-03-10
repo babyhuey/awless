@@ -179,10 +179,10 @@ func (s *Template) CommandNodesIterator() (nodes []*ast.CommandNode) {
 		case *ast.CommandNode:
 			nodes = append(nodes, nn)
 		case *ast.DeclarationNode:
-			expr := sts.Node.(*ast.DeclarationNode).Expr
-			switch expr.(type) {
+			expr := nn.Expr
+			switch cmd := expr.(type) {
 			case *ast.CommandNode:
-				nodes = append(nodes, expr.(*ast.CommandNode))
+				nodes = append(nodes, cmd)
 			}
 		}
 	}
@@ -192,14 +192,14 @@ func (s *Template) CommandNodesIterator() (nodes []*ast.CommandNode) {
 func (s *Template) CommandNodesReverseIterator() (nodes []*ast.CommandNode) {
 	for i := len(s.Statements) - 1; i >= 0; i-- {
 		sts := s.Statements[i]
-		switch sts.Node.(type) {
+		switch nn := sts.Node.(type) {
 		case *ast.CommandNode:
-			nodes = append(nodes, sts.Node.(*ast.CommandNode))
+			nodes = append(nodes, nn)
 		case *ast.DeclarationNode:
-			expr := sts.Node.(*ast.DeclarationNode).Expr
-			switch expr.(type) {
+			expr := nn.Expr
+			switch cmd := expr.(type) {
 			case *ast.CommandNode:
-				nodes = append(nodes, expr.(*ast.CommandNode))
+				nodes = append(nodes, cmd)
 			}
 		}
 	}

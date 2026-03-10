@@ -242,7 +242,7 @@ func WithColumns(properties []string) optsFn {
 		for _, p := range properties {
 			var found bool
 			for _, definition := range DefaultsColumnDefinitions[b.rdfType] {
-				if strings.ToLower(p) == strings.ToLower(definition.propKey()) || strings.ToLower(p) == strings.ToLower(definition.title()) {
+				if strings.EqualFold(p, definition.propKey()) || strings.EqualFold(p, definition.title()) {
 					found = true
 					columns = append(columns, definition)
 					continue

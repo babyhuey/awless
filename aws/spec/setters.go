@@ -17,6 +17,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -29,8 +30,6 @@ import (
 	gotemplate "text/template"
 	"time"
 
-	"bytes"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	applicationautoscalingtypes "github.com/aws/aws-sdk-go-v2/service/applicationautoscaling/types"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
@@ -41,6 +40,7 @@ import (
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+
 	"github.com/wallix/awless/logger"
 )
 

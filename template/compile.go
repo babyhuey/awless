@@ -296,12 +296,8 @@ func resolveMissingHolesPass(tpl *Template, cenv env.Compiling) (*Template, env.
 
 		if a.IsOptional() == b.IsOptional() {
 			return a.Hole() < b.Hole()
-		} else {
-			if a.IsOptional() {
-				return false
-			}
-			return true
 		}
+		return !a.IsOptional()
 	})
 
 	for _, hole := range sortedHoles {

@@ -36,6 +36,7 @@ jobs:
 
       - name: Update coverage badge
         if: github.ref == 'refs/heads/master'
+        continue-on-error: true
         uses: ncruces/go-coverage-report@v0
         with:
           coverage-file: coverage.out
@@ -56,12 +57,11 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      - name: Install golangci-lint from source
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
       - name: golangci-lint
-        # golangci-lint may lag behind the latest Go version; skip if unavailable
-        continue-on-error: true
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
+        run: golangci-lint run ./...
 
   build:
     name: Build

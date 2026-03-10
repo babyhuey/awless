@@ -33,7 +33,7 @@ func privateKeyAuth(priv privateKey) (ssh.AuthMethod, error) {
 
 func encryptedPrivKeyAuth(priv privateKey) (ssh.AuthMethod, error) {
 	fmt.Fprintf(os.Stderr, "This SSH key is encrypted. Please enter passphrase for key '%s':", priv.path)
-	passphrase, err := term.ReadPassword(int(syscall.Stdin))
+	passphrase, err := term.ReadPassword(syscall.Stdin)
 	if err != nil {
 		return nil, err
 	}

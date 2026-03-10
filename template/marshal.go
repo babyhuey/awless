@@ -114,9 +114,8 @@ func (t *TemplateExecution) UnmarshalJSON(b []byte) error {
 			return err
 		}
 
-		switch node.(type) {
+		switch n := node.(type) {
 		case *ast.CommandNode:
-			n := node.(*ast.CommandNode)
 			if len(c.Results) > 0 {
 				n.CmdResult = c.Results[0]
 			}

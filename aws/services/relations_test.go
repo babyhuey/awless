@@ -10,11 +10,10 @@ type innerStruct struct {
 }
 
 type testStruct struct {
-	Name     string
-	Value    *string
-	Nested   innerStruct
-	PtrNest  *innerStruct
-	unexport string
+	Name    string
+	Value   *string
+	Nested  innerStruct
+	PtrNest *innerStruct
 }
 
 func strPtr(s string) *string { return &s }

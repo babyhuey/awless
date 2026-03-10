@@ -1,7 +1,6 @@
 package web
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/wallix/awless/graph"
@@ -120,8 +119,5 @@ func TestRoutes(t *testing.T) {
 	handler := s.routes()
 	if handler == nil {
 		t.Fatal("expected routes() to return a non-nil http.Handler")
-	}
-	if _, ok := handler.(http.Handler); !ok {
-		t.Fatal("expected routes() to return an http.Handler")
 	}
 }

@@ -101,7 +101,7 @@ func print(all []*database.LoadedTemplate, printer logPrinter) {
 
 	for i, loaded := range all {
 		if loaded.Err != nil {
-			logger.Errorf("Template '%s' in error: %s", string(loaded.Key), loaded.Err)
+			logger.Errorf("Template '%s' in error: %s", loaded.Key, loaded.Err)
 			logger.Verbosef("Template raw content\n%s", loaded.Raw)
 			fmt.Println()
 			continue

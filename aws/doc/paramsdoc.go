@@ -280,7 +280,7 @@ var paramsDoc = map[string]map[string]string{
 		"enable":          "From this field, you can enable or disable the selected distribution",
 		"forward-cookies": "Specifies which cookies to forward to the origin for this cache behavior",
 		"forward-queries": "Indicates whether you want CloudFront to forward query strings to the origin that is associated with this cache behavior and cache based on the query string parameters",
-		"https-behaviour": "The protocol (HTTP or HTTPS) that viewers can use to access the files",
+		"https-behaviour": "The protocol (HTTP or HTTPS) that viewers can use to access the files", //nolint:misspell
 		"min-ttl":         "The minimum amount of time that you want objects to stay in CloudFront caches before CloudFront forwards another request to your origin to determine whether the object has been updated",
 		"origin-domain":   "The DNS name of the Amazon S3 bucket from which you want CloudFront to get objects for this origin, for example, myawsbucket.s3.amazonaws.com",
 		"origin-path":     "An optional element that causes CloudFront to request your content from a directory in your Amazon S3 bucket or your custom origin. When you include this element, specify the directory name, beginning with a /",
@@ -863,7 +863,7 @@ var paramsDoc = map[string]map[string]string{
 		"enable":          "Enable/Disable the distribution",
 		"forward-cookies": "Specifies which cookies to forward to the origin for this cache behavior",
 		"forward-queries": "Indicates whether you want CloudFront to forward query strings to the origin that is associated with this cache behavior and cache based on the query string parameters (true | false)",
-		"https-behaviour": "The protocol (HTTP or HTTPS) that viewers can use to access the files",
+		"https-behaviour": "The protocol (HTTP or HTTPS) that viewers can use to access the files", //nolint:misspell
 		"id":              "The ID of the distribution to update",
 		"min-ttl":         "The minimum amount of time that you want objects to stay in CloudFront caches before CloudFront forwards another request to your origin to determine whether the object has been updated",
 		"origin-domain":   "The DNS name of the Amazon S3 bucket from which you want CloudFront to get objects for this origin, for example, myawsbucket.s3.amazonaws.com",

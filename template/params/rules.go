@@ -229,9 +229,7 @@ func (n opt) String() string {
 }
 
 func (n opt) keys() (keys []string) {
-	for _, k := range n.optionals {
-		keys = append(keys, string(k))
-	}
+	keys = append(keys, n.optionals...)
 	for _, k := range n.suggested {
 		keys = append(keys, string(k))
 	}

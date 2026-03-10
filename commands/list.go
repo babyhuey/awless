@@ -33,6 +33,8 @@ import (
 	"github.com/wallix/awless/sync"
 )
 
+type contextKey string
+
 var (
 	listingFormat              string
 	listingFiltersFlag         []string
@@ -56,10 +58,7 @@ func init() {
 	}
 
 	for _, name := range awsservices.ServiceNames {
-		var resources []string
-		for _, resType := range awsservices.ResourceTypesPerServiceName()[name] {
-			resources = append(resources, resType)
-		}
+		resources := append([]string{}, awsservices.ResourceTypesPerServiceName()[name]...)
 		sort.Strings(resources)
 		for _, resType := range resources {
 			listCmd.AddCommand(listSpecificResourceCmd(resType))
@@ -119,8 +118,8 @@ var listSpecificResourceCmd = func(resType string) *cobra.Command {
 			} else {
 				srv, err := cloud.GetServiceForType(resType)
 				exitOn(err)
-				fetchContext := context.WithValue(context.Background(), "force", true)
-				g, err = srv.FetchByType(context.WithValue(fetchContext, "filters", listingFiltersFlag), resType)
+				fetchContext := context.WithValue(context.Background(), contextKey("force"), true)
+				g, err = srv.FetchByType(context.WithValue(fetchContext, contextKey("filters"), listingFiltersFlag), resType)
 				exitOn(err)
 			}
 

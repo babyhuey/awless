@@ -132,7 +132,7 @@ func (t *stackEventTailer) Tail(w io.Writer) error {
 					var f filters = []string{StackEventLogicalID, StackEventType, StackEventStatus, StackEventStatusReason}
 
 					if isTimeoutReached {
-						errBuf.WriteString("Update was cancelled because timeout has been reached and option 'Cancel On Timeout' enabled\n")
+						errBuf.WriteString("Update was canceled because timeout has been reached and option 'Cancel On Timeout' enabled\n")
 					} else {
 						errBuf.WriteString("Update failed\n")
 					}

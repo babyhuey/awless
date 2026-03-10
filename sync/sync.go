@@ -106,23 +106,16 @@ func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, err
 	var allErrors []error
 	graphs := make(map[string]cloud.GraphAPI)
 	servicesByName := make(map[string]cloud.Service)
-Loop:
-	for {
-		select {
-		case res, ok := <-resultc:
-			if !ok {
-				break Loop
-			}
-			if res.err != nil {
-				allErrors = append(allErrors, fmt.Errorf("syncing %s: %s", res.service.Name(), res.err))
-			} else {
-				s.logger.ExtraVerbosef("sync: fetched %s service took %s", res.service.Name(), time.Since(res.start))
-			}
-			if serv := res.service; serv != nil {
-				servicesByName[serv.Name()] = serv
-				if res.gph != nil {
-					graphs[serv.Name()] = res.gph
-				}
+	for res := range resultc {
+		if res.err != nil {
+			allErrors = append(allErrors, fmt.Errorf("syncing %s: %s", res.service.Name(), res.err))
+		} else {
+			s.logger.ExtraVerbosef("sync: fetched %s service took %s", res.service.Name(), time.Since(res.start))
+		}
+		if serv := res.service; serv != nil {
+			servicesByName[serv.Name()] = serv
+			if res.gph != nil {
+				graphs[serv.Name()] = res.gph
 			}
 		}
 	}

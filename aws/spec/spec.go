@@ -156,7 +156,7 @@ func (c *checker) check() error {
 		if err != nil {
 			return fmt.Errorf("check %s: %s", c.description, err)
 		}
-		if strings.ToLower(got) == strings.ToLower(c.expect) {
+		if strings.EqualFold(got, c.expect) {
 			c.logger.InteractiveInfof("check %s %s '%s' done", c.description, c.checkName, c.expect)
 			return nil
 		}

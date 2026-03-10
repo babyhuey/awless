@@ -35,7 +35,9 @@ import (
 	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
 	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
@@ -52,8 +54,6 @@ import (
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
-	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
-	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 
 	"github.com/wallix/awless/cloud"
@@ -861,10 +861,6 @@ func extractURLEncodedJson(i interface{}) (interface{}, error) {
 		return buff.String(), err
 	}
 	return docStr, nil
-}
-
-func notEmpty(str *string) bool {
-	return awssdk.ToString(str) != ""
 }
 
 func notEmptyStr(str *string) bool {

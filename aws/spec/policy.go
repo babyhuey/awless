@@ -387,7 +387,7 @@ func (c *policyConditions) MarshalJSON() ([]byte, error) {
 	return buff.Bytes(), nil
 }
 
-var conditionRegex = regexp.MustCompile("^([a-zA-Z0-9:_\\-\\[\\]\\*]+)(==|!=|=~|!~|<=|>=|<|>)(.*)$")
+var conditionRegex = regexp.MustCompile(`^([a-zA-Z0-9:_\-\[\]\*]+)(==|!=|=~|!~|<=|>=|<|>)(.*)$`)
 
 func parseCondition(condition string) (*policyCondition, error) {
 	matches := conditionRegex.FindStringSubmatch(condition)

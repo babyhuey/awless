@@ -10,7 +10,7 @@ import (
 )
 
 func TestIsFetchingByType(t *testing.T) {
-	s, bytype := fetch.IsFetchingByType(context.WithValue(context.Background(), "fetchmode", "user"))
+	s, bytype := fetch.IsFetchingByType(context.WithValue(context.Background(), fetch.FetchModeKey, "user"))
 	if got, want := s, "user"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}

@@ -34,24 +34,24 @@ import (
 )
 
 type CreateInstance struct {
-	_              string `action:"create" entity:"instance" awsAPI:"ec2" awsCall:"RunInstances" awsInput:"ec2.RunInstancesInput" awsOutput:"ec2.Reservation" awsDryRun:""`
-	logger         *logger.Logger
-	graph          cloud.GraphAPI
-	api            *ec2.Client
-	Image          *string   `awsName:"ImageId" awsType:"awsstr" templateName:"image"`
-	Count          *int64    `awsName:"MaxCount,MinCount" awsType:"awsin64" templateName:"count"`
-	Type           *string   `awsName:"InstanceType" awsType:"awsstr" templateName:"type"`
-	Name           *string   `templateName:"name"`
-	Subnet         *string   `awsName:"SubnetId" awsType:"awsstr" templateName:"subnet"`
-	Keypair        *string   `awsName:"KeyName" awsType:"awsstr" templateName:"keypair"`
-	PrivateIP      *string   `awsName:"PrivateIpAddress" awsType:"awsstr" templateName:"ip"`
-	UserData       *string   `awsName:"UserData" awsType:"awsuserdatatobase64" templateName:"userdata"`
-	SecurityGroups []*string `awsName:"SecurityGroupIds" awsType:"awsstringslice" templateName:"securitygroup"`
-	Lock           *bool     `awsName:"DisableApiTermination" awsType:"awsbool" templateName:"lock"`
-	EbsOptimized     *bool     `awsName:"EbsOptimized" awsType:"awsbool" templateName:"ebs-optimized"`
-	Role             *string   `awsName:"IamInstanceProfile.Name" awsType:"awsstr" templateName:"role"`
-	DistroQuery      *string   `awsType:"awsstr" templateName:"distro"`
-	AssociatePublicIP *bool    `templateName:"associate-public-ip"`
+	_                 string `action:"create" entity:"instance" awsAPI:"ec2" awsCall:"RunInstances" awsInput:"ec2.RunInstancesInput" awsOutput:"ec2.Reservation" awsDryRun:""`
+	logger            *logger.Logger
+	graph             cloud.GraphAPI
+	api               *ec2.Client
+	Image             *string   `awsName:"ImageId" awsType:"awsstr" templateName:"image"`
+	Count             *int64    `awsName:"MaxCount,MinCount" awsType:"awsin64" templateName:"count"`
+	Type              *string   `awsName:"InstanceType" awsType:"awsstr" templateName:"type"`
+	Name              *string   `templateName:"name"`
+	Subnet            *string   `awsName:"SubnetId" awsType:"awsstr" templateName:"subnet"`
+	Keypair           *string   `awsName:"KeyName" awsType:"awsstr" templateName:"keypair"`
+	PrivateIP         *string   `awsName:"PrivateIpAddress" awsType:"awsstr" templateName:"ip"`
+	UserData          *string   `awsName:"UserData" awsType:"awsuserdatatobase64" templateName:"userdata"`
+	SecurityGroups    []*string `awsName:"SecurityGroupIds" awsType:"awsstringslice" templateName:"securitygroup"`
+	Lock              *bool     `awsName:"DisableApiTermination" awsType:"awsbool" templateName:"lock"`
+	EbsOptimized      *bool     `awsName:"EbsOptimized" awsType:"awsbool" templateName:"ebs-optimized"`
+	Role              *string   `awsName:"IamInstanceProfile.Name" awsType:"awsstr" templateName:"role"`
+	DistroQuery       *string   `awsType:"awsstr" templateName:"distro"`
+	AssociatePublicIP *bool     `templateName:"associate-public-ip"`
 }
 
 func (cmd *CreateInstance) ParamsSpec() params.Spec {
@@ -78,7 +78,7 @@ func (cmd *CreateInstance) PostProcessInput(iface interface{}) {
 
 	nic := ec2types.InstanceNetworkInterfaceSpecification{
 		AssociatePublicIpAddress: cmd.AssociatePublicIP,
-		DeviceIndex:             awssdk.Int32(0),
+		DeviceIndex:              awssdk.Int32(0),
 	}
 
 	if len(input.SecurityGroupIds) > 0 {

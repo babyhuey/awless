@@ -69,7 +69,7 @@ func (res *Resource) String() string {
 }
 
 var (
-	layoutRegex = regexp.MustCompile("%(\\[(\\w+)\\])?(\\w)")
+	layoutRegex = regexp.MustCompile(`%(\[(\w+)\])?(\w)`)
 )
 
 func (res *Resource) Format(layout string) (out string) {
@@ -172,22 +172,22 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 
 		propId, err := rdf.Properties.GetRDFId(key)
 		if err != nil {
-			return triples, fmt.Errorf("resource %s: marshalling property: %s", res, err)
+			return triples, fmt.Errorf("resource %s: marshaling property: %s", res, err)
 		}
 
 		propType, err := rdf.Properties.GetDefinedBy(propId)
 		if err != nil {
-			return triples, fmt.Errorf("resource %s: marshalling property: %s", res, err)
+			return triples, fmt.Errorf("resource %s: marshaling property: %s", res, err)
 		}
 		dataType, err := rdf.Properties.GetDataType(propId)
 		if err != nil {
-			return triples, fmt.Errorf("resource %s: marshalling property: %s", res, err)
+			return triples, fmt.Errorf("resource %s: marshaling property: %s", res, err)
 		}
 		switch propType {
 		case rdf.RdfsLiteral, rdf.RdfsClass:
 			obj, err := marshalToRdfObject(value, propType, dataType)
 			if err != nil {
-				return triples, fmt.Errorf("resource %s: marshalling property '%s': %s", res, key, err)
+				return triples, fmt.Errorf("resource %s: marshaling property '%s': %s", res, key, err)
 			}
 			triples = append(triples, tstore.SubjPred(res.Id(), propId).Object(obj))
 		case rdf.RdfsList:
@@ -195,7 +195,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 			case rdf.XsdString:
 				list, ok := value.([]string)
 				if !ok {
-					return triples, fmt.Errorf("resource %s: marshalling property '%s': expected a string slice, got a %T", res, key, value)
+					return triples, fmt.Errorf("resource %s: marshaling property '%s': expected a string slice, got a %T", res, key, value)
 				}
 				for _, l := range list {
 					triples = append(triples, tstore.SubjPred(res.id, propId).StringLiteral(l))
@@ -203,7 +203,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 			case rdf.RdfsClass:
 				list, ok := value.([]string)
 				if !ok {
-					return triples, fmt.Errorf("resource %s: marshalling property '%s': expected a string slice, got a %T", res, key, value)
+					return triples, fmt.Errorf("resource %s: marshaling property '%s': expected a string slice, got a %T", res, key, value)
 				}
 				for _, l := range list {
 					triples = append(triples, tstore.SubjPred(res.id, propId).Resource(l))
@@ -211,7 +211,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 			case rdf.NetFirewallRule:
 				list, ok := value.([]*FirewallRule)
 				if !ok {
-					return triples, fmt.Errorf("resource %s: marshalling property '%s': expected a firewall rule slice, got a %T", res, key, value)
+					return triples, fmt.Errorf("resource %s: marshaling property '%s': expected a firewall rule slice, got a %T", res, key, value)
 				}
 				for _, r := range list {
 					ruleId := randomRdfId()
@@ -221,7 +221,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 			case rdf.NetRoute:
 				list, ok := value.([]*Route)
 				if !ok {
-					return triples, fmt.Errorf("resource %s: marshalling property '%s': expected a route slice, got a %T", res, key, value)
+					return triples, fmt.Errorf("resource %s: marshaling property '%s': expected a route slice, got a %T", res, key, value)
 				}
 				for _, r := range list {
 					routeId := randomRdfId()
@@ -231,7 +231,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 			case rdf.Grant:
 				list, ok := value.([]*Grant)
 				if !ok {
-					return triples, fmt.Errorf("resource %s: marshalling property '%s': expected a grant slice, got a %T", res, key, value)
+					return triples, fmt.Errorf("resource %s: marshaling property '%s': expected a grant slice, got a %T", res, key, value)
 				}
 				for _, g := range list {
 					grantId := randomRdfId()
@@ -241,7 +241,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 			case rdf.KeyValue:
 				list, ok := value.([]*KeyValue)
 				if !ok {
-					return triples, fmt.Errorf("resource %s: marshalling property '%s': expected a keyvalue slice, got a %T", res, key, value)
+					return triples, fmt.Errorf("resource %s: marshaling property '%s': expected a keyvalue slice, got a %T", res, key, value)
 				}
 				for _, kv := range list {
 					keyValId := randomRdfId()
@@ -251,7 +251,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 			case rdf.DistributionOrigin:
 				list, ok := value.([]*DistributionOrigin)
 				if !ok {
-					return triples, fmt.Errorf("resource %s: marshalling property '%s': expected a distribution origin slice, got a %T", res, key, value)
+					return triples, fmt.Errorf("resource %s: marshaling property '%s': expected a distribution origin slice, got a %T", res, key, value)
 				}
 				for _, o := range list {
 					keyValId := randomRdfId()
@@ -260,11 +260,11 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 				}
 			case rdf.Grant:
 			default:
-				return triples, fmt.Errorf("resource %s: marshalling property '%s': unexpected rdfs:DataType: %s", res, key, dataType)
+				return triples, fmt.Errorf("resource %s: marshaling property '%s': unexpected rdfs:DataType: %s", res, key, dataType)
 			}
 
 		default:
-			return triples, fmt.Errorf("resource %s: marshalling property '%s': unexpected rdfs:isDefinedBy: %s", res, key, propType)
+			return triples, fmt.Errorf("resource %s: marshaling property '%s': unexpected rdfs:isDefinedBy: %s", res, key, propType)
 		}
 
 	}
@@ -295,16 +295,16 @@ func (res *Resource) unmarshalFullRdf(gph tstore.RDFGraph) error {
 
 		propKey, err := rdf.Properties.GetLabel(pred)
 		if err != nil {
-			return fmt.Errorf("unmarshalling property: label: %s", err)
+			return fmt.Errorf("unmarshaling property: label: %s", err)
 		}
 		propVal, err := getPropertyValue(gph, t.Object(), pred)
 		if err != nil {
-			return fmt.Errorf("unmarshalling property '%s' of resource '%s': %s", propKey, res.Id(), err)
+			return fmt.Errorf("unmarshaling property '%s' of resource '%s': %s", propKey, res.Id(), err)
 		}
 		if rdf.Properties.IsRDFList(pred) {
 			dataType, err := rdf.Properties.GetDataType(pred)
 			if err != nil {
-				return fmt.Errorf("unmarshalling property: datatype: %s", err)
+				return fmt.Errorf("unmarshaling property: datatype: %s", err)
 			}
 			switch dataType {
 			case rdf.RdfsClass, rdf.XsdString:
@@ -350,7 +350,7 @@ func (res *Resource) unmarshalFullRdf(gph tstore.RDFGraph) error {
 				list = append(list, propVal.(*DistributionOrigin))
 				res.properties[propKey] = list
 			default:
-				return fmt.Errorf("unmarshalling property: unexpected datatype %s", dataType)
+				return fmt.Errorf("unmarshaling property: unexpected datatype %s", dataType)
 			}
 		} else {
 			res.properties[propKey] = propVal

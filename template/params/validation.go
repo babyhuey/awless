@@ -33,7 +33,7 @@ type Validators map[string]validatorFunc
 func IsInEnumIgnoreCase(items ...string) validatorFunc {
 	included := func(arr []string, s string) bool {
 		for _, a := range arr {
-			if strings.ToLower(s) == strings.ToLower(a) {
+			if strings.EqualFold(s, a) {
 				return true
 			}
 		}

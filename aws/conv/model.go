@@ -1,5 +1,4 @@
 /*
-/*
 Copyright 2017 WALLIX
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,24 +26,24 @@ import (
 var awsResourcesDef = map[string]map[string]*propertyTransform{
 	//EC2
 	cloud.Instance: {
-		properties.Name:              {name: "Tags", transform: extractTagFn("Name")},
-		properties.Type:              {name: "InstanceType", transform: extractValueFn},
-		properties.Subnet:            {name: "SubnetId", transform: extractValueFn},
-		properties.Vpc:               {name: "VpcId", transform: extractValueFn},
-		properties.PublicIP:          {name: "PublicIpAddress", transform: extractValueFn},
-		properties.PrivateIP:         {name: "PrivateIpAddress", transform: extractValueFn},
-		properties.Image:             {name: "ImageId", transform: extractValueFn},
-		properties.Launched:          {name: "LaunchTime", transform: extractValueFn},
-		properties.State:             {name: "State", transform: extractFieldFn("Name")},
-		properties.KeyPair:           {name: "KeyName", transform: extractValueFn},
-		properties.SecurityGroups:    {name: "SecurityGroups", transform: extractStringSliceValues("GroupId")},
-		properties.Affinity:          {name: "Placement", transform: extractFieldFn("Affinity")},
-		properties.AvailabilityZone:  {name: "Placement", transform: extractFieldFn("AvailabilityZone")},
-		properties.PlacementGroup:    {name: "Placement", transform: extractFieldFn("GroupName")},
-		properties.Host:              {name: "Placement", transform: extractFieldFn("HostId")},
-		properties.Architecture:      {name: "Architecture", transform: extractValueFn},
-		properties.Hypervisor:        {name: "Hypervisor", transform: extractValueFn},
-		properties.Profile:           {name: "IamInstanceProfile", transform: extractFieldFn("Arn")},
+		properties.Name:             {name: "Tags", transform: extractTagFn("Name")},
+		properties.Type:             {name: "InstanceType", transform: extractValueFn},
+		properties.Subnet:           {name: "SubnetId", transform: extractValueFn},
+		properties.Vpc:              {name: "VpcId", transform: extractValueFn},
+		properties.PublicIP:         {name: "PublicIpAddress", transform: extractValueFn},
+		properties.PrivateIP:        {name: "PrivateIpAddress", transform: extractValueFn},
+		properties.Image:            {name: "ImageId", transform: extractValueFn},
+		properties.Launched:         {name: "LaunchTime", transform: extractValueFn},
+		properties.State:            {name: "State", transform: extractFieldFn("Name")},
+		properties.KeyPair:          {name: "KeyName", transform: extractValueFn},
+		properties.SecurityGroups:   {name: "SecurityGroups", transform: extractStringSliceValues("GroupId")},
+		properties.Affinity:         {name: "Placement", transform: extractFieldFn("Affinity")},
+		properties.AvailabilityZone: {name: "Placement", transform: extractFieldFn("AvailabilityZone")},
+		properties.PlacementGroup:   {name: "Placement", transform: extractFieldFn("GroupName")},
+		properties.Host:             {name: "Placement", transform: extractFieldFn("HostId")},
+		properties.Architecture:     {name: "Architecture", transform: extractValueFn},
+		properties.Hypervisor:       {name: "Hypervisor", transform: extractValueFn},
+		properties.Profile:          {name: "IamInstanceProfile", transform: extractFieldFn("Arn")},
 		properties.Lifecycle: {fetch: func(i interface{}) (interface{}, error) {
 			val := reflect.ValueOf(i)
 			field := val.FieldByName("InstanceLifecycle")

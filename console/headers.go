@@ -224,9 +224,7 @@ func (h FirewallRulesColumnDefinition) format(i interface{}) string {
 		for _, net := range r.IPRanges {
 			netStrings = append(netStrings, net.String())
 		}
-		for _, src := range r.Sources {
-			netStrings = append(netStrings, src)
-		}
+		netStrings = append(netStrings, r.Sources...)
 		w.WriteString(strings.Join(netStrings, ";"))
 
 		w.WriteString("](")

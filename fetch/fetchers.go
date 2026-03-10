@@ -83,10 +83,14 @@ func (f *fetcher) Fetch(ctx context.Context) (*graph.Graph, error) {
 	return gph, nil
 }
 
-const fetchModeKey = "fetchmode"
+// ContextKey is a typed key for context values to avoid SA1029.
+type ContextKey string
+
+// FetchModeKey is the context key used to indicate fetch-by-type mode.
+const FetchModeKey ContextKey = "fetchmode"
 
 func IsFetchingByType(c context.Context) (string, bool) {
-	v, ok := c.Value(fetchModeKey).(string)
+	v, ok := c.Value(FetchModeKey).(string)
 	return v, len(v) != 0 && ok
 }
 
@@ -95,21 +99,19 @@ func (f *fetcher) FetchByType(ctx context.Context, resourceType string) (*graph.
 	defer close(results)
 
 	go f.fetchResource(
-		context.WithValue(ctx, fetchModeKey, resourceType),
+		context.WithValue(ctx, FetchModeKey, resourceType),
 		resourceType,
 		results)
 
 	gph := graph.NewGraph()
-	select {
-	case res := <-results:
-		if err := res.Err; err != nil {
-			return gph, err
-		}
-		for _, r := range res.Resources {
-			gph.AddResource(r)
-		}
-		return gph, nil
+	res := <-results
+	if err := res.Err; err != nil {
+		return gph, err
 	}
+	for _, r := range res.Resources {
+		gph.AddResource(r)
+	}
+	return gph, nil
 }
 
 func (f *fetcher) fetchResource(ctx context.Context, resourceType string, results chan<- FetchResult) {

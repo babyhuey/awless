@@ -70,7 +70,9 @@ func TestLoadLocalGraphForServiceNonExistent(t *testing.T) {
 	}
 
 	// Should return empty graph - verify by trying to get resources
-	all, _ := g.(interface{ GetAllResources(string) ([]*cloud.Resource, error) })
+	all, _ := g.(interface {
+		GetAllResources(string) ([]*cloud.Resource, error)
+	})
 	if all != nil {
 		t.Log("graph returned, checking it is usable")
 	}

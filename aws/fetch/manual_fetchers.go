@@ -784,7 +784,7 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 							if err != nil {
 								errC <- err
 							}
-							res.Properties()[properties.Created] = time.Unix(int64(timestamp), 0)
+							res.Properties()[properties.Created] = time.Unix(timestamp, 0)
 						}
 					case "LastModifiedTimestamp":
 						if v != "" {
@@ -792,7 +792,7 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 							if err != nil {
 								errC <- err
 							}
-							res.Properties()[properties.Modified] = time.Unix(int64(timestamp), 0)
+							res.Properties()[properties.Modified] = time.Unix(timestamp, 0)
 						}
 					case "QueueArn":
 						res.Properties()[properties.Arn] = v

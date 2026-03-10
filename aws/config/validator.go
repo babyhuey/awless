@@ -109,14 +109,14 @@ func StdinInstanceTypeSelector() string {
 }
 
 func IsValidRegion(given string) bool {
-	reg, _ := regexp.Compile("^(us|eu|ap|sa|ca|af|me|il|cn)\\-\\w+\\-\\d+$")
-	regCompound, _ := regexp.Compile("^(us\\-gov|us\\-iso|us\\-isob|eu\\-isoe)\\-\\w+\\-\\d+$")
+	reg, _ := regexp.Compile(`^(us|eu|ap|sa|ca|af|me|il|cn)\-\w+\-\d+$`)
+	regCompound, _ := regexp.Compile(`^(us\-gov|us\-iso|us\-isob|eu\-isoe)\-\w+\-\d+$`)
 
 	return reg.MatchString(given) || regCompound.MatchString(given)
 }
 
 func isValidInstanceType(given string) bool {
-	return regexp.MustCompile("\\w+\\.\\w+").MatchString(given)
+	return regexp.MustCompile(`\w+\.\w+`).MatchString(given)
 }
 
 func allRegions() []string {

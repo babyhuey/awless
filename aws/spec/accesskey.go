@@ -283,7 +283,6 @@ func promptUntilNonEmpty(question string, v *string) {
 	}
 	for ask(v) {
 	}
-	return
 }
 
 func awsHomeDirMissing() bool {

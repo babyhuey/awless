@@ -63,18 +63,10 @@ func fetchAccountAuthorizationDetails(ctx context.Context, entities []iamtypes.E
 		if err != nil {
 			return details, err
 		}
-		for _, u := range out.UserDetailList {
-			details.Users = append(details.Users, u)
-		}
-		for _, g := range out.GroupDetailList {
-			details.Groups = append(details.Groups, g)
-		}
-		for _, r := range out.RoleDetailList {
-			details.Roles = append(details.Roles, r)
-		}
-		for _, p := range out.Policies {
-			details.Policies = append(details.Policies, p)
-		}
+		details.Users = append(details.Users, out.UserDetailList...)
+		details.Groups = append(details.Groups, out.GroupDetailList...)
+		details.Roles = append(details.Roles, out.RoleDetailList...)
+		details.Policies = append(details.Policies, out.Policies...)
 	}
 
 	return details, nil

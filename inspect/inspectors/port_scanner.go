@@ -46,9 +46,9 @@ func (p *PortScanner) Inspect(g cloud.GraphAPI) error {
 	p.applyingOn = make(map[string][]string)
 	for _, sg := range sgroups {
 		rules := sg.Properties()["InboundRules"]
-		switch rules.(type) {
+		switch typedRules := rules.(type) {
 		case []*graph.FirewallRule:
-			p.inbounds[sg.Id()] = rules.([]*graph.FirewallRule)
+			p.inbounds[sg.Id()] = typedRules
 			res, err := g.ResourceRelations(sg, rdf.ApplyOn, false)
 			if err != nil {
 				return err
@@ -78,7 +78,7 @@ func (p *PortScanner) Print(w io.Writer) {
 		var allPermissive bool
 
 		for _, inbound := range inbounds {
-			if portRange, prot := inbound.PortRange, inbound.Protocol; portRange.Any == true && prot == "any" {
+			if portRange, prot := inbound.PortRange, inbound.Protocol; portRange.Any && prot == "any" {
 				var allIps bool
 				for _, n := range inbound.IPRanges {
 					if n.IP.Equal(allLocalIPs) {

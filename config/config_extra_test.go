@@ -102,11 +102,11 @@ func TestGetConfigWithPrefixExtra(t *testing.T) {
 	defer func() { Config = origConfig }()
 
 	Config = map[string]interface{}{
-		"aws.region":          "us-east-1",
-		"aws.profile":        "prod",
-		"aws.infra.sync":     true,
-		"other.setting":      "value",
-		"scheduler.url":      "http://localhost:8082",
+		"aws.region":     "us-east-1",
+		"aws.profile":    "prod",
+		"aws.infra.sync": true,
+		"other.setting":  "value",
+		"scheduler.url":  "http://localhost:8082",
 	}
 
 	t.Run("aws prefix", func(t *testing.T) {

@@ -52,7 +52,7 @@ func init() {
 			awstailers.StackEventType))
 
 	stackEventsCmd.PersistentFlags().BoolVar(&cancelStackUpdateAfterTimeout, "cancel-on-timeout", false, "Cancel stack update when timeout is reached, use with 'timeout' flag")
-	stackEventsCmd.PersistentFlags().DurationVar(&stackEventsTailTimeout, "timeout", time.Duration(1*time.Hour), "Time to wait for stack update to complete, use with 'follow' flag")
+	stackEventsCmd.PersistentFlags().DurationVar(&stackEventsTailTimeout, "timeout", 1*time.Hour, "Time to wait for stack update to complete, use with 'follow' flag")
 
 	tailCmd.AddCommand(stackEventsCmd)
 }

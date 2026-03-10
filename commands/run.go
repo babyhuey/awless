@@ -120,9 +120,6 @@ var runCmd = &cobra.Command{
 			Template: templ,
 			Path:     fullPath,
 			Message:  strings.TrimSpace(runLogMessage),
-			Locale:   config.GetAWSRegion(),
-			Profile:  config.GetAWSProfile(),
-			Source:   templ.String(),
 		}
 
 		exitOn(NewRunnerRequiredParamsOnly(tplExec.Template, tplExec.Message, tplExec.Path, config.Defaults, extraParams).Run())
@@ -261,9 +258,6 @@ func createDriverCommands(action string, entities []string) *cobra.Command {
 
 			tplExec := &template.TemplateExecution{
 				Template: templ,
-				Locale:   config.GetAWSRegion(),
-				Profile:  config.GetAWSProfile(),
-				Source:   templ.String(),
 			}
 
 			exitOn(NewRunner(tplExec.Template, tplExec.Message, tplExec.Path).Run())
@@ -292,9 +286,6 @@ func createDriverCommands(action string, entities []string) *cobra.Command {
 
 				tplExec := &template.TemplateExecution{
 					Template: templ,
-					Locale:   config.GetAWSRegion(),
-					Profile:  config.GetAWSProfile(),
-					Source:   templ.String(),
 				}
 
 				exitOn(NewRunner(tplExec.Template, tplExec.Message, tplExec.Path, config.Defaults).Run())
@@ -505,12 +496,14 @@ func getTemplateText(path string) (content []byte, expanded string, err error) {
 	return content, expanded, nil
 }
 
+var commentRegex = regexp.MustCompile(`^\s*#`)
+
 func removeComments(b []byte) []byte {
 	scn := bufio.NewScanner(bytes.NewReader(b))
 	var cleaned bytes.Buffer
 	for scn.Scan() {
 		line := scn.Text()
-		if comment, _ := regexp.MatchString(`^\s*#`, line); comment {
+		if commentRegex.MatchString(line) {
 			continue
 		}
 		cleaned.WriteString(line)
@@ -553,7 +546,7 @@ func listRemoteTemplates() error {
 			tpl.MinimalVersion = config.Version
 		}
 		if comp, err := config.CompareSemver(tpl.MinimalVersion, config.Version); comp < 1 && err == nil {
-			fmt.Fprintln(w, fmt.Sprintf("%s\t%s\tawless run repo:%s -v", tpl.Title, strings.Join(tpl.Tags, ","), tpl.Name))
+			fmt.Fprintf(w, "%s\t%s\tawless run repo:%s -v\n", tpl.Title, strings.Join(tpl.Tags, ","), tpl.Name)
 		}
 	}
 	w.Flush()
@@ -572,13 +565,6 @@ func readHttpContent(path string) ([]byte, error) {
 	}
 
 	return io.ReadAll(resp.Body)
-}
-
-func isQuoted(s string) bool {
-	if strings.HasPrefix(s, "@") {
-		return isQuoted(s[1:])
-	}
-	return (strings.HasPrefix(s, "\"") && strings.HasSuffix(s, "\"")) || strings.HasPrefix(s, "'") && strings.HasSuffix(s, "'")
 }
 
 func isCSV(s string) bool {

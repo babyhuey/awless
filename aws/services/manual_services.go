@@ -139,9 +139,7 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 			return
 		}
 
-		for _, name := range policies.PolicyNames {
-			all.Inlined = append(all.Inlined, name)
-		}
+		all.Inlined = append(all.Inlined, policies.PolicyNames...)
 	}()
 
 	wg.Add(1)
