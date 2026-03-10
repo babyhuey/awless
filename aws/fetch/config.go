@@ -14,6 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	"github.com/aws/aws-sdk-go-v2/service/cloudtrail"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
@@ -60,6 +62,8 @@ type AWSAPI struct {
 	Apigatewayv2           *apigatewayv2.Client
 	Ssm                    *ssm.Client
 	Efs                    *efs.Client
+	Cloudtrail             *cloudtrail.Client
+	Cloudwatchlogs         *cloudwatchlogs.Client
 }
 
 type Config struct {

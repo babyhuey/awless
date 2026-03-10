@@ -56,6 +56,10 @@ import (
   ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
   efs "github.com/aws/aws-sdk-go-v2/service/efs"
   efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
+  cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
+  cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
+  cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+  cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
   "github.com/wallix/awless/fetch"
   "github.com/wallix/awless/graph"
   awsconv "github.com/wallix/awless/aws/conv"
@@ -1176,6 +1180,72 @@ func BuildEfsFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 				for _, output := range out.FileSystems {
+					objects = append(objects, output)
+					var res *graph.Resource
+					res, err = awsconv.NewResource(output)
+					if err != nil {
+						return resources, objects, err
+					}
+					resources = append(resources, res)
+				}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildCloudtrailFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualCloudtrailFetchFuncs(conf, funcs)
+
+	funcs["trail"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+		var resources []*graph.Resource
+		var objects []cloudtrailtypes.Trail
+
+		if !conf.getBoolDefaultTrue("aws.cloudtrail.trail.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource cloudtrail[trail]")
+			return resources, objects, nil
+		}
+
+		out, err := conf.APIs.Cloudtrail.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
+		if err != nil {
+			return resources, objects, err
+		}
+
+		for _, output := range out.TrailList {
+			objects = append(objects, output)
+			res, err := awsconv.NewResource(output)
+			if err != nil {
+				return resources, objects, err
+			}
+			resources = append(resources, res)
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildCloudwatchlogsFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualCloudwatchlogsFetchFuncs(conf, funcs)
+
+	funcs["loggroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+		var resources []*graph.Resource
+		var objects []cloudwatchlogstypes.LogGroup
+
+		if !conf.getBoolDefaultTrue("aws.cloudwatchlogs.loggroup.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource cloudwatchlogs[loggroup]")
+			return resources, objects, nil
+		}
+		paginator := cloudwatchlogs.NewDescribeLogGroupsPaginator(conf.APIs.Cloudwatchlogs, &cloudwatchlogs.DescribeLogGroupsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+				for _, output := range out.LogGroups {
 					objects = append(objects, output)
 					var res *graph.Resource
 					res, err = awsconv.NewResource(output)

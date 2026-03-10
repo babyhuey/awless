@@ -263,6 +263,15 @@ const (
   LifecycleState = "cloud:lifecycleState"
   IPAddress = "net:ipAddress"
   NumberOfMountTargets = "cloud:numberOfMountTargets"
+  IsMultiRegion = "cloud:isMultiRegion"
+  IsLogging = "cloud:isLogging"
+  S3BucketName = "cloud:s3BucketName"
+  HomeRegion = "cloud:homeRegion"
+  HasCustomEventSelectors = "cloud:hasCustomEventSelectors"
+  HasInsightSelectors = "cloud:hasInsightSelectors"
+  TrailArn = "cloud:trailArn"
+  RetentionDays = "cloud:retentionDays"
+  StoredBytes = "cloud:storedBytes"
 )
 
 func init() {
@@ -510,6 +519,15 @@ func init() {
 	properties.LifecycleState: LifecycleState,
 	properties.IPAddress: IPAddress,
 	properties.NumberOfMountTargets: NumberOfMountTargets,
+	properties.IsMultiRegion: IsMultiRegion,
+	properties.IsLogging: IsLogging,
+	properties.S3BucketName: S3BucketName,
+	properties.HomeRegion: HomeRegion,
+	properties.HasCustomEventSelectors: HasCustomEventSelectors,
+	properties.HasInsightSelectors: HasInsightSelectors,
+	properties.TrailArn: TrailArn,
+	properties.RetentionDays: RetentionDays,
+	properties.StoredBytes: StoredBytes,
 	}
 }
 
@@ -757,5 +775,14 @@ var Properties = RDFProperties{
   LifecycleState: {ID: LifecycleState, RdfType: "rdf:Property", RdfsLabel: "LifecycleState", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
   IPAddress: {ID: IPAddress, RdfType: "rdf:Property", RdfsLabel: "IPAddress", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
   NumberOfMountTargets: {ID: NumberOfMountTargets, RdfType: "rdf:Property", RdfsLabel: "NumberOfMountTargets", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+  IsMultiRegion: {ID: IsMultiRegion, RdfType: "rdf:Property", RdfsLabel: "IsMultiRegion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+  IsLogging: {ID: IsLogging, RdfType: "rdf:Property", RdfsLabel: "IsLogging", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+  S3BucketName: {ID: S3BucketName, RdfType: "rdf:Property", RdfsLabel: "S3BucketName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+  HomeRegion: {ID: HomeRegion, RdfType: "rdf:Property", RdfsLabel: "HomeRegion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+  HasCustomEventSelectors: {ID: HasCustomEventSelectors, RdfType: "rdf:Property", RdfsLabel: "HasCustomEventSelectors", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+  HasInsightSelectors: {ID: HasInsightSelectors, RdfType: "rdf:Property", RdfsLabel: "HasInsightSelectors", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+  TrailArn: {ID: TrailArn, RdfType: "rdf:Property", RdfsLabel: "TrailArn", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+  RetentionDays: {ID: RetentionDays, RdfType: "rdf:Property", RdfsLabel: "RetentionDays", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+  StoredBytes: {ID: StoredBytes, RdfType: "rdf:Property", RdfsLabel: "StoredBytes", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 }
 

@@ -46,8 +46,8 @@ func TestAutoCompletion(t *testing.T) {
 	g.AddResource(resourcetest.SecurityGroup("sg-1").Prop(p.Name, "ssh").Build())
 	g.AddResource(resourcetest.Subnet("s-5").Prop(p.Name, "subnet 1").Prop(p.Public, true).Prop(p.CIDR, "10.0.0.0/0").Build())
 	g.AddResource(resourcetest.Subnet("s-6").Prop(p.Name, "subnet 2").Prop(p.Public, false).Prop(p.CIDR, "192.168.0.0/0").Build())
-	g.AddResource(resourcetest.Alarm("1").Prop(p.Dimensions, []*graph.KeyValue{{"abc", "val1"}, {"abd", "val2"}}).Build())
-	g.AddResource(resourcetest.Alarm("2").Prop(p.Dimensions, []*graph.KeyValue{{"def", "val3"}}).Build())
+	g.AddResource(resourcetest.Alarm("1").Prop(p.Dimensions, []*graph.KeyValue{{KeyName: "abc", Value: "val1"}, {KeyName: "abd", Value: "val2"}}).Build())
+	g.AddResource(resourcetest.Alarm("2").Prop(p.Dimensions, []*graph.KeyValue{{KeyName: "def", Value: "val3"}}).Build())
 
 	t.Run("no matches", func(t *testing.T) {
 		list, _ := holeAutoCompletion(g, []string{"create.instance.id"}).Do([]rune{'a'}, 1)

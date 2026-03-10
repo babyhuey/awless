@@ -654,4 +654,22 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.IPAddress:      {name: "IpAddress", transform: extractValueFn},
 		properties.LifecycleState: {name: "LifeCycleState", transform: extractValueFn},
 	},
+	// CloudTrail
+	cloud.Trail: {
+		properties.Name:                    {name: "Name", transform: extractValueFn},
+		properties.Arn:                     {name: "TrailARN", transform: extractValueFn},
+		properties.IsMultiRegion:           {name: "IsMultiRegionTrail", transform: extractValueFn},
+		properties.S3BucketName:            {name: "S3BucketName", transform: extractValueFn},
+		properties.HomeRegion:              {name: "HomeRegion", transform: extractValueFn},
+		properties.HasCustomEventSelectors: {name: "HasCustomEventSelectors", transform: extractValueFn},
+		properties.HasInsightSelectors:     {name: "HasInsightSelectors", transform: extractValueFn},
+	},
+	// CloudWatch Logs
+	cloud.LogGroup: {
+		properties.Name:          {name: "LogGroupName", transform: extractValueFn},
+		properties.Arn:           {name: "Arn", transform: extractValueFn},
+		properties.RetentionDays: {name: "RetentionInDays", transform: extractValueFn},
+		properties.StoredBytes:   {name: "StoredBytes", transform: extractValueFn},
+		properties.Created:       {name: "CreationTime", transform: extractMillisecondEpochTimeFn},
+	},
 }

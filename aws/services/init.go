@@ -28,7 +28,7 @@ import (
 
 var (
 	AccessService, InfraService, StorageService, MessagingService, DnsService, LambdaService, MonitoringService, CdnService, CloudformationService cloud.Service
-	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService                                                  cloud.Service
+	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]interface{}, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -59,6 +59,8 @@ func Init(profile, region string, extraConf map[string]interface{}, log *logger.
 	ApigatewayService = NewApigateway(cfg, profile, extraConf, log)
 	SsmService = NewSsm(cfg, profile, extraConf, log)
 	EfsService = NewEfs(cfg, profile, extraConf, log)
+	CloudtrailService = NewCloudtrail(cfg, profile, extraConf, log)
+	CloudwatchlogsService = NewCloudwatchlogs(cfg, profile, extraConf, log)
 
 	cloud.ServiceRegistry[InfraService.Name()] = InfraService
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
@@ -75,6 +77,8 @@ func Init(profile, region string, extraConf map[string]interface{}, log *logger.
 	cloud.ServiceRegistry[ApigatewayService.Name()] = ApigatewayService
 	cloud.ServiceRegistry[SsmService.Name()] = SsmService
 	cloud.ServiceRegistry[EfsService.Name()] = EfsService
+	cloud.ServiceRegistry[CloudtrailService.Name()] = CloudtrailService
+	cloud.ServiceRegistry[CloudwatchlogsService.Name()] = CloudwatchlogsService
 
 	awsspec.CommandFactory = &awsspec.AWSFactory{
 		Log: log,

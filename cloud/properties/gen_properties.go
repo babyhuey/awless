@@ -261,5 +261,14 @@ const (
   LifecycleState = "LifecycleState"
   IPAddress = "IPAddress"
   NumberOfMountTargets = "NumberOfMountTargets"
+  IsMultiRegion = "IsMultiRegion"
+  IsLogging = "IsLogging"
+  S3BucketName = "S3BucketName"
+  HomeRegion = "HomeRegion"
+  HasCustomEventSelectors = "HasCustomEventSelectors"
+  HasInsightSelectors = "HasInsightSelectors"
+  TrailArn = "TrailArn"
+  RetentionDays = "RetentionDays"
+  StoredBytes = "StoredBytes"
 )
 

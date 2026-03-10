@@ -94,7 +94,7 @@ func InteractiveTerminal(client *ssh.Client) error {
 		return err
 	}
 
-	signalc := make(chan os.Signal)
+	signalc := make(chan os.Signal, 1)
 	defer func() {
 		signal.Reset()
 		close(signalc)

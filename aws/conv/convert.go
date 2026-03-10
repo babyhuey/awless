@@ -52,6 +52,8 @@ import (
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
+	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
+	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 
 	"github.com/wallix/awless/cloud"
@@ -211,6 +213,12 @@ func InitResource(source interface{}) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.FileSystem, awssdk.ToString(ss.FileSystemId))
 	case efstypes.MountTargetDescription:
 		res = graph.InitResource(cloud.MountTarget, awssdk.ToString(ss.MountTargetId))
+	// CloudTrail
+	case cloudtrailtypes.Trail:
+		res = graph.InitResource(cloud.Trail, awssdk.ToString(ss.TrailARN))
+	// CloudWatch Logs
+	case cloudwatchlogstypes.LogGroup:
+		res = graph.InitResource(cloud.LogGroup, awssdk.ToString(ss.LogGroupName))
 	default:
 		return nil, fmt.Errorf("Unknown type of resource %T", source)
 	}
@@ -367,6 +375,22 @@ var extractTimeFn = func(i interface{}) (interface{}, error) {
 		return t.UTC(), nil
 	}
 	return nil, fmt.Errorf("extract time: expected time pointer, got: %T", i)
+}
+
+// Extract time from *int64 representing milliseconds since epoch (e.g., CloudWatch Logs CreationTime)
+var extractMillisecondEpochTimeFn = func(i interface{}) (interface{}, error) {
+	p, ok := i.(*int64)
+	if ok {
+		if p == nil {
+			return nil, nil
+		}
+		return time.UnixMilli(*p).UTC(), nil
+	}
+	v, ok := i.(int64)
+	if ok {
+		return time.UnixMilli(v).UTC(), nil
+	}
+	return nil, fmt.Errorf("extract millis epoch time: expected *int64 or int64, got: %T", i)
 }
 
 // Extract time that have a Z directly after the time without a space which means UTC

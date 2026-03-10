@@ -228,19 +228,19 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 						switch state {
 						case "stopped":
 							stoppedServicesCount++
-							deployments = append(deployments, &graph.KeyValue{arnToName(clusterArn), group[len("service:"):] + " (stopped service)"})
+							deployments = append(deployments, &graph.KeyValue{KeyName: arnToName(clusterArn), Value: group[len("service:"):] + " (stopped service)"})
 						case "running":
 							runningServicesCount++
-							deployments = append(deployments, &graph.KeyValue{arnToName(clusterArn), group[len("service:"):] + " (running service)"})
+							deployments = append(deployments, &graph.KeyValue{KeyName: arnToName(clusterArn), Value: group[len("service:"):] + " (running service)"})
 						}
 					}
 					if strings.HasPrefix(group, "family:") {
 						switch state {
 						case "stopped":
-							deployments = append(deployments, &graph.KeyValue{arnToName(clusterArn), group[len("family:"):] + " (stopped task)"})
+							deployments = append(deployments, &graph.KeyValue{KeyName: arnToName(clusterArn), Value: group[len("family:"):] + " (stopped task)"})
 							stoppedTasksCount++
 						case "running":
-							deployments = append(deployments, &graph.KeyValue{arnToName(clusterArn), group[len("family:"):] + " (running task)"})
+							deployments = append(deployments, &graph.KeyValue{KeyName: arnToName(clusterArn), Value: group[len("family:"):] + " (running task)"})
 							runningTasksCount++
 						}
 					}
@@ -1202,6 +1202,9 @@ func addManualApigatewayFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 func addManualSsmFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
+func addManualCloudtrailFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}
+
 func addManualEfsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	funcs["mounttarget"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
 		var resources []*graph.Resource
@@ -1234,4 +1237,7 @@ func addManualEfsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		}
 		return resources, objects, nil
 	}
+}
+
+func addManualCloudwatchlogsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }

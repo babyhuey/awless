@@ -84,6 +84,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.SSMParameter:        {properties.Name, properties.ParameterType, properties.DataType, properties.Tier, properties.Version, properties.Modified},
 	cloud.FileSystem:          {properties.ID, properties.Name, properties.State, properties.SizeBytes, properties.PerformanceMode, properties.ThroughputMode, properties.Encrypted, properties.Created},
 	cloud.MountTarget:         {properties.ID, properties.Subnet, properties.Vpc, properties.IPAddress, properties.LifecycleState},
+	cloud.Trail:               {properties.ID, properties.Name, properties.Arn, properties.IsMultiRegion, properties.S3BucketName, properties.HomeRegion},
+	cloud.LogGroup:            {properties.Name, properties.Arn, properties.RetentionDays, properties.StoredBytes, properties.Created},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -602,5 +604,22 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Vpc},
 		StringColumnDefinition{Prop: properties.IPAddress, Friendly: "IP Address"},
 		StringColumnDefinition{Prop: properties.LifecycleState, Friendly: "State"},
+	},
+	// CloudTrail
+	cloud.Trail: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Arn},
+		StringColumnDefinition{Prop: properties.IsMultiRegion, Friendly: "Multi-Region"},
+		StringColumnDefinition{Prop: properties.S3BucketName, Friendly: "S3 Bucket"},
+		StringColumnDefinition{Prop: properties.HomeRegion, Friendly: "Home Region"},
+	},
+	// CloudWatch Logs
+	cloud.LogGroup: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Arn},
+		StringColumnDefinition{Prop: properties.RetentionDays, Friendly: "Retention (days)"},
+		StringColumnDefinition{Prop: properties.StoredBytes, Friendly: "Stored (bytes)"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

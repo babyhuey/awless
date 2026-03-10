@@ -38,6 +38,10 @@ func ApiToInterface(api string) string {
 		return "ApiGatewayV2API"
 	case "secretsmanager":
 		return "SecretsManagerAPI"
+	case "cloudtrail":
+		return "CloudTrailAPI"
+	case "cloudwatchlogs":
+		return "CloudWatchLogsAPI"
 	case "route53", "lambda":
 		return strings.Title(api) + "API"
 	default:
@@ -242,6 +246,20 @@ var FetchersDefs = []fetchersDef{
 		Fetchers: []fetcher{
 			{Api: "efs", ResourceType: cloud.FileSystem, AWSType: "efstypes.FileSystemDescription", ApiMethod: "DescribeFileSystems", Input: "efs.DescribeFileSystemsInput{}", Output: "efs.DescribeFileSystemsOutput", OutputsExtractor: "FileSystems", Multipage: true, NextPageMarker: "NextMarker"},
 			{Api: "efs", ResourceType: cloud.MountTarget, AWSType: "efstypes.MountTargetDescription", ManualFetcher: true},
+		},
+	},
+	{
+		Name: "cloudtrail",
+		Api:  []string{"cloudtrail"},
+		Fetchers: []fetcher{
+			{Api: "cloudtrail", ResourceType: cloud.Trail, AWSType: "cloudtrailtypes.Trail", ApiMethod: "DescribeTrails", Input: "cloudtrail.DescribeTrailsInput{}", Output: "cloudtrail.DescribeTrailsOutput", OutputsExtractor: "TrailList"},
+		},
+	},
+	{
+		Name: "cloudwatchlogs",
+		Api:  []string{"cloudwatchlogs"},
+		Fetchers: []fetcher{
+			{Api: "cloudwatchlogs", ResourceType: cloud.LogGroup, AWSType: "cloudwatchlogstypes.LogGroup", ApiMethod: "DescribeLogGroups", Input: "cloudwatchlogs.DescribeLogGroupsInput{}", Output: "cloudwatchlogs.DescribeLogGroupsOutput", OutputsExtractor: "LogGroups", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
 }

@@ -14,6 +14,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.71.7
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.60.2
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.55.1
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.64.0
+	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.55.7
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.56.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.294.0
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.55.4

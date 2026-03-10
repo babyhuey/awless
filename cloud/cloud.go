@@ -115,6 +115,10 @@ const (
 	//efs
 	FileSystem  string = "filesystem"
 	MountTarget string = "mounttarget"
+	//cloudtrail
+	Trail string = "trail"
+	//cloudwatchlogs
+	LogGroup string = "loggroup"
 )
 
 type Service interface {

@@ -259,4 +259,15 @@ var PropertiesDefinitions = []property{
 	{AwlessLabel: "LifecycleState", RDFLabel: fmt.Sprintf("%s:lifecycleState", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "IPAddress", RDFLabel: fmt.Sprintf("%s:ipAddress", rdf.NetNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "NumberOfMountTargets", RDFLabel: fmt.Sprintf("%s:numberOfMountTargets", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdInt},
+	// New properties for CloudTrail
+	{AwlessLabel: "IsMultiRegion", RDFLabel: fmt.Sprintf("%s:isMultiRegion", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdBoolean},
+	{AwlessLabel: "IsLogging", RDFLabel: fmt.Sprintf("%s:isLogging", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdBoolean},
+	{AwlessLabel: "S3BucketName", RDFLabel: fmt.Sprintf("%s:s3BucketName", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
+	{AwlessLabel: "HomeRegion", RDFLabel: fmt.Sprintf("%s:homeRegion", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
+	{AwlessLabel: "HasCustomEventSelectors", RDFLabel: fmt.Sprintf("%s:hasCustomEventSelectors", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdBoolean},
+	{AwlessLabel: "HasInsightSelectors", RDFLabel: fmt.Sprintf("%s:hasInsightSelectors", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdBoolean},
+	{AwlessLabel: "TrailArn", RDFLabel: fmt.Sprintf("%s:trailArn", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
+	// CloudWatch Logs
+	{AwlessLabel: "RetentionDays", RDFLabel: fmt.Sprintf("%s:retentionDays", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdInt},
+	{AwlessLabel: "StoredBytes", RDFLabel: fmt.Sprintf("%s:storedBytes", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdInt},
 }

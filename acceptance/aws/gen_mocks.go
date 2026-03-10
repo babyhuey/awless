@@ -23,35 +23,7 @@ package awsat
 
 
 
-type autoscalingMock struct {
-  basicMock
-}
-
-type snsMock struct {
-  basicMock
-}
-
 type rdsMock struct {
-  basicMock
-}
-
-type acmMock struct {
-  basicMock
-}
-
-type iamMock struct {
-  basicMock
-}
-
-type applicationautoscalingMock struct {
-  basicMock
-}
-
-type ecrMock struct {
-  basicMock
-}
-
-type ec2Mock struct {
   basicMock
 }
 
@@ -59,27 +31,7 @@ type lambdaMock struct {
   basicMock
 }
 
-type cloudfrontMock struct {
-  basicMock
-}
-
-type ecsMock struct {
-  basicMock
-}
-
-type cloudformationMock struct {
-  basicMock
-}
-
-type s3Mock struct {
-  basicMock
-}
-
-type cloudwatchMock struct {
-  basicMock
-}
-
-type route53Mock struct {
+type acmMock struct {
   basicMock
 }
 
@@ -87,11 +39,59 @@ type elbv2Mock struct {
   basicMock
 }
 
-type elbMock struct {
+type applicationautoscalingMock struct {
+  basicMock
+}
+
+type route53Mock struct {
+  basicMock
+}
+
+type snsMock struct {
+  basicMock
+}
+
+type s3Mock struct {
+  basicMock
+}
+
+type ecrMock struct {
+  basicMock
+}
+
+type cloudfrontMock struct {
   basicMock
 }
 
 type sqsMock struct {
+  basicMock
+}
+
+type autoscalingMock struct {
+  basicMock
+}
+
+type cloudformationMock struct {
+  basicMock
+}
+
+type elbMock struct {
+  basicMock
+}
+
+type iamMock struct {
+  basicMock
+}
+
+type cloudwatchMock struct {
+  basicMock
+}
+
+type ecsMock struct {
+  basicMock
+}
+
+type ec2Mock struct {
   basicMock
 }
 
