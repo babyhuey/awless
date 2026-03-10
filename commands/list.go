@@ -78,8 +78,8 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-	Use:               "list",
-	Aliases:           []string{"ls"},
+	Use:     "list",
+	Aliases: []string{"ls"},
 	Example: `  awless list instances --sort uptime
   awless list users --format csv
   awless list volumes --filter state=in-use --filter type=gp2

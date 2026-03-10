@@ -74,8 +74,8 @@ func init() {
 }
 
 var RootCmd = &cobra.Command{
-	Use:                    "awless COMMAND",
-	Short:                  "Manage  and explore your cloud",
+	Use:   "awless COMMAND",
+	Short: "Manage  and explore your cloud",
 	Long: `awless is a powerful CLI to explore, sync and manage your cloud infrastructure.
 
 Supported services: EC2, IAM, S3, RDS, ELBv2, Auto Scaling, Lambda, SNS, SQS, Route53,
