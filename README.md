@@ -1,4 +1,6 @@
 
+[![CI](https://github.com/babyhuey/awless/actions/workflows/ci.yml/badge.svg)](https://github.com/babyhuey/awless/actions/workflows/ci.yml)
+[![Go Coverage](https://github.com/babyhuey/awless/wiki/coverage.svg)](https://raw.githack.com/wiki/babyhuey/awless/coverage.html)
 
 `awless` is a powerful, innovative and small surface command line interface (CLI) to manage Amazon Web Services.
 
@@ -77,6 +79,8 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **API Gateway v2** | APIs, routes, stages |
 | **Systems Manager (SSM)** | parameters |
 | **EFS** | file systems, mount targets |
+| **CloudTrail** | trails |
+| **CloudWatch Logs** | log groups |
 
 Services in **bold** are new in this fork.
 

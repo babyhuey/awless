@@ -34,6 +34,15 @@ jobs:
           name: coverage
           path: coverage.out
 
+      - name: Update coverage badge
+        if: github.ref == 'refs/heads/master'
+        uses: ncruces/go-coverage-report@v0
+        with:
+          coverage-file: coverage.out
+          report: true
+          chart: true
+          amend: true
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
