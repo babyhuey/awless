@@ -163,34 +163,38 @@ Note `git log` shows a prior "sort panic" fix (`71665081`), so this class of cra
 
 ---
 
-### B8: Goroutine leak on first error in fan-out helpers
+### B8: Goroutine leak on first error in fan-out helpers — **PARTIALLY FIXED**
 
 **Severity:** Medium  
-**Files:** `aws/fetch/s3_helpers.go:35`, `aws/fetch/s3_helpers.go:148`, `aws/fetch/ecs_helpers.go:60`, `inspect/inspectors/pricer.go:75`, `aws/conv/convert.go:263`
+**Fixed:** `aws/fetch/s3_helpers.go` (forEachBucketParallel, getBucketsPerRegion), `aws/fetch/ecs_helpers.go` (getAllTasks), `aws/conv/convert.go`, `inspect/inspectors/pricer.go`  
+**Remaining:** `aws/fetch/manual_fetchers.go`
 
-The recurring pattern spawns N goroutines that send to an **unbuffered** error channel, then the consumer returns on the first error:
+The pattern spawned one goroutine per item writing to an **unbuffered** error
+channel, while the consumer returned on the first error — leaving every other
+failing goroutine blocked on send forever, so `wg.Wait()` never completed and
+the channel was never closed.
 
-```go
-errc := make(chan error)          // unbuffered
-for _, output := range buckets {
-    go func(b s3types.Bucket) {
-        defer wg.Done()
-        if err := f(b); err != nil {
-            errc <- err            // blocks forever if nobody reads
-        }
-    }(output)
-}
-...
-for err := range errc {
-    if err != nil {
-        return err                 // abandons remaining senders
-    }
-}
-```
+Five sites were migrated to `errgroup` with `SetLimit` (see commit
+`bdee93f8`), which fixes the leak and bounds concurrency together.
 
-Once the consumer returns, any other goroutine that also failed blocks permanently on `errc <- err`. `wg.Wait()` never completes, so `close(errc)` never runs. For a long-lived process this leaks goroutines; for the CLI it leaks until exit but still holds resources and can mask errors.
+**Remaining work — 5 per-item fan-outs in `manual_fetchers.go`:**
 
-**Fix:** Either buffer the channel (`make(chan error, len(buckets))`), or drain all errors before returning, or use `errgroup.WithContext` which handles cancellation and collection correctly.
+| Line | Fans out over |
+|---|---|
+| 180 | ECS task definition ARNs |
+| 341 | ELBv2 load balancers |
+| 611 | IAM users |
+| 759 | (URL fetches) |
+| 884 | Route53 hosted zones |
+
+Note the original estimate of "5 sites" undercounted: `manual_fetchers.go` was
+not audited when this issue was written. The other ~15 `go func` occurrences in
+that file are single-producer streaming goroutines feeding `resourcesC`, a
+different and lower-severity pattern — they should be reviewed but are not the
+same leak.
+
+**Fix:** same treatment — `errgroup` with `SetLimit(maxParallelAWSCalls)`, the
+constant already added in `aws/fetch/limits.go`.
 
 ---
 
@@ -812,18 +816,23 @@ This is the worst combination: a codebase with heavy goroutine fan-out (20+ `go 
 
 ---
 
-### I13: Unbounded concurrency in fan-out fetchers
+### I13: Unbounded concurrency in fan-out fetchers — **PARTIALLY FIXED**
 
 **Severity:** Medium  
-**Files:** `aws/fetch/s3_helpers.go:35,148`, `aws/fetch/ecs_helpers.go:60,74`, `aws/conv/convert.go:263`, `inspect/inspectors/pricer.go:75`
+**Fixed / Remaining:** same split as `B8` above — both were fixed by the same change.
 
-The fan-out helpers spawn one goroutine per item with no concurrency limit. For an account with thousands of S3 buckets or ECS clusters, `awless sync` spawns thousands of simultaneous AWS API calls. This causes:
+Unbounded fan-out meant an account with thousands of buckets, clusters or IAM
+users issued that many simultaneous AWS API calls, reliably causing throttling
+(`RequestLimitExceeded`, `Throttling`) and unpredictable memory use.
 
-- API throttling (`RequestLimitExceeded`, `Throttling`) under normal operation on large accounts
-- Unpredictable memory use
-- No backpressure
+Bounded via `errgroup.SetLimit` at the five sites listed in `B8`.
+`aws/fetch/limits.go` defines `maxParallelAWSCalls = 20`;
+`inspect/inspectors/pricer.go` uses a local limit of 10 for the pricing
+endpoint.
 
-**Fix:** Bound concurrency with `errgroup.SetLimit(n)` (Go's `golang.org/x/sync/errgroup`) or a semaphore channel. A limit of 10–20 is a reasonable default; make it configurable via the existing `awless config` mechanism. This pairs naturally with the fix for B8 since both call for `errgroup`.
+**Remaining:** the 5 `manual_fetchers.go` sites in `B8`. Consider also making
+the limit configurable via `awless config` if 20 proves wrong for very large
+accounts.
 
 ---
 
