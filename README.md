@@ -1,6 +1,6 @@
 
-[![CI](https://github.com/babyhuey/awless/actions/workflows/ci.yml/badge.svg)](https://github.com/babyhuey/awless/actions/workflows/ci.yml)
-[![Go Coverage](https://github.com/babyhuey/awless/wiki/coverage.svg)](https://raw.githack.com/wiki/babyhuey/awless/coverage.html)
+[![CI](https://github.com/bootswithdefer/awless/actions/workflows/ci.yml/badge.svg)](https://github.com/bootswithdefer/awless/actions/workflows/ci.yml)
+[![Go Coverage](https://github.com/bootswithdefer/awless/wiki/coverage.svg)](https://raw.githack.com/wiki/bootswithdefer/awless/coverage.html)
 
 `awless` is a powerful, innovative and small surface command line interface (CLI) to manage Amazon Web Services.
 
@@ -36,7 +36,7 @@ go install github.com/bootswithdefer/awless@latest
 Or clone and build:
 
 ```sh
-git clone https://github.com/babyhuey/awless.git
+git clone https://github.com/bootswithdefer/awless.git
 cd awless
 go build -o awless .
 ```
@@ -51,7 +51,7 @@ git config core.hooksPath .githooks
 
 ### Pre-built binaries
 
-Download the latest `awless` binaries (Windows/Linux/macOS) [from Github releases](https://github.com/babyhuey/awless/releases/latest).
+Download the latest `awless` binaries (Windows/Linux/macOS) [from Github releases](https://github.com/bootswithdefer/awless/releases/latest).
 
 ### Configuration
 
@@ -211,7 +211,7 @@ Terraform is much broader in scope. `awless` takes a different approach:
 
 # About
 
-`awless` was originally created by Henri Binsztok, Quentin Bourgerie, Simon Caplette and Francois-Xavier Aguessy at [WALLIX](https://github.com/wallix). This fork is maintained by [babyhuey](https://github.com/babyhuey).
+`awless` was originally created by Henri Binsztok, Quentin Bourgerie, Simon Caplette and Francois-Xavier Aguessy at [WALLIX](https://github.com/wallix). This fork is maintained by [bootswithdefer](https://github.com/bootswithdefer).
 
 `awless` is released under the Apache License.
 
@@ -219,4 +219,4 @@ Terraform is much broader in scope. `awless` takes a different approach:
     we will not be responsible for any cloud costs incurred (even if you create a
     million instances using awless templates).
 
-Contributors are welcome! Note that `awless` uses [triplestore](https://github.com/wallix/triplestore) another project developed at WALLIX.
+Contributors are welcome! Note that `awless` uses [triplestore](https://github.com/bootswithdefer/triplestore) another project developed at WALLIX.
