@@ -32,7 +32,7 @@ func Parse(text string) (tmpl *Template, err error) {
 		if rerr := recover(); rerr != nil {
 			switch rerr := rerr.(type) {
 			case error:
-				err = fmt.Errorf("template parsing: %s", rerr)
+				err = fmt.Errorf("template parsing: %w", rerr)
 			default:
 				panic(rerr)
 			}
@@ -79,7 +79,7 @@ func parseParamsAsCommandNode(text string) (*ast.CommandNode, error) {
 	full := fmt.Sprintf("none none %s", text)
 	n, err := parseStatement(full)
 	if err != nil {
-		return nil, fmt.Errorf("parse params: %s", err)
+		return nil, fmt.Errorf("parse params: %w", err)
 	}
 
 	switch n := n.(type) {

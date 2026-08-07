@@ -411,7 +411,7 @@ func (cmd *DeleteContainertask) ParamsSpec() params.Spec {
 
 func (cmd *DeleteContainertask) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 	taskDefinitionName := StringValue(cmd.Name)
 
@@ -451,7 +451,7 @@ func (cmd *DeleteContainertask) ManualRun(renv env.Running) (interface{}, error)
 			cmd.logger.ExtraVerbosef("deleting '%s'", task)
 			start := time.Now()
 			if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: aws.String(task)}); err != nil {
-				return nil, fmt.Errorf("deregister task definition: %s", err)
+				return nil, fmt.Errorf("deregister task definition: %w", err)
 			}
 			cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))
 		}
@@ -465,7 +465,7 @@ func (cmd *DeleteContainertask) ManualRun(renv env.Running) (interface{}, error)
 		cmd.logger.ExtraVerbosef("deleting '%s'", aws.ToString(taskDefOutput.TaskDefinition.TaskDefinitionArn))
 		start := time.Now()
 		if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: taskDefOutput.TaskDefinition.TaskDefinitionArn}); err != nil {
-			return nil, fmt.Errorf("deregister task definition: %s", err)
+			return nil, fmt.Errorf("deregister task definition: %w", err)
 		}
 		cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))
 	}

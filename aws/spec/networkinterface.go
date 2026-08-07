@@ -107,7 +107,7 @@ func (cmd *DetachNetworkinterface) ParamsSpec() params.Spec {
 
 func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DetachNetworkInterfaceInput{}

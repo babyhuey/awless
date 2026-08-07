@@ -99,7 +99,7 @@ func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (interface{}, error
 				if e, ok := err.(*exec.ExitError); ok {
 					return nil, fmt.Errorf("error running docker command: %s", e.Stderr)
 				}
-				return nil, fmt.Errorf("error running docker command: %s", err)
+				return nil, fmt.Errorf("error running docker command: %w", err)
 			}
 			if len(out) > 0 {
 				cmd.logger.Info(string(out))

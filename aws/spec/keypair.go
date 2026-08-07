@@ -81,10 +81,10 @@ func (cmd *CreateKeypair) BeforeRun(renv env.Running) error {
 	pub, priv, err := console.GenerateSSHKeyPair(4096, encrypted)
 	cmd.logger.ExtraVerbosef("4096 bits key generation took %s", time.Since(start))
 	if err != nil {
-		return fmt.Errorf("generating key: %s", err)
+		return fmt.Errorf("generating key: %w", err)
 	}
 	if err = os.WriteFile(privKeyPath, priv, 0400); err != nil {
-		return fmt.Errorf("saving private key: %s", err)
+		return fmt.Errorf("saving private key: %w", err)
 	}
 	cmd.PublicKeyMaterial = pub
 	return nil

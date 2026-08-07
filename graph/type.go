@@ -74,18 +74,18 @@ func (r *FirewallRule) unmarshalFromTriples(g tstore.RDFGraph, id string) error 
 	portRangeTs := g.WithSubjPred(id, rdf.PortRange)
 	ports, err := extractUniqueLiteralTextFromTriples(portRangeTs)
 	if err != nil {
-		return fmt.Errorf("unmarshal firewall rule: port range: %s", err)
+		return fmt.Errorf("unmarshal firewall rule: port range: %w", err)
 	}
 	pr, err := ParsePortRange(ports)
 	if err != nil {
-		return fmt.Errorf("unmarshal firewall rule: %s", err)
+		return fmt.Errorf("unmarshal firewall rule: %w", err)
 	}
 	r.PortRange = pr
 
 	protocolTs := g.WithSubjPred(id, rdf.Protocol)
 	protocol, err := extractUniqueLiteralTextFromTriples(protocolTs)
 	if err != nil {
-		return fmt.Errorf("unmarshal firewall rule: protocol: %s", err)
+		return fmt.Errorf("unmarshal firewall rule: protocol: %w", err)
 	}
 	r.Protocol = protocol
 
@@ -93,11 +93,11 @@ func (r *FirewallRule) unmarshalFromTriples(g tstore.RDFGraph, id string) error 
 	for _, cidrT := range cidrTs {
 		cidrTxt, err := tstore.ParseString(cidrT.Object())
 		if err != nil {
-			return fmt.Errorf("unmarshal firewall rule: cidr: %s", err)
+			return fmt.Errorf("unmarshal firewall rule: cidr: %w", err)
 		}
 		_, cidr, err := net.ParseCIDR(cidrTxt)
 		if err != nil {
-			return fmt.Errorf("unmarshal firewall rule: cidr: %s", err)
+			return fmt.Errorf("unmarshal firewall rule: cidr: %w", err)
 		}
 		r.IPRanges = append(r.IPRanges, cidr)
 	}
@@ -106,7 +106,7 @@ func (r *FirewallRule) unmarshalFromTriples(g tstore.RDFGraph, id string) error 
 	for _, sourceT := range sourceTs {
 		source, err := tstore.ParseString(sourceT.Object())
 		if err != nil {
-			return fmt.Errorf("unmarshal firewall rule: source: %s", err)
+			return fmt.Errorf("unmarshal firewall rule: source: %w", err)
 		}
 		r.Sources = append(r.Sources, source)
 	}
@@ -234,11 +234,11 @@ func (r *Route) unmarshalFromTriples(g tstore.RDFGraph, id string) error {
 	if len(routeDestTs) > 0 {
 		dest, err := extractUniqueLiteralTextFromTriples(routeDestTs)
 		if err != nil {
-			return fmt.Errorf("unmarshal route: destination: %s", err)
+			return fmt.Errorf("unmarshal route: destination: %w", err)
 		}
 		_, r.Destination, err = net.ParseCIDR(dest)
 		if err != nil {
-			return fmt.Errorf("unmarshal route: destination: %s", err)
+			return fmt.Errorf("unmarshal route: destination: %w", err)
 		}
 	}
 
@@ -247,11 +247,11 @@ func (r *Route) unmarshalFromTriples(g tstore.RDFGraph, id string) error {
 	if len(routeDestv6Ts) > 0 {
 		destv6, err := extractUniqueLiteralTextFromTriples(routeDestv6Ts)
 		if err != nil {
-			return fmt.Errorf("unmarshal route: destinationV6: %s", err)
+			return fmt.Errorf("unmarshal route: destinationV6: %w", err)
 		}
 		_, r.DestinationIPv6, err = net.ParseCIDR(destv6)
 		if err != nil {
-			return fmt.Errorf("unmarshal route: destinationV6: %s", err)
+			return fmt.Errorf("unmarshal route: destinationV6: %w", err)
 		}
 	}
 
@@ -260,7 +260,7 @@ func (r *Route) unmarshalFromTriples(g tstore.RDFGraph, id string) error {
 		var err error
 		r.DestinationPrefixListId, err = extractUniqueLiteralTextFromTriples(destPrefixTs)
 		if err != nil {
-			return fmt.Errorf("unmarshal route: destination prefix: %s", err)
+			return fmt.Errorf("unmarshal route: destination prefix: %w", err)
 		}
 	}
 
@@ -272,7 +272,7 @@ func (r *Route) unmarshalFromTriples(g tstore.RDFGraph, id string) error {
 		}
 		target, err := ParseRouteTarget(litText)
 		if err != nil {
-			return fmt.Errorf("unmarshal route target: %s", err)
+			return fmt.Errorf("unmarshal route target: %w", err)
 		}
 		r.Targets = append(r.Targets, target)
 	}
@@ -316,7 +316,7 @@ func (g *Grant) unmarshalFromTriples(gph tstore.RDFGraph, id string) error {
 	var err error
 	g.Permission, err = extractUniqueLiteralTextFromTriples(permissionTs)
 	if err != nil {
-		return fmt.Errorf("unmarshal grant: permission: %s", err)
+		return fmt.Errorf("unmarshal grant: permission: %w", err)
 	}
 	granteeTs := gph.WithSubjPred(id, rdf.Grantee)
 	if len(granteeTs) != 1 {
@@ -330,14 +330,14 @@ func (g *Grant) unmarshalFromTriples(gph tstore.RDFGraph, id string) error {
 	if len(granteeIdTs) > 0 {
 		g.Grantee.GranteeID, err = extractUniqueLiteralTextFromTriples(granteeIdTs)
 		if err != nil {
-			return fmt.Errorf("unmarshal grant: grantee id: %s", err)
+			return fmt.Errorf("unmarshal grant: grantee id: %w", err)
 		}
 	}
 	granteeNameTs := gph.WithSubjPred(granteeNode, rdf.Name)
 	if len(granteeNameTs) > 0 {
 		g.Grantee.GranteeDisplayName, err = extractUniqueLiteralTextFromTriples(granteeNameTs)
 		if err != nil {
-			return fmt.Errorf("unmarshal grant: grantee name: %s", err)
+			return fmt.Errorf("unmarshal grant: grantee name: %w", err)
 		}
 	}
 
@@ -345,7 +345,7 @@ func (g *Grant) unmarshalFromTriples(gph tstore.RDFGraph, id string) error {
 	if len(granteeTypeTs) > 0 {
 		g.Grantee.GranteeType, err = extractUniqueLiteralTextFromTriples(granteeTypeTs)
 		if err != nil {
-			return fmt.Errorf("unmarshal grant: grantee type: %s", err)
+			return fmt.Errorf("unmarshal grant: grantee type: %w", err)
 		}
 	}
 
@@ -374,11 +374,11 @@ func (kv *KeyValue) unmarshalFromTriples(gph tstore.RDFGraph, id string) error {
 	var err error
 	kv.KeyName, err = extractUniqueLiteralTextFromGraph(gph, id, rdf.KeyName)
 	if err != nil {
-		return fmt.Errorf("unmarshal keyvalue: key name: %s", err)
+		return fmt.Errorf("unmarshal keyvalue: key name: %w", err)
 	}
 	kv.Value, err = extractUniqueLiteralTextFromGraph(gph, id, rdf.Value)
 	if err != nil {
-		return fmt.Errorf("unmarshal keyvalue: val name: %s", err)
+		return fmt.Errorf("unmarshal keyvalue: val name: %w", err)
 	}
 	return nil
 }
@@ -422,23 +422,23 @@ func (o *DistributionOrigin) unmarshalFromTriples(gph tstore.RDFGraph, id string
 	var err error
 	o.ID, err = extractUniqueLiteralTextFromGraph(gph, id, rdf.ID)
 	if err != nil {
-		return fmt.Errorf("unmarshal DistributionOrigin: extract id: %s", err)
+		return fmt.Errorf("unmarshal DistributionOrigin: extract id: %w", err)
 	}
 	o.PublicDNS, err = extractUniqueLiteralTextFromGraph(gph, id, rdf.PublicDNS)
 	if err != nil {
-		return fmt.Errorf("unmarshal DistributionOrigin: extract PublicDNS: %s", err)
+		return fmt.Errorf("unmarshal DistributionOrigin: extract PublicDNS: %w", err)
 	}
 	o.PathPrefix, err = extractUniqueLiteralTextFromGraph(gph, id, rdf.PathPrefix)
 	if err != nil {
-		return fmt.Errorf("unmarshal DistributionOrigin: extract PathPrefix: %s", err)
+		return fmt.Errorf("unmarshal DistributionOrigin: extract PathPrefix: %w", err)
 	}
 	o.OriginType, err = extractUniqueLiteralTextFromGraph(gph, id, rdf.Type)
 	if err != nil {
-		return fmt.Errorf("unmarshal DistributionOrigin: extract Type: %s", err)
+		return fmt.Errorf("unmarshal DistributionOrigin: extract Type: %w", err)
 	}
 	o.Config, err = extractUniqueLiteralTextFromGraph(gph, id, rdf.Config)
 	if err != nil {
-		return fmt.Errorf("unmarshal DistributionOrigin: extract Config: %s", err)
+		return fmt.Errorf("unmarshal DistributionOrigin: extract Config: %w", err)
 	}
 	return nil
 }

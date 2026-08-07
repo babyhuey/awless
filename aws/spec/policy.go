@@ -73,7 +73,7 @@ func (cmd *CreatePolicy) BeforeRun(renv env.Running) error {
 
 	b, err := json.MarshalIndent(policy, "", " ")
 	if err != nil {
-		return fmt.Errorf("cannot marshal policy document: %s", err)
+		return fmt.Errorf("cannot marshal policy document: %w", err)
 	}
 	cmd.Document = String(string(b))
 	cmd.logger.ExtraVerbosef("policy document json:\n%s\n", string(b))
@@ -131,7 +131,7 @@ func (cmd *UpdatePolicy) BeforeRun(renv env.Running) error {
 
 	b, err := json.MarshalIndent(defaultPolicyDocument, "", " ")
 	if err != nil {
-		return fmt.Errorf("cannot marshal policy document: %s", err)
+		return fmt.Errorf("cannot marshal policy document: %w", err)
 	}
 	cmd.Document = String(string(b))
 	cmd.DefaultVersion = aws.Bool(true)
@@ -166,7 +166,7 @@ func (cmd *UpdatePolicy) getPolicyLastVersionDocument(arn *string) (string, erro
 	}
 	document, err := url.QueryUnescape(aws.ToString(defaultVersion.Document))
 	if err != nil {
-		return "", fmt.Errorf("decoding policy document: %s", err)
+		return "", fmt.Errorf("decoding policy document: %w", err)
 	}
 	return document, nil
 }
@@ -190,13 +190,13 @@ func (cmd *DeletePolicy) BeforeRun(renv env.Running) error {
 	if BoolValue(cmd.AllVersions) {
 		list, err := cmd.api.ListPolicyVersions(context.Background(), &iam.ListPolicyVersionsInput{PolicyArn: cmd.Arn})
 		if err != nil {
-			return fmt.Errorf("list all policy versions: %s", err)
+			return fmt.Errorf("list all policy versions: %w", err)
 		}
 		for _, v := range list.Versions {
 			if !v.IsDefaultVersion {
 				cmd.logger.Verbosef("deleting version '%s' of policy '%s'", aws.ToString(v.VersionId), StringValue(cmd.Arn))
 				if _, err := cmd.api.DeletePolicyVersion(context.Background(), &iam.DeletePolicyVersionInput{PolicyArn: cmd.Arn, VersionId: v.VersionId}); err != nil {
-					return fmt.Errorf("delete version %s: %s", aws.ToString(v.VersionId), err)
+					return fmt.Errorf("delete version %s: %w", aws.ToString(v.VersionId), err)
 				}
 			}
 		}

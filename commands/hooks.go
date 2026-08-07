@@ -47,7 +47,7 @@ func applyHooks(funcs ...func(*cobra.Command, []string) error) func(*cobra.Comma
 
 func initAwlessEnvHook(cmd *cobra.Command, args []string) error {
 	if err := config.InitAwlessEnv(); err != nil {
-		return fmt.Errorf("cannot init awless environment: %s", err)
+		return fmt.Errorf("cannot init awless environment: %w", err)
 	}
 
 	return applyRegionAndProfilePrecedence()
@@ -255,7 +255,7 @@ func hasEmbeddedRegionInSharedConfigForProfile(profile string) (string, bool, er
 		awsconfig.WithSharedConfigProfile(profile),
 	)
 	if err != nil {
-		return "", false, fmt.Errorf("cannot check profile '%s' has embedded region in shared config file: %s", profile, err)
+		return "", false, fmt.Errorf("cannot check profile '%s' has embedded region in shared config file: %w", profile, err)
 	}
 	region := cfg.Region
 	return region, len(region) > 0, nil

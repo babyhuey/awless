@@ -86,7 +86,7 @@ func (cmd *UpdateImage) ParamsSpec() params.Spec {
 func (cmd *UpdateImage) prepareImageAttributeInput(ctx map[string]interface{}) (*ec2.ModifyImageAttributeInput, error) {
 	input := &ec2.ModifyImageAttributeInput{}
 	if err := structInjector(cmd, input, ctx); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %w", err)
 	}
 	if cmd.Accounts != nil || cmd.Groups != nil {
 		input.Attribute = awssdk.String("launchPermission")
@@ -106,7 +106,7 @@ func (cmd *UpdateImage) ManualRun(renv env.Running) (interface{}, error) {
 		return nil, err
 	}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %w", err)
 	}
 	start := time.Now()
 	output, err := cmd.api.ModifyImageAttribute(context.Background(), input)
@@ -116,7 +116,7 @@ func (cmd *UpdateImage) ManualRun(renv env.Running) (interface{}, error) {
 
 func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("dry run: cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("dry run: cannot set params on command struct: %w", err)
 	}
 	input, err := cmd.prepareImageAttributeInput(renv.Context())
 	if err != nil {
@@ -124,7 +124,7 @@ func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]interface{}) 
 	}
 	input.DryRun = awssdk.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("dry run: cannot inject in ec2.ModifyImageAttributeInput: %s", err)
+		return nil, fmt.Errorf("dry run: cannot inject in ec2.ModifyImageAttributeInput: %w", err)
 	}
 
 	start := time.Now()
@@ -138,7 +138,7 @@ func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]interface{}) 
 		}
 	}
 
-	return nil, fmt.Errorf("dry run: %s", err)
+	return nil, fmt.Errorf("dry run: %w", err)
 }
 
 type CopyImage struct {
@@ -208,7 +208,7 @@ func (cmd *DeleteImage) ParamsSpec() params.Spec {
 
 func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 	input := &ec2.DeregisterImageInput{}
 	input.DryRun = Bool(true)
@@ -273,7 +273,7 @@ func (cmd *DeleteImage) ManualRun(renv env.Running) (interface{}, error) {
 				return nil, err
 			}
 			if _, err := deleteSnapshot.Run(renv, entries); err != nil {
-				return nil, fmt.Errorf("delete snapshot %s: %s", snap, err)
+				return nil, fmt.Errorf("delete snapshot %s: %w", snap, err)
 			}
 		}
 	}

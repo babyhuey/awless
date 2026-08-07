@@ -35,7 +35,7 @@ func (db *DB) AddTemplate(tplExec *template.TemplateExecution) error {
 
 		bucket, err := tx.CreateBucketIfNotExists([]byte(TEMPLATES_BUCKET))
 		if err != nil {
-			return fmt.Errorf("create bucket %s: %s", TEMPLATES_BUCKET, err)
+			return fmt.Errorf("create bucket %s: %w", TEMPLATES_BUCKET, err)
 		}
 
 		b, err := tplExec.MarshalJSON()

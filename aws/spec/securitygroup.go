@@ -90,7 +90,7 @@ func (cmd *UpdateSecuritygroup) ParamsSpec() params.Spec {
 
 func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 	ipPerms, err := cmd.buildIpPermissions()
 	if err != nil {
@@ -135,7 +135,7 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]inter
 			return nil, nil
 		}
 	}
-	return nil, fmt.Errorf("dry run: update securitygroup: %s", err)
+	return nil, fmt.Errorf("dry run: update securitygroup: %w", err)
 }
 
 func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
@@ -271,7 +271,7 @@ func (cmd *AttachSecuritygroup) ParamsSpec() params.Spec {
 func (cmd *AttachSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
 	groups, err := fetchInstanceSecurityGroups(cmd.api, StringValue(cmd.Instance))
 	if err != nil {
-		return nil, fmt.Errorf("fetching securitygroups for instance %s: %s", StringValue(cmd.Instance), err)
+		return nil, fmt.Errorf("fetching securitygroups for instance %s: %w", StringValue(cmd.Instance), err)
 	}
 
 	groups = append(groups, StringValue(cmd.Id))
@@ -303,7 +303,7 @@ func (cmd *DetachSecuritygroup) ParamsSpec() params.Spec {
 func (cmd *DetachSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
 	groups, err := fetchInstanceSecurityGroups(cmd.api, StringValue(cmd.Instance))
 	if err != nil {
-		return nil, fmt.Errorf("fetching securitygroups for instance %s: %s", StringValue(cmd.Instance), err)
+		return nil, fmt.Errorf("fetching securitygroups for instance %s: %w", StringValue(cmd.Instance), err)
 	}
 
 	cleaned := removeString(groups, StringValue(cmd.Id))

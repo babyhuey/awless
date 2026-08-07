@@ -75,7 +75,7 @@ func (cmd *AttachInstanceprofile) ParamsSpec() params.Spec {
 
 func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 	if BoolValue(cmd.Replace) {
 		in := &ec2.DescribeIamInstanceProfileAssociationsInput{
@@ -85,7 +85,7 @@ func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]int
 		}
 		out, err := cmd.api.DescribeIamInstanceProfileAssociations(context.Background(), in)
 		if err != nil {
-			return nil, fmt.Errorf("replace mode on: cannot get: %s", err)
+			return nil, fmt.Errorf("replace mode on: cannot get: %w", err)
 		}
 		if assocs := out.IamInstanceProfileAssociations; len(assocs) > 0 {
 			for _, ass := range assocs {
@@ -128,7 +128,7 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 						},
 					})
 				if err != nil {
-					return nil, fmt.Errorf("attach instanceprofile: replace mode on: cannot replace with new instance profile: %s", err)
+					return nil, fmt.Errorf("attach instanceprofile: replace mode on: cannot replace with new instance profile: %w", err)
 				}
 
 				cmd.logger.Verbosef("attach profile: replaced profile '%s' with '%s' on instance %s", oldProfileArn, profileName, instanceId)
@@ -177,7 +177,7 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 			},
 		})
 	if err != nil {
-		return nil, fmt.Errorf("cannot list profile on instance %s: %s", instanceId, err)
+		return nil, fmt.Errorf("cannot list profile on instance %s: %w", instanceId, err)
 	}
 
 	assocs := out.IamInstanceProfileAssociations

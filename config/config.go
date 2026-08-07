@@ -168,7 +168,7 @@ func Unset(key string) error {
 		if err := database.Execute(func(db *database.DB) error {
 			return db.UnsetConfig(dbKey, key)
 		}); err != nil {
-			return fmt.Errorf("unset config: %s", err)
+			return fmt.Errorf("unset config: %w", err)
 		}
 	}
 

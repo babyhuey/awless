@@ -172,22 +172,22 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 
 		propId, err := rdf.Properties.GetRDFId(key)
 		if err != nil {
-			return triples, fmt.Errorf("resource %s: marshaling property: %s", res, err)
+			return triples, fmt.Errorf("resource %s: marshaling property: %w", res, err)
 		}
 
 		propType, err := rdf.Properties.GetDefinedBy(propId)
 		if err != nil {
-			return triples, fmt.Errorf("resource %s: marshaling property: %s", res, err)
+			return triples, fmt.Errorf("resource %s: marshaling property: %w", res, err)
 		}
 		dataType, err := rdf.Properties.GetDataType(propId)
 		if err != nil {
-			return triples, fmt.Errorf("resource %s: marshaling property: %s", res, err)
+			return triples, fmt.Errorf("resource %s: marshaling property: %w", res, err)
 		}
 		switch propType {
 		case rdf.RdfsLiteral, rdf.RdfsClass:
 			obj, err := marshalToRdfObject(value, propType, dataType)
 			if err != nil {
-				return triples, fmt.Errorf("resource %s: marshaling property '%s': %s", res, key, err)
+				return triples, fmt.Errorf("resource %s: marshaling property '%s': %w", res, key, err)
 			}
 			triples = append(triples, tstore.SubjPred(res.Id(), propId).Object(obj))
 		case rdf.RdfsList:
@@ -295,16 +295,16 @@ func (res *Resource) unmarshalFullRdf(gph tstore.RDFGraph) error {
 
 		propKey, err := rdf.Properties.GetLabel(pred)
 		if err != nil {
-			return fmt.Errorf("unmarshaling property: label: %s", err)
+			return fmt.Errorf("unmarshaling property: label: %w", err)
 		}
 		propVal, err := getPropertyValue(gph, t.Object(), pred)
 		if err != nil {
-			return fmt.Errorf("unmarshaling property '%s' of resource '%s': %s", propKey, res.Id(), err)
+			return fmt.Errorf("unmarshaling property '%s' of resource '%s': %w", propKey, res.Id(), err)
 		}
 		if rdf.Properties.IsRDFList(pred) {
 			dataType, err := rdf.Properties.GetDataType(pred)
 			if err != nil {
-				return fmt.Errorf("unmarshaling property: datatype: %s", err)
+				return fmt.Errorf("unmarshaling property: datatype: %w", err)
 			}
 			switch dataType {
 			case rdf.RdfsClass, rdf.XsdString:

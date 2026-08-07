@@ -131,16 +131,16 @@ func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, err
 		fullpath := filepath.Join(serviceDir, fmt.Sprintf("%s%s", name, fileExt))
 		f, err := os.OpenFile(fullpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
-			allErrors = append(allErrors, fmt.Errorf("opening %s: %s", fullpath, err))
+			allErrors = append(allErrors, fmt.Errorf("opening %s: %w", fullpath, err))
 			continue
 		}
 		closeFile := func() {
 			if err := f.Close(); err != nil {
-				allErrors = append(allErrors, fmt.Errorf("closing file %s: %s", fullpath, err))
+				allErrors = append(allErrors, fmt.Errorf("closing file %s: %w", fullpath, err))
 			}
 		}
 		if err := g.MarshalTo(f); err != nil {
-			allErrors = append(allErrors, fmt.Errorf("marshal to %s: %s", fullpath, err))
+			allErrors = append(allErrors, fmt.Errorf("marshal to %s: %w", fullpath, err))
 			closeFile()
 			continue
 		}
@@ -157,7 +157,7 @@ func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, err
 
 	if runtime.GOOS != "windows" { // https://github.com/bootswithdefer/awless/issues/119
 		if err := s.Commit(filepaths...); err != nil {
-			allErrors = append(allErrors, fmt.Errorf("committing %s: %s", strings.Join(filepaths, ", "), err))
+			allErrors = append(allErrors, fmt.Errorf("committing %s: %w", strings.Join(filepaths, ", "), err))
 		}
 	}
 

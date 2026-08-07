@@ -50,13 +50,13 @@ func (cmd *CreateTag) ParamsSpec() params.Spec {
 
 func (cmd *CreateTag) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("dry run: cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("dry run: cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateTagsInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("dry run: cannot inject in ec2.CreateTagsInput: %s", err)
+		return nil, fmt.Errorf("dry run: cannot inject in ec2.CreateTagsInput: %w", err)
 	}
 	input.Tags = []ec2types.Tag{{Key: cmd.Key, Value: cmd.Value}}
 
@@ -71,13 +71,13 @@ func (cmd *CreateTag) dryRun(renv env.Running, params map[string]interface{}) (i
 		}
 	}
 
-	return nil, fmt.Errorf("dry run: %s", err)
+	return nil, fmt.Errorf("dry run: %w", err)
 }
 
 func (cmd *CreateTag) ManualRun(renv env.Running) (interface{}, error) {
 	input := &ec2.CreateTagsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateTagsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateTagsInput: %w", err)
 	}
 	input.Tags = []ec2types.Tag{{Key: cmd.Key, Value: cmd.Value}}
 
@@ -115,13 +115,13 @@ func (cmd *DeleteTag) ParamsSpec() params.Spec {
 
 func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteTagsInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteTagsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTagsInput: %w", err)
 	}
 	input.Tags = []ec2types.Tag{{Key: cmd.Key, Value: cmd.Value}}
 
@@ -142,7 +142,7 @@ func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]interface{}) (i
 func (cmd *DeleteTag) ManualRun(renv env.Running) (interface{}, error) {
 	input := &ec2.DeleteTagsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteTagsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTagsInput: %w", err)
 	}
 	input.Tags = []ec2types.Tag{{Key: cmd.Key, Value: cmd.Value}}
 

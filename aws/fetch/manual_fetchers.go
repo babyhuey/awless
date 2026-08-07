@@ -688,11 +688,11 @@ func addManualStorageFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			bucketM.Unlock()
 			res, err := awsconv.NewResource(b)
 			if err != nil {
-				return fmt.Errorf("build resource for bucket `%s`: %s", awssdk.ToString(b.Name), err)
+				return fmt.Errorf("build resource for bucket `%s`: %w", awssdk.ToString(b.Name), err)
 			}
 			grants, err := fetchAndExtractGrantsFn(ctx, conf.APIs.S3, awssdk.ToString(b.Name))
 			if err != nil {
-				return fmt.Errorf("fetching grants for bucket %s: %s", awssdk.ToString(b.Name), err)
+				return fmt.Errorf("fetching grants for bucket %s: %w", awssdk.ToString(b.Name), err)
 			}
 			res.Properties()[properties.Grants] = grants
 			bucketM.Lock()

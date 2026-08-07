@@ -78,7 +78,7 @@ type rawJSONPrinter struct {
 
 func (p *rawJSONPrinter) print(t *template.TemplateExecution) error {
 	if err := json.NewEncoder(p.w).Encode(t); err != nil {
-		return fmt.Errorf("json printer: %s", err)
+		return fmt.Errorf("json printer: %w", err)
 	}
 	return nil
 }

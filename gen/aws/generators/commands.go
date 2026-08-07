@@ -285,7 +285,7 @@ func (cmd *{{ $cmdName }}) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 	
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -297,7 +297,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 	{{ if $tag.Call }}
 	input := &{{ $tag.Input }}{}
 	if err := structInjector(cmd, input, renv.Context()) ; err != nil {
-		return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %s", err)
+		return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -344,13 +344,13 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 	{{ if $tag.GenDryRun }}
 	func (cmd *{{ $cmdName }}) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 		if err := cmd.inject(params); err != nil {
-			return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+			return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 		}
 
 		input := &{{ $tag.Input }}{}
 		input.DryRun = aws.Bool(true)
 		if err := structInjector(cmd, input, renv.Context()) ; err != nil {
-			return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %s", err)
+			return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %w", err)
 		}
 		if v, ok := implementsInputPostProcessor(cmd); ok {
 			v.PostProcessInput(input)

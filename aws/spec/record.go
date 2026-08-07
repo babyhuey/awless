@@ -121,7 +121,7 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 				delete(values, "id")
 				r, err := cmd.graph.FindOne(cloud.NewQuery(cloud.Record).Match(match.Property(properties.ID, id)))
 				if err != nil {
-					return values, fmt.Errorf("can not find record for %s: %s", id, err)
+					return values, fmt.Errorf("can not find record for %s: %w", id, err)
 				}
 				if r == nil {
 					return values, fmt.Errorf("record not found with id '%s' in local model ", id)
@@ -140,7 +140,7 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 				}
 				parents, err := cmd.graph.ResourceRelations(r, rdf.ParentOf, false)
 				if err != nil {
-					return values, fmt.Errorf("cannot get record's zone: %s", err)
+					return values, fmt.Errorf("cannot get record's zone: %w", err)
 				}
 				if len(parents) != 1 || parents[0].Type() != cloud.Zone {
 					return values, fmt.Errorf("record is not in a zone, got %v ", parents)

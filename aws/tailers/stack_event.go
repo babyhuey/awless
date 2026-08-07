@@ -114,7 +114,7 @@ func (t *stackEventTailer) Tail(w io.Writer) error {
 				color.Red("Canceling update of stack %q", t.stackName)
 				err := t.cancelStackUpdate(cfn)
 				if err != nil {
-					return fmt.Errorf("Couldn't cancel stack update.\nError: %s\nStack update could be running, please check manually", err)
+					return fmt.Errorf("Couldn't cancel stack update.\nError: %w\nStack update could be running, please check manually", err)
 				}
 			} else {
 				return fmt.Errorf("Timeout (%s) reached. Exiting...", t.timeout.String())

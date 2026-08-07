@@ -40,11 +40,11 @@ func (r *ByTypeAndProperty) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
 	}
 	rdfProp, err := rdf.Properties.Get(rdfpropLabel)
 	if err != nil {
-		return resources, fmt.Errorf("resolve by property: %s", err)
+		return resources, fmt.Errorf("resolve by property: %w", err)
 	}
 	obj, err := marshalToRdfObject(r.Value, rdfProp.RdfsDefinedBy, rdfProp.RdfsDataType)
 	if err != nil {
-		return resources, fmt.Errorf("resolve by property: unmarshaling property '%s': %s", r.Key, err)
+		return resources, fmt.Errorf("resolve by property: unmarshaling property '%s': %w", r.Key, err)
 	}
 	for _, t := range snap.WithPredObj(rdfpropLabel, obj) {
 		rt, err := resolveResourceType(snap, t.Subject())
@@ -79,11 +79,11 @@ func (r *ByProperty) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
 	}
 	rdfProp, err := rdf.Properties.Get(rdfpropLabel)
 	if err != nil {
-		return resources, fmt.Errorf("resolve by property: %s", err)
+		return resources, fmt.Errorf("resolve by property: %w", err)
 	}
 	obj, err := marshalToRdfObject(r.Value, rdfProp.RdfsDefinedBy, rdfProp.RdfsDataType)
 	if err != nil {
-		return resources, fmt.Errorf("resolve by property: unmarshaling property '%s': %s", r.Key, err)
+		return resources, fmt.Errorf("resolve by property: unmarshaling property '%s': %w", r.Key, err)
 	}
 	for _, t := range snap.WithPredObj(rdfpropLabel, obj) {
 		rt, err := resolveResourceType(snap, t.Subject())

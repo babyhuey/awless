@@ -98,13 +98,13 @@ func (cmd *CreateInstance) convertDistroToAMI(values map[string]interface{}) (ma
 	if distro, ok := values["distro"].(string); ok {
 		query, err := ParseImageQuery(distro)
 		if err != nil {
-			return nil, fmt.Errorf("distro: %s", err)
+			return nil, fmt.Errorf("distro: %w", err)
 		}
 		resolver := ImageResolver(cmd.api.DescribeImages)
 		cmd.logger.Verbosef("Searching for bare community distro: '%s' expanded to '%s'", distro, query)
 		images, fromCache, err := resolver.Resolve(query)
 		if err != nil {
-			return nil, fmt.Errorf("distro: %s", err)
+			return nil, fmt.Errorf("distro: %w", err)
 		}
 		if len(images) > 0 {
 			var caching string

@@ -62,7 +62,7 @@ func (cmd *CreateMfadevice) ManualRun(renv env.Running) (interface{}, error) {
 	var output *iam.CreateVirtualMFADeviceOutput
 	output, err = cmd.api.CreateVirtualMFADevice(context.Background(), input)
 	if err != nil {
-		return nil, fmt.Errorf("%s", err)
+		return nil, fmt.Errorf("%w", err)
 	}
 	cmd.logger.ExtraVerbosef("iam.CreateVirtualMFADevice call took %s", time.Since(start))
 
@@ -72,12 +72,12 @@ func (cmd *CreateMfadevice) ManualRun(renv env.Running) (interface{}, error) {
 	qrCodeURI := fmt.Sprintf("otpauth://totp/AWS:%s?secret=%s", name, string(output.VirtualMFADevice.Base32StringSeed))
 	qrcode, err := qr.Encode(qrCodeURI, qr.L, qr.Auto)
 	if err != nil {
-		return nil, fmt.Errorf("encode qrcode: %s", err)
+		return nil, fmt.Errorf("encode qrcode: %w", err)
 	}
 	qrCodeDisplaySize := 40
 	qrcode, err = barcode.Scale(qrcode, qrCodeDisplaySize, qrCodeDisplaySize)
 	if err != nil {
-		return nil, fmt.Errorf("scale qrcode: %s", err)
+		return nil, fmt.Errorf("scale qrcode: %w", err)
 	}
 	displayQRCode(os.Stderr, qrcode)
 	cmd.logger.Warning("This is your only opportunity to view the secret. You will not have access to the secret again after this step.\n")
@@ -231,12 +231,12 @@ func promptRole(api *iam.Client) (string, error) {
 			AutoComplete: roleCompleter,
 		})
 		if err != nil {
-			return "", fmt.Errorf("error while selecting role: %s", err)
+			return "", fmt.Errorf("error while selecting role: %w", err)
 		}
 		defer rl.Close()
 		role, err := rl.Readline()
 		if err != nil {
-			return "", fmt.Errorf("error while selecting role: %s", err)
+			return "", fmt.Errorf("error while selecting role: %w", err)
 		}
 		if arn, isName := rolesNameToArn[strings.TrimSpace(role)]; isName {
 			return arn, nil

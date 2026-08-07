@@ -42,7 +42,7 @@ func (s *server) Start() error {
 	log.Println("(use awless web -p otherprofile for browsing through another profile)")
 	g, err := sync.LoadAllLocalGraphs(s.awsProfile)
 	if err != nil {
-		return fmt.Errorf("cannot load local graphs: %s", err)
+		return fmt.Errorf("cannot load local graphs: %w", err)
 	}
 
 	s.gph = g
@@ -228,7 +228,7 @@ func loadLocalTriples(profile string) ([]tstore.Triple, error) {
 	for _, f := range files {
 		reader, err := os.Open(f)
 		if err != nil {
-			return nil, fmt.Errorf("loading '%s': %s", f, err)
+			return nil, fmt.Errorf("loading '%s': %w", f, err)
 		}
 		readers = append(readers, reader)
 	}

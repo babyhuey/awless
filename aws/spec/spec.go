@@ -118,7 +118,7 @@ func (dc *awsCall) execute(input interface{}) (output interface{}, err error) {
 	results := fnVal.Call(values)
 
 	if err, ok := results[1].Interface().(error); ok && err != nil {
-		return nil, fmt.Errorf("%s", err)
+		return nil, fmt.Errorf("%w", err)
 	}
 
 	dc.logger.ExtraVerbosef("%s call took %s", dc.fnName, time.Since(start))
@@ -154,7 +154,7 @@ func (c *checker) check() error {
 		}
 		got, err := c.fetchFunc()
 		if err != nil {
-			return fmt.Errorf("check %s: %s", c.description, err)
+			return fmt.Errorf("check %s: %w", c.description, err)
 		}
 		if strings.EqualFold(got, c.expect) {
 			c.logger.InteractiveInfof("check %s %s '%s' done", c.description, c.checkName, c.expect)

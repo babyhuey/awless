@@ -166,7 +166,7 @@ func readStackFile(p string) (sf *stackFile, err error) {
 			// before run:
 			// json: unmarshal errors:
 			//   invalid character '}' looking for beginning of object key string
-			return nil, fmt.Errorf("\njson: unmarshal errors:\n  %s", err)
+			return nil, fmt.Errorf("\njson: unmarshal errors:\n  %w", err)
 		}
 	case ".yml", ".yaml":
 		err = yaml.Unmarshal(file, &sf)
@@ -176,7 +176,7 @@ func readStackFile(p string) (sf *stackFile, err error) {
 			// before run:
 			// yaml: unmarshal errors:
 			//   line 1: cannot unmarshal !!str `lalla` into awsspec.stackFile
-			return nil, fmt.Errorf("\n%s", err)
+			return nil, fmt.Errorf("\n%w", err)
 		}
 	default:
 		return nil, fmt.Errorf("Unknown StackFile format %q. Should be \".json\", \".yml\" or \".yaml\"", path.Ext(p))

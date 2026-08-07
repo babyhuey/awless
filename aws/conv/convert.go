@@ -276,7 +276,7 @@ func NewResource(source interface{}) (*graph.Resource, error) {
 						return nil
 					}
 					if err != nil {
-						return fmt.Errorf("type [%s]: prop '%v': %s", res.Type(), p, err)
+						return fmt.Errorf("type [%s]: prop '%v': %w", res.Type(), p, err)
 					}
 					setProp(val)
 				}
@@ -284,7 +284,7 @@ func NewResource(source interface{}) (*graph.Resource, error) {
 			if t.fetch != nil {
 				val, err := t.fetch(source)
 				if err != nil {
-					return fmt.Errorf("type [%s]: prop '%v': %s", res.Type(), p, err)
+					return fmt.Errorf("type [%s]: prop '%v': %w", res.Type(), p, err)
 				}
 				setProp(val)
 			}

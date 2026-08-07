@@ -96,7 +96,7 @@ func (c *Client) DialWithUsers(usernames ...string) error {
 		}
 	}
 
-	return fmt.Errorf("unable to authenticate to %s for users %q. Last error: %s", hostport, usernames, err)
+	return fmt.Errorf("unable to authenticate to %s for users %q. Last error: %w", hostport, usernames, err)
 }
 
 func (c *Client) NewClientWithProxy(destinationHost string, destinationPort int, usernames ...string) (*Client, error) {
@@ -104,7 +104,7 @@ func (c *Client) NewClientWithProxy(destinationHost string, destinationPort int,
 	for _, user := range usernames {
 		netConn, err := c.Dial("tcp", hostport)
 		if err != nil {
-			return nil, fmt.Errorf("cannot dial from %s:%d to %s:%d - %s", c.IP, c.Port, destinationHost, destinationPort, err)
+			return nil, fmt.Errorf("cannot dial from %s:%d to %s:%d - %w", c.IP, c.Port, destinationHost, destinationPort, err)
 		}
 		c.logger.ExtraVerbosef("successful tcp connection from %s:%d to %s:%d", c.IP, c.Port, destinationHost, destinationPort)
 		newConfig := *c.Config

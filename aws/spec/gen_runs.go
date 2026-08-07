@@ -77,7 +77,7 @@ func (cmd *AttachAlarm) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *AttachAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -150,7 +150,7 @@ func (cmd *AttachClassicLoadbalancer) Run(renv env.Running, params map[string]in
 
 func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -161,7 +161,7 @@ func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]in
 
 	input := &elb.RegisterInstancesWithLoadBalancerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elb.RegisterInstancesWithLoadBalancerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elb.RegisterInstancesWithLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -232,7 +232,7 @@ func (cmd *AttachContainertask) Run(renv env.Running, params map[string]interfac
 
 func (cmd *AttachContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -305,7 +305,7 @@ func (cmd *AttachElasticip) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *AttachElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -316,7 +316,7 @@ func (cmd *AttachElasticip) run(renv env.Running, params map[string]interface{})
 
 	input := &ec2.AssociateAddressInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -354,13 +354,13 @@ func (cmd *AttachElasticip) run(renv env.Running, params map[string]interface{})
 
 func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.AssociateAddressInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -412,7 +412,7 @@ func (cmd *AttachInstance) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *AttachInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -423,7 +423,7 @@ func (cmd *AttachInstance) run(renv env.Running, params map[string]interface{}) 
 
 	input := &elbv2.RegisterTargetsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.RegisterTargetsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.RegisterTargetsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -494,7 +494,7 @@ func (cmd *AttachInstanceprofile) Run(renv env.Running, params map[string]interf
 
 func (cmd *AttachInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -563,7 +563,7 @@ func (cmd *AttachInternetgateway) Run(renv env.Running, params map[string]interf
 
 func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -574,7 +574,7 @@ func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]interf
 
 	input := &ec2.AttachInternetGatewayInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -612,13 +612,13 @@ func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]interf
 
 func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.AttachInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -670,7 +670,7 @@ func (cmd *AttachListener) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *AttachListener) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -681,7 +681,7 @@ func (cmd *AttachListener) run(renv env.Running, params map[string]interface{}) 
 
 	input := &elbv2.AddListenerCertificatesInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.AddListenerCertificatesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.AddListenerCertificatesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -752,7 +752,7 @@ func (cmd *AttachMfadevice) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *AttachMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -763,7 +763,7 @@ func (cmd *AttachMfadevice) run(renv env.Running, params map[string]interface{})
 
 	input := &iam.EnableMFADeviceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.EnableMFADeviceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.EnableMFADeviceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -834,7 +834,7 @@ func (cmd *AttachNetworkinterface) Run(renv env.Running, params map[string]inter
 
 func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -845,7 +845,7 @@ func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]inter
 
 	input := &ec2.AttachNetworkInterfaceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -883,13 +883,13 @@ func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]inter
 
 func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.AttachNetworkInterfaceInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -941,7 +941,7 @@ func (cmd *AttachPolicy) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *AttachPolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1014,7 +1014,7 @@ func (cmd *AttachRole) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *AttachRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1025,7 +1025,7 @@ func (cmd *AttachRole) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &iam.AddRoleToInstanceProfileInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.AddRoleToInstanceProfileInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.AddRoleToInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -1096,7 +1096,7 @@ func (cmd *AttachRoutetable) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *AttachRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1107,7 +1107,7 @@ func (cmd *AttachRoutetable) run(renv env.Running, params map[string]interface{}
 
 	input := &ec2.AssociateRouteTableInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -1145,13 +1145,13 @@ func (cmd *AttachRoutetable) run(renv env.Running, params map[string]interface{}
 
 func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.AssociateRouteTableInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -1203,7 +1203,7 @@ func (cmd *AttachSecuritygroup) Run(renv env.Running, params map[string]interfac
 
 func (cmd *AttachSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1276,7 +1276,7 @@ func (cmd *AttachUser) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *AttachUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1287,7 +1287,7 @@ func (cmd *AttachUser) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &iam.AddUserToGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.AddUserToGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.AddUserToGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -1358,7 +1358,7 @@ func (cmd *AttachVolume) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *AttachVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1369,7 +1369,7 @@ func (cmd *AttachVolume) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.AttachVolumeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -1407,13 +1407,13 @@ func (cmd *AttachVolume) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.AttachVolumeInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -1465,7 +1465,7 @@ func (cmd *AuthenticateRegistry) Run(renv env.Running, params map[string]interfa
 
 func (cmd *AuthenticateRegistry) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1538,7 +1538,7 @@ func (cmd *CheckCertificate) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *CheckCertificate) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1611,7 +1611,7 @@ func (cmd *CheckDatabase) Run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *CheckDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1684,7 +1684,7 @@ func (cmd *CheckDistribution) Run(renv env.Running, params map[string]interface{
 
 func (cmd *CheckDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1757,7 +1757,7 @@ func (cmd *CheckInstance) Run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *CheckInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1830,7 +1830,7 @@ func (cmd *CheckLoadbalancer) Run(renv env.Running, params map[string]interface{
 
 func (cmd *CheckLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1903,7 +1903,7 @@ func (cmd *CheckNatgateway) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *CheckNatgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -1976,7 +1976,7 @@ func (cmd *CheckNetworkinterface) Run(renv env.Running, params map[string]interf
 
 func (cmd *CheckNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2049,7 +2049,7 @@ func (cmd *CheckScalinggroup) Run(renv env.Running, params map[string]interface{
 
 func (cmd *CheckScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2122,7 +2122,7 @@ func (cmd *CheckSecuritygroup) Run(renv env.Running, params map[string]interface
 
 func (cmd *CheckSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2195,7 +2195,7 @@ func (cmd *CheckVolume) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CheckVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2268,7 +2268,7 @@ func (cmd *CopyImage) Run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *CopyImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2279,7 +2279,7 @@ func (cmd *CopyImage) run(renv env.Running, params map[string]interface{}) (inte
 
 	input := &ec2.CopyImageInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2317,13 +2317,13 @@ func (cmd *CopyImage) run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *CopyImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CopyImageInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2375,7 +2375,7 @@ func (cmd *CopySnapshot) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CopySnapshot) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2386,7 +2386,7 @@ func (cmd *CopySnapshot) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.CopySnapshotInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2424,13 +2424,13 @@ func (cmd *CopySnapshot) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CopySnapshotInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2482,7 +2482,7 @@ func (cmd *CreateAccesskey) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *CreateAccesskey) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2493,7 +2493,7 @@ func (cmd *CreateAccesskey) run(renv env.Running, params map[string]interface{})
 
 	input := &iam.CreateAccessKeyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.CreateAccessKeyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.CreateAccessKeyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2564,7 +2564,7 @@ func (cmd *CreateAlarm) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2575,7 +2575,7 @@ func (cmd *CreateAlarm) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &cloudwatch.PutMetricAlarmInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in cloudwatch.PutMetricAlarmInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in cloudwatch.PutMetricAlarmInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2646,7 +2646,7 @@ func (cmd *CreateAppscalingpolicy) Run(renv env.Running, params map[string]inter
 
 func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2657,7 +2657,7 @@ func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]inter
 
 	input := &applicationautoscaling.PutScalingPolicyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in applicationautoscaling.PutScalingPolicyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in applicationautoscaling.PutScalingPolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2728,7 +2728,7 @@ func (cmd *CreateAppscalingtarget) Run(renv env.Running, params map[string]inter
 
 func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2739,7 +2739,7 @@ func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]inter
 
 	input := &applicationautoscaling.RegisterScalableTargetInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in applicationautoscaling.RegisterScalableTargetInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in applicationautoscaling.RegisterScalableTargetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2810,7 +2810,7 @@ func (cmd *CreateBucket) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CreateBucket) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2821,7 +2821,7 @@ func (cmd *CreateBucket) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &s3.CreateBucketInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in s3.CreateBucketInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in s3.CreateBucketInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -2892,7 +2892,7 @@ func (cmd *CreateCertificate) Run(renv env.Running, params map[string]interface{
 
 func (cmd *CreateCertificate) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2965,7 +2965,7 @@ func (cmd *CreateClassicLoadbalancer) Run(renv env.Running, params map[string]in
 
 func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -2976,7 +2976,7 @@ func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]in
 
 	input := &elb.CreateLoadBalancerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elb.CreateLoadBalancerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elb.CreateLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3047,7 +3047,7 @@ func (cmd *CreateContainercluster) Run(renv env.Running, params map[string]inter
 
 func (cmd *CreateContainercluster) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3058,7 +3058,7 @@ func (cmd *CreateContainercluster) run(renv env.Running, params map[string]inter
 
 	input := &ecs.CreateClusterInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ecs.CreateClusterInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ecs.CreateClusterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3129,7 +3129,7 @@ func (cmd *CreateDatabase) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3202,7 +3202,7 @@ func (cmd *CreateDbsubnetgroup) Run(renv env.Running, params map[string]interfac
 
 func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3213,7 +3213,7 @@ func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]interfac
 
 	input := &rds.CreateDBSubnetGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in rds.CreateDBSubnetGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in rds.CreateDBSubnetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3284,7 +3284,7 @@ func (cmd *CreateDistribution) Run(renv env.Running, params map[string]interface
 
 func (cmd *CreateDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3357,7 +3357,7 @@ func (cmd *CreateElasticip) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *CreateElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3368,7 +3368,7 @@ func (cmd *CreateElasticip) run(renv env.Running, params map[string]interface{})
 
 	input := &ec2.AllocateAddressInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3406,13 +3406,13 @@ func (cmd *CreateElasticip) run(renv env.Running, params map[string]interface{})
 
 func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.AllocateAddressInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3464,7 +3464,7 @@ func (cmd *CreateFunction) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateFunction) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3475,7 +3475,7 @@ func (cmd *CreateFunction) run(renv env.Running, params map[string]interface{}) 
 
 	input := &lambda.CreateFunctionInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in lambda.CreateFunctionInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in lambda.CreateFunctionInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3546,7 +3546,7 @@ func (cmd *CreateGroup) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateGroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3557,7 +3557,7 @@ func (cmd *CreateGroup) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &iam.CreateGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.CreateGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.CreateGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3628,7 +3628,7 @@ func (cmd *CreateImage) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3639,7 +3639,7 @@ func (cmd *CreateImage) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &ec2.CreateImageInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3677,13 +3677,13 @@ func (cmd *CreateImage) run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateImageInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3735,7 +3735,7 @@ func (cmd *CreateInstance) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3746,7 +3746,7 @@ func (cmd *CreateInstance) run(renv env.Running, params map[string]interface{}) 
 
 	input := &ec2.RunInstancesInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3784,13 +3784,13 @@ func (cmd *CreateInstance) run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.RunInstancesInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3842,7 +3842,7 @@ func (cmd *CreateInstanceprofile) Run(renv env.Running, params map[string]interf
 
 func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3853,7 +3853,7 @@ func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]interf
 
 	input := &iam.CreateInstanceProfileInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.CreateInstanceProfileInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.CreateInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3924,7 +3924,7 @@ func (cmd *CreateInternetgateway) Run(renv env.Running, params map[string]interf
 
 func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -3935,7 +3935,7 @@ func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]interf
 
 	input := &ec2.CreateInternetGatewayInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -3973,13 +3973,13 @@ func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]interf
 
 func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4031,7 +4031,7 @@ func (cmd *CreateKeypair) Run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *CreateKeypair) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4042,7 +4042,7 @@ func (cmd *CreateKeypair) run(renv env.Running, params map[string]interface{}) (
 
 	input := &ec2.ImportKeyPairInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ImportKeyPairInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ImportKeyPairInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4113,7 +4113,7 @@ func (cmd *CreateLaunchconfiguration) Run(renv env.Running, params map[string]in
 
 func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4124,7 +4124,7 @@ func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]in
 
 	input := &autoscaling.CreateLaunchConfigurationInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in autoscaling.CreateLaunchConfigurationInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in autoscaling.CreateLaunchConfigurationInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4195,7 +4195,7 @@ func (cmd *CreateListener) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateListener) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4206,7 +4206,7 @@ func (cmd *CreateListener) run(renv env.Running, params map[string]interface{}) 
 
 	input := &elbv2.CreateListenerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.CreateListenerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.CreateListenerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4277,7 +4277,7 @@ func (cmd *CreateLoadbalancer) Run(renv env.Running, params map[string]interface
 
 func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4288,7 +4288,7 @@ func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]interface
 
 	input := &elbv2.CreateLoadBalancerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.CreateLoadBalancerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.CreateLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4359,7 +4359,7 @@ func (cmd *CreateLoginprofile) Run(renv env.Running, params map[string]interface
 
 func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4370,7 +4370,7 @@ func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]interface
 
 	input := &iam.CreateLoginProfileInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.CreateLoginProfileInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.CreateLoginProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4441,7 +4441,7 @@ func (cmd *CreateMfadevice) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *CreateMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4514,7 +4514,7 @@ func (cmd *CreateNatgateway) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *CreateNatgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4525,7 +4525,7 @@ func (cmd *CreateNatgateway) run(renv env.Running, params map[string]interface{}
 
 	input := &ec2.CreateNatGatewayInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateNatGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateNatGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4596,7 +4596,7 @@ func (cmd *CreateNetworkinterface) Run(renv env.Running, params map[string]inter
 
 func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4607,7 +4607,7 @@ func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]inter
 
 	input := &ec2.CreateNetworkInterfaceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4645,13 +4645,13 @@ func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]inter
 
 func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateNetworkInterfaceInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4703,7 +4703,7 @@ func (cmd *CreatePolicy) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CreatePolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4714,7 +4714,7 @@ func (cmd *CreatePolicy) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &iam.CreatePolicyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4785,7 +4785,7 @@ func (cmd *CreateQueue) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateQueue) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4796,7 +4796,7 @@ func (cmd *CreateQueue) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &sqs.CreateQueueInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in sqs.CreateQueueInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in sqs.CreateQueueInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -4867,7 +4867,7 @@ func (cmd *CreateRecord) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CreateRecord) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4940,7 +4940,7 @@ func (cmd *CreateRepository) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *CreateRepository) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -4951,7 +4951,7 @@ func (cmd *CreateRepository) run(renv env.Running, params map[string]interface{}
 
 	input := &ecr.CreateRepositoryInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ecr.CreateRepositoryInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ecr.CreateRepositoryInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5022,7 +5022,7 @@ func (cmd *CreateRole) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *CreateRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5095,7 +5095,7 @@ func (cmd *CreateRoute) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateRoute) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5106,7 +5106,7 @@ func (cmd *CreateRoute) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &ec2.CreateRouteInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5144,13 +5144,13 @@ func (cmd *CreateRoute) run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateRouteInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5202,7 +5202,7 @@ func (cmd *CreateRoutetable) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *CreateRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5213,7 +5213,7 @@ func (cmd *CreateRoutetable) run(renv env.Running, params map[string]interface{}
 
 	input := &ec2.CreateRouteTableInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5251,13 +5251,13 @@ func (cmd *CreateRoutetable) run(renv env.Running, params map[string]interface{}
 
 func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateRouteTableInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5309,7 +5309,7 @@ func (cmd *CreateS3object) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateS3object) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5382,7 +5382,7 @@ func (cmd *CreateScalinggroup) Run(renv env.Running, params map[string]interface
 
 func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5393,7 +5393,7 @@ func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]interface
 
 	input := &autoscaling.CreateAutoScalingGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in autoscaling.CreateAutoScalingGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in autoscaling.CreateAutoScalingGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5464,7 +5464,7 @@ func (cmd *CreateScalingpolicy) Run(renv env.Running, params map[string]interfac
 
 func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5475,7 +5475,7 @@ func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]interfac
 
 	input := &autoscaling.PutScalingPolicyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in autoscaling.PutScalingPolicyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in autoscaling.PutScalingPolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5546,7 +5546,7 @@ func (cmd *CreateSecuritygroup) Run(renv env.Running, params map[string]interfac
 
 func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5557,7 +5557,7 @@ func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]interfac
 
 	input := &ec2.CreateSecurityGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5595,13 +5595,13 @@ func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]interfac
 
 func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateSecurityGroupInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5653,7 +5653,7 @@ func (cmd *CreateSnapshot) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateSnapshot) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5664,7 +5664,7 @@ func (cmd *CreateSnapshot) run(renv env.Running, params map[string]interface{}) 
 
 	input := &ec2.CreateSnapshotInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5702,13 +5702,13 @@ func (cmd *CreateSnapshot) run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateSnapshotInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5760,7 +5760,7 @@ func (cmd *CreateStack) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateStack) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5771,7 +5771,7 @@ func (cmd *CreateStack) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &cloudformation.CreateStackInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in cloudformation.CreateStackInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in cloudformation.CreateStackInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5842,7 +5842,7 @@ func (cmd *CreateSubnet) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CreateSubnet) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5853,7 +5853,7 @@ func (cmd *CreateSubnet) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.CreateSubnetInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5891,13 +5891,13 @@ func (cmd *CreateSubnet) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateSubnetInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -5949,7 +5949,7 @@ func (cmd *CreateSubscription) Run(renv env.Running, params map[string]interface
 
 func (cmd *CreateSubscription) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -5960,7 +5960,7 @@ func (cmd *CreateSubscription) run(renv env.Running, params map[string]interface
 
 	input := &sns.SubscribeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in sns.SubscribeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in sns.SubscribeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6031,7 +6031,7 @@ func (cmd *CreateTag) Run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *CreateTag) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6100,7 +6100,7 @@ func (cmd *CreateTargetgroup) Run(renv env.Running, params map[string]interface{
 
 func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6111,7 +6111,7 @@ func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]interface{
 
 	input := &elbv2.CreateTargetGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.CreateTargetGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.CreateTargetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6182,7 +6182,7 @@ func (cmd *CreateTopic) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *CreateTopic) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6193,7 +6193,7 @@ func (cmd *CreateTopic) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &sns.CreateTopicInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in sns.CreateTopicInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in sns.CreateTopicInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6264,7 +6264,7 @@ func (cmd *CreateUser) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *CreateUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6275,7 +6275,7 @@ func (cmd *CreateUser) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &iam.CreateUserInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.CreateUserInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.CreateUserInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6346,7 +6346,7 @@ func (cmd *CreateVolume) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CreateVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6357,7 +6357,7 @@ func (cmd *CreateVolume) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.CreateVolumeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6395,13 +6395,13 @@ func (cmd *CreateVolume) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateVolumeInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6453,7 +6453,7 @@ func (cmd *CreateVpc) Run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *CreateVpc) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6464,7 +6464,7 @@ func (cmd *CreateVpc) run(renv env.Running, params map[string]interface{}) (inte
 
 	input := &ec2.CreateVpcInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6502,13 +6502,13 @@ func (cmd *CreateVpc) run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.CreateVpcInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6560,7 +6560,7 @@ func (cmd *CreateZone) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *CreateZone) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6571,7 +6571,7 @@ func (cmd *CreateZone) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &route53.CreateHostedZoneInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in route53.CreateHostedZoneInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in route53.CreateHostedZoneInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6642,7 +6642,7 @@ func (cmd *DeleteAccesskey) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6653,7 +6653,7 @@ func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]interface{})
 
 	input := &iam.DeleteAccessKeyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeleteAccessKeyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeleteAccessKeyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6724,7 +6724,7 @@ func (cmd *DeleteAlarm) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6735,7 +6735,7 @@ func (cmd *DeleteAlarm) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &cloudwatch.DeleteAlarmsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in cloudwatch.DeleteAlarmsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in cloudwatch.DeleteAlarmsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6806,7 +6806,7 @@ func (cmd *DeleteAppscalingpolicy) Run(renv env.Running, params map[string]inter
 
 func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6817,7 +6817,7 @@ func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]inter
 
 	input := &applicationautoscaling.DeleteScalingPolicyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeleteScalingPolicyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeleteScalingPolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6888,7 +6888,7 @@ func (cmd *DeleteAppscalingtarget) Run(renv env.Running, params map[string]inter
 
 func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6899,7 +6899,7 @@ func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]inter
 
 	input := &applicationautoscaling.DeregisterScalableTargetInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeregisterScalableTargetInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeregisterScalableTargetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -6970,7 +6970,7 @@ func (cmd *DeleteBucket) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DeleteBucket) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -6981,7 +6981,7 @@ func (cmd *DeleteBucket) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &s3.DeleteBucketInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in s3.DeleteBucketInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in s3.DeleteBucketInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7052,7 +7052,7 @@ func (cmd *DeleteCertificate) Run(renv env.Running, params map[string]interface{
 
 func (cmd *DeleteCertificate) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7063,7 +7063,7 @@ func (cmd *DeleteCertificate) run(renv env.Running, params map[string]interface{
 
 	input := &acm.DeleteCertificateInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in acm.DeleteCertificateInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in acm.DeleteCertificateInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7134,7 +7134,7 @@ func (cmd *DeleteClassicLoadbalancer) Run(renv env.Running, params map[string]in
 
 func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7145,7 +7145,7 @@ func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]in
 
 	input := &elb.DeleteLoadBalancerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elb.DeleteLoadBalancerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elb.DeleteLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7216,7 +7216,7 @@ func (cmd *DeleteContainercluster) Run(renv env.Running, params map[string]inter
 
 func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7227,7 +7227,7 @@ func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]inter
 
 	input := &ecs.DeleteClusterInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ecs.DeleteClusterInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ecs.DeleteClusterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7298,7 +7298,7 @@ func (cmd *DeleteContainertask) Run(renv env.Running, params map[string]interfac
 
 func (cmd *DeleteContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7367,7 +7367,7 @@ func (cmd *DeleteDatabase) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7378,7 +7378,7 @@ func (cmd *DeleteDatabase) run(renv env.Running, params map[string]interface{}) 
 
 	input := &rds.DeleteDBInstanceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in rds.DeleteDBInstanceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in rds.DeleteDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7449,7 +7449,7 @@ func (cmd *DeleteDbsubnetgroup) Run(renv env.Running, params map[string]interfac
 
 func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7460,7 +7460,7 @@ func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]interfac
 
 	input := &rds.DeleteDBSubnetGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in rds.DeleteDBSubnetGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in rds.DeleteDBSubnetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7531,7 +7531,7 @@ func (cmd *DeleteDistribution) Run(renv env.Running, params map[string]interface
 
 func (cmd *DeleteDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7604,7 +7604,7 @@ func (cmd *DeleteElasticip) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *DeleteElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7615,7 +7615,7 @@ func (cmd *DeleteElasticip) run(renv env.Running, params map[string]interface{})
 
 	input := &ec2.ReleaseAddressInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7653,13 +7653,13 @@ func (cmd *DeleteElasticip) run(renv env.Running, params map[string]interface{})
 
 func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.ReleaseAddressInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7711,7 +7711,7 @@ func (cmd *DeleteFunction) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteFunction) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7722,7 +7722,7 @@ func (cmd *DeleteFunction) run(renv env.Running, params map[string]interface{}) 
 
 	input := &lambda.DeleteFunctionInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in lambda.DeleteFunctionInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in lambda.DeleteFunctionInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7793,7 +7793,7 @@ func (cmd *DeleteGroup) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteGroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7804,7 +7804,7 @@ func (cmd *DeleteGroup) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &iam.DeleteGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeleteGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeleteGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7875,7 +7875,7 @@ func (cmd *DeleteImage) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7944,7 +7944,7 @@ func (cmd *DeleteInstance) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -7955,7 +7955,7 @@ func (cmd *DeleteInstance) run(renv env.Running, params map[string]interface{}) 
 
 	input := &ec2.TerminateInstancesInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -7993,13 +7993,13 @@ func (cmd *DeleteInstance) run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.TerminateInstancesInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8051,7 +8051,7 @@ func (cmd *DeleteInstanceprofile) Run(renv env.Running, params map[string]interf
 
 func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8062,7 +8062,7 @@ func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]interf
 
 	input := &iam.DeleteInstanceProfileInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeleteInstanceProfileInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeleteInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8133,7 +8133,7 @@ func (cmd *DeleteInternetgateway) Run(renv env.Running, params map[string]interf
 
 func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8144,7 +8144,7 @@ func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]interf
 
 	input := &ec2.DeleteInternetGatewayInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8182,13 +8182,13 @@ func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]interf
 
 func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8240,7 +8240,7 @@ func (cmd *DeleteKeypair) Run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *DeleteKeypair) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8251,7 +8251,7 @@ func (cmd *DeleteKeypair) run(renv env.Running, params map[string]interface{}) (
 
 	input := &ec2.DeleteKeyPairInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8289,13 +8289,13 @@ func (cmd *DeleteKeypair) run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteKeyPairInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8347,7 +8347,7 @@ func (cmd *DeleteLaunchconfiguration) Run(renv env.Running, params map[string]in
 
 func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8358,7 +8358,7 @@ func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]in
 
 	input := &autoscaling.DeleteLaunchConfigurationInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteLaunchConfigurationInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteLaunchConfigurationInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8429,7 +8429,7 @@ func (cmd *DeleteListener) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteListener) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8440,7 +8440,7 @@ func (cmd *DeleteListener) run(renv env.Running, params map[string]interface{}) 
 
 	input := &elbv2.DeleteListenerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.DeleteListenerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.DeleteListenerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8511,7 +8511,7 @@ func (cmd *DeleteLoadbalancer) Run(renv env.Running, params map[string]interface
 
 func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8522,7 +8522,7 @@ func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]interface
 
 	input := &elbv2.DeleteLoadBalancerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.DeleteLoadBalancerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.DeleteLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8593,7 +8593,7 @@ func (cmd *DeleteLoginprofile) Run(renv env.Running, params map[string]interface
 
 func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8604,7 +8604,7 @@ func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]interface
 
 	input := &iam.DeleteLoginProfileInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeleteLoginProfileInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeleteLoginProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8675,7 +8675,7 @@ func (cmd *DeleteMfadevice) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8686,7 +8686,7 @@ func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]interface{})
 
 	input := &iam.DeleteVirtualMFADeviceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeleteVirtualMFADeviceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeleteVirtualMFADeviceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8757,7 +8757,7 @@ func (cmd *DeleteNatgateway) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8768,7 +8768,7 @@ func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]interface{}
 
 	input := &ec2.DeleteNatGatewayInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteNatGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteNatGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8839,7 +8839,7 @@ func (cmd *DeleteNetworkinterface) Run(renv env.Running, params map[string]inter
 
 func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8850,7 +8850,7 @@ func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]inter
 
 	input := &ec2.DeleteNetworkInterfaceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8888,13 +8888,13 @@ func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]inter
 
 func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteNetworkInterfaceInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -8946,7 +8946,7 @@ func (cmd *DeletePolicy) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DeletePolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -8957,7 +8957,7 @@ func (cmd *DeletePolicy) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &iam.DeletePolicyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeletePolicyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeletePolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9028,7 +9028,7 @@ func (cmd *DeleteQueue) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteQueue) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9039,7 +9039,7 @@ func (cmd *DeleteQueue) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &sqs.DeleteQueueInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in sqs.DeleteQueueInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in sqs.DeleteQueueInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9110,7 +9110,7 @@ func (cmd *DeleteRecord) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DeleteRecord) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9183,7 +9183,7 @@ func (cmd *DeleteRepository) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *DeleteRepository) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9194,7 +9194,7 @@ func (cmd *DeleteRepository) run(renv env.Running, params map[string]interface{}
 
 	input := &ecr.DeleteRepositoryInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ecr.DeleteRepositoryInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ecr.DeleteRepositoryInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9265,7 +9265,7 @@ func (cmd *DeleteRole) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *DeleteRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9338,7 +9338,7 @@ func (cmd *DeleteRoute) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteRoute) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9349,7 +9349,7 @@ func (cmd *DeleteRoute) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &ec2.DeleteRouteInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9387,13 +9387,13 @@ func (cmd *DeleteRoute) run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteRouteInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9445,7 +9445,7 @@ func (cmd *DeleteRoutetable) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9456,7 +9456,7 @@ func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]interface{}
 
 	input := &ec2.DeleteRouteTableInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9494,13 +9494,13 @@ func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]interface{}
 
 func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteRouteTableInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9552,7 +9552,7 @@ func (cmd *DeleteS3object) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteS3object) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9563,7 +9563,7 @@ func (cmd *DeleteS3object) run(renv env.Running, params map[string]interface{}) 
 
 	input := &s3.DeleteObjectInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in s3.DeleteObjectInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in s3.DeleteObjectInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9634,7 +9634,7 @@ func (cmd *DeleteScalinggroup) Run(renv env.Running, params map[string]interface
 
 func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9645,7 +9645,7 @@ func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]interface
 
 	input := &autoscaling.DeleteAutoScalingGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteAutoScalingGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteAutoScalingGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9716,7 +9716,7 @@ func (cmd *DeleteScalingpolicy) Run(renv env.Running, params map[string]interfac
 
 func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9727,7 +9727,7 @@ func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]interfac
 
 	input := &autoscaling.DeletePolicyInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in autoscaling.DeletePolicyInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in autoscaling.DeletePolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9798,7 +9798,7 @@ func (cmd *DeleteSecuritygroup) Run(renv env.Running, params map[string]interfac
 
 func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9809,7 +9809,7 @@ func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]interfac
 
 	input := &ec2.DeleteSecurityGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9847,13 +9847,13 @@ func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]interfac
 
 func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteSecurityGroupInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9905,7 +9905,7 @@ func (cmd *DeleteSnapshot) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -9916,7 +9916,7 @@ func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]interface{}) 
 
 	input := &ec2.DeleteSnapshotInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -9954,13 +9954,13 @@ func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteSnapshotInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10012,7 +10012,7 @@ func (cmd *DeleteStack) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteStack) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10023,7 +10023,7 @@ func (cmd *DeleteStack) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &cloudformation.DeleteStackInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in cloudformation.DeleteStackInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in cloudformation.DeleteStackInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10094,7 +10094,7 @@ func (cmd *DeleteSubnet) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DeleteSubnet) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10105,7 +10105,7 @@ func (cmd *DeleteSubnet) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.DeleteSubnetInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10143,13 +10143,13 @@ func (cmd *DeleteSubnet) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteSubnetInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10201,7 +10201,7 @@ func (cmd *DeleteSubscription) Run(renv env.Running, params map[string]interface
 
 func (cmd *DeleteSubscription) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10212,7 +10212,7 @@ func (cmd *DeleteSubscription) run(renv env.Running, params map[string]interface
 
 	input := &sns.UnsubscribeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in sns.UnsubscribeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in sns.UnsubscribeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10283,7 +10283,7 @@ func (cmd *DeleteTag) Run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *DeleteTag) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10352,7 +10352,7 @@ func (cmd *DeleteTargetgroup) Run(renv env.Running, params map[string]interface{
 
 func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10363,7 +10363,7 @@ func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]interface{
 
 	input := &elbv2.DeleteTargetGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.DeleteTargetGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.DeleteTargetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10434,7 +10434,7 @@ func (cmd *DeleteTopic) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DeleteTopic) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10445,7 +10445,7 @@ func (cmd *DeleteTopic) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &sns.DeleteTopicInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in sns.DeleteTopicInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in sns.DeleteTopicInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10516,7 +10516,7 @@ func (cmd *DeleteUser) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *DeleteUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10527,7 +10527,7 @@ func (cmd *DeleteUser) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &iam.DeleteUserInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeleteUserInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeleteUserInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10598,7 +10598,7 @@ func (cmd *DeleteVolume) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DeleteVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10609,7 +10609,7 @@ func (cmd *DeleteVolume) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.DeleteVolumeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10647,13 +10647,13 @@ func (cmd *DeleteVolume) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteVolumeInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10705,7 +10705,7 @@ func (cmd *DeleteVpc) Run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *DeleteVpc) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10716,7 +10716,7 @@ func (cmd *DeleteVpc) run(renv env.Running, params map[string]interface{}) (inte
 
 	input := &ec2.DeleteVpcInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10754,13 +10754,13 @@ func (cmd *DeleteVpc) run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DeleteVpcInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10812,7 +10812,7 @@ func (cmd *DeleteZone) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *DeleteZone) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10823,7 +10823,7 @@ func (cmd *DeleteZone) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &route53.DeleteHostedZoneInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in route53.DeleteHostedZoneInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in route53.DeleteHostedZoneInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -10894,7 +10894,7 @@ func (cmd *DetachAlarm) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *DetachAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10967,7 +10967,7 @@ func (cmd *DetachClassicLoadbalancer) Run(renv env.Running, params map[string]in
 
 func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -10978,7 +10978,7 @@ func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]in
 
 	input := &elb.DeregisterInstancesFromLoadBalancerInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elb.DeregisterInstancesFromLoadBalancerInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elb.DeregisterInstancesFromLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11049,7 +11049,7 @@ func (cmd *DetachContainertask) Run(renv env.Running, params map[string]interfac
 
 func (cmd *DetachContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11122,7 +11122,7 @@ func (cmd *DetachElasticip) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *DetachElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11133,7 +11133,7 @@ func (cmd *DetachElasticip) run(renv env.Running, params map[string]interface{})
 
 	input := &ec2.DisassociateAddressInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11171,13 +11171,13 @@ func (cmd *DetachElasticip) run(renv env.Running, params map[string]interface{})
 
 func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DisassociateAddressInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11229,7 +11229,7 @@ func (cmd *DetachInstance) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *DetachInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11240,7 +11240,7 @@ func (cmd *DetachInstance) run(renv env.Running, params map[string]interface{}) 
 
 	input := &elbv2.DeregisterTargetsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elbv2.DeregisterTargetsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elbv2.DeregisterTargetsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11311,7 +11311,7 @@ func (cmd *DetachInstanceprofile) Run(renv env.Running, params map[string]interf
 
 func (cmd *DetachInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11384,7 +11384,7 @@ func (cmd *DetachInternetgateway) Run(renv env.Running, params map[string]interf
 
 func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11395,7 +11395,7 @@ func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]interf
 
 	input := &ec2.DetachInternetGatewayInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11433,13 +11433,13 @@ func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]interf
 
 func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DetachInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11491,7 +11491,7 @@ func (cmd *DetachMfadevice) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *DetachMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11502,7 +11502,7 @@ func (cmd *DetachMfadevice) run(renv env.Running, params map[string]interface{})
 
 	input := &iam.DeactivateMFADeviceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.DeactivateMFADeviceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.DeactivateMFADeviceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11573,7 +11573,7 @@ func (cmd *DetachNetworkinterface) Run(renv env.Running, params map[string]inter
 
 func (cmd *DetachNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11642,7 +11642,7 @@ func (cmd *DetachPolicy) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DetachPolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11715,7 +11715,7 @@ func (cmd *DetachRole) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *DetachRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11726,7 +11726,7 @@ func (cmd *DetachRole) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &iam.RemoveRoleFromInstanceProfileInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.RemoveRoleFromInstanceProfileInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.RemoveRoleFromInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11797,7 +11797,7 @@ func (cmd *DetachRoutetable) Run(renv env.Running, params map[string]interface{}
 
 func (cmd *DetachRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11808,7 +11808,7 @@ func (cmd *DetachRoutetable) run(renv env.Running, params map[string]interface{}
 
 	input := &ec2.DisassociateRouteTableInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11846,13 +11846,13 @@ func (cmd *DetachRoutetable) run(renv env.Running, params map[string]interface{}
 
 func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DisassociateRouteTableInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -11904,7 +11904,7 @@ func (cmd *DetachSecuritygroup) Run(renv env.Running, params map[string]interfac
 
 func (cmd *DetachSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11977,7 +11977,7 @@ func (cmd *DetachUser) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *DetachUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -11988,7 +11988,7 @@ func (cmd *DetachUser) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &iam.RemoveUserFromGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.RemoveUserFromGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.RemoveUserFromGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12059,7 +12059,7 @@ func (cmd *DetachVolume) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DetachVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12070,7 +12070,7 @@ func (cmd *DetachVolume) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.DetachVolumeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12108,13 +12108,13 @@ func (cmd *DetachVolume) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.DetachVolumeInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12166,7 +12166,7 @@ func (cmd *ImportImage) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *ImportImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12177,7 +12177,7 @@ func (cmd *ImportImage) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &ec2.ImportImageInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12215,13 +12215,13 @@ func (cmd *ImportImage) run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *ImportImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.ImportImageInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12273,7 +12273,7 @@ func (cmd *RestartDatabase) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *RestartDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12284,7 +12284,7 @@ func (cmd *RestartDatabase) run(renv env.Running, params map[string]interface{})
 
 	input := &rds.RebootDBInstanceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in rds.RebootDBInstanceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in rds.RebootDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12355,7 +12355,7 @@ func (cmd *RestartInstance) Run(renv env.Running, params map[string]interface{})
 
 func (cmd *RestartInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12366,7 +12366,7 @@ func (cmd *RestartInstance) run(renv env.Running, params map[string]interface{})
 
 	input := &ec2.RebootInstancesInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12404,13 +12404,13 @@ func (cmd *RestartInstance) run(renv env.Running, params map[string]interface{})
 
 func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.RebootInstancesInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12462,7 +12462,7 @@ func (cmd *StartAlarm) Run(renv env.Running, params map[string]interface{}) (int
 
 func (cmd *StartAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12473,7 +12473,7 @@ func (cmd *StartAlarm) run(renv env.Running, params map[string]interface{}) (int
 
 	input := &cloudwatch.EnableAlarmActionsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in cloudwatch.EnableAlarmActionsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in cloudwatch.EnableAlarmActionsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12544,7 +12544,7 @@ func (cmd *StartContainertask) Run(renv env.Running, params map[string]interface
 
 func (cmd *StartContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12617,7 +12617,7 @@ func (cmd *StartDatabase) Run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *StartDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12628,7 +12628,7 @@ func (cmd *StartDatabase) run(renv env.Running, params map[string]interface{}) (
 
 	input := &rds.StartDBInstanceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in rds.StartDBInstanceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in rds.StartDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12699,7 +12699,7 @@ func (cmd *StartInstance) Run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *StartInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12710,7 +12710,7 @@ func (cmd *StartInstance) run(renv env.Running, params map[string]interface{}) (
 
 	input := &ec2.StartInstancesInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12748,13 +12748,13 @@ func (cmd *StartInstance) run(renv env.Running, params map[string]interface{}) (
 
 func (cmd *StartInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.StartInstancesInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12806,7 +12806,7 @@ func (cmd *StopAlarm) Run(renv env.Running, params map[string]interface{}) (inte
 
 func (cmd *StopAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12817,7 +12817,7 @@ func (cmd *StopAlarm) run(renv env.Running, params map[string]interface{}) (inte
 
 	input := &cloudwatch.DisableAlarmActionsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in cloudwatch.DisableAlarmActionsInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in cloudwatch.DisableAlarmActionsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -12888,7 +12888,7 @@ func (cmd *StopContainertask) Run(renv env.Running, params map[string]interface{
 
 func (cmd *StopContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12961,7 +12961,7 @@ func (cmd *StopDatabase) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *StopDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -12972,7 +12972,7 @@ func (cmd *StopDatabase) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &rds.StopDBInstanceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in rds.StopDBInstanceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in rds.StopDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13043,7 +13043,7 @@ func (cmd *StopInstance) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *StopInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13054,7 +13054,7 @@ func (cmd *StopInstance) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.StopInstancesInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13092,13 +13092,13 @@ func (cmd *StopInstance) run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *StopInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.StopInstancesInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13150,7 +13150,7 @@ func (cmd *UpdateBucket) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *UpdateBucket) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13223,7 +13223,7 @@ func (cmd *UpdateClassicLoadbalancer) Run(renv env.Running, params map[string]in
 
 func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13234,7 +13234,7 @@ func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]in
 
 	input := &elb.ConfigureHealthCheckInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in elb.ConfigureHealthCheckInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in elb.ConfigureHealthCheckInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13305,7 +13305,7 @@ func (cmd *UpdateContainertask) Run(renv env.Running, params map[string]interfac
 
 func (cmd *UpdateContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13316,7 +13316,7 @@ func (cmd *UpdateContainertask) run(renv env.Running, params map[string]interfac
 
 	input := &ecs.UpdateServiceInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ecs.UpdateServiceInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ecs.UpdateServiceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13387,7 +13387,7 @@ func (cmd *UpdateDistribution) Run(renv env.Running, params map[string]interface
 
 func (cmd *UpdateDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13460,7 +13460,7 @@ func (cmd *UpdateImage) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *UpdateImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13529,7 +13529,7 @@ func (cmd *UpdateInstance) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *UpdateInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13540,7 +13540,7 @@ func (cmd *UpdateInstance) run(renv env.Running, params map[string]interface{}) 
 
 	input := &ec2.ModifyInstanceAttributeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13578,13 +13578,13 @@ func (cmd *UpdateInstance) run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	input := &ec2.ModifyInstanceAttributeInput{}
 	input.DryRun = aws.Bool(true)
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13636,7 +13636,7 @@ func (cmd *UpdateLoginprofile) Run(renv env.Running, params map[string]interface
 
 func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13647,7 +13647,7 @@ func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]interface
 
 	input := &iam.UpdateLoginProfileInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.UpdateLoginProfileInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.UpdateLoginProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13718,7 +13718,7 @@ func (cmd *UpdatePolicy) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *UpdatePolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13729,7 +13729,7 @@ func (cmd *UpdatePolicy) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &iam.CreatePolicyVersionInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyVersionInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyVersionInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13800,7 +13800,7 @@ func (cmd *UpdateRecord) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *UpdateRecord) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13873,7 +13873,7 @@ func (cmd *UpdateS3object) Run(renv env.Running, params map[string]interface{}) 
 
 func (cmd *UpdateS3object) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13884,7 +13884,7 @@ func (cmd *UpdateS3object) run(renv env.Running, params map[string]interface{}) 
 
 	input := &s3.PutObjectAclInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in s3.PutObjectAclInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in s3.PutObjectAclInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -13955,7 +13955,7 @@ func (cmd *UpdateScalinggroup) Run(renv env.Running, params map[string]interface
 
 func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -13966,7 +13966,7 @@ func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]interface
 
 	input := &autoscaling.UpdateAutoScalingGroupInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in autoscaling.UpdateAutoScalingGroupInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in autoscaling.UpdateAutoScalingGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -14037,7 +14037,7 @@ func (cmd *UpdateSecuritygroup) Run(renv env.Running, params map[string]interfac
 
 func (cmd *UpdateSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -14106,7 +14106,7 @@ func (cmd *UpdateStack) Run(renv env.Running, params map[string]interface{}) (in
 
 func (cmd *UpdateStack) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -14117,7 +14117,7 @@ func (cmd *UpdateStack) run(renv env.Running, params map[string]interface{}) (in
 
 	input := &cloudformation.UpdateStackInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in cloudformation.UpdateStackInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in cloudformation.UpdateStackInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -14188,7 +14188,7 @@ func (cmd *UpdateSubnet) Run(renv env.Running, params map[string]interface{}) (i
 
 func (cmd *UpdateSubnet) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {
@@ -14199,7 +14199,7 @@ func (cmd *UpdateSubnet) run(renv env.Running, params map[string]interface{}) (i
 
 	input := &ec2.ModifySubnetAttributeInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
-		return nil, fmt.Errorf("cannot inject in ec2.ModifySubnetAttributeInput: %s", err)
+		return nil, fmt.Errorf("cannot inject in ec2.ModifySubnetAttributeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
 		v.PostProcessInput(input)
@@ -14270,7 +14270,7 @@ func (cmd *UpdateTargetgroup) Run(renv env.Running, params map[string]interface{
 
 func (cmd *UpdateTargetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
 	if err := cmd.inject(params); err != nil {
-		return nil, fmt.Errorf("cannot set params on command struct: %s", err)
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
 
 	if v, ok := implementsBeforeRun(cmd); ok {

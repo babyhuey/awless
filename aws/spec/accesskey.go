@@ -55,7 +55,7 @@ func (cmd *CreateAccesskey) ParamsSpec() params.Spec {
 			if noPrompt, hasNoPrompt := values["no-prompt"]; hasNoPrompt {
 				b, err := castBool(noPrompt)
 				if err != nil {
-					return nil, fmt.Errorf("no-prompt: %s", err)
+					return nil, fmt.Errorf("no-prompt: %w", err)
 				}
 				return map[string]interface{}{"save": !b}, nil
 			} else {
@@ -141,7 +141,7 @@ func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 					UserName: String(user),
 				})
 				if err != nil {
-					return values, fmt.Errorf("can not find access key for %s: %s", user, err)
+					return values, fmt.Errorf("can not find access key for %s: %w", user, err)
 				}
 				switch len(keys.AccessKeyMetadata) {
 				case 0:
@@ -228,14 +228,14 @@ func appendToAwsFile(content string, awsFilePath string) (bool, error) {
 	var created bool
 	if awsHomeDirMissing() {
 		if err := os.MkdirAll(awsconfig.AWSHomeDir(), 0700); err != nil {
-			return created, fmt.Errorf("creating '%s' : %s", awsconfig.AWSHomeDir(), err)
+			return created, fmt.Errorf("creating '%s' : %w", awsconfig.AWSHomeDir(), err)
 		}
 		created = true
 	}
 
 	f, err := os.OpenFile(awsFilePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
-		return created, fmt.Errorf("appending to '%s': %s", awsFilePath, err)
+		return created, fmt.Errorf("appending to '%s': %w", awsFilePath, err)
 	}
 
 	if _, err := fmt.Fprintf(f, "%s", content); err != nil {

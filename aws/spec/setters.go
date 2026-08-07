@@ -655,7 +655,7 @@ func structSetter(s interface{}, params map[string]interface{}) error {
 				}
 			}
 			if err := setFieldWithType(v, s, field.Name, fieldType); err != nil {
-				return fmt.Errorf("%s: %s", tplName, err)
+				return fmt.Errorf("%s: %w", tplName, err)
 			}
 		}
 	}
@@ -680,7 +680,7 @@ func structInjector(src, dest interface{}, ctx map[string]interface{}) error {
 							if tplName, ok := field.Tag.Lookup("templateName"); ok {
 								fieldName = tplName
 							}
-							return fmt.Errorf("%s: %s", fieldName, err)
+							return fmt.Errorf("%s: %w", fieldName, err)
 						}
 					}
 				}
