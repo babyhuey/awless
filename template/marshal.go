@@ -49,6 +49,22 @@ func (t *TemplateExecution) SetMessage(s string) {
 	t.Message = out
 }
 
+// redactFillers returns a copy of fillers with the values of sensitive keys
+// replaced. Template fillers are user-supplied values for template holes, so
+// `awless run tpl.aws password=SECRET` puts the secret here as well as in the
+// command line.
+func redactFillers(in map[string]interface{}) map[string]interface{} {
+	out := make(map[string]interface{}, len(in))
+	for k, v := range in {
+		if ast.IsSensitiveParam(k) {
+			out[k] = ast.RedactedValue
+			continue
+		}
+		out[k] = v
+	}
+	return out
+}
+
 func (t *TemplateExecution) MarshalJSON() ([]byte, error) {
 	out := &toJSON{}
 	out.ID = t.ID
@@ -58,15 +74,17 @@ func (t *TemplateExecution) MarshalJSON() ([]byte, error) {
 	out.Profile = t.Profile
 	out.Message = t.Message
 	out.Path = t.Path
-	out.Fillers = t.Fillers
-	if out.Fillers == nil {
-		out.Fillers = make(map[string]interface{}, 0) // friendlier for json, avoiding "fillers": null,
-	}
+	// Redacted: this is the persistence boundary. Command lines and fillers can
+	// contain secrets (e.g. `create loginprofile password=...`), and this JSON
+	// is written to the local BoltDB log and replayed by `awless log`.
+	// redactFillers always returns a non-nil map, which also keeps the JSON
+	// friendly by emitting "fillers": {} rather than null.
+	out.Fillers = redactFillers(t.Fillers)
 	out.Commands = []command{}
 
 	for _, cmd := range t.CommandNodesIterator() {
 		newCmd := command{}
-		newCmd.Line = cmd.String()
+		newCmd.Line = cmd.StringRedacted()
 		if cmd.CmdErr != nil {
 			newCmd.Errors = append(newCmd.Errors, cmd.CmdErr.Error())
 		}

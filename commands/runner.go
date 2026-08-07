@@ -93,7 +93,10 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 	runner.AfterRun = func(tplExec *template.TemplateExecution) error {
 		if tplExec.Message == "" {
 			if tplExec.IsOneLiner() {
-				tplExec.SetMessage(fmt.Sprintf("Run %s", tplExec.Template))
+				// Redacted: Message is persisted to the local template log, and
+				// a one-liner message embeds the full command line, which may
+				// carry a secret (e.g. `create loginprofile password=...`).
+				tplExec.SetMessage(fmt.Sprintf("Run %s", tplExec.Template.StringRedacted()))
 			} else if path := tplExec.Path; path != "" {
 				stats := tplExec.Stats()
 				if stats.KOCount > 0 {

@@ -72,9 +72,27 @@ func (c *CommandNode) Keys() (keys []string) {
 }
 
 func (c *CommandNode) String() string {
+	return c.string(false)
+}
+
+// StringRedacted renders the command with the values of sensitive parameters
+// replaced by RedactedValue. Use it whenever a command is persisted or logged;
+// see IsSensitiveParam.
+//
+// The result is still valid template syntax, so it round-trips through the
+// parser when the log is read back.
+func (c *CommandNode) StringRedacted() string {
+	return c.string(true)
+}
+
+func (c *CommandNode) string(redact bool) string {
 	var all []string
 
 	for k, v := range c.ParamNodes {
+		if redact && IsSensitiveParam(k) {
+			all = append(all, fmt.Sprintf("%s=%s", k, RedactedValue))
+			continue
+		}
 		switch vv := v.(type) {
 		case string:
 			all = append(all, fmt.Sprintf("%s=%v", k, quoteStringIfNeeded(vv)))
@@ -94,6 +112,10 @@ func (c *CommandNode) String() string {
 		}
 	}
 	for k, v := range c.Refs {
+		if redact && IsSensitiveParam(k) {
+			all = append(all, fmt.Sprintf("%s=%s", k, RedactedValue))
+			continue
+		}
 		all = append(all, fmt.Sprintf("%s=%v", k, v))
 	}
 
