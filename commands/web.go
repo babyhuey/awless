@@ -17,22 +17,40 @@ limitations under the License.
 package commands
 
 import (
+	"net"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/wallix/awless/config"
+	"github.com/wallix/awless/logger"
 	"github.com/wallix/awless/web"
 )
 
 var (
-	webPortFlag string
+	webPortFlag      string
+	webListenAllFlag bool
 )
 
 func init() {
 	RootCmd.AddCommand(webCmd)
 
 	webCmd.Flags().StringVar(&webPortFlag, "port", ":8080", "Web UI port to listen on")
+	webCmd.Flags().BoolVar(&webListenAllFlag, "listen-all", false, "Listen on all interfaces instead of loopback only. The web UI has no authentication: only use this on a trusted network")
+}
+
+// webListenAddr builds the listen address for the web UI.
+//
+// It defaults to loopback: this UI serves the local synced inventory (instance
+// IDs, private IPs, security group rules, VPC topology) and has no
+// authentication, so binding every interface by default exposed it to the whole
+// network. listenAll is the explicit opt-out.
+func webListenAddr(port string, listenAll bool) string {
+	host := "127.0.0.1"
+	if listenAll {
+		host = "0.0.0.0"
+	}
+	return net.JoinHostPort(host, strings.TrimPrefix(port, ":"))
 }
 
 var webCmd = &cobra.Command{
@@ -42,10 +60,11 @@ var webCmd = &cobra.Command{
 	PersistentPreRun: applyHooks(initLoggerHook, initAwlessEnvHook),
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if !strings.HasPrefix(webPortFlag, ":") {
-			webPortFlag = ":" + webPortFlag
+		if webListenAllFlag {
+			logger.Warning("web UI listening on all interfaces with no authentication; anyone who can reach this port can browse your synced AWS inventory")
 		}
-		server := web.New(webPortFlag, config.GetAWSProfile())
+
+		server := web.New(webListenAddr(webPortFlag, webListenAllFlag), config.GetAWSProfile())
 		exitOn(server.Start())
 	},
 }

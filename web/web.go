@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gorilla/mux"
 	tstore "github.com/wallix/triplestore"
@@ -23,13 +24,17 @@ import (
 )
 
 type server struct {
-	port       string
+	// addr is a full listen address ("host:port"), not just a port. Callers are
+	// responsible for choosing the host; commands/web.go defaults it to
+	// loopback so a local browsing UI is not exposed to the network.
+	addr       string
 	awsProfile string
 	gph        cloud.GraphAPI
 }
 
-func New(port, profile string) *server {
-	return &server{port: port, awsProfile: profile}
+// New builds the web UI server. addr must be a full "host:port" listen address.
+func New(addr, profile string) *server {
+	return &server{addr: addr, awsProfile: profile}
 }
 
 func (s *server) Start() error {
@@ -42,8 +47,19 @@ func (s *server) Start() error {
 
 	s.gph = g
 
-	log.Printf("Starting browsing at http://localhost%s\n", s.port)
-	return http.ListenAndServe(s.port, s.routes())
+	log.Printf("Starting browsing at http://%s\n", s.addr)
+
+	// Explicit timeouts: bare http.ListenAndServe has none, which leaves the
+	// server open to slow-client (Slowloris) resource exhaustion.
+	srv := &http.Server{
+		Addr:              s.addr,
+		Handler:           s.routes(),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+	return srv.ListenAndServe()
 }
 
 func (s *server) routes() http.Handler {

@@ -12,8 +12,8 @@ import (
 
 func TestNew(t *testing.T) {
 	s := New(":8080", "default")
-	if s.port != ":8080" {
-		t.Errorf("expected port ':8080', got %q", s.port)
+	if s.addr != ":8080" {
+		t.Errorf("expected addr ':8080', got %q", s.addr)
 	}
 	if s.awsProfile != "default" {
 		t.Errorf("expected profile 'default', got %q", s.awsProfile)
@@ -25,8 +25,8 @@ func TestNew(t *testing.T) {
 
 func TestNewDifferentParams(t *testing.T) {
 	s := New(":9090", "production")
-	if s.port != ":9090" {
-		t.Errorf("expected port ':9090', got %q", s.port)
+	if s.addr != ":9090" {
+		t.Errorf("expected addr ':9090', got %q", s.addr)
 	}
 	if s.awsProfile != "production" {
 		t.Errorf("expected profile 'production', got %q", s.awsProfile)
