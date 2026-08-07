@@ -96,7 +96,6 @@ fmt-check: ## Fail if any non-generated file is unformatted
 
 .PHONY: generate
 generate: ## Regenerate gen_*.go from gen/aws definitions and templates
-	@echo "NOTE: generator output currently does not compile — see ISSUES.md I15"
 	cd gen/aws/generators && go run *.go
 
 .PHONY: generate-check

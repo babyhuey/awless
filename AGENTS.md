@@ -39,10 +39,10 @@ make verify        # full gate:  fmt-check vet lint test-race vuln  (mirrors CI)
 
 `make verify` is the gate to run before committing; it is what CI enforces.
 
-**Caveat on `make generate`:** the generators currently emit a `gen_mocks_test.go`
-with an unused import, so their output does not compile, and the committed
-generated files differ from generator output by ~2400 lines. See ISSUES.md I15
-before relying on it.
+`make generate` requires `goimports` on PATH (`make tools` installs it): the
+generators shell out to it to prune the unused imports their templates emit.
+Output is deterministic, and CI enforces that committed generated files match
+(the `codegen` job).
 
 ## Directory Structure
 

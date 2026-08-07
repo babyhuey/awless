@@ -26,13 +26,19 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"text/template"
 )
+
+// localPrefix matches the goimports -local setting in .golangci.yml and the
+// Makefile, so generated files group imports the same way as hand-written ones.
+const localPrefix = "github.com/bootswithdefer/awless"
 
 var (
 	ROOT_DIR = filepath.Join("..", "..", "..")
@@ -77,7 +83,32 @@ func writeTemplateToFile(templ *template.Template, data any, dir, filename strin
 		log.Fatal(err)
 	}
 
+	// Templates emit an import for every AWS API in the definitions, whether or
+	// not the generated body references it — the s3 client package, for example,
+	// is unused when only s3types is referenced. That produced output that did
+	// not compile.
+	//
+	// goimports drops the unused imports and groups the rest. It runs here rather
+	// than only via the //go:generate directives above, so `go run *.go` produces
+	// compiling output too.
+	if err := runGoimports(path); err != nil {
+		log.Fatalf("goimports %s: %s", relativePathToRoot(path), err)
+	}
+
 	log.Printf("generated %s", relativePathToRoot(path))
+}
+
+// runGoimports formats a generated file and prunes its unused imports.
+func runGoimports(path string) error {
+	bin, err := exec.LookPath("goimports")
+	if err != nil {
+		return fmt.Errorf("goimports not found on PATH; install it with `go install golang.org/x/tools/cmd/goimports@latest`: %w", err)
+	}
+	out, err := exec.Command(bin, "-w", "-local", localPrefix, path).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%w: %s", err, out)
+	}
+	return nil
 }
 
 func relativePathToRoot(path string) string {

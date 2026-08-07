@@ -862,61 +862,41 @@ The template parser is generated from a PEG grammar and takes untrusted file inp
 
 ---
 
-### I15: Generated code is out of sync and the generators produce non-compiling output
+### I15: Generated code drift and non-compiling generator output — **FIXED**
 
-**Severity:** Medium — raised from Low; both problems are now measured, not hypothetical  
-**Files:** `gen/aws/generators/*.go`, all `gen_*.go`, `.github/workflows/ci.yml`
+**Severity:** was Medium  
+**Files:** `gen/aws/generators/main.go`, `gen/aws/generators/acceptance_mocks.go`, `.github/workflows/ci.yml`
 
-Running the generators against the current tree revealed two concrete problems.
+Three problems, with a shared root cause that was not obvious at first.
 
-**1. The generators' output does not compile.**
+**1. Generator output did not compile.** The templates emit an import for every
+AWS API in the definitions whether or not the generated body references it, so
+`gen_mocks_test.go` imported the `s3` client package while only referencing
+`s3types`:
 
 ```
-$ cd gen/aws/generators && go run *.go
-$ go vet ./aws/services/
 vet: aws/services/gen_mocks_test.go:39:3: "github.com/aws/aws-sdk-go-v2/service/s3" imported and not used
 ```
 
-The mock template emits an import it does not use, so a fresh regeneration
-breaks the build. The committed `gen_mocks_test.go` compiles, meaning it was
-either produced by an older generator or hand-corrected — either way the
-generators are not currently a usable source of truth.
+`writeTemplateToFile` now runs `goimports` on every file it writes, which prunes
+the unused imports and applies the same `-local` grouping as hand-written code.
+The `//go:generate goimports` directives at the top of `main.go` only took effect
+under `go generate`, not under `go run *.go`, which is how the generators are
+actually invoked.
 
-**2. ~2,400 lines of pre-existing drift.**
+**2. The ~2,400-line "drift" was mostly that same bug.** It was almost entirely
+formatting: the committed files had been goimports-formatted while fresh output
+had not. Once the generator formats its own output, the difference collapsed to
+21 lines.
 
-Regenerating at an untouched checkout produces `3 files changed, 2381
-insertions(+), 1946 deletions(-)`, almost all in `aws/spec/gen_runs.go`. So the
-committed generated files have not matched their generators for some time.
+**3. Those remaining 21 lines were non-determinism.** `acceptance_mocks.go` built
+its API list by iterating a `map[string]bool`, so Go's randomized map iteration
+reordered the emitted mock types on every run. Now sorted. Verified by
+regenerating twice and confirming a byte-identical result.
 
-This is why the module rename in `78e9316f` rewrote generated files in place
-instead of regenerating: regenerating would have mixed an unrelated 2,400-line
-drift correction, plus a compile failure, into that change.
-
-**Fix, in order:**
-
-1. Fix the unused-import bug in the mock generator template so output compiles.
-2. Regenerate everything and commit the drift correction as its own change, so
-   the diff is reviewable in isolation.
-3. Only then add the CI drift check below, which is meaningless until 1 and 2
-   land.
-
-```yaml
-  codegen:
-    name: Codegen Drift
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - run: go install golang.org/x/tools/cmd/goimports@latest
-      - run: cd gen/aws/generators && go run *.go
-      - run: git diff --exit-code || (echo "Generated files are out of date. Run: cd gen/aws/generators && go run *.go" && exit 1)
-```
-
-This also enforces the "never hand-edit `gen_*.go`" rule documented in
-`AGENTS.md`, which the rename commit had to bend precisely because the
-generators were unreliable.
+Only with all three fixed is a drift check meaningful, so the `codegen` CI job
+was added last. It regenerates and fails on any diff, enforcing the "never
+hand-edit `gen_*.go`" rule in `AGENTS.md`.
 
 ---
 

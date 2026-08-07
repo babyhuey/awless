@@ -5,6 +5,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -35,6 +36,10 @@ func generateAcceptanceMocks() {
 	for api := range usedApis {
 		apiList = append(apiList, api)
 	}
+	// Sorted so generated output is byte-identical between runs. Without this,
+	// Go's randomized map iteration reordered the emitted mock types every time,
+	// which made a codegen drift check in CI impossible.
+	sort.Strings(apiList)
 
 	templ, err := template.New("mocks").Funcs(
 		template.FuncMap{
