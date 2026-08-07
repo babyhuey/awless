@@ -256,7 +256,7 @@ Generated Go source files are written mode `0666` (world-writable, subject to um
 
 ## Technical Debt
 
-### D1: Acceptance tests completely broken
+### D1: Acceptance tests completely broken — **FIXED** (middleware-based mocking; found a nil-name panic)
 
 **Severity:** High  
 **File:** `acceptance/aws/gen_factory.go`
@@ -419,7 +419,7 @@ Build-info ldflags inject `github.com/wallix/awless/config` paths, and the upgra
 
 ---
 
-### D8: No integration test coverage for SDK v2 API calls
+### D8: No integration test coverage for SDK v2 API calls — **FIXED** (first acceptance tests in the repo's history)
 
 **Severity:** Medium  
 **Files:** `aws/fetch/manual_fetchers.go` (38KB), `aws/spec/*.go` (command implementations)

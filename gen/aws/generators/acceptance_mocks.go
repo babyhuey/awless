@@ -106,18 +106,32 @@ import (
   "github.com/bootswithdefer/awless/logger"
 )
 
+// AcceptanceFactory builds commands whose AWS clients are routed through a Mock.
+//
+// SDK v2 clients are concrete structs, so they cannot be replaced with an
+// interface. Instead every command is constructed from Mock.Config(), whose
+// APIOptions carry a middleware that intercepts the call before it is signed or
+// sent. The generated constructors already do service.NewFromConfig(cfg), so no
+// SetApi call is needed.
 type AcceptanceFactory struct {
-	Mock   any
+	Mock   *Mock
 	Logger *logger.Logger
-	Graph cloud.GraphAPI
+	Graph  cloud.GraphAPI
 }
 
-func NewAcceptanceFactory(mock any, g cloud.GraphAPI, l ...*logger.Logger) *AcceptanceFactory {
+func NewAcceptanceFactory(mock *Mock, g cloud.GraphAPI, l ...*logger.Logger) *AcceptanceFactory {
 	lg := logger.DiscardLogger
 	if len(l) > 0 {
 		lg = l[0]
 	}
-	return &AcceptanceFactory{Mock: mock, Graph:g, Logger: lg}
+	return &AcceptanceFactory{Mock: mock, Graph: g, Logger: lg}
+}
+
+func (f *AcceptanceFactory) config() aws.Config {
+	if f.Mock == nil {
+		return aws.Config{}
+	}
+	return f.Mock.Config()
 }
 
 func (f *AcceptanceFactory) Build(key string) func() any {
@@ -125,10 +139,7 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		{{- range $cmdName, $cmd := . }}
 		case "{{ $cmd.Action }}{{ $cmd.Entity }}":
 			return func() any {
-				cmd := awsspec.New{{ $cmdName }}(aws.Config{}, f.Graph, f.Logger)
-				// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-				_ = cmd
-				return cmd
+				return awsspec.New{{ $cmdName }}(f.config(), f.Graph, f.Logger)
 			}
 		{{- end}}
 	}

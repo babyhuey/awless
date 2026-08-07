@@ -20,7 +20,7 @@ type ATBuilder struct {
 	ignoredInput map[string]struct{}
 	fillers      map[string]string
 	expectRevert string
-	mock         mock
+	mock         *Mock
 	graph        *graph.Graph
 }
 
@@ -61,7 +61,7 @@ func (b *ATBuilder) Graph(g *graph.Graph) *ATBuilder {
 	return b
 }
 
-func (b *ATBuilder) Mock(i mock) *ATBuilder {
+func (b *ATBuilder) Mock(i *Mock) *ATBuilder {
 	b.mock = i
 	return b
 }
@@ -78,6 +78,9 @@ func (b *ATBuilder) ExpectRevert(revert string) *ATBuilder {
 
 func (b *ATBuilder) Run(t *testing.T, l ...*logger.Logger) {
 	t.Helper()
+	if b.mock == nil {
+		b.mock = NewMock()
+	}
 	b.mock.SetInputs(b.expectInput)
 	b.mock.SetIgnored(b.ignoredInput)
 	b.mock.SetTesting(t)

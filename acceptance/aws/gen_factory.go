@@ -25,13 +25,20 @@ import (
 	"github.com/bootswithdefer/awless/logger"
 )
 
+// AcceptanceFactory builds commands whose AWS clients are routed through a Mock.
+//
+// SDK v2 clients are concrete structs, so they cannot be replaced with an
+// interface. Instead every command is constructed from Mock.Config(), whose
+// APIOptions carry a middleware that intercepts the call before it is signed or
+// sent. The generated constructors already do service.NewFromConfig(cfg), so no
+// SetApi call is needed.
 type AcceptanceFactory struct {
-	Mock   any
+	Mock   *Mock
 	Logger *logger.Logger
 	Graph  cloud.GraphAPI
 }
 
-func NewAcceptanceFactory(mock any, g cloud.GraphAPI, l ...*logger.Logger) *AcceptanceFactory {
+func NewAcceptanceFactory(mock *Mock, g cloud.GraphAPI, l ...*logger.Logger) *AcceptanceFactory {
 	lg := logger.DiscardLogger
 	if len(l) > 0 {
 		lg = l[0]
@@ -39,1176 +46,682 @@ func NewAcceptanceFactory(mock any, g cloud.GraphAPI, l ...*logger.Logger) *Acce
 	return &AcceptanceFactory{Mock: mock, Graph: g, Logger: lg}
 }
 
+func (f *AcceptanceFactory) config() aws.Config {
+	if f.Mock == nil {
+		return aws.Config{}
+	}
+	return f.Mock.Config()
+}
+
 func (f *AcceptanceFactory) Build(key string) func() any {
 	switch key {
 	case "attachalarm":
 		return func() any {
-			cmd := awsspec.NewAttachAlarm(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachAlarm(f.config(), f.Graph, f.Logger)
 		}
 	case "attachclassicloadbalancer":
 		return func() any {
-			cmd := awsspec.NewAttachClassicLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachClassicLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "attachcontainertask":
 		return func() any {
-			cmd := awsspec.NewAttachContainertask(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachContainertask(f.config(), f.Graph, f.Logger)
 		}
 	case "attachelasticip":
 		return func() any {
-			cmd := awsspec.NewAttachElasticip(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachElasticip(f.config(), f.Graph, f.Logger)
 		}
 	case "attachinstance":
 		return func() any {
-			cmd := awsspec.NewAttachInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "attachinstanceprofile":
 		return func() any {
-			cmd := awsspec.NewAttachInstanceprofile(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachInstanceprofile(f.config(), f.Graph, f.Logger)
 		}
 	case "attachinternetgateway":
 		return func() any {
-			cmd := awsspec.NewAttachInternetgateway(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachInternetgateway(f.config(), f.Graph, f.Logger)
 		}
 	case "attachlistener":
 		return func() any {
-			cmd := awsspec.NewAttachListener(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachListener(f.config(), f.Graph, f.Logger)
 		}
 	case "attachmfadevice":
 		return func() any {
-			cmd := awsspec.NewAttachMfadevice(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachMfadevice(f.config(), f.Graph, f.Logger)
 		}
 	case "attachnetworkinterface":
 		return func() any {
-			cmd := awsspec.NewAttachNetworkinterface(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachNetworkinterface(f.config(), f.Graph, f.Logger)
 		}
 	case "attachpolicy":
 		return func() any {
-			cmd := awsspec.NewAttachPolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachPolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "attachrole":
 		return func() any {
-			cmd := awsspec.NewAttachRole(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachRole(f.config(), f.Graph, f.Logger)
 		}
 	case "attachroutetable":
 		return func() any {
-			cmd := awsspec.NewAttachRoutetable(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachRoutetable(f.config(), f.Graph, f.Logger)
 		}
 	case "attachsecuritygroup":
 		return func() any {
-			cmd := awsspec.NewAttachSecuritygroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachSecuritygroup(f.config(), f.Graph, f.Logger)
 		}
 	case "attachuser":
 		return func() any {
-			cmd := awsspec.NewAttachUser(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachUser(f.config(), f.Graph, f.Logger)
 		}
 	case "attachvolume":
 		return func() any {
-			cmd := awsspec.NewAttachVolume(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAttachVolume(f.config(), f.Graph, f.Logger)
 		}
 	case "authenticateregistry":
 		return func() any {
-			cmd := awsspec.NewAuthenticateRegistry(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewAuthenticateRegistry(f.config(), f.Graph, f.Logger)
 		}
 	case "checkcertificate":
 		return func() any {
-			cmd := awsspec.NewCheckCertificate(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckCertificate(f.config(), f.Graph, f.Logger)
 		}
 	case "checkdatabase":
 		return func() any {
-			cmd := awsspec.NewCheckDatabase(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckDatabase(f.config(), f.Graph, f.Logger)
 		}
 	case "checkdistribution":
 		return func() any {
-			cmd := awsspec.NewCheckDistribution(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckDistribution(f.config(), f.Graph, f.Logger)
 		}
 	case "checkinstance":
 		return func() any {
-			cmd := awsspec.NewCheckInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "checkloadbalancer":
 		return func() any {
-			cmd := awsspec.NewCheckLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "checknatgateway":
 		return func() any {
-			cmd := awsspec.NewCheckNatgateway(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckNatgateway(f.config(), f.Graph, f.Logger)
 		}
 	case "checknetworkinterface":
 		return func() any {
-			cmd := awsspec.NewCheckNetworkinterface(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckNetworkinterface(f.config(), f.Graph, f.Logger)
 		}
 	case "checkscalinggroup":
 		return func() any {
-			cmd := awsspec.NewCheckScalinggroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckScalinggroup(f.config(), f.Graph, f.Logger)
 		}
 	case "checksecuritygroup":
 		return func() any {
-			cmd := awsspec.NewCheckSecuritygroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckSecuritygroup(f.config(), f.Graph, f.Logger)
 		}
 	case "checkvolume":
 		return func() any {
-			cmd := awsspec.NewCheckVolume(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCheckVolume(f.config(), f.Graph, f.Logger)
 		}
 	case "copyimage":
 		return func() any {
-			cmd := awsspec.NewCopyImage(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCopyImage(f.config(), f.Graph, f.Logger)
 		}
 	case "copysnapshot":
 		return func() any {
-			cmd := awsspec.NewCopySnapshot(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCopySnapshot(f.config(), f.Graph, f.Logger)
 		}
 	case "createaccesskey":
 		return func() any {
-			cmd := awsspec.NewCreateAccesskey(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateAccesskey(f.config(), f.Graph, f.Logger)
 		}
 	case "createalarm":
 		return func() any {
-			cmd := awsspec.NewCreateAlarm(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateAlarm(f.config(), f.Graph, f.Logger)
 		}
 	case "createappscalingpolicy":
 		return func() any {
-			cmd := awsspec.NewCreateAppscalingpolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateAppscalingpolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "createappscalingtarget":
 		return func() any {
-			cmd := awsspec.NewCreateAppscalingtarget(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateAppscalingtarget(f.config(), f.Graph, f.Logger)
 		}
 	case "createbucket":
 		return func() any {
-			cmd := awsspec.NewCreateBucket(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateBucket(f.config(), f.Graph, f.Logger)
 		}
 	case "createcertificate":
 		return func() any {
-			cmd := awsspec.NewCreateCertificate(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateCertificate(f.config(), f.Graph, f.Logger)
 		}
 	case "createclassicloadbalancer":
 		return func() any {
-			cmd := awsspec.NewCreateClassicLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateClassicLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "createcontainercluster":
 		return func() any {
-			cmd := awsspec.NewCreateContainercluster(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateContainercluster(f.config(), f.Graph, f.Logger)
 		}
 	case "createdatabase":
 		return func() any {
-			cmd := awsspec.NewCreateDatabase(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateDatabase(f.config(), f.Graph, f.Logger)
 		}
 	case "createdbsubnetgroup":
 		return func() any {
-			cmd := awsspec.NewCreateDbsubnetgroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateDbsubnetgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "createdistribution":
 		return func() any {
-			cmd := awsspec.NewCreateDistribution(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateDistribution(f.config(), f.Graph, f.Logger)
 		}
 	case "createelasticip":
 		return func() any {
-			cmd := awsspec.NewCreateElasticip(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateElasticip(f.config(), f.Graph, f.Logger)
 		}
 	case "createfunction":
 		return func() any {
-			cmd := awsspec.NewCreateFunction(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateFunction(f.config(), f.Graph, f.Logger)
 		}
 	case "creategroup":
 		return func() any {
-			cmd := awsspec.NewCreateGroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateGroup(f.config(), f.Graph, f.Logger)
 		}
 	case "createimage":
 		return func() any {
-			cmd := awsspec.NewCreateImage(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateImage(f.config(), f.Graph, f.Logger)
 		}
 	case "createinstance":
 		return func() any {
-			cmd := awsspec.NewCreateInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "createinstanceprofile":
 		return func() any {
-			cmd := awsspec.NewCreateInstanceprofile(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateInstanceprofile(f.config(), f.Graph, f.Logger)
 		}
 	case "createinternetgateway":
 		return func() any {
-			cmd := awsspec.NewCreateInternetgateway(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateInternetgateway(f.config(), f.Graph, f.Logger)
 		}
 	case "createkeypair":
 		return func() any {
-			cmd := awsspec.NewCreateKeypair(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateKeypair(f.config(), f.Graph, f.Logger)
 		}
 	case "createlaunchconfiguration":
 		return func() any {
-			cmd := awsspec.NewCreateLaunchconfiguration(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateLaunchconfiguration(f.config(), f.Graph, f.Logger)
 		}
 	case "createlistener":
 		return func() any {
-			cmd := awsspec.NewCreateListener(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateListener(f.config(), f.Graph, f.Logger)
 		}
 	case "createloadbalancer":
 		return func() any {
-			cmd := awsspec.NewCreateLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "createloginprofile":
 		return func() any {
-			cmd := awsspec.NewCreateLoginprofile(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateLoginprofile(f.config(), f.Graph, f.Logger)
 		}
 	case "createmfadevice":
 		return func() any {
-			cmd := awsspec.NewCreateMfadevice(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateMfadevice(f.config(), f.Graph, f.Logger)
 		}
 	case "createnatgateway":
 		return func() any {
-			cmd := awsspec.NewCreateNatgateway(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateNatgateway(f.config(), f.Graph, f.Logger)
 		}
 	case "createnetworkinterface":
 		return func() any {
-			cmd := awsspec.NewCreateNetworkinterface(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateNetworkinterface(f.config(), f.Graph, f.Logger)
 		}
 	case "createpolicy":
 		return func() any {
-			cmd := awsspec.NewCreatePolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreatePolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "createqueue":
 		return func() any {
-			cmd := awsspec.NewCreateQueue(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateQueue(f.config(), f.Graph, f.Logger)
 		}
 	case "createrecord":
 		return func() any {
-			cmd := awsspec.NewCreateRecord(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateRecord(f.config(), f.Graph, f.Logger)
 		}
 	case "createrepository":
 		return func() any {
-			cmd := awsspec.NewCreateRepository(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateRepository(f.config(), f.Graph, f.Logger)
 		}
 	case "createrole":
 		return func() any {
-			cmd := awsspec.NewCreateRole(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateRole(f.config(), f.Graph, f.Logger)
 		}
 	case "createroute":
 		return func() any {
-			cmd := awsspec.NewCreateRoute(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateRoute(f.config(), f.Graph, f.Logger)
 		}
 	case "createroutetable":
 		return func() any {
-			cmd := awsspec.NewCreateRoutetable(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateRoutetable(f.config(), f.Graph, f.Logger)
 		}
 	case "creates3object":
 		return func() any {
-			cmd := awsspec.NewCreateS3object(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateS3object(f.config(), f.Graph, f.Logger)
 		}
 	case "createscalinggroup":
 		return func() any {
-			cmd := awsspec.NewCreateScalinggroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateScalinggroup(f.config(), f.Graph, f.Logger)
 		}
 	case "createscalingpolicy":
 		return func() any {
-			cmd := awsspec.NewCreateScalingpolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateScalingpolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "createsecuritygroup":
 		return func() any {
-			cmd := awsspec.NewCreateSecuritygroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateSecuritygroup(f.config(), f.Graph, f.Logger)
 		}
 	case "createsnapshot":
 		return func() any {
-			cmd := awsspec.NewCreateSnapshot(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateSnapshot(f.config(), f.Graph, f.Logger)
 		}
 	case "createstack":
 		return func() any {
-			cmd := awsspec.NewCreateStack(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateStack(f.config(), f.Graph, f.Logger)
 		}
 	case "createsubnet":
 		return func() any {
-			cmd := awsspec.NewCreateSubnet(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateSubnet(f.config(), f.Graph, f.Logger)
 		}
 	case "createsubscription":
 		return func() any {
-			cmd := awsspec.NewCreateSubscription(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateSubscription(f.config(), f.Graph, f.Logger)
 		}
 	case "createtag":
 		return func() any {
-			cmd := awsspec.NewCreateTag(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateTag(f.config(), f.Graph, f.Logger)
 		}
 	case "createtargetgroup":
 		return func() any {
-			cmd := awsspec.NewCreateTargetgroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateTargetgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "createtopic":
 		return func() any {
-			cmd := awsspec.NewCreateTopic(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateTopic(f.config(), f.Graph, f.Logger)
 		}
 	case "createuser":
 		return func() any {
-			cmd := awsspec.NewCreateUser(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateUser(f.config(), f.Graph, f.Logger)
 		}
 	case "createvolume":
 		return func() any {
-			cmd := awsspec.NewCreateVolume(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateVolume(f.config(), f.Graph, f.Logger)
 		}
 	case "createvpc":
 		return func() any {
-			cmd := awsspec.NewCreateVpc(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateVpc(f.config(), f.Graph, f.Logger)
 		}
 	case "createzone":
 		return func() any {
-			cmd := awsspec.NewCreateZone(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewCreateZone(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteaccesskey":
 		return func() any {
-			cmd := awsspec.NewDeleteAccesskey(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteAccesskey(f.config(), f.Graph, f.Logger)
 		}
 	case "deletealarm":
 		return func() any {
-			cmd := awsspec.NewDeleteAlarm(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteAlarm(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteappscalingpolicy":
 		return func() any {
-			cmd := awsspec.NewDeleteAppscalingpolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteAppscalingpolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteappscalingtarget":
 		return func() any {
-			cmd := awsspec.NewDeleteAppscalingtarget(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteAppscalingtarget(f.config(), f.Graph, f.Logger)
 		}
 	case "deletebucket":
 		return func() any {
-			cmd := awsspec.NewDeleteBucket(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteBucket(f.config(), f.Graph, f.Logger)
 		}
 	case "deletecertificate":
 		return func() any {
-			cmd := awsspec.NewDeleteCertificate(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteCertificate(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteclassicloadbalancer":
 		return func() any {
-			cmd := awsspec.NewDeleteClassicLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteClassicLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "deletecontainercluster":
 		return func() any {
-			cmd := awsspec.NewDeleteContainercluster(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteContainercluster(f.config(), f.Graph, f.Logger)
 		}
 	case "deletecontainertask":
 		return func() any {
-			cmd := awsspec.NewDeleteContainertask(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteContainertask(f.config(), f.Graph, f.Logger)
 		}
 	case "deletedatabase":
 		return func() any {
-			cmd := awsspec.NewDeleteDatabase(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteDatabase(f.config(), f.Graph, f.Logger)
 		}
 	case "deletedbsubnetgroup":
 		return func() any {
-			cmd := awsspec.NewDeleteDbsubnetgroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteDbsubnetgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deletedistribution":
 		return func() any {
-			cmd := awsspec.NewDeleteDistribution(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteDistribution(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteelasticip":
 		return func() any {
-			cmd := awsspec.NewDeleteElasticip(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteElasticip(f.config(), f.Graph, f.Logger)
 		}
 	case "deletefunction":
 		return func() any {
-			cmd := awsspec.NewDeleteFunction(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteFunction(f.config(), f.Graph, f.Logger)
 		}
 	case "deletegroup":
 		return func() any {
-			cmd := awsspec.NewDeleteGroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteGroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteimage":
 		return func() any {
-			cmd := awsspec.NewDeleteImage(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteImage(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteinstance":
 		return func() any {
-			cmd := awsspec.NewDeleteInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteinstanceprofile":
 		return func() any {
-			cmd := awsspec.NewDeleteInstanceprofile(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteInstanceprofile(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteinternetgateway":
 		return func() any {
-			cmd := awsspec.NewDeleteInternetgateway(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteInternetgateway(f.config(), f.Graph, f.Logger)
 		}
 	case "deletekeypair":
 		return func() any {
-			cmd := awsspec.NewDeleteKeypair(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteKeypair(f.config(), f.Graph, f.Logger)
 		}
 	case "deletelaunchconfiguration":
 		return func() any {
-			cmd := awsspec.NewDeleteLaunchconfiguration(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteLaunchconfiguration(f.config(), f.Graph, f.Logger)
 		}
 	case "deletelistener":
 		return func() any {
-			cmd := awsspec.NewDeleteListener(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteListener(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteloadbalancer":
 		return func() any {
-			cmd := awsspec.NewDeleteLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteloginprofile":
 		return func() any {
-			cmd := awsspec.NewDeleteLoginprofile(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteLoginprofile(f.config(), f.Graph, f.Logger)
 		}
 	case "deletemfadevice":
 		return func() any {
-			cmd := awsspec.NewDeleteMfadevice(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteMfadevice(f.config(), f.Graph, f.Logger)
 		}
 	case "deletenatgateway":
 		return func() any {
-			cmd := awsspec.NewDeleteNatgateway(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteNatgateway(f.config(), f.Graph, f.Logger)
 		}
 	case "deletenetworkinterface":
 		return func() any {
-			cmd := awsspec.NewDeleteNetworkinterface(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteNetworkinterface(f.config(), f.Graph, f.Logger)
 		}
 	case "deletepolicy":
 		return func() any {
-			cmd := awsspec.NewDeletePolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeletePolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "deletequeue":
 		return func() any {
-			cmd := awsspec.NewDeleteQueue(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteQueue(f.config(), f.Graph, f.Logger)
 		}
 	case "deleterecord":
 		return func() any {
-			cmd := awsspec.NewDeleteRecord(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteRecord(f.config(), f.Graph, f.Logger)
 		}
 	case "deleterepository":
 		return func() any {
-			cmd := awsspec.NewDeleteRepository(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteRepository(f.config(), f.Graph, f.Logger)
 		}
 	case "deleterole":
 		return func() any {
-			cmd := awsspec.NewDeleteRole(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteRole(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteroute":
 		return func() any {
-			cmd := awsspec.NewDeleteRoute(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteRoute(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteroutetable":
 		return func() any {
-			cmd := awsspec.NewDeleteRoutetable(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteRoutetable(f.config(), f.Graph, f.Logger)
 		}
 	case "deletes3object":
 		return func() any {
-			cmd := awsspec.NewDeleteS3object(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteS3object(f.config(), f.Graph, f.Logger)
 		}
 	case "deletescalinggroup":
 		return func() any {
-			cmd := awsspec.NewDeleteScalinggroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteScalinggroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deletescalingpolicy":
 		return func() any {
-			cmd := awsspec.NewDeleteScalingpolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteScalingpolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "deletesecuritygroup":
 		return func() any {
-			cmd := awsspec.NewDeleteSecuritygroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteSecuritygroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deletesnapshot":
 		return func() any {
-			cmd := awsspec.NewDeleteSnapshot(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteSnapshot(f.config(), f.Graph, f.Logger)
 		}
 	case "deletestack":
 		return func() any {
-			cmd := awsspec.NewDeleteStack(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteStack(f.config(), f.Graph, f.Logger)
 		}
 	case "deletesubnet":
 		return func() any {
-			cmd := awsspec.NewDeleteSubnet(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteSubnet(f.config(), f.Graph, f.Logger)
 		}
 	case "deletesubscription":
 		return func() any {
-			cmd := awsspec.NewDeleteSubscription(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteSubscription(f.config(), f.Graph, f.Logger)
 		}
 	case "deletetag":
 		return func() any {
-			cmd := awsspec.NewDeleteTag(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteTag(f.config(), f.Graph, f.Logger)
 		}
 	case "deletetargetgroup":
 		return func() any {
-			cmd := awsspec.NewDeleteTargetgroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteTargetgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deletetopic":
 		return func() any {
-			cmd := awsspec.NewDeleteTopic(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteTopic(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteuser":
 		return func() any {
-			cmd := awsspec.NewDeleteUser(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteUser(f.config(), f.Graph, f.Logger)
 		}
 	case "deletevolume":
 		return func() any {
-			cmd := awsspec.NewDeleteVolume(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteVolume(f.config(), f.Graph, f.Logger)
 		}
 	case "deletevpc":
 		return func() any {
-			cmd := awsspec.NewDeleteVpc(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteVpc(f.config(), f.Graph, f.Logger)
 		}
 	case "deletezone":
 		return func() any {
-			cmd := awsspec.NewDeleteZone(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDeleteZone(f.config(), f.Graph, f.Logger)
 		}
 	case "detachalarm":
 		return func() any {
-			cmd := awsspec.NewDetachAlarm(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachAlarm(f.config(), f.Graph, f.Logger)
 		}
 	case "detachclassicloadbalancer":
 		return func() any {
-			cmd := awsspec.NewDetachClassicLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachClassicLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "detachcontainertask":
 		return func() any {
-			cmd := awsspec.NewDetachContainertask(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachContainertask(f.config(), f.Graph, f.Logger)
 		}
 	case "detachelasticip":
 		return func() any {
-			cmd := awsspec.NewDetachElasticip(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachElasticip(f.config(), f.Graph, f.Logger)
 		}
 	case "detachinstance":
 		return func() any {
-			cmd := awsspec.NewDetachInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "detachinstanceprofile":
 		return func() any {
-			cmd := awsspec.NewDetachInstanceprofile(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachInstanceprofile(f.config(), f.Graph, f.Logger)
 		}
 	case "detachinternetgateway":
 		return func() any {
-			cmd := awsspec.NewDetachInternetgateway(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachInternetgateway(f.config(), f.Graph, f.Logger)
 		}
 	case "detachmfadevice":
 		return func() any {
-			cmd := awsspec.NewDetachMfadevice(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachMfadevice(f.config(), f.Graph, f.Logger)
 		}
 	case "detachnetworkinterface":
 		return func() any {
-			cmd := awsspec.NewDetachNetworkinterface(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachNetworkinterface(f.config(), f.Graph, f.Logger)
 		}
 	case "detachpolicy":
 		return func() any {
-			cmd := awsspec.NewDetachPolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachPolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "detachrole":
 		return func() any {
-			cmd := awsspec.NewDetachRole(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachRole(f.config(), f.Graph, f.Logger)
 		}
 	case "detachroutetable":
 		return func() any {
-			cmd := awsspec.NewDetachRoutetable(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachRoutetable(f.config(), f.Graph, f.Logger)
 		}
 	case "detachsecuritygroup":
 		return func() any {
-			cmd := awsspec.NewDetachSecuritygroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachSecuritygroup(f.config(), f.Graph, f.Logger)
 		}
 	case "detachuser":
 		return func() any {
-			cmd := awsspec.NewDetachUser(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachUser(f.config(), f.Graph, f.Logger)
 		}
 	case "detachvolume":
 		return func() any {
-			cmd := awsspec.NewDetachVolume(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewDetachVolume(f.config(), f.Graph, f.Logger)
 		}
 	case "importimage":
 		return func() any {
-			cmd := awsspec.NewImportImage(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewImportImage(f.config(), f.Graph, f.Logger)
 		}
 	case "restartdatabase":
 		return func() any {
-			cmd := awsspec.NewRestartDatabase(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewRestartDatabase(f.config(), f.Graph, f.Logger)
 		}
 	case "restartinstance":
 		return func() any {
-			cmd := awsspec.NewRestartInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewRestartInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "startalarm":
 		return func() any {
-			cmd := awsspec.NewStartAlarm(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStartAlarm(f.config(), f.Graph, f.Logger)
 		}
 	case "startcontainertask":
 		return func() any {
-			cmd := awsspec.NewStartContainertask(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStartContainertask(f.config(), f.Graph, f.Logger)
 		}
 	case "startdatabase":
 		return func() any {
-			cmd := awsspec.NewStartDatabase(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStartDatabase(f.config(), f.Graph, f.Logger)
 		}
 	case "startinstance":
 		return func() any {
-			cmd := awsspec.NewStartInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStartInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "stopalarm":
 		return func() any {
-			cmd := awsspec.NewStopAlarm(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStopAlarm(f.config(), f.Graph, f.Logger)
 		}
 	case "stopcontainertask":
 		return func() any {
-			cmd := awsspec.NewStopContainertask(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStopContainertask(f.config(), f.Graph, f.Logger)
 		}
 	case "stopdatabase":
 		return func() any {
-			cmd := awsspec.NewStopDatabase(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStopDatabase(f.config(), f.Graph, f.Logger)
 		}
 	case "stopinstance":
 		return func() any {
-			cmd := awsspec.NewStopInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewStopInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "updatebucket":
 		return func() any {
-			cmd := awsspec.NewUpdateBucket(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateBucket(f.config(), f.Graph, f.Logger)
 		}
 	case "updateclassicloadbalancer":
 		return func() any {
-			cmd := awsspec.NewUpdateClassicLoadbalancer(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateClassicLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
 	case "updatecontainertask":
 		return func() any {
-			cmd := awsspec.NewUpdateContainertask(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateContainertask(f.config(), f.Graph, f.Logger)
 		}
 	case "updatedistribution":
 		return func() any {
-			cmd := awsspec.NewUpdateDistribution(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateDistribution(f.config(), f.Graph, f.Logger)
 		}
 	case "updateimage":
 		return func() any {
-			cmd := awsspec.NewUpdateImage(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateImage(f.config(), f.Graph, f.Logger)
 		}
 	case "updateinstance":
 		return func() any {
-			cmd := awsspec.NewUpdateInstance(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateInstance(f.config(), f.Graph, f.Logger)
 		}
 	case "updateloginprofile":
 		return func() any {
-			cmd := awsspec.NewUpdateLoginprofile(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateLoginprofile(f.config(), f.Graph, f.Logger)
 		}
 	case "updatepolicy":
 		return func() any {
-			cmd := awsspec.NewUpdatePolicy(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdatePolicy(f.config(), f.Graph, f.Logger)
 		}
 	case "updaterecord":
 		return func() any {
-			cmd := awsspec.NewUpdateRecord(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateRecord(f.config(), f.Graph, f.Logger)
 		}
 	case "updates3object":
 		return func() any {
-			cmd := awsspec.NewUpdateS3object(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateS3object(f.config(), f.Graph, f.Logger)
 		}
 	case "updatescalinggroup":
 		return func() any {
-			cmd := awsspec.NewUpdateScalinggroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateScalinggroup(f.config(), f.Graph, f.Logger)
 		}
 	case "updatesecuritygroup":
 		return func() any {
-			cmd := awsspec.NewUpdateSecuritygroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateSecuritygroup(f.config(), f.Graph, f.Logger)
 		}
 	case "updatestack":
 		return func() any {
-			cmd := awsspec.NewUpdateStack(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateStack(f.config(), f.Graph, f.Logger)
 		}
 	case "updatesubnet":
 		return func() any {
-			cmd := awsspec.NewUpdateSubnet(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateSubnet(f.config(), f.Graph, f.Logger)
 		}
 	case "updatetargetgroup":
 		return func() any {
-			cmd := awsspec.NewUpdateTargetgroup(aws.Config{}, f.Graph, f.Logger)
-			// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
-			_ = cmd
-			return cmd
+			return awsspec.NewUpdateTargetgroup(f.config(), f.Graph, f.Logger)
 		}
 	}
 	return nil

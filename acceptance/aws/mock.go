@@ -5,44 +5,38 @@ import (
 	"testing"
 )
 
-type mock interface {
-	Calls() map[string]int
-	SetInputs(map[string]any)
-	SetIgnored(map[string]struct{})
-	SetTesting(*testing.T)
-}
-
-type basicMock struct { //nolint:unused // embedded in generated mock types
+// basicMock records calls and verifies inputs. Embedded in Mock.
+type basicMock struct {
 	t       *testing.T
 	calls   map[string]int
 	inputs  map[string]any
 	ignored map[string]struct{}
 }
 
-func (m *basicMock) addCall(call string) { //nolint:unused
+func (m *basicMock) addCall(call string) {
 	if m.calls == nil {
 		m.calls = make(map[string]int)
 	}
 	m.calls[call]++
 }
 
-func (m *basicMock) Calls() map[string]int { //nolint:unused
+func (m *basicMock) Calls() map[string]int {
 	return m.calls
 }
 
-func (m *basicMock) SetTesting(t *testing.T) { //nolint:unused
+func (m *basicMock) SetTesting(t *testing.T) {
 	m.t = t
 }
 
-func (m *basicMock) SetInputs(inputs map[string]any) { //nolint:unused
+func (m *basicMock) SetInputs(inputs map[string]any) {
 	m.inputs = inputs
 }
 
-func (m *basicMock) SetIgnored(ignored map[string]struct{}) { //nolint:unused
+func (m *basicMock) SetIgnored(ignored map[string]struct{}) {
 	m.ignored = ignored
 }
 
-func (m *basicMock) verifyInput(call string, got any) { //nolint:unused
+func (m *basicMock) verifyInput(call string, got any) {
 	if m.t == nil {
 		return
 	}

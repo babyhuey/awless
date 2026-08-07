@@ -153,7 +153,15 @@ func (cmd *DeleteTag) ManualRun(renv env.Running) (any, error) {
 	return nil, err
 }
 
+// createNameTag tags a freshly created resource with its Name.
+//
+// name is nil whenever the user did not pass `name=`, which is legal for every
+// command that calls this from AfterRun. Attempting the tag then panicked while
+// injecting a nil Value into CreateTag, so return early instead.
 func createNameTag(resource, name *string, renv env.Running) error {
+	if name == nil || *name == "" {
+		return nil
+	}
 	createTag := CommandFactory.Build("createtag")().(*CreateTag)
 	entries := map[string]any{
 		"key":      "Name",
