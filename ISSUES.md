@@ -930,18 +930,13 @@ Note `errcheck` (proposed in I9) would have caught this.
 
 ---
 
-### I18: Pin the Go toolchain version
+### I18: Pin the Go toolchain version — **PARTIALLY DONE**
 
 **Severity:** Low  
 **Files:** `go.mod:3`, `.github/workflows/ci.yml`
 
-`go.mod` declares `go 1.26.1` while CI pins `go-version: '1.26'`, which resolves to the latest 1.26.x patch. There is no `toolchain` directive and no `.go-version` file, so local developer builds, CI, and release builds can all use different patch releases.
+**Done:** all three CI jobs now use `go-version-file: go.mod` instead of a hardcoded `'1.26'`, so the Go version has a single source of truth and CI installs exactly `1.26.1` rather than a floating latest patch. The `test` job's single-value `go-version` matrix was removed as redundant; the `build` job's `goos`/`goarch` matrix is untouched.
 
-**Fix:** Add a `toolchain` line to `go.mod` and reference a single source of truth in CI:
+**Deliberately not done:** no `toolchain` directive was added to `go.mod`. It would pin local developer builds to an exact patch, but the dev toolchain in use here is a custom build (`go1.26.5-X:nodwarf5`), and a `toolchain` line risks Go fetching a different official toolchain in preference to it. CI is already deterministic without it.
 
-```
-go 1.26.1
-toolchain go1.26.3
-```
-
-Then in CI use `go-version-file: go.mod` instead of a hardcoded string, so the toolchain version is defined in exactly one place. This also matters for reproducible release artifacts (see I11).
+**Remaining (optional):** add `toolchain go1.26.x` if reproducible *release* artifacts become a requirement — most relevant alongside `I11` (GoReleaser), where the build toolchain forms part of an artifact's provenance.
