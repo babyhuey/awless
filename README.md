@@ -14,7 +14,7 @@
 
 - small and hierarchical set of commands
 - a simple/powerful text [templating language](https://github.com/wallix/awless/wiki/Templates) to create and **revert** fully-fledged infrastructures
-- wrapping/composing AWS API calls when necessary to enrich behaviour. Ex: ensure smart defaults, security best practices, etc.
+- wrapping/composing AWS API calls when necessary to enrich behavior. Ex: ensure smart defaults, security best practices, etc.
 - local log of all your cloud modifications done through `awless` to list/revert past actions
 - sync to a local graph storage of your cloud representation
 - exploration of your cloud infrastructure and resources interrelations, **even offline** using the local graph storage

@@ -85,7 +85,7 @@ var EnumDoc = map[string][]string{
 	"create.distribution.enable":          boolean,
 	"create.distribution.forward-cookies": {"all", "none", "whitelist"},
 	"create.distribution.forward-queries": boolean,
-	"create.distribution.https-behaviour": {"allow-all", "redirect-to-https", "https-only"}, //nolint:misspell
+	"create.distribution.https-behavior":  {"allow-all", "redirect-to-https", "https-only"},
 	"create.distribution.price-class":     {"PriceClass_All", "PriceClass_100", "PriceClass_200"},
 
 	"create.elasticip.domain": {"vpc", "ec2-classic"},
@@ -168,7 +168,7 @@ var EnumDoc = map[string][]string{
 	"update.distribution.default-file":    {"index.html"},
 	"update.distribution.forward-cookies": {"all", "none", "whitelist"},
 	"update.distribution.forward-queries": boolean,
-	"update.distribution.https-behaviour": {"allow-all", "redirect-to-https", "https-only"}, //nolint:misspell
+	"update.distribution.https-behavior":  {"allow-all", "redirect-to-https", "https-only"},
 	"update.distribution.price-class":     {"PriceClass_All", "PriceClass_100", "PriceClass_200"},
 	"update.distribution.enable":          boolean,
 

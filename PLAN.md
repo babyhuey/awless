@@ -118,7 +118,7 @@ This overrides the standing "do not commit to main or master" convention, by exp
 
 ### 0.5 — Version bump for the flag removal — **DECIDED: `v1.1.0`**
 
-Phase 4 removes `--run-in`, `--revert-in`, the hidden `scheduler` command, and the `scheduler.url` config key. Treated as a minor bump, not major: semver governs working behaviour, and none of these can succeed today without a buildable daemon.
+Phase 4 removes `--run-in`, `--revert-in`, the hidden `scheduler` command, and the `scheduler.url` config key. Treated as a minor bump, not major: semver governs working behavior, and none of these can succeed today without a buildable daemon.
 
 Rejected: `v2.0.0` (nothing functional is lost) and a deprecation cycle (writing new code whose only job is to reject flags that already fail).
 
@@ -291,7 +291,7 @@ go build ./... && go test ./...
 
 The `bootswithdefer/awless-scheduler` fork and its local clone were deleted on 2026-08-06. No further action.
 
-For anyone looking for the capability later: `awless` templates can be scheduled with EventBridge Scheduler, cron + `awless`, or CI schedules. The timed-revert behaviour has no direct substitute, but `awless revert` on a logged template execution covers the manual case.
+For anyone looking for the capability later: `awless` templates can be scheduled with EventBridge Scheduler, cron + `awless`, or CI schedules. The timed-revert behavior has no direct substitute, but `awless revert` on a logged template execution covers the manual case.
 
 ---
 

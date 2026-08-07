@@ -457,7 +457,7 @@ Tests that are permanently skipped are dead weight and may mask regressions.
 
 golangci-lint v2 merged `gosimple` and `stylecheck` into `staticcheck`. The v1 config enabled `gosimple` + `staticcheck` but **not** `stylecheck`, so `ST*` checks had never run against this codebase. Separately, `govet`'s `enable-all: true` now picks up a recently added `inline` analyzer that is not part of stock `go vet`.
 
-Enabling all of it produces **271 findings**, so `B5` excluded them to keep that commit a behaviour-preserving migration rather than a 271-fix changeset. Exclusions are `-ST*`, `-QF*`, and `govet: disable: [inline]`, each commented in place.
+Enabling all of it produces **271 findings**, so `B5` excluded them to keep that commit a behavior-preserving migration rather than a 271-fix changeset. Exclusions are `-ST*`, `-QF*`, and `govet: disable: [inline]`, each commented in place.
 
 | Check | Count | What it is |
 |---|---|---|

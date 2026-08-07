@@ -52,7 +52,7 @@ type CreateDistribution struct {
 	Enable         *bool     `templateName:"enable"`
 	ForwardCookies *string   `templateName:"forward-cookies"`
 	ForwardQueries *bool     `templateName:"forward-queries"`
-	HttpsBehaviour *string   `templateName:"https-behaviour"` //nolint:misspell
+	HttpsBehavior  *string   `templateName:"https-behavior"`
 	OriginPath     *string   `templateName:"origin-path"`
 	PriceClass     *string   `templateName:"price-class"`
 	MinTtl         *int64    `templateName:"min-ttl"`
@@ -60,7 +60,7 @@ type CreateDistribution struct {
 
 func (cmd *CreateDistribution) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("origin-domain"),
-		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behaviour", "min-ttl", "origin-path", "price-class"), //nolint:misspell
+		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behavior", "min-ttl", "origin-path", "price-class"),
 	))
 }
 
@@ -130,8 +130,8 @@ func (cmd *CreateDistribution) ManualRun(renv env.Running) (any, error) {
 	if cmd.ForwardQueries != nil {
 		call.setters = append(call.setters, setter{val: cmd.ForwardQueries, fieldPath: "DistributionConfig.DefaultCacheBehavior.ForwardedValues.QueryString", fieldType: awsbool})
 	}
-	if cmd.HttpsBehaviour != nil {
-		call.setters = append(call.setters, setter{val: cmd.HttpsBehaviour, fieldPath: "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", fieldType: awsstr})
+	if cmd.HttpsBehavior != nil {
+		call.setters = append(call.setters, setter{val: cmd.HttpsBehavior, fieldPath: "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", fieldType: awsstr})
 	}
 	if cmd.MinTtl != nil {
 		call.setters = append(call.setters, setter{val: cmd.MinTtl, fieldPath: "DistributionConfig.DefaultCacheBehavior.MinTTL", fieldType: awsint64})
@@ -213,7 +213,7 @@ type UpdateDistribution struct {
 	Enable         *bool     `templateName:"enable"`
 	ForwardCookies *string   `templateName:"forward-cookies"`
 	ForwardQueries *bool     `templateName:"forward-queries"`
-	HttpsBehaviour *string   `templateName:"https-behaviour"` //nolint:misspell
+	HttpsBehavior  *string   `templateName:"https-behavior"`
 	OriginPath     *string   `templateName:"origin-path"`
 	PriceClass     *string   `templateName:"price-class"`
 	MinTtl         *int64    `templateName:"min-ttl"`
@@ -221,7 +221,7 @@ type UpdateDistribution struct {
 
 func (cmd *UpdateDistribution) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("id"),
-		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behaviour", "min-ttl", "origin-domain", "origin-path", "price-class"), //nolint:misspell
+		params.Opt("certificate", "comment", "default-file", "domain-aliases", "enable", "forward-cookies", "forward-queries", "https-behavior", "min-ttl", "origin-domain", "origin-path", "price-class"),
 	))
 }
 
@@ -313,8 +313,8 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 			return nil, err
 		}
 	}
-	if cmd.HttpsBehaviour != nil {
-		if err = setFieldWithType(cmd.HttpsBehaviour, input, "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", awsstr); err != nil {
+	if cmd.HttpsBehavior != nil {
+		if err = setFieldWithType(cmd.HttpsBehavior, input, "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", awsstr); err != nil {
 			return nil, err
 		}
 	}

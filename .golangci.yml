@@ -33,7 +33,7 @@ linters:
         - -SA1019 # deprecated usage - too noisy for a migration
         # golangci-lint v2 merged gosimple and stylecheck into staticcheck.
         # v1 enabled gosimple + staticcheck but NOT stylecheck, so ST* and QF*
-        # checks never ran here. Excluded to keep this a behaviour-preserving
+        # checks never ran here. Excluded to keep this a behavior-preserving
         # migration: enabling them adds 255 findings. Tracked as ISSUES.md I19.
         - -ST*
         - -QF*

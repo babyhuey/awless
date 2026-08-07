@@ -1,5 +1,15 @@
 ## v1.1.0
 
+### Changed (breaking)
+
+- **`https-behaviour` renamed to `https-behavior`** on `create distribution` and
+  `update distribution`, for consistency with the American spelling used everywhere
+  else and enforced by the `misspell` linter.
+
+  Templates and one-liners using `https-behaviour=` must be updated. Reverting a
+  previously logged distribution creation will also fail, since the persisted command
+  line carries the old parameter name.
+
 ### Removed
 
 - **Scheduler support.** `awless run --run-in`, `--revert-in`, the hidden `awless scheduler`
