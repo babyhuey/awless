@@ -33,9 +33,15 @@ func TestLoadConfigs(t *testing.T) {
 		t.Fatalf("got %+v, want %+v", got, want)
 	}
 
-	db.SetConfig(configKey, "key-1", "value-1")
-	db.SetConfig(configKey, "key-2", "value-2")
-	db.SetConfig(configKey, "key-1", "value-3")
+	if err := db.SetConfig(configKey, "key-1", "value-1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.SetConfig(configKey, "key-2", "value-2"); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.SetConfig(configKey, "key-1", "value-3"); err != nil {
+		t.Fatal(err)
+	}
 
 	expected := configs{
 		"key-1": "value-3",
@@ -59,7 +65,9 @@ func TestLoadConfigs(t *testing.T) {
 		t.Fatalf("got %+v, want %+v", got, want)
 	}
 
-	db.UnsetConfig(configKey, "key-2")
+	if err := db.UnsetConfig(configKey, "key-2"); err != nil {
+		t.Fatal(err)
+	}
 
 	expected = configs{
 		"key-1": "value-3",

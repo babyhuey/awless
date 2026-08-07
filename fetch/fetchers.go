@@ -73,7 +73,9 @@ func (f *fetcher) Fetch(ctx context.Context) (*graph.Graph, error) {
 		if err := res.Err; err != nil {
 			ferr.Add(err)
 		}
-		gph.AddResource(res.Resources...)
+		if err := gph.AddResource(res.Resources...); err != nil {
+			ferr.Add(err)
+		}
 	}
 
 	if ferr.Any() {
@@ -109,7 +111,9 @@ func (f *fetcher) FetchByType(ctx context.Context, resourceType string) (*graph.
 		return gph, err
 	}
 	for _, r := range res.Resources {
-		gph.AddResource(r)
+		if err := gph.AddResource(r); err != nil {
+			return gph, err
+		}
 	}
 	return gph, nil
 }

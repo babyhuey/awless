@@ -696,7 +696,7 @@ func TestNotifyIfUpgradeBrew(t *testing.T) {
 
 	BuildFor = "brew"
 	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
+		_, _ = w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
 	}))
 	defer tserver.Close()
 
@@ -715,7 +715,7 @@ func TestNotifyIfUpgradeGoGet(t *testing.T) {
 
 	BuildFor = "" // default, not brew or zip
 	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
+		_, _ = w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
 	}))
 	defer tserver.Close()
 
@@ -730,7 +730,7 @@ func TestNotifyIfUpgradeGoGet(t *testing.T) {
 
 func TestNotifyIfUpgradeNoUpgrade(t *testing.T) {
 	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"URL":"","Version":"0.0.0"}`))
+		_, _ = w.Write([]byte(`{"URL":"","Version":"0.0.0"}`))
 	}))
 	defer tserver.Close()
 
@@ -745,7 +745,7 @@ func TestNotifyIfUpgradeNoUpgrade(t *testing.T) {
 
 func TestNotifyIfUpgradeInvalidJSON(t *testing.T) {
 	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`not json`))
+		_, _ = w.Write([]byte(`not json`))
 	}))
 	defer tserver.Close()
 

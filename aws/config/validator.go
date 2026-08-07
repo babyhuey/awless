@@ -100,11 +100,11 @@ func StdinInstanceTypeSelector() string {
 
 	fmt.Println()
 	fmt.Print("Value ? > ")
-	fmt.Scan(&instanceType)
+	_, _ = fmt.Scan(&instanceType)
 	for !isValidInstanceType(instanceType) {
 		fmt.Printf("'%s' is not a valid instance type\n", instanceType)
 		fmt.Print("Value ? > ")
-		fmt.Scan(&instanceType)
+		_, _ = fmt.Scan(&instanceType)
 	}
 	return instanceType
 }

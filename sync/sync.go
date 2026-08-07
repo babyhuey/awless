@@ -126,7 +126,10 @@ func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, err
 		serviceRegion := servicesByName[name].Region()
 		serviceProfile := servicesByName[name].Profile()
 		serviceDir := filepath.Join(s.BaseDir(), serviceProfile, serviceRegion)
-		os.MkdirAll(serviceDir, 0700)
+		if err := os.MkdirAll(serviceDir, 0700); err != nil {
+			allErrors = append(allErrors, fmt.Errorf("creating %s: %w", serviceDir, err))
+			continue
+		}
 
 		fullpath := filepath.Join(serviceDir, fmt.Sprintf("%s%s", name, fileExt))
 		f, err := os.OpenFile(fullpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)

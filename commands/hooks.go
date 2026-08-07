@@ -104,7 +104,9 @@ func applyRegionAndProfilePrecedence() error {
 }
 
 func notifyOnRegionOrProfilePrecedenceHook(*cobra.Command, []string) error {
-	applyRegionAndProfilePrecedence()
+	if err := applyRegionAndProfilePrecedence(); err != nil {
+		return err
+	}
 
 	if m := profileOverridenThrough; len(m) > 0 {
 		logger.Infof("profile precedence: '%s' loaded through %s", config.GetAWSProfile(), m)
@@ -136,7 +138,9 @@ func initCloudServicesHook(cmd *cobra.Command, args []string) error {
 		}
 		if !noSyncGlobalFlag {
 			logger.Infof("Syncing new region '%s'... (disable with --no-sync global flag)", region)
-			sync.NewSyncer(logger.DefaultLogger).Sync(services...)
+			if _, err := sync.NewSyncer(logger.DefaultLogger).Sync(services...); err != nil {
+				logger.Warningf("syncing new region '%s': %s", region, err)
+			}
 		}
 	}
 
@@ -204,7 +208,9 @@ func verifyNewVersionHook(cmd *cobra.Command, args []string) error {
 	if localGlobalFlag {
 		return nil
 	}
-	config.VerifyNewVersionAvailable("https://updates.awless.io", os.Stderr)
+	// Advisory only: a failed update check must never affect the command the
+	// user ran.
+	_ = config.VerifyNewVersionAvailable("https://updates.awless.io", os.Stderr)
 	return nil
 }
 
@@ -228,7 +234,9 @@ func firstInstallDoneHook(cmd *cobra.Command, args []string) error {
 func migrationActionsAndExtraMessages(current string) {
 	switch current {
 	case "v0.1.7":
-		config.Set("instance.distro", "amazonlinux")
+		if err := config.Set("instance.distro", "amazonlinux"); err != nil {
+			logger.Warningf("migrating 'instance.image' to 'instance.distro': %s", err)
+		}
 		logger.Info("In v0.1.7, the default template config value 'instance.image' has been deprecated in favor of 'instance.distro'")
 
 		ami, _ := config.Get("instance.image")
@@ -238,7 +246,9 @@ func migrationActionsAndExtraMessages(current string) {
 		} else {
 			logger.Info("\tMigrated correctly the deprecated 'instance.image' to 'instance.distro'")
 		}
-		config.Unset("instance.image")
+		if err := config.Unset("instance.image"); err != nil {
+			logger.Warningf("removing deprecated 'instance.image': %s", err)
+		}
 		logger.Info("\tYou can always check your config values with 'awless config'")
 	case "v0.1.9":
 		logger.Info("In v0.1.9, the local data file model has been moved to support multi-account transparently")

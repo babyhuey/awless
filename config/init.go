@@ -47,7 +47,9 @@ func InitAwlessEnv() error {
 	AwlessFirstInstall = os.IsNotExist(err)
 	os.Setenv("__AWLESS_FIRST_INSTALL", strconv.FormatBool(AwlessFirstInstall))
 
-	os.MkdirAll(KeysDir, 0700)
+	if err := os.MkdirAll(KeysDir, 0700); err != nil {
+		return fmt.Errorf("creating keys dir %s: %w", KeysDir, err)
+	}
 
 	if AwlessFirstInstall {
 		fmt.Fprint(os.Stderr, AWLESS_ASCII_LOGO)

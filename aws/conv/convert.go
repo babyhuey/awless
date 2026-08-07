@@ -878,6 +878,6 @@ func HashFields(fields ...any) string {
 		buf.WriteString(fmt.Sprint(field))
 	}
 	h := adler32.New()
-	buf.WriteTo(h)
+	_, _ = buf.WriteTo(h)
 	return "awls-" + hex.EncodeToString(h.Sum(nil))
 }

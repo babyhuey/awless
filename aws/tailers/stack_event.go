@@ -77,7 +77,7 @@ func (t *stackEventTailer) Tail(w io.Writer) error {
 	}
 
 	tab := tabwriter.NewWriter(w, 8, 8, 8, '\t', 0)
-	tab.Write(t.filters.header())
+	_, _ = tab.Write(t.filters.header())
 
 	if !t.follow {
 		if err := t.displayLastEvents(cfn, tab); err != nil {
@@ -141,8 +141,9 @@ func (t *stackEventTailer) Tail(w io.Writer) error {
 
 					// printing error events as a nice table
 					errTab := tabwriter.NewWriter(&errBuf, 25, 8, 0, '\t', 0)
-					errTab.Write(f.header())
-					t.deploymentStatus.failedEvents.printReverse(errTab, f)
+					_, _ = errTab.Write(f.header())
+					// Display only: the surrounding Flush surfaces write failures.
+					_ = t.deploymentStatus.failedEvents.printReverse(errTab, f)
 					errTab.Flush()
 
 					return fmt.Errorf("%s", errBuf.String())
@@ -301,7 +302,7 @@ func coloredResourceStatus(str string) string {
 
 func (e stackEvents) printReverse(w io.Writer, f filters) error {
 	for i := len(e) - 1; i >= 0; i-- {
-		w.Write(e[i].filter(f))
+		_, _ = w.Write(e[i].filter(f))
 	}
 
 	return nil

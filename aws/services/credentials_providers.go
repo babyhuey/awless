@@ -116,7 +116,9 @@ func (f *folder) getFileContent(filename string) (content []byte, ok bool) {
 
 func (f *folder) putFileContent(filename string, content []byte) error {
 	if _, err := os.Stat(f.path); os.IsNotExist(err) {
-		os.MkdirAll(f.path, 0700)
+		if err := os.MkdirAll(f.path, 0700); err != nil {
+			return fmt.Errorf("creating credentials cache dir %s: %w", f.path, err)
+		}
 	}
 
 	return os.WriteFile(filepath.Join(f.path, filename), content, 0600)

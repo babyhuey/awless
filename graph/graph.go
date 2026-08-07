@@ -141,7 +141,9 @@ func (g *Graph) FindAncestor(res *Resource, resourceType string) *Resource {
 		}
 		return nil
 	}
-	g.Accept(&ParentsVisitor{From: res, Each: find})
+	// The visitor's Each never returns an error here, so a traversal failure can
+	// only mean a malformed graph; the nil result below conveys "not found".
+	_ = g.Accept(&ParentsVisitor{From: res, Each: find})
 	return found
 }
 

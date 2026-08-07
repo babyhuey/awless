@@ -29,11 +29,11 @@ func TestLazyLoadingGraph(t *testing.T) {
 	}
 
 	lazy := &LazyGraph{LoadingFunc: loadingFunc}
-	lazy.FindOne(NewQuery(""))
+	lazy.FindOne(NewQuery("")) //nolint:errcheck // asserting the load count, not the result
 	if got, want := nbCalls, 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	lazy.FindOne(NewQuery(""))
+	lazy.FindOne(NewQuery("")) //nolint:errcheck // asserting the load count, not the result
 	if got, want := nbCalls, 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
@@ -175,15 +175,17 @@ func TestLazyGraphLoadOnlyOnce(t *testing.T) {
 		return &StubGraph{}
 	}}
 
-	// Call multiple different methods
-	lazy.Find(NewQuery(""))
-	lazy.FindWithProperties(nil)
-	lazy.FilterGraph(NewQuery(""))
-	lazy.MarshalTo(io.Discard)
-	lazy.ResourceRelations(nil, "", false)
-	lazy.VisitRelations(nil, "", false, nil)
-	lazy.ResourceSiblings(nil)
-	lazy.Merge(nil)
+	// Call multiple different methods. Return values are deliberately ignored:
+	// the assertion below is that LoadingFunc runs exactly once regardless of
+	// which method triggers the load.
+	lazy.Find(NewQuery(""))                  //nolint:errcheck
+	lazy.FindWithProperties(nil)             //nolint:errcheck
+	lazy.FilterGraph(NewQuery(""))           //nolint:errcheck
+	lazy.MarshalTo(io.Discard)               //nolint:errcheck
+	lazy.ResourceRelations(nil, "", false)   //nolint:errcheck
+	lazy.VisitRelations(nil, "", false, nil) //nolint:errcheck
+	lazy.ResourceSiblings(nil)               //nolint:errcheck
+	lazy.Merge(nil)                          //nolint:errcheck
 
 	if callCount != 1 {
 		t.Fatalf("loading function called %d times, expected 1", callCount)

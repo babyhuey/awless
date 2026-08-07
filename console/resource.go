@@ -84,11 +84,11 @@ func (d *tableResourceDisplayer) Print(w io.Writer) error {
 
 	for i := range values {
 		if val := fmt.Sprint(values[i][1]); val != "" {
-			table.Append([]string{fmt.Sprint(values[i][0]), wraper.Wrap(val)})
+			_ = table.Append([]string{fmt.Sprint(values[i][0]), wraper.Wrap(val)})
 		}
 	}
 
-	table.Render()
+	_ = table.Render()
 
 	return nil
 }

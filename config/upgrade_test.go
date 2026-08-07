@@ -31,7 +31,7 @@ func TestUpgradeMessaging(t *testing.T) {
 		if ua := r.Header.Get("User-Agent"); !strings.HasPrefix(ua, "awless-client-"+Version) {
 			t.Fatalf("unexpected user-agent: %s", ua)
 		}
-		w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
+		_, _ = w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
 	}))
 	var buff bytes.Buffer
 	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {

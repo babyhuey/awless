@@ -228,10 +228,14 @@ func TestParseRouteTargetRoundtrip(t *testing.T) {
 
 func TestGraphMerge(t *testing.T) {
 	g1 := NewGraph()
-	g1.AddResource(instResource("i1").build())
+	if err := g1.AddResource(instResource("i1").build()); err != nil {
+		t.Fatal(err)
+	}
 
 	g2 := NewGraph()
-	g2.AddResource(subResource("s1").build())
+	if err := g2.AddResource(subResource("s1").build()); err != nil {
+		t.Fatal(err)
+	}
 
 	if err := g1.Merge(g2); err != nil {
 		t.Fatal(err)
@@ -252,7 +256,9 @@ func TestOrFilter(t *testing.T) {
 	i1 := instResource("i1").prop("Name", "redis").build()
 	i2 := instResource("i2").prop("Name", "postgres").build()
 	i3 := instResource("i3").prop("Name", "memcache").build()
-	g.AddResource(i1, i2, i3)
+	if err := g.AddResource(i1, i2, i3); err != nil {
+		t.Fatal(err)
+	}
 
 	matchRedis := func(r *Resource) bool { return r.Properties()["Name"] == "redis" }
 	matchPostgres := func(r *Resource) bool { return r.Properties()["Name"] == "postgres" }
@@ -282,7 +288,9 @@ func TestResolveResourcesWithProp(t *testing.T) {
 	i1 := instResource("i1").prop("Name", "redis").build()
 	i2 := instResource("i2").prop("Name", "postgres").build()
 	s1 := subResource("s1").prop("Name", "redis").build()
-	g.AddResource(i1, i2, s1)
+	if err := g.AddResource(i1, i2, s1); err != nil {
+		t.Fatal(err)
+	}
 
 	snap := g.AsRDFGraphSnaphot()
 
@@ -422,7 +430,9 @@ func TestResourceSame(t *testing.T) {
 
 func TestMarshalMustMarshalRoundtrip(t *testing.T) {
 	g := NewGraph()
-	g.AddResource(instResource("i1").prop("Name", "test").build())
+	if err := g.AddResource(instResource("i1").prop("Name", "test").build()); err != nil {
+		t.Fatal(err)
+	}
 
 	data := g.MustMarshal()
 	if data == "" {
@@ -445,7 +455,9 @@ func TestMarshalMustMarshalRoundtrip(t *testing.T) {
 
 func TestMarshalTo(t *testing.T) {
 	g := NewGraph()
-	g.AddResource(instResource("i1").prop("Name", "test-marshal").build())
+	if err := g.AddResource(instResource("i1").prop("Name", "test-marshal").build()); err != nil {
+		t.Fatal(err)
+	}
 
 	var buf bytes.Buffer
 	if err := g.MarshalTo(&buf); err != nil {
@@ -476,11 +488,21 @@ func TestVisitRelations(t *testing.T) {
 	s2 := InitResource("subnet", "sub_2")
 	i1 := InitResource("instance", "inst_1")
 	sg1 := InitResource("securitygroup", "secgroup_1")
-	g.AddResource(v1, s1, s2, i1, sg1)
-	g.AddParentRelation(v1, s1)
-	g.AddParentRelation(v1, s2)
-	g.AddParentRelation(s1, i1)
-	g.AddAppliesOnRelation(sg1, i1)
+	if err := g.AddResource(v1, s1, s2, i1, sg1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(v1, s1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(v1, s2); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(s1, i1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddAppliesOnRelation(sg1, i1); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("ChildrenOfRel", func(t *testing.T) {
 		var collected []string
@@ -564,9 +586,15 @@ func TestListResourcesDependingOn(t *testing.T) {
 	inst := InitResource("instance", "inst_1")
 	sg1 := InitResource("securitygroup", "sg_1")
 	sg2 := InitResource("securitygroup", "sg_2")
-	g.AddResource(inst, sg1, sg2)
-	g.AddAppliesOnRelation(sg1, inst)
-	g.AddAppliesOnRelation(sg2, inst)
+	if err := g.AddResource(inst, sg1, sg2); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddAppliesOnRelation(sg1, inst); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddAppliesOnRelation(sg2, inst); err != nil {
+		t.Fatal(err)
+	}
 
 	resources, err := g.ListResourcesDependingOn(inst)
 	if err != nil {
@@ -589,9 +617,15 @@ func TestListResourcesAppliedOn(t *testing.T) {
 	sg := InitResource("securitygroup", "sg_1")
 	inst1 := InitResource("instance", "inst_1")
 	inst2 := InitResource("instance", "inst_2")
-	g.AddResource(sg, inst1, inst2)
-	g.AddAppliesOnRelation(sg, inst1)
-	g.AddAppliesOnRelation(sg, inst2)
+	if err := g.AddResource(sg, inst1, inst2); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddAppliesOnRelation(sg, inst1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddAppliesOnRelation(sg, inst2); err != nil {
+		t.Fatal(err)
+	}
 
 	resources, err := g.ListResourcesAppliedOn(sg)
 	if err != nil {
@@ -619,7 +653,9 @@ func TestMergeWithNonGraphType(t *testing.T) {
 
 func TestFindWithNoResourceType(t *testing.T) {
 	g := NewGraph()
-	g.AddResource(instResource("i1").build())
+	if err := g.AddResource(instResource("i1").build()); err != nil {
+		t.Fatal(err)
+	}
 
 	_, err := g.Find(cloud.Query{})
 	if err == nil {
@@ -632,7 +668,9 @@ func TestFindWithNoResourceType(t *testing.T) {
 
 func TestFindWithMultipleTypesAndMatcher(t *testing.T) {
 	g := NewGraph()
-	g.AddResource(instResource("i1").build())
+	if err := g.AddResource(instResource("i1").build()); err != nil {
+		t.Fatal(err)
+	}
 
 	// Multiple resource types + matcher should error
 	q := cloud.Query{ResourceType: []string{"instance", "subnet"}}
@@ -699,7 +737,9 @@ func TestFindResourceMultipleWithSameId(t *testing.T) {
 	// Add two instances with the same ID property value
 	i1 := instResource("inst_a").prop("Name", "same").build()
 	i2 := instResource("inst_b").prop("Name", "same").build()
-	g.AddResource(i1, i2)
+	if err := g.AddResource(i1, i2); err != nil {
+		t.Fatal(err)
+	}
 
 	// FindResourcesByProperty with Name should find both
 	res, err := g.FindResourcesByProperty("Name", "same")
@@ -958,7 +998,9 @@ func TestNamespacedResourceType(t *testing.T) {
 
 func TestUnmarshalFromReaders(t *testing.T) {
 	g := NewGraph()
-	g.AddResource(instResource("i1").prop("Name", "test").build())
+	if err := g.AddResource(instResource("i1").prop("Name", "test").build()); err != nil {
+		t.Fatal(err)
+	}
 
 	// Marshal to a buffer
 	var buf bytes.Buffer
@@ -1006,7 +1048,9 @@ func TestUnmarshalMeta(t *testing.T) {
 	g := NewGraph()
 	r := instResource("i1").build()
 	r.meta["diff"] = "extra"
-	g.AddResource(r)
+	if err := g.AddResource(r); err != nil {
+		t.Fatal(err)
+	}
 	// Manually add meta triple
 	g.store.Add(
 		tstore.SubjPred("i1", MetaPredicate).StringLiteral("extra"),

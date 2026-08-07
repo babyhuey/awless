@@ -70,7 +70,9 @@ func BaseDir() string {
 
 func New() (Repo, error) {
 	dir := BaseDir()
-	os.MkdirAll(dir, 0700)
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return nil, fmt.Errorf("creating repo dir %s: %w", dir, err)
+	}
 	return newGitRepo(dir)
 }
 
@@ -164,7 +166,15 @@ func unmarshalIntoGraph(g *graph.Graph, commit *object.Commit, filename string) 
 		if err != nil {
 			return err
 		}
-		g.Unmarshal([]byte(contents))
+		// An empty file is legitimate: a service with no resources marshals to
+		// nothing, and the decoder would report EOF for it. Only real decode
+		// failures, i.e. a corrupt cache, should propagate.
+		if strings.TrimSpace(contents) == "" {
+			return nil
+		}
+		if err := g.Unmarshal([]byte(contents)); err != nil {
+			return fmt.Errorf("unmarshal %s: %w", f.Name, err)
+		}
 	}
 	return nil
 }

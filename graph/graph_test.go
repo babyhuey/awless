@@ -35,9 +35,15 @@ func TestFindAncestors(t *testing.T) {
 	inst := InitResource("instance", "inst_1")
 	sub := InitResource("subnet", "subnet_1")
 	region := InitResource("region", "north-korea")
-	g.AddResource(inst, sub, region)
-	g.AddParentRelation(sub, inst)
-	g.AddParentRelation(region, sub)
+	if err := g.AddResource(inst, sub, region); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(sub, inst); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(region, sub); err != nil {
+		t.Fatal(err)
+	}
 
 	res := g.FindAncestor(inst, "region")
 	if got, want := res.Id(), "north-korea"; got != want {
@@ -69,13 +75,17 @@ func TestFindAncestors(t *testing.T) {
 func TestAddGraphRelation(t *testing.T) {
 	t.Run("Add parent", func(t *testing.T) {
 		g := NewGraph()
-		g.AddResource(InitResource("instance", "inst_1"))
+		if err := g.AddResource(InitResource("instance", "inst_1")); err != nil {
+			t.Fatal(err)
+		}
 
 		res, err := g.GetResource("instance", "inst_1")
 		if err != nil {
 			t.Fatal(err)
 		}
-		g.AddParentRelation(InitResource("subnet", "subnet_1"), res)
+		if err := g.AddParentRelation(InitResource("subnet", "subnet_1"), res); err != nil {
+			t.Fatal(err)
+		}
 
 		expTriples := tstore.Triples([]tstore.Triple{
 			tstore.SubjPred("inst_1", "rdf:type").Resource("cloud-owl:Instance"),
@@ -90,13 +100,17 @@ func TestAddGraphRelation(t *testing.T) {
 
 	t.Run("Add applies on", func(t *testing.T) {
 		g := NewGraph()
-		g.AddResource(InitResource("instance", "inst_1"))
+		if err := g.AddResource(InitResource("instance", "inst_1")); err != nil {
+			t.Fatal(err)
+		}
 
 		res, err := g.GetResource("instance", "inst_1")
 		if err != nil {
 			t.Fatal(err)
 		}
-		g.AddAppliesOnRelation(InitResource("subnet", "subnet_1"), res)
+		if err := g.AddAppliesOnRelation(InitResource("subnet", "subnet_1"), res); err != nil {
+			t.Fatal(err)
+		}
 
 		expTriples := tstore.Triples([]tstore.Triple{
 			tstore.SubjPred("inst_1", "rdf:type").Resource("cloud-owl:Instance"),
@@ -117,7 +131,9 @@ func TestFind(t *testing.T) {
 	s1 := subResource("s1").prop(properties.Tags, []string{"TagKey2=TagValue2"}).build()
 	s2 := subResource("s2").prop("Name", "prod").prop("ActiveServicesCount", 42).build()
 	v1 := vpcResource("v1").prop("Name", "prod").prop(properties.Tags, []string{"TagKey2=TagValue2"}).build()
-	g.AddResource(i1, i2, s1, s2, v1)
+	if err := g.AddResource(i1, i2, s1, s2, v1); err != nil {
+		t.Fatal(err)
+	}
 	tcases := []struct {
 		query     cloud.Query
 		expectRes []cloud.Resource
@@ -211,7 +227,9 @@ func TestFindWithProperties(t *testing.T) {
 	s1 := subResource("s1").prop(properties.Tags, []string{"TagKey2=TagValue2"}).build()
 	s2 := subResource("s2").prop("Name", "prod").prop("ActiveServicesCount", 42).build()
 	v1 := vpcResource("v1").prop("Name", "prod").prop(properties.Tags, []string{"TagKey2=TagValue2"}).build()
-	g.AddResource(i1, i2, s1, s2, v1)
+	if err := g.AddResource(i1, i2, s1, s2, v1); err != nil {
+		t.Fatal(err)
+	}
 	tcases := []struct {
 		props     map[string]any
 		expectRes []cloud.Resource
@@ -252,7 +270,9 @@ func TestFindOne(t *testing.T) {
 	i2 := instResource("i2").prop("Subnet", "s1").build()
 	s1 := subResource("s1").build()
 	v1 := vpcResource("s1").build()
-	g.AddResource(i1, i2, s1, v1)
+	if err := g.AddResource(i1, i2, s1, v1); err != nil {
+		t.Fatal(err)
+	}
 	tcases := []struct {
 		query             cloud.Query
 		expectRes         cloud.Resource
@@ -308,15 +328,33 @@ func TestResourceChildrenAndSiblings(t *testing.T) {
 	i2 := InitResource("instance", "inst_2")
 	i3 := InitResource("instance", "inst_3")
 	sg1 := InitResource("securitygroup", "secgroup_1")
-	g.AddResource(v1, s1, s2, i1, i2, i3, sg1)
-	g.AddParentRelation(v1, s1)
-	g.AddParentRelation(v1, s2)
-	g.AddParentRelation(v1, sg1)
-	g.AddParentRelation(s1, i1)
-	g.AddParentRelation(s1, i2)
-	g.AddParentRelation(s2, i3)
-	g.AddAppliesOnRelation(sg1, i1)
-	g.AddAppliesOnRelation(sg1, i3)
+	if err := g.AddResource(v1, s1, s2, i1, i2, i3, sg1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(v1, s1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(v1, s2); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(v1, sg1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(s1, i1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(s1, i2); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(s2, i3); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddAppliesOnRelation(sg1, i1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddAppliesOnRelation(sg1, i3); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("ResourceChildren", func(t *testing.T) {
 		tcases := []struct {

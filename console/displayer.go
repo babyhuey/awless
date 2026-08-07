@@ -504,11 +504,11 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 		return err
 	}
 	if len(resources) == 0 {
-		w.Write([]byte("No results found.\n"))
+		_, _ = w.Write([]byte("No results found.\n"))
 		return nil
 	}
 	if len(d.columnDefinitions) == 0 {
-		w.Write([]byte("No columns to display.\n"))
+		_, _ = w.Write([]byte("No columns to display.\n"))
 		return nil
 	}
 
@@ -587,10 +587,10 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 			}
 
 		}
-		table.Append(props)
+		_ = table.Append(props)
 	}
 
-	table.Render()
+	_ = table.Render()
 	if len(columnsToDisplay) < len(d.columnDefinitions) {
 		var hiddenColumns []string
 		for i := len(columnsToDisplay); i < len(d.columnDefinitions); i++ {
@@ -714,10 +714,10 @@ func (d *multiResourcesTableDisplayer) Print(w io.Writer) error {
 		for j := range values[i] {
 			row[j] = wraper.Wrap(fmt.Sprint(values[i][j]))
 		}
-		table.Append(row)
+		_ = table.Append(row)
 	}
 
-	table.Render()
+	_ = table.Render()
 
 	return nil
 }
@@ -844,10 +844,10 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 		for j := range values[i] {
 			row[j] = fmt.Sprint(values[i][j])
 		}
-		table.Append(row)
+		_ = table.Append(row)
 	}
 
-	table.Render()
+	_ = table.Render()
 	return nil
 }
 

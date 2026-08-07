@@ -46,7 +46,9 @@ func VerifyNewVersionAvailable(url string, messaging io.Writer) error {
 		}
 
 		if time.Since(last) > upgradeFreq {
-			notifyIfUpgrade(url, messaging)
+			// Advisory only: failing to reach the release endpoint must never
+			// affect the command the user actually ran.
+			_ = notifyIfUpgrade(url, messaging)
 		}
 
 		return db.SetTimeValue(lastUpgradeCheckDbKey, time.Now())

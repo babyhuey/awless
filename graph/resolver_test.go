@@ -9,11 +9,13 @@ import (
 
 func TestResolvers(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(
+	if err := g.AddResource(
 		resourcetest.Instance("inst_1").Prop("Name", "redis").Build(),
 		resourcetest.Instance("inst_2").Build(),
 		resourcetest.Subnet("sub_1").Prop("Name", "redis").Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("and", func(t *testing.T) {
 		resources, err := g.ResolveResources(&graph.And{[]graph.Resolver{

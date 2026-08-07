@@ -516,15 +516,19 @@ func TestValueLowerOrEqualHandlesMismatchedTypes(t *testing.T) {
 
 func TestTSVDisplay(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(
+	if err := g.AddResource(
 		graph.InitResource("instance", "inst_1"),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 	inst := graph.InitResource("instance", "inst_1")
 	inst.Properties()["ID"] = "inst_1"
 	inst.Properties()["Name"] = "test"
 
 	g2 := graph.NewGraph()
-	g2.AddResource(inst)
+	if err := g2.AddResource(inst); err != nil {
+		t.Fatal(err)
+	}
 
 	columns := []ColumnDefinition{
 		StringColumnDefinition{Prop: "ID"},

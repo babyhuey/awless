@@ -197,7 +197,9 @@ func (c *credentialsPrompter) Prompt() error {
 	}
 
 	if c.ProfileSetterCallback != nil {
-		c.ProfileSetterCallback(c.Profile)
+		if err := c.ProfileSetterCallback(c.Profile); err != nil {
+			return fmt.Errorf("setting profile %s: %w", c.Profile, err)
+		}
 	}
 
 	return nil
@@ -250,7 +252,7 @@ func appendToAwsFile(content string, awsFilePath string) (bool, error) {
 func promptConfirm(msg string, a ...any) bool {
 	var yesorno string
 	fmt.Fprintf(os.Stderr, "%s [y/N] ", fmt.Sprintf(msg, a...))
-	fmt.Scanln(&yesorno)
+	_, _ = fmt.Scanln(&yesorno)
 	if y := strings.TrimSpace(strings.ToLower(yesorno)); y == "y" || y == "yes" {
 		return true
 	}
@@ -264,7 +266,7 @@ func (c *credentialsPrompter) HasProfile() bool {
 func promptToOverride(question string, v *string) {
 	fmt.Print(question)
 	var override string
-	fmt.Scanln(&override)
+	_, _ = fmt.Scanln(&override)
 	if strings.TrimSpace(override) != "" {
 		*v = override
 		return

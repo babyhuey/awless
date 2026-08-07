@@ -122,7 +122,9 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 
 	for i, tcase := range tcases {
 		cmd := &UpdateSecuritygroup{}
-		cmd.inject(tcase.params)
+		if err := cmd.inject(tcase.params); err != nil {
+			t.Fatal(err)
+		}
 		ipPermissions, err := cmd.buildIpPermissions()
 		if err != nil {
 			t.Fatal(i+1, ":", err)

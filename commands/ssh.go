@@ -310,7 +310,9 @@ func (ctx *instanceConnectionContext) fetchConnectionInfo() {
 			exitOn(err)
 		}
 	}
-	resourcesGraph.Merge(sgroupsGraph)
+	if err := resourcesGraph.Merge(sgroupsGraph); err != nil {
+		exitOn(fmt.Errorf("merging security group graph: %w", err))
+	}
 
 	ctx.resourcesGraph = resourcesGraph
 	ctx.myip = myip

@@ -15,7 +15,9 @@ func TestFilterGraph(t *testing.T) {
 	inst2 := resourcetest.Instance("inst_2").Prop("Tags", []string{"Creator=God"}).Prop("Name", "redis").Build()
 	subnet1 := resourcetest.Subnet("sub_1").Build()
 
-	g.AddResource(inst1, inst2, subnet1)
+	if err := g.AddResource(inst1, inst2, subnet1); err != nil {
+		t.Fatal(err)
+	}
 
 	filtered, err := g.Filter("subnet")
 	if err != nil {

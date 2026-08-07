@@ -638,7 +638,7 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 func promptConfirmDefaultYes(msg string, a ...any) bool {
 	var yesorno string
 	fmt.Fprintf(os.Stderr, "%s [Y/n] ", fmt.Sprintf(msg, a...))
-	fmt.Scanln(&yesorno)
+	_, _ = fmt.Scanln(&yesorno)
 	if y := strings.TrimSpace(strings.ToLower(yesorno)); y == "y" || y == "yes" || y == "" {
 		return true
 	}

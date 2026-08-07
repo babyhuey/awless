@@ -29,9 +29,11 @@ import (
 func TestGetResource(t *testing.T) {
 	g := graph.NewGraph()
 
-	g.AddResource(
+	if err := g.AddResource(
 		resourcetest.Instance("inst_1").Prop("Name", "redis").Prop("Type", "t2.micro").Prop("PublicIP", "1.2.3.4").Prop("State", "running").Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 
 	res, err := g.GetResource("instance", "inst_1")
 	if err != nil {
@@ -52,11 +54,13 @@ func TestFindResources(t *testing.T) {
 	t.Parallel()
 	g := graph.NewGraph()
 
-	g.AddResource(
+	if err := g.AddResource(
 		resourcetest.Instance("inst_1").Prop("Name", "redis").Build(),
 		resourcetest.Instance("inst_2").Build(),
 		resourcetest.Subnet("sub_1").Prop("Name", "redis").Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("FindResource", func(t *testing.T) {
 		t.Parallel()
@@ -131,12 +135,14 @@ func TestGetAllResources(t *testing.T) {
 
 	time, _ := time.Parse(time.RFC3339, "2017-01-10T16:47:18Z")
 
-	g.AddResource(
+	if err := g.AddResource(
 		resourcetest.Instance("inst_1").Prop("Name", "redis").Build(),
 		resourcetest.Instance("inst_2").Prop("Name", "redis2").Build(),
 		resourcetest.Instance("inst_3").Prop("Name", "redis3").Prop("Created", time).Build(),
 		resourcetest.Subnet("subnet").Prop("Name", "redis").Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 
 	expected := []*graph.Resource{
 		resourcetest.Instance("inst_1").Prop("Name", "redis").Build(),

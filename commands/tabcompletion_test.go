@@ -20,10 +20,18 @@ func TestEnumCompletionFunc(t *testing.T) {
 
 func TestTypedParamCompletionFunc(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(resourcetest.Instance("1").Prop(p.Name, "broker_1").Build())
-	g.AddResource(resourcetest.Instance("2").Prop(p.Name, "broker_2").Build())
-	g.AddResource(resourcetest.Instance("3").Prop(p.Name, "redis").Build())
-	g.AddResource(resourcetest.Instance("4").Prop(p.Records, []string{"rec1", "rec2"}).Build())
+	if err := g.AddResource(resourcetest.Instance("1").Prop(p.Name, "broker_1").Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Instance("2").Prop(p.Name, "broker_2").Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Instance("3").Prop(p.Name, "redis").Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Instance("4").Prop(p.Records, []string{"rec1", "rec2"}).Build()); err != nil {
+		t.Fatal(err)
+	}
 
 	list, _ := typedParamCompletionFunc(g, "instance", p.Name).Do([]rune{'b'}, 1)
 	sort.Slice(list, func(i, j int) bool { return string(list[i]) <= string(list[j]) })
@@ -39,15 +47,33 @@ func TestTypedParamCompletionFunc(t *testing.T) {
 
 func TestAutoCompletion(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(resourcetest.Instance("1").Prop(p.Name, "broker_1").Prop(p.Type, "t2.micro").Prop(p.Subnet, "1").Prop(p.ActiveServicesCount, 42).Build())
-	g.AddResource(resourcetest.Instance("2").Prop(p.Name, "broker_2").Prop(p.Type, "t3.medium").Prop(p.Subnet, "2").Prop(p.ActiveServicesCount, 24).Build())
-	g.AddResource(resourcetest.Instance("3").Prop(p.Name, "kafka").Prop(p.Type, "t3.medium").Prop(p.Subnet, "2").Prop(p.ActiveServicesCount, 44).Build())
-	g.AddResource(resourcetest.Instance("4").Prop(p.Name, "redis").Build())
-	g.AddResource(resourcetest.SecurityGroup("sg-1").Prop(p.Name, "ssh").Build())
-	g.AddResource(resourcetest.Subnet("s-5").Prop(p.Name, "subnet 1").Prop(p.Public, true).Prop(p.CIDR, "10.0.0.0/0").Build())
-	g.AddResource(resourcetest.Subnet("s-6").Prop(p.Name, "subnet 2").Prop(p.Public, false).Prop(p.CIDR, "192.168.0.0/0").Build())
-	g.AddResource(resourcetest.Alarm("1").Prop(p.Dimensions, []*graph.KeyValue{{KeyName: "abc", Value: "val1"}, {KeyName: "abd", Value: "val2"}}).Build())
-	g.AddResource(resourcetest.Alarm("2").Prop(p.Dimensions, []*graph.KeyValue{{KeyName: "def", Value: "val3"}}).Build())
+	if err := g.AddResource(resourcetest.Instance("1").Prop(p.Name, "broker_1").Prop(p.Type, "t2.micro").Prop(p.Subnet, "1").Prop(p.ActiveServicesCount, 42).Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Instance("2").Prop(p.Name, "broker_2").Prop(p.Type, "t3.medium").Prop(p.Subnet, "2").Prop(p.ActiveServicesCount, 24).Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Instance("3").Prop(p.Name, "kafka").Prop(p.Type, "t3.medium").Prop(p.Subnet, "2").Prop(p.ActiveServicesCount, 44).Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Instance("4").Prop(p.Name, "redis").Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.SecurityGroup("sg-1").Prop(p.Name, "ssh").Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Subnet("s-5").Prop(p.Name, "subnet 1").Prop(p.Public, true).Prop(p.CIDR, "10.0.0.0/0").Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Subnet("s-6").Prop(p.Name, "subnet 2").Prop(p.Public, false).Prop(p.CIDR, "192.168.0.0/0").Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Alarm("1").Prop(p.Dimensions, []*graph.KeyValue{{KeyName: "abc", Value: "val1"}, {KeyName: "abd", Value: "val2"}}).Build()); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddResource(resourcetest.Alarm("2").Prop(p.Dimensions, []*graph.KeyValue{{KeyName: "def", Value: "val3"}}).Build()); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("no matches", func(t *testing.T) {
 		list, _ := holeAutoCompletion(g, []string{"create.instance.id"}).Do([]rune{'a'}, 1)

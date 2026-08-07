@@ -194,7 +194,7 @@ func displayQRCode(w io.Writer, qrCode barcode.Barcode) {
 
 func promptStringWithDefault(msg, def string) (res string) {
 	fmt.Fprintf(os.Stderr, "%s", msg)
-	fmt.Scanln(&res)
+	_, _ = fmt.Scanln(&res)
 	res = strings.TrimSpace(res)
 	if res == "" {
 		res = def
@@ -246,7 +246,7 @@ func promptRole(api *iam.Client) (string, error) {
 	//No permission to list roles:
 	var roleArn string
 	fmt.Fprint(os.Stderr, "Please specify the role ARN to assume with this MFA device:")
-	fmt.Scanln(&roleArn)
+	_, _ = fmt.Scanln(&roleArn)
 	roleArn = strings.TrimSpace(roleArn)
 	if roleArn == "" {
 		return roleArn, errors.New("Role cannot be empty")

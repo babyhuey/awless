@@ -18,6 +18,7 @@ package console
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
@@ -86,10 +87,12 @@ func TestSorting(t *testing.T) {
 // #248: sorting by a boolean column like Public should not panic
 func TestSortByBoolColumn(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(
+	if err := g.AddResource(
 		resourcetest.Subnet("sub_1").Prop(p.Name, "public_subnet").Prop(p.Public, true).Build(),
 		resourcetest.Subnet("sub_2").Prop(p.Name, "private_subnet").Prop(p.Public, false).Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 
 	var w bytes.Buffer
 	displayer, _ := BuildOptions(
@@ -425,11 +428,13 @@ func TestDiffDisplay(t *testing.T) {
 
 func TestDateLists(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(resourcetest.Region("eu-west-1").Build(),
+	if err := g.AddResource(resourcetest.Region("eu-west-1").Build(),
 		resourcetest.User("user1").Prop("Name", "my_username_1").Build(),
 		resourcetest.User("user2").Prop("Name", "my_username_2").Prop("PasswordLastUsed", time.Unix(1482405203, 0).UTC()).Build(),
 		resourcetest.User("user3").Prop("Name", "my_username_3").Prop("PasswordLastUsed", time.Unix(1481358937, 0).UTC()).Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 	globalNow = time.Unix(1505832866, 0)
 	defer func() {
 		globalNow = time.Now().UTC()
@@ -670,11 +675,13 @@ func TestPipeOutputNotTruncated(t *testing.T) {
 
 func TestFilter(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(
+	if err := g.AddResource(
 		resourcetest.Subnet("sub_1").Prop(p.Name, "my_subnet").Prop(p.Vpc, "vpc_1").Prop(p.Public, true).Build(),
 		resourcetest.Subnet("sub_2").Prop(p.Vpc, "vpc_2").Prop(p.Public, false).Build(),
 		resourcetest.Subnet("sub_3").Prop(p.Name, "my_subnet").Prop(p.Vpc, "vpc_1").Prop(p.Public, false).Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("No filter", func(t *testing.T) {
 		var w bytes.Buffer
@@ -760,11 +767,13 @@ func TestCompareInterface(t *testing.T) {
 
 func TestCSVDisplayWithCommaAndQuotes(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(
+	if err := g.AddResource(
 		resourcetest.Instance("inst_1").Prop(p.Name, "with,comma").Build(),
 		resourcetest.Instance("inst_2").Prop(p.Name, "with\nlinebreak").Build(),
 		resourcetest.Instance("inst_3").Prop(p.Name, "with\"quote").Build(),
-	)
+	); err != nil {
+		t.Fatal(err)
+	}
 
 	displayer, _ := BuildOptions(
 		WithRdfType("instance"),
@@ -787,7 +796,7 @@ func TestCSVDisplayWithCommaAndQuotes(t *testing.T) {
 
 func createInfraGraph() *graph.Graph {
 	g := graph.NewGraph()
-	g.AddResource(resourcetest.Region("eu-west-1").Build(),
+	if err := g.AddResource(resourcetest.Region("eu-west-1").Build(),
 		resourcetest.Instance("inst_1").Prop(p.Name, "redis").Prop(p.Type, "t2.micro").Prop(p.PublicIP, "1.2.3.4").Prop(p.State, "running").Build(),
 		resourcetest.Instance("inst_2").Prop(p.Name, "django").Prop(p.Type, "t2.medium").Prop(p.State, "stopped").Build(),
 		resourcetest.Instance("inst_3").Prop(p.Name, "apache").Prop(p.Type, "t2.xlarge").Prop(p.State, "running").Build(),
@@ -795,7 +804,9 @@ func createInfraGraph() *graph.Graph {
 		resourcetest.VPC("vpc_2").Prop(p.Name, "my_vpc_2").Build(),
 		resourcetest.Subnet("sub_1").Prop(p.Name, "my_subnet").Prop(p.Vpc, "vpc_1").Build(),
 		resourcetest.Subnet("sub_2").Prop(p.Vpc, "vpc_2").Build(),
-	)
+	); err != nil {
+		panic(fmt.Sprintf("createInfraGraph: %s", err))
+	}
 
 	return g
 }

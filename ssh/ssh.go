@@ -199,7 +199,7 @@ Host {{ .Name }}
 {{- range $key, $value := .Extra }}
   {{ $key }} {{ $value -}}
 {{ end -}}
-`)).Execute(&buf, params)
+`)).Execute(&buf, params) //nolint:errcheck // static template, writes to a buffer
 
 	return buf.String()
 }

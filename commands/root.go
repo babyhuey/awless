@@ -49,12 +49,12 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&forceGlobalFlag, "force", "f", false, "Force the command and bypass confirmation prompts")
 	RootCmd.PersistentFlags().BoolVar(&noSyncGlobalFlag, "no-sync", false, "Do not run any sync on command")
 	RootCmd.PersistentFlags().StringVarP(&awsRegionGlobalFlag, "aws-region", "r", "", "Override AWS region temporarily for the current command")
-	RootCmd.PersistentFlags().SetAnnotation("aws-region", cobra.BashCompCustom, []string{"__awless_region_list"})
+	_ = RootCmd.PersistentFlags().SetAnnotation("aws-region", cobra.BashCompCustom, []string{"__awless_region_list"})
 	RootCmd.PersistentFlags().StringVarP(&awsProfileGlobalFlag, "aws-profile", "p", "", "Override AWS profile temporarily for the current command")
-	RootCmd.PersistentFlags().SetAnnotation("aws-profile", cobra.BashCompCustom, []string{"__awless_profile_list"})
+	_ = RootCmd.PersistentFlags().SetAnnotation("aws-profile", cobra.BashCompCustom, []string{"__awless_profile_list"})
 	RootCmd.PersistentFlags().StringVar(&awsColorGlobalFlag, "color", "auto", "Force enabling/disabling colors in display (auto, never, always)")
 	RootCmd.PersistentFlags().BoolVar(&networkMonitorFlag, "network-monitor", false, "Debug requests with network monitor")
-	RootCmd.PersistentFlags().MarkHidden("network-monitor")
+	_ = RootCmd.PersistentFlags().MarkHidden("network-monitor")
 
 	RootCmd.Flags().BoolVar(&versionGlobalFlag, "version", false, "Print awless version")
 

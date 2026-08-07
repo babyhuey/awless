@@ -235,7 +235,7 @@ func defaultStdinParamProvider() string {
 	var value string
 	for value == "" {
 		fmt.Print("Value ? > ")
-		fmt.Scan(&value)
+		_, _ = fmt.Scan(&value)
 	}
 	return value
 }

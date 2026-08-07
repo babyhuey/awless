@@ -13,7 +13,9 @@ import (
 
 func TestGetRegion(t *testing.T) {
 	g := graph.NewGraph()
-	g.AddResource(resourcetest.Region("us-east-1").Build())
+	if err := g.AddResource(resourcetest.Region("us-east-1").Build()); err != nil {
+		t.Fatal(err)
+	}
 
 	region, err := getRegion(g)
 	if err != nil {

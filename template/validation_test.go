@@ -14,10 +14,12 @@ func TestValidation(t *testing.T) {
 		text := "create instance name=instance1_name"
 
 		g := graph.NewGraph()
-		g.AddResource(
+		if err := g.AddResource(
 			resourcetest.Instance("inst_1").Prop("Name", "instance1_name").Prop("State", "terminated").Build(),
 			resourcetest.Instance("inst_2").Prop("Name", "instance2_name").Build(),
-		)
+		); err != nil {
+			t.Fatal(err)
+		}
 
 		tpl := template.MustParse(text)
 

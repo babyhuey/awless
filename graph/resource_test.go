@@ -425,7 +425,7 @@ func BenchmarkRdfUnmarshaling(b *testing.B) {
 	graph := buildBenchmarkFullRdfTriples(resources)
 	b.ResetTimer()
 	f, _ := os.Create("./fullcpu.out")
-	pprof.StartCPUProfile(f)
+	_ = pprof.StartCPUProfile(f)
 	defer pprof.StopCPUProfile()
 	b.Run("full RDF", func(b *testing.B) {
 		snap := graph.store.Snapshot()

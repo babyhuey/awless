@@ -26,12 +26,24 @@ func TestGetSyncEnabled(t *testing.T) {
 		if err := LoadConfig(); err != nil {
 			t.Fatal(err)
 		}
-		Set("aws.ec2.sync", "true")
-		Set("aws.ec2.subnet.sync", "true")
-		Set("aws.ec2.instance.sync", "false")
-		Set("aws.iam.group.sync", "true")
-		Set("aws.iam.user.sync", "false")
-		Set("other.iam.user.sync", "false")
+		if err := Set("aws.ec2.sync", "true"); err != nil {
+			t.Fatal(err)
+		}
+		if err := Set("aws.ec2.subnet.sync", "true"); err != nil {
+			t.Fatal(err)
+		}
+		if err := Set("aws.ec2.instance.sync", "false"); err != nil {
+			t.Fatal(err)
+		}
+		if err := Set("aws.iam.group.sync", "true"); err != nil {
+			t.Fatal(err)
+		}
+		if err := Set("aws.iam.user.sync", "false"); err != nil {
+			t.Fatal(err)
+		}
+		if err := Set("other.iam.user.sync", "false"); err != nil {
+			t.Fatal(err)
+		}
 		expect := map[string]any{
 			"aws.region":            "eu-west-1",
 			"aws.ec2.sync":          true,

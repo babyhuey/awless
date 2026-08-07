@@ -36,11 +36,21 @@ func TestCollectors(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	g.AddParentRelation(s1, i1)
-	g.AddParentRelation(s1, i2)
-	g.AddParentRelation(s2, i3)
-	g.AddParentRelation(v1, s1)
-	g.AddParentRelation(v2, s2)
+	if err := g.AddParentRelation(s1, i1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(s1, i2); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(s2, i3); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(v1, s1); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.AddParentRelation(v2, s2); err != nil {
+		t.Fatal(err)
+	}
 
 	var collect []*graph.Resource
 	tcases := []struct {

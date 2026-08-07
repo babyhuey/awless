@@ -55,19 +55,19 @@ func InteractiveTerminal(client *ssh.Client) error {
 	if err != nil {
 		return err
 	}
-	go io.Copy(stdin, os.Stdin)
+	go func() { _, _ = io.Copy(stdin, os.Stdin) }()
 
 	stdout, err := session.StdoutPipe()
 	if err != nil {
 		return err
 	}
-	go io.Copy(os.Stdout, stdout)
+	go func() { _, _ = io.Copy(os.Stdout, stdout) }()
 
 	stderr, err := session.StderrPipe()
 	if err != nil {
 		return err
 	}
-	go io.Copy(os.Stderr, stderr)
+	go func() { _, _ = io.Copy(os.Stderr, stderr) }()
 
 	// Set up terminal modes
 	modes := ssh.TerminalModes{

@@ -92,14 +92,22 @@ func (cmd *CreateRole) ManualRun(renv env.Running) (any, error) {
 	}
 	role := output.(*iam.CreateRoleOutput).Role
 
+	// The role already exists at this point, so a failure here leaves it without
+	// an instance profile rather than rolling back. Warn instead of failing so the
+	// caller still learns the role was created.
 	createInstProfile := CommandFactory.Build("createinstanceprofile")().(*CreateInstanceprofile)
 	createInstProfile.Name = cmd.Name
-	createInstProfile.Run(renv, nil)
+	if _, err := createInstProfile.Run(renv, nil); err != nil {
+		cmd.logger.Warningf("role %s created but creating its instance profile failed: %s", StringValue(cmd.Name), err)
+		return output, nil
+	}
 
 	attachRole := CommandFactory.Build("attachrole")().(*AttachRole)
 	attachRole.Name = role.RoleName
 	attachRole.Instanceprofile = role.RoleName
-	attachRole.Run(renv, nil)
+	if _, err := attachRole.Run(renv, nil); err != nil {
+		cmd.logger.Warningf("role %s and its instance profile created but attaching them failed: %s", StringValue(cmd.Name), err)
+	}
 
 	if v := cmd.SleepAfter; v != nil {
 		vv := Int64AsIntValue(v)
@@ -127,14 +135,21 @@ func (cmd *DeleteRole) ParamsSpec() params.Spec {
 }
 
 func (cmd *DeleteRole) ManualRun(renv env.Running) (any, error) {
+	// Best effort teardown: the role may have no instance profile attached, so
+	// these failing is not necessarily an error. Warn and continue to the actual
+	// role deletion below.
 	detachRole := CommandFactory.Build("detachrole")().(*DetachRole)
 	detachRole.Name = cmd.Name
 	detachRole.Instanceprofile = cmd.Name
-	detachRole.Run(renv, nil)
+	if _, err := detachRole.Run(renv, nil); err != nil {
+		cmd.logger.Verbosef("detaching instance profile from role %s: %s", StringValue(cmd.Name), err)
+	}
 
 	deleteInstProfile := CommandFactory.Build("deleteinstanceprofile")().(*DeleteInstanceprofile)
 	deleteInstProfile.Name = cmd.Name
-	deleteInstProfile.Run(renv, nil)
+	if _, err := deleteInstProfile.Run(renv, nil); err != nil {
+		cmd.logger.Verbosef("deleting instance profile for role %s: %s", StringValue(cmd.Name), err)
+	}
 
 	input := &iam.DeleteRoleInput{}
 	if err := setFieldWithType(cmd.Name, input, "RoleName", awsstr); err != nil {

@@ -45,7 +45,9 @@ H3GpnLFThj3dhdyhCwJAcYdeLp39POwN0d4Dwf7Bu0sMRZIZrQpSbtO7ypOBwi3j
 hTSx5geAH2W73IyiTK8zIdgPMJPh69//5OhFzhQ8Ug==
 -----END RSA PRIVATE KEY-----`
 
-	os.WriteFile(keypath1, []byte(rawkey), 0644)
+	if err := os.WriteFile(keypath1, []byte(rawkey), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	awlessKeysPath := filepath.Join(f, ".awless-keys")
 	err = os.MkdirAll(awlessKeysPath, 0755)
@@ -53,7 +55,9 @@ hTSx5geAH2W73IyiTK8zIdgPMJPh69//5OhFzhQ8Ug==
 		t.Fatal(err)
 	}
 	keypath2 := filepath.Join(awlessKeysPath, "mysecondkey.pem")
-	os.WriteFile(keypath2, []byte(rawkey), 0644)
+	if err := os.WriteFile(keypath2, []byte(rawkey), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	tcases := []struct {
 		keyname    string

@@ -156,12 +156,18 @@ func TestDefaults(t *testing.T) {
 		if got, want := Defaults, map[string]any{"instance.type": "t2.nano", "instance.image": "ami-165a0876", "instance.count": 1, "subnet.create": true}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
-		Unset("ec2.autosync")
-		Unset("instance.image")
+		if err := Unset("ec2.autosync"); err != nil {
+			t.Fatal(err)
+		}
+		if err := Unset("instance.image"); err != nil {
+			t.Fatal(err)
+		}
 		if got, want := Config, map[string]any{"aws.region": "us-west-1"}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
-		LoadConfig()
+		if err := LoadConfig(); err != nil {
+			t.Fatal(err)
+		}
 		if got, want := Config, map[string]any{"aws.region": "us-west-1"}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}

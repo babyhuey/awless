@@ -25,7 +25,9 @@ func (g *Graph) filter(apply func(filters ...FilterFn) FilterFn, entity string, 
 
 	for _, r := range all {
 		if apply(filters...)(r) {
-			filtered.AddResource(r)
+			if err := filtered.AddResource(r); err != nil {
+				return filtered, err
+			}
 		}
 	}
 

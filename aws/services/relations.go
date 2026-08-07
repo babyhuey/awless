@@ -326,15 +326,14 @@ func verifyValidStructField(i any, name string) (reflect.Value, error) {
 func addRelation(g *graph.Graph, first, other *graph.Resource, relation int) error {
 	switch relation {
 	case PARENT_OF:
-		g.AddParentRelation(first, other)
+		return g.AddParentRelation(first, other)
 	case APPLIES_ON:
-		g.AddAppliesOnRelation(first, other)
+		return g.AddAppliesOnRelation(first, other)
 	case DEPENDING_ON:
-		g.AddAppliesOnRelation(other, first)
+		return g.AddAppliesOnRelation(other, first)
 	default:
 		return errors.New("unknown relation type")
 	}
-	return nil
 }
 
 func addRegionParent(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
@@ -342,8 +341,7 @@ func addRegionParent(g *graph.Graph, snap tstore.RDFGraph, region string, i any)
 	if err != nil {
 		return err
 	}
-	g.AddParentRelation(graph.InitResource(cloud.Region, region), res)
-	return nil
+	return g.AddParentRelation(graph.InitResource(cloud.Region, region), res)
 }
 
 func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
@@ -378,7 +376,9 @@ func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 			fmt.Fprintf(os.Stderr, "add parent to '%s/%s': unknown policy named '%s'. Ignoring it.\n", res.Type(), res.Id(), aws.ToString(policy.PolicyName))
 			return nil
 		}
-		g.AddAppliesOnRelation(policies[0], res)
+		if err := g.AddAppliesOnRelation(policies[0], res); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -403,7 +403,9 @@ func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string,
 		case 0:
 			fmt.Fprintf(os.Stderr, "no group with name %s found for user %s\n", groupName, n.Id())
 		case 1:
-			g.AddAppliesOnRelation(resources[0], n)
+			if err := g.AddAppliesOnRelation(resources[0], n); err != nil {
+				return err
+			}
 		default:
 			fmt.Fprintf(os.Stderr, "multiple groups with name %s found for user %s:%v\n", groupName, n.Id(), resources)
 		}
