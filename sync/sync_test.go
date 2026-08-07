@@ -36,7 +36,7 @@ func TestSyncTripleFiles(t *testing.T) {
 
 	os.Setenv("__AWLESS_HOME", tmpDir)
 
-	if _, err := NewSyncer().Sync(srv1, srv2); err != nil {
+	if _, err := NewSyncer().Sync(context.Background(), srv1, srv2); err != nil {
 		t.Fatal(err)
 	}
 

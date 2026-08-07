@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -62,7 +61,7 @@ func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (any, error) {
 	}
 
 	start := time.Now()
-	output, err := cmd.api.GetAuthorizationToken(context.Background(), input)
+	output, err := cmd.api.GetAuthorizationToken(renv.RequestContext(), input)
 	if err != nil {
 		return nil, err
 	}

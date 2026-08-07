@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -83,7 +82,7 @@ func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]any
 				{Name: String("instance-id"), Values: []string{StringValue(cmd.Instance)}},
 			},
 		}
-		out, err := cmd.api.DescribeIamInstanceProfileAssociations(context.Background(), in)
+		out, err := cmd.api.DescribeIamInstanceProfileAssociations(renv.RequestContext(), in)
 		if err != nil {
 			return nil, fmt.Errorf("replace mode on: cannot get: %w", err)
 		}
@@ -102,7 +101,7 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 	profileName := StringValue(cmd.Name)
 
 	if BoolValue(cmd.Replace) {
-		out, err := cmd.api.DescribeIamInstanceProfileAssociations(context.Background(),
+		out, err := cmd.api.DescribeIamInstanceProfileAssociations(renv.RequestContext(),
 			&ec2.DescribeIamInstanceProfileAssociationsInput{
 				Filters: []ec2types.Filter{
 					{Name: String("instance-id"), Values: []string{instanceId}},
@@ -120,7 +119,7 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 			oldProfileArn := StringValue(assoc[0].IamInstanceProfile.Arn)
 			cmd.logger.ExtraVerbosef("attach profile: found existing profile to replace with %s", profileName)
 			if assocInstId == instanceId {
-				out, err := cmd.api.ReplaceIamInstanceProfileAssociation(context.Background(),
+				out, err := cmd.api.ReplaceIamInstanceProfileAssociation(renv.RequestContext(),
 					&ec2.ReplaceIamInstanceProfileAssociationInput{
 						AssociationId: String(assocId),
 						IamInstanceProfile: &ec2types.IamInstanceProfileSpecification{
@@ -148,7 +147,7 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 	}
 
 	start := time.Now()
-	output, err := cmd.api.AssociateIamInstanceProfile(context.Background(), input)
+	output, err := cmd.api.AssociateIamInstanceProfile(renv.RequestContext(), input)
 	cmd.logger.ExtraVerbosef("ec2.AssociateIamInstanceProfile call took %s", time.Since(start))
 	return output, err
 }
@@ -170,7 +169,7 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 	instanceId := StringValue(cmd.Instance)
 	profileName := StringValue(cmd.Name)
 
-	out, err := cmd.api.DescribeIamInstanceProfileAssociations(context.Background(),
+	out, err := cmd.api.DescribeIamInstanceProfileAssociations(renv.RequestContext(),
 		&ec2.DescribeIamInstanceProfileAssociationsInput{
 			Filters: []ec2types.Filter{
 				{Name: String("instance-id"), Values: []string{instanceId}},
@@ -194,7 +193,7 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 			}
 
 			start := time.Now()
-			output, err := cmd.api.DisassociateIamInstanceProfile(context.Background(), input)
+			output, err := cmd.api.DisassociateIamInstanceProfile(renv.RequestContext(), input)
 			if err != nil {
 				return nil, err
 			}

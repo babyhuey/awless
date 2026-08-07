@@ -134,7 +134,7 @@ func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]an
 		}
 	}
 
-	_, err := cmd.api.DetachNetworkInterface(context.Background(), input)
+	_, err := cmd.api.DetachNetworkInterface(renv.RequestContext(), input)
 	var awsErr smithy.APIError
 	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
@@ -173,7 +173,7 @@ func (cmd *DetachNetworkinterface) ManualRun(renv env.Running) (any, error) {
 	}
 
 	start := time.Now()
-	output, err := cmd.api.DetachNetworkInterface(context.Background(), input)
+	output, err := cmd.api.DetachNetworkInterface(renv.RequestContext(), input)
 	cmd.logger.ExtraVerbosef("ec2.DetachNetworkInterface call took %s", time.Since(start))
 	return output, err
 }
@@ -206,7 +206,7 @@ func (cmd *CheckNetworkinterface) ManualRun(renv env.Running) (any, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeNetworkInterfaces(context.Background(), input)
+			output, err := cmd.api.DescribeNetworkInterfaces(renv.RequestContext(), input)
 			if err != nil {
 				var awserr smithy.APIError
 				if errors.As(err, &awserr) {

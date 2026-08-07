@@ -78,7 +78,7 @@ var syncCmd = &cobra.Command{
 		var syncErr error
 		var graphs map[string]cloud.GraphAPI
 		syncFn := func() {
-			graphs, syncErr = sync.DefaultSyncer.Sync(services...)
+			graphs, syncErr = sync.DefaultSyncer.Sync(RootContext(), services...)
 		}
 
 		start := time.Now()

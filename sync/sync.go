@@ -37,7 +37,8 @@ var DefaultSyncer Syncer
 
 type Syncer interface {
 	repo.Repo
-	Sync(...cloud.Service) (map[string]cloud.GraphAPI, error)
+	// Sync fetches the given services. ctx cancels the outbound AWS calls.
+	Sync(ctx context.Context, services ...cloud.Service) (map[string]cloud.GraphAPI, error)
 }
 
 type noopsyncer struct {
@@ -46,7 +47,7 @@ type noopsyncer struct {
 
 func NoOpSyncer() Syncer { return new(noopsyncer) }
 
-func (s *noopsyncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, error) {
+func (s *noopsyncer) Sync(context.Context, ...cloud.Service) (map[string]cloud.GraphAPI, error) {
 	return map[string]cloud.GraphAPI{}, nil
 }
 
@@ -72,7 +73,7 @@ func NewSyncer(l ...*logger.Logger) Syncer {
 	return s
 }
 
-func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, error) {
+func (s *syncer) Sync(ctx context.Context, services ...cloud.Service) (map[string]cloud.GraphAPI, error) {
 	var workers gosync.WaitGroup
 
 	type result struct {
@@ -93,7 +94,7 @@ func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, err
 		go func(srv cloud.Service) {
 			defer workers.Done()
 			start := time.Now()
-			g, err := srv.Fetch(context.Background())
+			g, err := srv.Fetch(ctx)
 			resultc <- &result{service: srv, gph: g, start: start, err: err}
 		}(service)
 	}

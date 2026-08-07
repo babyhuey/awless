@@ -123,7 +123,7 @@ func (cmd *AttachAlarm) ManualRun(renv env.Running) (any, error) {
 	}
 	alarm.AlarmActions = append(alarm.AlarmActions, aws.ToString(cmd.ActionArn))
 
-	return cmd.api.PutMetricAlarm(context.Background(), &cloudwatch.PutMetricAlarmInput{
+	return cmd.api.PutMetricAlarm(renv.RequestContext(), &cloudwatch.PutMetricAlarmInput{
 		ActionsEnabled:                   alarm.ActionsEnabled,
 		AlarmActions:                     alarm.AlarmActions,
 		AlarmDescription:                 alarm.AlarmDescription,
@@ -177,7 +177,7 @@ func (cmd *DetachAlarm) ManualRun(renv env.Running) (any, error) {
 		return nil, fmt.Errorf("detach alarm: action '%s' is not attached to alarm actions of alarm %s", actionArn, aws.ToString(alarm.AlarmName))
 	}
 
-	return cmd.api.PutMetricAlarm(context.Background(), &cloudwatch.PutMetricAlarmInput{
+	return cmd.api.PutMetricAlarm(renv.RequestContext(), &cloudwatch.PutMetricAlarmInput{
 		ActionsEnabled:                   alarm.ActionsEnabled,
 		AlarmActions:                     updatedActions,
 		AlarmDescription:                 alarm.AlarmDescription,

@@ -17,15 +17,30 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/bootswithdefer/awless/commands"
 )
 
 func main() {
+	// Cancel on SIGINT/SIGTERM so in-flight AWS calls stop instead of being
+	// abandoned when the user hits Ctrl-C. The context reaches the AWS SDK via
+	// env.Running.RequestContext(); see template/env.
+	//
+	// A second signal aborts immediately: signal.NotifyContext restores the
+	// default disposition after the first one, so an unresponsive command can
+	// still be killed with a repeated Ctrl-C.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	commands.SetRootContext(ctx)
+
 	// cobra already prints the error to stderr (SilenceErrors is not set on
 	// RootCmd), so only the exit status needs handling here.
-	if err := commands.RootCmd.Execute(); err != nil {
+	if err := commands.RootCmd.ExecuteContext(ctx); err != nil {
 		os.Exit(1)
 	}
 }

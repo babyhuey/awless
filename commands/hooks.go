@@ -22,8 +22,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"context"
-
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/spf13/cobra"
 
@@ -138,7 +136,7 @@ func initCloudServicesHook(cmd *cobra.Command, args []string) error {
 		}
 		if !noSyncGlobalFlag {
 			logger.Infof("Syncing new region '%s'... (disable with --no-sync global flag)", region)
-			if _, err := sync.NewSyncer(logger.DefaultLogger).Sync(services...); err != nil {
+			if _, err := sync.NewSyncer(logger.DefaultLogger).Sync(RootContext(), services...); err != nil {
 				logger.Warningf("syncing new region '%s': %s", region, err)
 			}
 		}
@@ -261,7 +259,7 @@ func migrationActionsAndExtraMessages(current string) {
 }
 
 func hasEmbeddedRegionInSharedConfigForProfile(profile string) (string, bool, error) {
-	cfg, err := awsconfig.LoadDefaultConfig(context.Background(),
+	cfg, err := awsconfig.LoadDefaultConfig(RootContext(),
 		awsconfig.WithSharedConfigProfile(profile),
 	)
 	if err != nil {

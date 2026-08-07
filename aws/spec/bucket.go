@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"time"
 
 	"github.com/bootswithdefer/awless/cloud"
@@ -80,7 +79,7 @@ func (cmd *UpdateBucket) ManualRun(renv env.Running) (any, error) {
 			return nil, err
 		}
 
-		if _, err := cmd.api.PutBucketAcl(context.Background(), input); err != nil {
+		if _, err := cmd.api.PutBucketAcl(renv.RequestContext(), input); err != nil {
 			return nil, err
 		}
 
@@ -105,11 +104,11 @@ func (cmd *UpdateBucket) ManualRun(renv env.Running) (any, error) {
 				input.WebsiteConfiguration.IndexDocument = &s3types.IndexDocument{Suffix: aws.String("index.html")}
 			}
 
-			if _, err := cmd.api.PutBucketWebsite(context.Background(), input); err != nil {
+			if _, err := cmd.api.PutBucketWebsite(renv.RequestContext(), input); err != nil {
 				return nil, err
 			}
 		} else {
-			if _, err := cmd.api.DeleteBucketWebsite(context.Background(), &s3.DeleteBucketWebsiteInput{Bucket: cmd.Name}); err != nil {
+			if _, err := cmd.api.DeleteBucketWebsite(renv.RequestContext(), &s3.DeleteBucketWebsiteInput{Bucket: cmd.Name}); err != nil {
 				return nil, err
 			}
 		}

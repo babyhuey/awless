@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -241,7 +240,7 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (any, error) {
 	var taskDefinitionInput *ecs.RegisterTaskDefinitionInput
 	taskDefinitionName := StringValue(cmd.Name)
 
-	taskdefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
+	taskdefOutput, err := cmd.api.DescribeTaskDefinition(renv.RequestContext(), &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: cmd.Name,
 	})
 	var awserr smithy.APIError
@@ -314,7 +313,7 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (any, error) {
 
 	start := time.Now()
 
-	taskDefOutput, err := cmd.api.RegisterTaskDefinition(context.Background(), taskDefinitionInput)
+	taskDefOutput, err := cmd.api.RegisterTaskDefinition(renv.RequestContext(), taskDefinitionInput)
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +339,7 @@ func (cmd *DetachContainertask) ParamsSpec() params.Spec {
 }
 
 func (cmd *DetachContainertask) ManualRun(renv env.Running) (any, error) {
-	taskdefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
+	taskdefOutput, err := cmd.api.DescribeTaskDefinition(renv.RequestContext(), &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: cmd.Name,
 	})
 	if err != nil {
@@ -374,7 +373,7 @@ func (cmd *DetachContainertask) ManualRun(renv env.Running) (any, error) {
 		}
 		start := time.Now()
 
-		if _, err := cmd.api.RegisterTaskDefinition(context.Background(), taskDefinitionInput); err != nil {
+		if _, err := cmd.api.RegisterTaskDefinition(renv.RequestContext(), taskDefinitionInput); err != nil {
 			return nil, err
 		}
 		cmd.logger.ExtraVerbosef("ecs.RegisterTaskDefinition call took %s", time.Since(start))
@@ -386,7 +385,7 @@ func (cmd *DetachContainertask) ManualRun(renv env.Running) (any, error) {
 		}
 		start := time.Now()
 
-		if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), taskDefinitionInput); err != nil {
+		if _, err := cmd.api.DeregisterTaskDefinition(renv.RequestContext(), taskDefinitionInput); err != nil {
 			return nil, err
 		}
 		cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))
@@ -416,7 +415,7 @@ func (cmd *DeleteContainertask) dryRun(renv env.Running, params map[string]any) 
 	}
 	taskDefinitionName := StringValue(cmd.Name)
 
-	taskDefOutput, err := cmd.api.ListTaskDefinitions(context.Background(), &ecs.ListTaskDefinitionsInput{
+	taskDefOutput, err := cmd.api.ListTaskDefinitions(renv.RequestContext(), &ecs.ListTaskDefinitionsInput{
 		FamilyPrefix: cmd.Name,
 	})
 	if err != nil {
@@ -442,7 +441,7 @@ func (cmd *DeleteContainertask) ManualRun(renv env.Running) (any, error) {
 	taskDefinitionName := StringValue(cmd.Name)
 
 	if BoolValue(cmd.AllVersions) {
-		taskDefOutput, err := cmd.api.ListTaskDefinitions(context.Background(), &ecs.ListTaskDefinitionsInput{
+		taskDefOutput, err := cmd.api.ListTaskDefinitions(renv.RequestContext(), &ecs.ListTaskDefinitionsInput{
 			FamilyPrefix: aws.String(taskDefinitionName),
 		})
 		if err != nil {
@@ -451,13 +450,13 @@ func (cmd *DeleteContainertask) ManualRun(renv env.Running) (any, error) {
 		for _, task := range taskDefOutput.TaskDefinitionArns {
 			cmd.logger.ExtraVerbosef("deleting '%s'", task)
 			start := time.Now()
-			if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: aws.String(task)}); err != nil {
+			if _, err := cmd.api.DeregisterTaskDefinition(renv.RequestContext(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: aws.String(task)}); err != nil {
 				return nil, fmt.Errorf("deregister task definition: %w", err)
 			}
 			cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))
 		}
 	} else {
-		taskDefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
+		taskDefOutput, err := cmd.api.DescribeTaskDefinition(renv.RequestContext(), &ecs.DescribeTaskDefinitionInput{
 			TaskDefinition: aws.String(taskDefinitionName),
 		})
 		if err != nil {
@@ -465,7 +464,7 @@ func (cmd *DeleteContainertask) ManualRun(renv env.Running) (any, error) {
 		}
 		cmd.logger.ExtraVerbosef("deleting '%s'", aws.ToString(taskDefOutput.TaskDefinition.TaskDefinitionArn))
 		start := time.Now()
-		if _, err := cmd.api.DeregisterTaskDefinition(context.Background(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: taskDefOutput.TaskDefinition.TaskDefinitionArn}); err != nil {
+		if _, err := cmd.api.DeregisterTaskDefinition(renv.RequestContext(), &ecs.DeregisterTaskDefinitionInput{TaskDefinition: taskDefOutput.TaskDefinition.TaskDefinitionArn}); err != nil {
 			return nil, fmt.Errorf("deregister task definition: %w", err)
 		}
 		cmd.logger.ExtraVerbosef("ecs.DeregisterTaskDefinition call took %s", time.Since(start))

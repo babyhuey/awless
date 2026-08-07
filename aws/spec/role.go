@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"time"
@@ -157,7 +156,7 @@ func (cmd *DeleteRole) ManualRun(renv env.Running) (any, error) {
 	}
 
 	start := time.Now()
-	output, err := cmd.api.DeleteRole(context.Background(), input)
+	output, err := cmd.api.DeleteRole(renv.RequestContext(), input)
 	cmd.logger.ExtraVerbosef("iam.DeleteRole call took %s", time.Since(start))
 	return output, err
 }

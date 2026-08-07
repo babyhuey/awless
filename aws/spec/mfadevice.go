@@ -60,7 +60,7 @@ func (cmd *CreateMfadevice) ManualRun(renv env.Running) (any, error) {
 
 	start := time.Now()
 	var output *iam.CreateVirtualMFADeviceOutput
-	output, err = cmd.api.CreateVirtualMFADevice(context.Background(), input)
+	output, err = cmd.api.CreateVirtualMFADevice(renv.RequestContext(), input)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}

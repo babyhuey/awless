@@ -23,7 +23,7 @@ func NewRunnerRequiredParamsOnly(tpl *template.Template, msg, tplPath string, fi
 }
 
 func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[string]any) *template.Runner {
-	runner := &template.Runner{}
+	runner := &template.Runner{Ctx: RootContext()}
 
 	runner.Template = tpl
 	runner.Locale = config.GetAWSRegion()

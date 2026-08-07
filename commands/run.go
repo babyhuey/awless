@@ -354,7 +354,7 @@ func runSyncFor(tplExec *template.TemplateExecution) {
 			logger.Infof("Resyncing %s ... (disable with --no-sync global flag)", joinSentence(cloud.Services(services).Names()))
 		}()
 	}
-	if _, err := sync.DefaultSyncer.Sync(services...); err != nil {
+	if _, err := sync.DefaultSyncer.Sync(RootContext(), services...); err != nil {
 		logger.ExtraVerbosef("%s", err.Error())
 	}
 }

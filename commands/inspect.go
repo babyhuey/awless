@@ -61,7 +61,7 @@ var inspectCmd = &cobra.Command{
 				services = append(services, srv)
 			}
 
-			if _, err := sync.DefaultSyncer.Sync(services...); err != nil {
+			if _, err := sync.DefaultSyncer.Sync(RootContext(), services...); err != nil {
 				logger.Verbose(err)
 			}
 		}

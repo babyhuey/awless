@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -124,7 +123,7 @@ func (sg *CheckScalinggroup) ManualRun(renv env.Running) (any, error) {
 		frequency:   5 * time.Second,
 		checkName:   "count",
 		fetchFunc: func() (string, error) {
-			output, err := sg.api.DescribeAutoScalingGroups(context.Background(), input)
+			output, err := sg.api.DescribeAutoScalingGroups(renv.RequestContext(), input)
 			if err != nil {
 				return "", err
 			}

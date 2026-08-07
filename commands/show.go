@@ -103,7 +103,7 @@ var showCmd = &cobra.Command{
 			}
 
 			logger.Verbosef("syncing services for %s type", resource.Type())
-			if _, err := sync.DefaultSyncer.Sync(services...); err != nil {
+			if _, err := sync.DefaultSyncer.Sync(RootContext(), services...); err != nil {
 				logger.Verbose(err)
 			}
 			resource, gph = findResourceInLocalGraphs(ref)
@@ -234,7 +234,7 @@ func runFullSync() {
 		services = append(services, srv)
 	}
 
-	if _, err := sync.DefaultSyncer.Sync(services...); err != nil {
+	if _, err := sync.DefaultSyncer.Sync(RootContext(), services...); err != nil {
 		logger.Verbose(err)
 	}
 }

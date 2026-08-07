@@ -18,7 +18,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -167,7 +166,7 @@ func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RegisterInstancesWithLoadBalancer(context.Background(), input)
+	output, err := cmd.api.RegisterInstancesWithLoadBalancer(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elb.RegisterInstancesWithLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -322,7 +321,7 @@ func (cmd *AttachElasticip) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AssociateAddress(context.Background(), input)
+	output, err := cmd.api.AssociateAddress(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.AssociateAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -367,7 +366,7 @@ func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]any) (any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AssociateAddress(context.Background(), input)
+	_, err := cmd.api.AssociateAddress(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -429,7 +428,7 @@ func (cmd *AttachInstance) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RegisterTargets(context.Background(), input)
+	output, err := cmd.api.RegisterTargets(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.RegisterTargets call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -580,7 +579,7 @@ func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]any) (
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AttachInternetGateway(context.Background(), input)
+	output, err := cmd.api.AttachInternetGateway(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.AttachInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -625,7 +624,7 @@ func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AttachInternetGateway(context.Background(), input)
+	_, err := cmd.api.AttachInternetGateway(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -687,7 +686,7 @@ func (cmd *AttachListener) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AddListenerCertificates(context.Background(), input)
+	output, err := cmd.api.AddListenerCertificates(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.AddListenerCertificates call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -769,7 +768,7 @@ func (cmd *AttachMfadevice) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.EnableMFADevice(context.Background(), input)
+	output, err := cmd.api.EnableMFADevice(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.EnableMFADevice call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -851,7 +850,7 @@ func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AttachNetworkInterface(context.Background(), input)
+	output, err := cmd.api.AttachNetworkInterface(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.AttachNetworkInterface call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -896,7 +895,7 @@ func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]an
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AttachNetworkInterface(context.Background(), input)
+	_, err := cmd.api.AttachNetworkInterface(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -1031,7 +1030,7 @@ func (cmd *AttachRole) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AddRoleToInstanceProfile(context.Background(), input)
+	output, err := cmd.api.AddRoleToInstanceProfile(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.AddRoleToInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1113,7 +1112,7 @@ func (cmd *AttachRoutetable) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AssociateRouteTable(context.Background(), input)
+	output, err := cmd.api.AssociateRouteTable(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.AssociateRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1158,7 +1157,7 @@ func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]any) (an
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AssociateRouteTable(context.Background(), input)
+	_, err := cmd.api.AssociateRouteTable(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -1293,7 +1292,7 @@ func (cmd *AttachUser) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AddUserToGroup(context.Background(), input)
+	output, err := cmd.api.AddUserToGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.AddUserToGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1375,7 +1374,7 @@ func (cmd *AttachVolume) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AttachVolume(context.Background(), input)
+	output, err := cmd.api.AttachVolume(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.AttachVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -1420,7 +1419,7 @@ func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AttachVolume(context.Background(), input)
+	_, err := cmd.api.AttachVolume(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -2285,7 +2284,7 @@ func (cmd *CopyImage) run(renv env.Running, params map[string]any) (any, error) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CopyImage(context.Background(), input)
+	output, err := cmd.api.CopyImage(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CopyImage call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2330,7 +2329,7 @@ func (cmd *CopyImage) dryRun(renv env.Running, params map[string]any) (any, erro
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CopyImage(context.Background(), input)
+	_, err := cmd.api.CopyImage(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -2392,7 +2391,7 @@ func (cmd *CopySnapshot) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CopySnapshot(context.Background(), input)
+	output, err := cmd.api.CopySnapshot(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CopySnapshot call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2437,7 +2436,7 @@ func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CopySnapshot(context.Background(), input)
+	_, err := cmd.api.CopySnapshot(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -2499,7 +2498,7 @@ func (cmd *CreateAccesskey) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateAccessKey(context.Background(), input)
+	output, err := cmd.api.CreateAccessKey(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.CreateAccessKey call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2581,7 +2580,7 @@ func (cmd *CreateAlarm) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutMetricAlarm(context.Background(), input)
+	output, err := cmd.api.PutMetricAlarm(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.PutMetricAlarm call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2663,7 +2662,7 @@ func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutScalingPolicy(context.Background(), input)
+	output, err := cmd.api.PutScalingPolicy(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.PutScalingPolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2745,7 +2744,7 @@ func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RegisterScalableTarget(context.Background(), input)
+	output, err := cmd.api.RegisterScalableTarget(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.RegisterScalableTarget call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2827,7 +2826,7 @@ func (cmd *CreateBucket) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateBucket(context.Background(), input)
+	output, err := cmd.api.CreateBucket(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("s3.CreateBucket call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -2982,7 +2981,7 @@ func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLoadBalancer(context.Background(), input)
+	output, err := cmd.api.CreateLoadBalancer(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elb.CreateLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3064,7 +3063,7 @@ func (cmd *CreateContainercluster) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateCluster(context.Background(), input)
+	output, err := cmd.api.CreateCluster(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ecs.CreateCluster call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3219,7 +3218,7 @@ func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]any) (an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateDBSubnetGroup(context.Background(), input)
+	output, err := cmd.api.CreateDBSubnetGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("rds.CreateDBSubnetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3374,7 +3373,7 @@ func (cmd *CreateElasticip) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.AllocateAddress(context.Background(), input)
+	output, err := cmd.api.AllocateAddress(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.AllocateAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3419,7 +3418,7 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.AllocateAddress(context.Background(), input)
+	_, err := cmd.api.AllocateAddress(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -3481,7 +3480,7 @@ func (cmd *CreateFunction) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateFunction(context.Background(), input)
+	output, err := cmd.api.CreateFunction(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("lambda.CreateFunction call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3563,7 +3562,7 @@ func (cmd *CreateGroup) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateGroup(context.Background(), input)
+	output, err := cmd.api.CreateGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.CreateGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3645,7 +3644,7 @@ func (cmd *CreateImage) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateImage(context.Background(), input)
+	output, err := cmd.api.CreateImage(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateImage call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3690,7 +3689,7 @@ func (cmd *CreateImage) dryRun(renv env.Running, params map[string]any) (any, er
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateImage(context.Background(), input)
+	_, err := cmd.api.CreateImage(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -3752,7 +3751,7 @@ func (cmd *CreateInstance) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RunInstances(context.Background(), input)
+	output, err := cmd.api.RunInstances(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.RunInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3797,7 +3796,7 @@ func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]any) (any,
 	}
 
 	start := time.Now()
-	_, err := cmd.api.RunInstances(context.Background(), input)
+	_, err := cmd.api.RunInstances(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -3859,7 +3858,7 @@ func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]any) (
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateInstanceProfile(context.Background(), input)
+	output, err := cmd.api.CreateInstanceProfile(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.CreateInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3941,7 +3940,7 @@ func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]any) (
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateInternetGateway(context.Background(), input)
+	output, err := cmd.api.CreateInternetGateway(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -3986,7 +3985,7 @@ func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateInternetGateway(context.Background(), input)
+	_, err := cmd.api.CreateInternetGateway(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -4048,7 +4047,7 @@ func (cmd *CreateKeypair) run(renv env.Running, params map[string]any) (any, err
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.ImportKeyPair(context.Background(), input)
+	output, err := cmd.api.ImportKeyPair(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.ImportKeyPair call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4130,7 +4129,7 @@ func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLaunchConfiguration(context.Background(), input)
+	output, err := cmd.api.CreateLaunchConfiguration(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("autoscaling.CreateLaunchConfiguration call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4212,7 +4211,7 @@ func (cmd *CreateListener) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateListener(context.Background(), input)
+	output, err := cmd.api.CreateListener(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.CreateListener call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4294,7 +4293,7 @@ func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLoadBalancer(context.Background(), input)
+	output, err := cmd.api.CreateLoadBalancer(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.CreateLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4376,7 +4375,7 @@ func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateLoginProfile(context.Background(), input)
+	output, err := cmd.api.CreateLoginProfile(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.CreateLoginProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4531,7 +4530,7 @@ func (cmd *CreateNatgateway) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateNatGateway(context.Background(), input)
+	output, err := cmd.api.CreateNatGateway(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateNatGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4613,7 +4612,7 @@ func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateNetworkInterface(context.Background(), input)
+	output, err := cmd.api.CreateNetworkInterface(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateNetworkInterface call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4658,7 +4657,7 @@ func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]an
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateNetworkInterface(context.Background(), input)
+	_, err := cmd.api.CreateNetworkInterface(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -4720,7 +4719,7 @@ func (cmd *CreatePolicy) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreatePolicy(context.Background(), input)
+	output, err := cmd.api.CreatePolicy(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.CreatePolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4802,7 +4801,7 @@ func (cmd *CreateQueue) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateQueue(context.Background(), input)
+	output, err := cmd.api.CreateQueue(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("sqs.CreateQueue call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -4957,7 +4956,7 @@ func (cmd *CreateRepository) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateRepository(context.Background(), input)
+	output, err := cmd.api.CreateRepository(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ecr.CreateRepository call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5112,7 +5111,7 @@ func (cmd *CreateRoute) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateRoute(context.Background(), input)
+	output, err := cmd.api.CreateRoute(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateRoute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5157,7 +5156,7 @@ func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]any) (any, er
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateRoute(context.Background(), input)
+	_, err := cmd.api.CreateRoute(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -5219,7 +5218,7 @@ func (cmd *CreateRoutetable) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateRouteTable(context.Background(), input)
+	output, err := cmd.api.CreateRouteTable(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5264,7 +5263,7 @@ func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]any) (an
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateRouteTable(context.Background(), input)
+	_, err := cmd.api.CreateRouteTable(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -5399,7 +5398,7 @@ func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateAutoScalingGroup(context.Background(), input)
+	output, err := cmd.api.CreateAutoScalingGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("autoscaling.CreateAutoScalingGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5481,7 +5480,7 @@ func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]any) (an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutScalingPolicy(context.Background(), input)
+	output, err := cmd.api.PutScalingPolicy(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("autoscaling.PutScalingPolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5563,7 +5562,7 @@ func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]any) (an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateSecurityGroup(context.Background(), input)
+	output, err := cmd.api.CreateSecurityGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateSecurityGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5608,7 +5607,7 @@ func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateSecurityGroup(context.Background(), input)
+	_, err := cmd.api.CreateSecurityGroup(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -5670,7 +5669,7 @@ func (cmd *CreateSnapshot) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateSnapshot(context.Background(), input)
+	output, err := cmd.api.CreateSnapshot(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateSnapshot call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5715,7 +5714,7 @@ func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateSnapshot(context.Background(), input)
+	_, err := cmd.api.CreateSnapshot(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -5777,7 +5776,7 @@ func (cmd *CreateStack) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateStack(context.Background(), input)
+	output, err := cmd.api.CreateStack(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("cloudformation.CreateStack call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5859,7 +5858,7 @@ func (cmd *CreateSubnet) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateSubnet(context.Background(), input)
+	output, err := cmd.api.CreateSubnet(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateSubnet call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -5904,7 +5903,7 @@ func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateSubnet(context.Background(), input)
+	_, err := cmd.api.CreateSubnet(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -5966,7 +5965,7 @@ func (cmd *CreateSubscription) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.Subscribe(context.Background(), input)
+	output, err := cmd.api.Subscribe(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("sns.Subscribe call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6117,7 +6116,7 @@ func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]any) (any,
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateTargetGroup(context.Background(), input)
+	output, err := cmd.api.CreateTargetGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.CreateTargetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6199,7 +6198,7 @@ func (cmd *CreateTopic) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateTopic(context.Background(), input)
+	output, err := cmd.api.CreateTopic(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("sns.CreateTopic call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6281,7 +6280,7 @@ func (cmd *CreateUser) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateUser(context.Background(), input)
+	output, err := cmd.api.CreateUser(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.CreateUser call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6363,7 +6362,7 @@ func (cmd *CreateVolume) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateVolume(context.Background(), input)
+	output, err := cmd.api.CreateVolume(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6408,7 +6407,7 @@ func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateVolume(context.Background(), input)
+	_, err := cmd.api.CreateVolume(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -6470,7 +6469,7 @@ func (cmd *CreateVpc) run(renv env.Running, params map[string]any) (any, error) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateVpc(context.Background(), input)
+	output, err := cmd.api.CreateVpc(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.CreateVpc call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6515,7 +6514,7 @@ func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 	}
 
 	start := time.Now()
-	_, err := cmd.api.CreateVpc(context.Background(), input)
+	_, err := cmd.api.CreateVpc(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -6577,7 +6576,7 @@ func (cmd *CreateZone) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreateHostedZone(context.Background(), input)
+	output, err := cmd.api.CreateHostedZone(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("route53.CreateHostedZone call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6659,7 +6658,7 @@ func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteAccessKey(context.Background(), input)
+	output, err := cmd.api.DeleteAccessKey(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteAccessKey call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6741,7 +6740,7 @@ func (cmd *DeleteAlarm) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteAlarms(context.Background(), input)
+	output, err := cmd.api.DeleteAlarms(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.DeleteAlarms call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6823,7 +6822,7 @@ func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteScalingPolicy(context.Background(), input)
+	output, err := cmd.api.DeleteScalingPolicy(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.DeleteScalingPolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6905,7 +6904,7 @@ func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeregisterScalableTarget(context.Background(), input)
+	output, err := cmd.api.DeregisterScalableTarget(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("applicationautoscaling.DeregisterScalableTarget call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -6987,7 +6986,7 @@ func (cmd *DeleteBucket) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteBucket(context.Background(), input)
+	output, err := cmd.api.DeleteBucket(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("s3.DeleteBucket call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7069,7 +7068,7 @@ func (cmd *DeleteCertificate) run(renv env.Running, params map[string]any) (any,
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteCertificate(context.Background(), input)
+	output, err := cmd.api.DeleteCertificate(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("acm.DeleteCertificate call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7151,7 +7150,7 @@ func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLoadBalancer(context.Background(), input)
+	output, err := cmd.api.DeleteLoadBalancer(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elb.DeleteLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7233,7 +7232,7 @@ func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteCluster(context.Background(), input)
+	output, err := cmd.api.DeleteCluster(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ecs.DeleteCluster call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7384,7 +7383,7 @@ func (cmd *DeleteDatabase) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteDBInstance(context.Background(), input)
+	output, err := cmd.api.DeleteDBInstance(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("rds.DeleteDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7466,7 +7465,7 @@ func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]any) (an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteDBSubnetGroup(context.Background(), input)
+	output, err := cmd.api.DeleteDBSubnetGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("rds.DeleteDBSubnetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7621,7 +7620,7 @@ func (cmd *DeleteElasticip) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.ReleaseAddress(context.Background(), input)
+	output, err := cmd.api.ReleaseAddress(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.ReleaseAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7666,7 +7665,7 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]any) (any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.ReleaseAddress(context.Background(), input)
+	_, err := cmd.api.ReleaseAddress(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -7728,7 +7727,7 @@ func (cmd *DeleteFunction) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteFunction(context.Background(), input)
+	output, err := cmd.api.DeleteFunction(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("lambda.DeleteFunction call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7810,7 +7809,7 @@ func (cmd *DeleteGroup) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteGroup(context.Background(), input)
+	output, err := cmd.api.DeleteGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -7961,7 +7960,7 @@ func (cmd *DeleteInstance) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.TerminateInstances(context.Background(), input)
+	output, err := cmd.api.TerminateInstances(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.TerminateInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8006,7 +8005,7 @@ func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]any) (any,
 	}
 
 	start := time.Now()
-	_, err := cmd.api.TerminateInstances(context.Background(), input)
+	_, err := cmd.api.TerminateInstances(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -8068,7 +8067,7 @@ func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]any) (
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteInstanceProfile(context.Background(), input)
+	output, err := cmd.api.DeleteInstanceProfile(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8150,7 +8149,7 @@ func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]any) (
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteInternetGateway(context.Background(), input)
+	output, err := cmd.api.DeleteInternetGateway(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8195,7 +8194,7 @@ func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteInternetGateway(context.Background(), input)
+	_, err := cmd.api.DeleteInternetGateway(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -8257,7 +8256,7 @@ func (cmd *DeleteKeypair) run(renv env.Running, params map[string]any) (any, err
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteKeyPair(context.Background(), input)
+	output, err := cmd.api.DeleteKeyPair(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteKeyPair call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8302,7 +8301,7 @@ func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]any) (any, 
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteKeyPair(context.Background(), input)
+	_, err := cmd.api.DeleteKeyPair(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -8364,7 +8363,7 @@ func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLaunchConfiguration(context.Background(), input)
+	output, err := cmd.api.DeleteLaunchConfiguration(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("autoscaling.DeleteLaunchConfiguration call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8446,7 +8445,7 @@ func (cmd *DeleteListener) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteListener(context.Background(), input)
+	output, err := cmd.api.DeleteListener(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeleteListener call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8528,7 +8527,7 @@ func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLoadBalancer(context.Background(), input)
+	output, err := cmd.api.DeleteLoadBalancer(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeleteLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8610,7 +8609,7 @@ func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteLoginProfile(context.Background(), input)
+	output, err := cmd.api.DeleteLoginProfile(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteLoginProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8692,7 +8691,7 @@ func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteVirtualMFADevice(context.Background(), input)
+	output, err := cmd.api.DeleteVirtualMFADevice(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteVirtualMFADevice call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8774,7 +8773,7 @@ func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteNatGateway(context.Background(), input)
+	output, err := cmd.api.DeleteNatGateway(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteNatGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8856,7 +8855,7 @@ func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]any) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteNetworkInterface(context.Background(), input)
+	output, err := cmd.api.DeleteNetworkInterface(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteNetworkInterface call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -8901,7 +8900,7 @@ func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]an
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteNetworkInterface(context.Background(), input)
+	_, err := cmd.api.DeleteNetworkInterface(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -8963,7 +8962,7 @@ func (cmd *DeletePolicy) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeletePolicy(context.Background(), input)
+	output, err := cmd.api.DeletePolicy(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeletePolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9045,7 +9044,7 @@ func (cmd *DeleteQueue) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteQueue(context.Background(), input)
+	output, err := cmd.api.DeleteQueue(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("sqs.DeleteQueue call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9200,7 +9199,7 @@ func (cmd *DeleteRepository) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteRepository(context.Background(), input)
+	output, err := cmd.api.DeleteRepository(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ecr.DeleteRepository call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9355,7 +9354,7 @@ func (cmd *DeleteRoute) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteRoute(context.Background(), input)
+	output, err := cmd.api.DeleteRoute(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteRoute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9400,7 +9399,7 @@ func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]any) (any, er
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteRoute(context.Background(), input)
+	_, err := cmd.api.DeleteRoute(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -9462,7 +9461,7 @@ func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteRouteTable(context.Background(), input)
+	output, err := cmd.api.DeleteRouteTable(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9507,7 +9506,7 @@ func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]any) (an
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteRouteTable(context.Background(), input)
+	_, err := cmd.api.DeleteRouteTable(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -9569,7 +9568,7 @@ func (cmd *DeleteS3object) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteObject(context.Background(), input)
+	output, err := cmd.api.DeleteObject(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("s3.DeleteObject call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9651,7 +9650,7 @@ func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteAutoScalingGroup(context.Background(), input)
+	output, err := cmd.api.DeleteAutoScalingGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("autoscaling.DeleteAutoScalingGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9733,7 +9732,7 @@ func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]any) (an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeletePolicy(context.Background(), input)
+	output, err := cmd.api.DeletePolicy(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("autoscaling.DeletePolicy call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9815,7 +9814,7 @@ func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]any) (an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteSecurityGroup(context.Background(), input)
+	output, err := cmd.api.DeleteSecurityGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteSecurityGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9860,7 +9859,7 @@ func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteSecurityGroup(context.Background(), input)
+	_, err := cmd.api.DeleteSecurityGroup(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -9922,7 +9921,7 @@ func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteSnapshot(context.Background(), input)
+	output, err := cmd.api.DeleteSnapshot(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteSnapshot call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -9967,7 +9966,7 @@ func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteSnapshot(context.Background(), input)
+	_, err := cmd.api.DeleteSnapshot(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -10029,7 +10028,7 @@ func (cmd *DeleteStack) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteStack(context.Background(), input)
+	output, err := cmd.api.DeleteStack(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("cloudformation.DeleteStack call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10111,7 +10110,7 @@ func (cmd *DeleteSubnet) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteSubnet(context.Background(), input)
+	output, err := cmd.api.DeleteSubnet(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteSubnet call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10156,7 +10155,7 @@ func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteSubnet(context.Background(), input)
+	_, err := cmd.api.DeleteSubnet(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -10218,7 +10217,7 @@ func (cmd *DeleteSubscription) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.Unsubscribe(context.Background(), input)
+	output, err := cmd.api.Unsubscribe(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("sns.Unsubscribe call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10369,7 +10368,7 @@ func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]any) (any,
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteTargetGroup(context.Background(), input)
+	output, err := cmd.api.DeleteTargetGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeleteTargetGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10451,7 +10450,7 @@ func (cmd *DeleteTopic) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteTopic(context.Background(), input)
+	output, err := cmd.api.DeleteTopic(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("sns.DeleteTopic call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10533,7 +10532,7 @@ func (cmd *DeleteUser) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteUser(context.Background(), input)
+	output, err := cmd.api.DeleteUser(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeleteUser call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10615,7 +10614,7 @@ func (cmd *DeleteVolume) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteVolume(context.Background(), input)
+	output, err := cmd.api.DeleteVolume(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10660,7 +10659,7 @@ func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteVolume(context.Background(), input)
+	_, err := cmd.api.DeleteVolume(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -10722,7 +10721,7 @@ func (cmd *DeleteVpc) run(renv env.Running, params map[string]any) (any, error) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteVpc(context.Background(), input)
+	output, err := cmd.api.DeleteVpc(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DeleteVpc call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10767,7 +10766,7 @@ func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteVpc(context.Background(), input)
+	_, err := cmd.api.DeleteVpc(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -10829,7 +10828,7 @@ func (cmd *DeleteZone) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeleteHostedZone(context.Background(), input)
+	output, err := cmd.api.DeleteHostedZone(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("route53.DeleteHostedZone call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -10984,7 +10983,7 @@ func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeregisterInstancesFromLoadBalancer(context.Background(), input)
+	output, err := cmd.api.DeregisterInstancesFromLoadBalancer(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elb.DeregisterInstancesFromLoadBalancer call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11139,7 +11138,7 @@ func (cmd *DetachElasticip) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DisassociateAddress(context.Background(), input)
+	output, err := cmd.api.DisassociateAddress(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DisassociateAddress call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11184,7 +11183,7 @@ func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]any) (any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DisassociateAddress(context.Background(), input)
+	_, err := cmd.api.DisassociateAddress(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -11246,7 +11245,7 @@ func (cmd *DetachInstance) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeregisterTargets(context.Background(), input)
+	output, err := cmd.api.DeregisterTargets(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elbv2.DeregisterTargets call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11401,7 +11400,7 @@ func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]any) (
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DetachInternetGateway(context.Background(), input)
+	output, err := cmd.api.DetachInternetGateway(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DetachInternetGateway call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11446,7 +11445,7 @@ func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DetachInternetGateway(context.Background(), input)
+	_, err := cmd.api.DetachInternetGateway(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -11508,7 +11507,7 @@ func (cmd *DetachMfadevice) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DeactivateMFADevice(context.Background(), input)
+	output, err := cmd.api.DeactivateMFADevice(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.DeactivateMFADevice call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11732,7 +11731,7 @@ func (cmd *DetachRole) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RemoveRoleFromInstanceProfile(context.Background(), input)
+	output, err := cmd.api.RemoveRoleFromInstanceProfile(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.RemoveRoleFromInstanceProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11814,7 +11813,7 @@ func (cmd *DetachRoutetable) run(renv env.Running, params map[string]any) (any, 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DisassociateRouteTable(context.Background(), input)
+	output, err := cmd.api.DisassociateRouteTable(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DisassociateRouteTable call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -11859,7 +11858,7 @@ func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]any) (an
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DisassociateRouteTable(context.Background(), input)
+	_, err := cmd.api.DisassociateRouteTable(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -11994,7 +11993,7 @@ func (cmd *DetachUser) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RemoveUserFromGroup(context.Background(), input)
+	output, err := cmd.api.RemoveUserFromGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.RemoveUserFromGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12076,7 +12075,7 @@ func (cmd *DetachVolume) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DetachVolume(context.Background(), input)
+	output, err := cmd.api.DetachVolume(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.DetachVolume call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12121,7 +12120,7 @@ func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.DetachVolume(context.Background(), input)
+	_, err := cmd.api.DetachVolume(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -12183,7 +12182,7 @@ func (cmd *ImportImage) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.ImportImage(context.Background(), input)
+	output, err := cmd.api.ImportImage(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.ImportImage call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12228,7 +12227,7 @@ func (cmd *ImportImage) dryRun(renv env.Running, params map[string]any) (any, er
 	}
 
 	start := time.Now()
-	_, err := cmd.api.ImportImage(context.Background(), input)
+	_, err := cmd.api.ImportImage(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -12290,7 +12289,7 @@ func (cmd *RestartDatabase) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RebootDBInstance(context.Background(), input)
+	output, err := cmd.api.RebootDBInstance(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("rds.RebootDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12372,7 +12371,7 @@ func (cmd *RestartInstance) run(renv env.Running, params map[string]any) (any, e
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.RebootInstances(context.Background(), input)
+	output, err := cmd.api.RebootInstances(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.RebootInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12417,7 +12416,7 @@ func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]any) (any
 	}
 
 	start := time.Now()
-	_, err := cmd.api.RebootInstances(context.Background(), input)
+	_, err := cmd.api.RebootInstances(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -12479,7 +12478,7 @@ func (cmd *StartAlarm) run(renv env.Running, params map[string]any) (any, error)
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.EnableAlarmActions(context.Background(), input)
+	output, err := cmd.api.EnableAlarmActions(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.EnableAlarmActions call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12634,7 +12633,7 @@ func (cmd *StartDatabase) run(renv env.Running, params map[string]any) (any, err
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.StartDBInstance(context.Background(), input)
+	output, err := cmd.api.StartDBInstance(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("rds.StartDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12716,7 +12715,7 @@ func (cmd *StartInstance) run(renv env.Running, params map[string]any) (any, err
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.StartInstances(context.Background(), input)
+	output, err := cmd.api.StartInstances(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.StartInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12761,7 +12760,7 @@ func (cmd *StartInstance) dryRun(renv env.Running, params map[string]any) (any, 
 	}
 
 	start := time.Now()
-	_, err := cmd.api.StartInstances(context.Background(), input)
+	_, err := cmd.api.StartInstances(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -12823,7 +12822,7 @@ func (cmd *StopAlarm) run(renv env.Running, params map[string]any) (any, error) 
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.DisableAlarmActions(context.Background(), input)
+	output, err := cmd.api.DisableAlarmActions(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("cloudwatch.DisableAlarmActions call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -12978,7 +12977,7 @@ func (cmd *StopDatabase) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.StopDBInstance(context.Background(), input)
+	output, err := cmd.api.StopDBInstance(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("rds.StopDBInstance call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13060,7 +13059,7 @@ func (cmd *StopInstance) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.StopInstances(context.Background(), input)
+	output, err := cmd.api.StopInstances(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.StopInstances call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13105,7 +13104,7 @@ func (cmd *StopInstance) dryRun(renv env.Running, params map[string]any) (any, e
 	}
 
 	start := time.Now()
-	_, err := cmd.api.StopInstances(context.Background(), input)
+	_, err := cmd.api.StopInstances(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -13240,7 +13239,7 @@ func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.ConfigureHealthCheck(context.Background(), input)
+	output, err := cmd.api.ConfigureHealthCheck(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("elb.ConfigureHealthCheck call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13322,7 +13321,7 @@ func (cmd *UpdateContainertask) run(renv env.Running, params map[string]any) (an
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateService(context.Background(), input)
+	output, err := cmd.api.UpdateService(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ecs.UpdateService call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13546,7 +13545,7 @@ func (cmd *UpdateInstance) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.ModifyInstanceAttribute(context.Background(), input)
+	output, err := cmd.api.ModifyInstanceAttribute(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.ModifyInstanceAttribute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13591,7 +13590,7 @@ func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]any) (any,
 	}
 
 	start := time.Now()
-	_, err := cmd.api.ModifyInstanceAttribute(context.Background(), input)
+	_, err := cmd.api.ModifyInstanceAttribute(renv.RequestContext(), input)
 	var ae smithy.APIError
 	if errors.As(err, &ae) {
 		switch code := ae.ErrorCode(); {
@@ -13653,7 +13652,7 @@ func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateLoginProfile(context.Background(), input)
+	output, err := cmd.api.UpdateLoginProfile(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.UpdateLoginProfile call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13735,7 +13734,7 @@ func (cmd *UpdatePolicy) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.CreatePolicyVersion(context.Background(), input)
+	output, err := cmd.api.CreatePolicyVersion(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("iam.CreatePolicyVersion call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13890,7 +13889,7 @@ func (cmd *UpdateS3object) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.PutObjectAcl(context.Background(), input)
+	output, err := cmd.api.PutObjectAcl(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("s3.PutObjectAcl call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -13972,7 +13971,7 @@ func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]any) (any
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateAutoScalingGroup(context.Background(), input)
+	output, err := cmd.api.UpdateAutoScalingGroup(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("autoscaling.UpdateAutoScalingGroup call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -14123,7 +14122,7 @@ func (cmd *UpdateStack) run(renv env.Running, params map[string]any) (any, error
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.UpdateStack(context.Background(), input)
+	output, err := cmd.api.UpdateStack(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("cloudformation.UpdateStack call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -14205,7 +14204,7 @@ func (cmd *UpdateSubnet) run(renv env.Running, params map[string]any) (any, erro
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.ModifySubnetAttribute(context.Background(), input)
+	output, err := cmd.api.ModifySubnetAttribute(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("ec2.ModifySubnetAttribute call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)

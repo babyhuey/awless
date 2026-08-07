@@ -25,8 +25,6 @@ import (
 	"github.com/bootswithdefer/awless/template/env"
 	"github.com/bootswithdefer/awless/template/params"
 
-	"context"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
@@ -178,7 +176,7 @@ func (cmd *CheckDistribution) ManualRun(renv env.Running) (any, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.GetDistribution(context.Background(), input)
+			output, err := cmd.api.GetDistribution(renv.RequestContext(), input)
 			if err != nil {
 				var awserr smithy.APIError
 				if errors.As(err, &awserr) {
@@ -226,7 +224,7 @@ func (cmd *UpdateDistribution) ParamsSpec() params.Spec {
 }
 
 func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
-	distribOutput, err := cmd.api.GetDistribution(context.Background(), &cloudfront.GetDistributionInput{
+	distribOutput, err := cmd.api.GetDistribution(renv.RequestContext(), &cloudfront.GetDistributionInput{
 		Id: cmd.Id,
 	})
 	if err != nil {
@@ -340,7 +338,7 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 
 	start := time.Now()
 	var output *cloudfront.UpdateDistributionOutput
-	output, err = cmd.api.UpdateDistribution(context.Background(), input)
+	output, err = cmd.api.UpdateDistribution(renv.RequestContext(), input)
 	cmd.logger.ExtraVerbosef("cloudfront.UpdateDistribution call took %s", time.Since(start))
 	return output, err
 }
@@ -408,7 +406,7 @@ func (cmd *DeleteDistribution) ManualRun(renv env.Running) (any, error) {
 	}
 
 	start := time.Now()
-	output, err := cmd.api.DeleteDistribution(context.Background(), input)
+	output, err := cmd.api.DeleteDistribution(renv.RequestContext(), input)
 	cmd.logger.ExtraVerbosef("cloudfront.DeleteDistribution call took %s", time.Since(start))
 	return output, err
 }

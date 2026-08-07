@@ -25,8 +25,6 @@ import (
 	"github.com/bootswithdefer/awless/template/env"
 	"github.com/bootswithdefer/awless/template/params"
 
-	"context"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -62,7 +60,7 @@ func (cmd *CreateTag) dryRun(renv env.Running, params map[string]any) (any, erro
 	input.Tags = []ec2types.Tag{{Key: cmd.Key, Value: cmd.Value}}
 
 	start := time.Now()
-	_, err := cmd.api.CreateTags(context.Background(), input)
+	_, err := cmd.api.CreateTags(renv.RequestContext(), input)
 	var awsErr smithy.APIError
 	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
@@ -86,7 +84,7 @@ func (cmd *CreateTag) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 	var err error
 	for attempt := 0; attempt < 5; attempt++ {
-		_, err = cmd.api.CreateTags(context.Background(), input)
+		_, err = cmd.api.CreateTags(renv.RequestContext(), input)
 		if err == nil {
 			break
 		}
@@ -128,7 +126,7 @@ func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]any) (any, erro
 	input.Tags = []ec2types.Tag{{Key: cmd.Key, Value: cmd.Value}}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteTags(context.Background(), input)
+	_, err := cmd.api.DeleteTags(renv.RequestContext(), input)
 	var awsErr smithy.APIError
 	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
@@ -150,7 +148,7 @@ func (cmd *DeleteTag) ManualRun(renv env.Running) (any, error) {
 	input.Tags = []ec2types.Tag{{Key: cmd.Key, Value: cmd.Value}}
 
 	start := time.Now()
-	_, err := cmd.api.DeleteTags(context.Background(), input)
+	_, err := cmd.api.DeleteTags(renv.RequestContext(), input)
 	cmd.logger.ExtraVerbosef("ec2.DeleteTags call took %s", time.Since(start))
 	return nil, err
 }

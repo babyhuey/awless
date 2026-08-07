@@ -120,13 +120,13 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 
 	switch ii := input.(type) {
 	case *ec2.AuthorizeSecurityGroupIngressInput:
-		_, err = cmd.api.AuthorizeSecurityGroupIngress(context.Background(), ii)
+		_, err = cmd.api.AuthorizeSecurityGroupIngress(renv.RequestContext(), ii)
 	case *ec2.RevokeSecurityGroupIngressInput:
-		_, err = cmd.api.RevokeSecurityGroupIngress(context.Background(), ii)
+		_, err = cmd.api.RevokeSecurityGroupIngress(renv.RequestContext(), ii)
 	case *ec2.AuthorizeSecurityGroupEgressInput:
-		_, err = cmd.api.AuthorizeSecurityGroupEgress(context.Background(), ii)
+		_, err = cmd.api.AuthorizeSecurityGroupEgress(renv.RequestContext(), ii)
 	case *ec2.RevokeSecurityGroupEgressInput:
-		_, err = cmd.api.RevokeSecurityGroupEgress(context.Background(), ii)
+		_, err = cmd.api.RevokeSecurityGroupEgress(renv.RequestContext(), ii)
 	}
 	var awsErr smithy.APIError
 	if errors.As(err, &awsErr) {
@@ -179,16 +179,16 @@ func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 	switch ii := input.(type) {
 	case *ec2.AuthorizeSecurityGroupIngressInput:
-		output, err = cmd.api.AuthorizeSecurityGroupIngress(context.Background(), ii)
+		output, err = cmd.api.AuthorizeSecurityGroupIngress(renv.RequestContext(), ii)
 		cmd.logger.ExtraVerbosef("ec2.AuthorizeSecurityGroupIngress call took %s", time.Since(start))
 	case *ec2.RevokeSecurityGroupIngressInput:
-		output, err = cmd.api.RevokeSecurityGroupIngress(context.Background(), ii)
+		output, err = cmd.api.RevokeSecurityGroupIngress(renv.RequestContext(), ii)
 		cmd.logger.ExtraVerbosef("ec2.RevokeSecurityGroupIngress call took %s", time.Since(start))
 	case *ec2.AuthorizeSecurityGroupEgressInput:
-		output, err = cmd.api.AuthorizeSecurityGroupEgress(context.Background(), ii)
+		output, err = cmd.api.AuthorizeSecurityGroupEgress(renv.RequestContext(), ii)
 		cmd.logger.ExtraVerbosef("ec2.AuthorizeSecurityGroupEgress call took %s", time.Since(start))
 	case *ec2.RevokeSecurityGroupEgressInput:
-		output, err = cmd.api.RevokeSecurityGroupEgress(context.Background(), ii)
+		output, err = cmd.api.RevokeSecurityGroupEgress(renv.RequestContext(), ii)
 		cmd.logger.ExtraVerbosef("ec2.RevokeSecurityGroupEgress call took %s", time.Since(start))
 	}
 
@@ -237,7 +237,7 @@ func (cmd *CheckSecuritygroup) ManualRun(renv env.Running) (any, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeNetworkInterfaces(context.Background(), input)
+			output, err := cmd.api.DescribeNetworkInterfaces(renv.RequestContext(), input)
 			if err != nil {
 				return "", err
 			}

@@ -134,7 +134,7 @@ var listSpecificResourceCmd = func(resType string) *cobra.Command {
 			} else {
 				srv, err := cloud.GetServiceForType(resType)
 				exitOn(err)
-				fetchContext := context.WithValue(context.Background(), contextKey("force"), true)
+				fetchContext := context.WithValue(RootContext(), contextKey("force"), true)
 				g, err = srv.FetchByType(context.WithValue(fetchContext, contextKey("filters"), listingFiltersFlag), resType)
 				exitOn(err)
 			}

@@ -1,6 +1,7 @@
 package template
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -8,6 +9,14 @@ import (
 	"github.com/bootswithdefer/awless/logger"
 	"github.com/bootswithdefer/awless/template/env"
 )
+
+// Context returns the runner's context, never nil.
+func (ru *Runner) Context() context.Context {
+	if ru.Ctx == nil {
+		return context.Background()
+	}
+	return ru.Ctx
+}
 
 type Runner struct {
 	Template                               *Template
@@ -19,6 +28,10 @@ type Runner struct {
 	CmdLookuper                            func(tokens ...string) any
 	Validators                             []Validator
 	ParamsSuggested                        int
+
+	// Ctx is the caller's context, propagated to every AWS call the template
+	// makes. Leave nil in tests; Context() falls back to context.Background().
+	Ctx context.Context
 
 	BeforeRun func(*TemplateExecution) (bool, error)
 	AfterRun  func(*TemplateExecution) error
@@ -61,6 +74,9 @@ func (ru *Runner) Run() error {
 	}
 
 	renv := NewRunEnv(cenv)
+	// Cancellation reaches every AWS call made by the commands through here; see
+	// env.Running.RequestContext.
+	renv.SetRequestContext(ru.Context())
 	if _, err = tplExec.Template.DryRun(renv); err != nil {
 		var t *Errors
 		if errors.As(err, &t) {

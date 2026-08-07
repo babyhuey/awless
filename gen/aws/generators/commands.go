@@ -303,7 +303,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]any) (any, er
 		v.PostProcessInput(input)
 	}
 	start := time.Now()
-	output, err := cmd.api.{{ $tag.Call }}(context.Background(), input)
+	output, err := cmd.api.{{ $tag.Call }}(renv.RequestContext(), input)
 	renv.Log().ExtraVerbosef("{{ $tag.API }}.{{ $tag.Call }} call took %s", time.Since(start))
 	if err != nil {
 		return nil, decorateAWSError(err)
@@ -357,7 +357,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]any) (any, er
 		}
 
 		start := time.Now()
-		_, err := cmd.api.{{ $tag.Call }}(context.Background(), input);
+		_, err := cmd.api.{{ $tag.Call }}(renv.RequestContext(), input);
 		var ae smithy.APIError
 		if errors.As(err, &ae) {
 			switch code := ae.ErrorCode(); {

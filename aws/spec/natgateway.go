@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -89,7 +88,7 @@ func (cmd *CheckNatgateway) ManualRun(renv env.Running) (any, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeNatGateways(context.Background(), input)
+			output, err := cmd.api.DescribeNatGateways(renv.RequestContext(), input)
 			if err != nil {
 				var awserr smithy.APIError
 				if errors.As(err, &awserr) {

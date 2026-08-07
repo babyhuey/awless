@@ -22,8 +22,6 @@ import (
 	"github.com/bootswithdefer/awless/template/env"
 	"github.com/bootswithdefer/awless/template/params"
 
-	"context"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
@@ -120,7 +118,7 @@ func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
 			return nil, err
 		}
 		start := time.Now()
-		if _, err = tg.api.ModifyTargetGroupAttributes(context.Background(), attrsInput); err != nil {
+		if _, err = tg.api.ModifyTargetGroupAttributes(renv.RequestContext(), attrsInput); err != nil {
 			return nil, err
 		}
 		tg.logger.ExtraVerbosef("elbv2.ModifyTargetGroupAttributes call took %s", time.Since(start))
@@ -182,7 +180,7 @@ func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
 			return nil, err
 		}
 		start := time.Now()
-		output, err := tg.api.ModifyTargetGroup(context.Background(), input)
+		output, err := tg.api.ModifyTargetGroup(renv.RequestContext(), input)
 		tg.logger.ExtraVerbosef("elbv2.ModifyTargetGroup call took %s", time.Since(start))
 		return output, err
 	}

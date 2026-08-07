@@ -188,14 +188,14 @@ func (cmd *DeletePolicy) ParamsSpec() params.Spec {
 
 func (cmd *DeletePolicy) BeforeRun(renv env.Running) error {
 	if BoolValue(cmd.AllVersions) {
-		list, err := cmd.api.ListPolicyVersions(context.Background(), &iam.ListPolicyVersionsInput{PolicyArn: cmd.Arn})
+		list, err := cmd.api.ListPolicyVersions(renv.RequestContext(), &iam.ListPolicyVersionsInput{PolicyArn: cmd.Arn})
 		if err != nil {
 			return fmt.Errorf("list all policy versions: %w", err)
 		}
 		for _, v := range list.Versions {
 			if !v.IsDefaultVersion {
 				cmd.logger.Verbosef("deleting version '%s' of policy '%s'", aws.ToString(v.VersionId), StringValue(cmd.Arn))
-				if _, err := cmd.api.DeletePolicyVersion(context.Background(), &iam.DeletePolicyVersionInput{PolicyArn: cmd.Arn, VersionId: v.VersionId}); err != nil {
+				if _, err := cmd.api.DeletePolicyVersion(renv.RequestContext(), &iam.DeletePolicyVersionInput{PolicyArn: cmd.Arn, VersionId: v.VersionId}); err != nil {
 					return fmt.Errorf("delete version %s: %w", aws.ToString(v.VersionId), err)
 				}
 			}
@@ -248,21 +248,21 @@ func (cmd *AttachPolicy) ManualRun(renv env.Running) (any, error) {
 		input := &iam.AttachUserPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.UserName = cmd.User
-		output, err := cmd.api.AttachUserPolicy(context.Background(), input)
+		output, err := cmd.api.AttachUserPolicy(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("ec2.AttachUserPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Group != nil:
 		input := &iam.AttachGroupPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.GroupName = cmd.Group
-		output, err := cmd.api.AttachGroupPolicy(context.Background(), input)
+		output, err := cmd.api.AttachGroupPolicy(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("ec2.AttachGroupPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Role != nil:
 		input := &iam.AttachRolePolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.RoleName = cmd.Role
-		output, err := cmd.api.AttachRolePolicy(context.Background(), input)
+		output, err := cmd.api.AttachRolePolicy(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("ec2.AttachRolePolicy call took %s", time.Since(start))
 		return output, err
 	default:
@@ -297,21 +297,21 @@ func (cmd *DetachPolicy) ManualRun(renv env.Running) (any, error) {
 		input := &iam.DetachUserPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.UserName = cmd.User
-		output, err := cmd.api.DetachUserPolicy(context.Background(), input)
+		output, err := cmd.api.DetachUserPolicy(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("ec2.DetachUserPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Group != nil:
 		input := &iam.DetachGroupPolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.GroupName = cmd.Group
-		output, err := cmd.api.DetachGroupPolicy(context.Background(), input)
+		output, err := cmd.api.DetachGroupPolicy(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("ec2.DetachGroupPolicy call took %s", time.Since(start))
 		return output, err
 	case cmd.Role != nil:
 		input := &iam.DetachRolePolicyInput{}
 		input.PolicyArn = cmd.Arn
 		input.RoleName = cmd.Role
-		output, err := cmd.api.DetachRolePolicy(context.Background(), input)
+		output, err := cmd.api.DetachRolePolicy(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("ec2.DetachRolePolicy call took %s", time.Since(start))
 		return output, err
 	default:

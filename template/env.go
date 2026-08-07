@@ -1,6 +1,7 @@
 package template
 
 import (
+	"context"
 	"sync"
 
 	"github.com/bootswithdefer/awless/logger"
@@ -16,6 +17,7 @@ type runEnv struct {
 	log    *logger.Logger
 	dryRun bool
 	ctx    map[string]any
+	reqCtx context.Context
 }
 
 func NewRunEnv(cenv env.Compiling, context ...map[string]any) env.Running {
@@ -33,6 +35,19 @@ func NewRunEnv(cenv env.Compiling, context ...map[string]any) env.Running {
 	renv.ctx["References"] = cenv.Get(env.RESOLVED_VARS) // retro-compatibility with v0.1.2
 
 	return renv
+}
+
+// RequestContext returns the context for outbound AWS calls. It never returns
+// nil, so callers can use it unconditionally.
+func (e *runEnv) RequestContext() context.Context {
+	if e.reqCtx == nil {
+		return context.Background()
+	}
+	return e.reqCtx
+}
+
+func (e *runEnv) SetRequestContext(ctx context.Context) {
+	e.reqCtx = ctx
 }
 
 func (e *runEnv) IsDryRun() bool {

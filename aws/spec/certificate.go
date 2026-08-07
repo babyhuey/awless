@@ -25,8 +25,6 @@ import (
 	"github.com/bootswithdefer/awless/template/env"
 	"github.com/bootswithdefer/awless/template/params"
 
-	"context"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/acm"
 	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
@@ -90,7 +88,7 @@ func (cmd *CreateCertificate) ManualRun(renv env.Running) (any, error) {
 
 	start := time.Now()
 	var output *acm.RequestCertificateOutput
-	output, err = cmd.api.RequestCertificate(context.Background(), input)
+	output, err = cmd.api.RequestCertificate(renv.RequestContext(), input)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +148,7 @@ func (cmd *CheckCertificate) ManualRun(renv env.Running) (any, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeCertificate(context.Background(), input)
+			output, err := cmd.api.DescribeCertificate(renv.RequestContext(), input)
 			if err != nil {
 				var awserr smithy.APIError
 				if errors.As(err, &awserr) {

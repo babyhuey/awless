@@ -110,7 +110,7 @@ func (cmd *UpdateImage) ManualRun(renv env.Running) (any, error) {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %w", err)
 	}
 	start := time.Now()
-	output, err := cmd.api.ModifyImageAttribute(context.Background(), input)
+	output, err := cmd.api.ModifyImageAttribute(renv.RequestContext(), input)
 	cmd.logger.ExtraVerbosef("ec2.ModifyImageAttributeInput call took %s", time.Since(start))
 	return output, err
 }
@@ -129,7 +129,7 @@ func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]any) (any, er
 	}
 
 	start := time.Now()
-	_, err = cmd.api.ModifyImageAttribute(context.Background(), input)
+	_, err = cmd.api.ModifyImageAttribute(renv.RequestContext(), input)
 	var awsErr smithy.APIError
 	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
@@ -230,7 +230,7 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]any) (any, er
 		}
 	}
 
-	_, err := cmd.api.DeregisterImage(context.Background(), input)
+	_, err := cmd.api.DeregisterImage(renv.RequestContext(), input)
 	var awsErr smithy.APIError
 	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
@@ -261,7 +261,7 @@ func (cmd *DeleteImage) ManualRun(renv env.Running) (any, error) {
 
 	start := time.Now()
 	var output *ec2.DeregisterImageOutput
-	if output, err = cmd.api.DeregisterImage(context.Background(), input); err != nil {
+	if output, err = cmd.api.DeregisterImage(renv.RequestContext(), input); err != nil {
 		return nil, err
 	}
 	cmd.logger.ExtraVerbosef("ec2.DeregisterImage call took %s", time.Since(start))

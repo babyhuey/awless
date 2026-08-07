@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -13,7 +14,7 @@ func TestNoOpSyncer(t *testing.T) {
 		t.Fatal("expected non-nil syncer")
 	}
 
-	result, err := s.Sync()
+	result, err := s.Sync(context.Background())
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -29,7 +30,7 @@ func TestNoOpSyncerWithServices(t *testing.T) {
 	s := NoOpSyncer()
 
 	// Even with services passed, NoOpSyncer should return empty map and no error
-	result, err := s.Sync()
+	result, err := s.Sync(context.Background())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

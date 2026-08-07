@@ -16,7 +16,6 @@ limitations under the License.
 package awsspec
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -150,7 +149,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output any, err error) {
 			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceReadReplicaInput: %w", ierr)
 		}
 		start := time.Now()
-		output, err = cmd.api.CreateDBInstanceReadReplica(context.Background(), input)
+		output, err = cmd.api.CreateDBInstanceReadReplica(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("rds.CreateDBInstanceReadReplica call took %s", time.Since(start))
 	} else {
 		input := &rds.CreateDBInstanceInput{}
@@ -158,7 +157,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output any, err error) {
 			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceInput: %w", ierr)
 		}
 		start := time.Now()
-		output, err = cmd.api.CreateDBInstance(context.Background(), input)
+		output, err = cmd.api.CreateDBInstance(renv.RequestContext(), input)
 		cmd.logger.ExtraVerbosef("rds.CreateDBInstance call took %s", time.Since(start))
 	}
 	if err != nil {
@@ -227,7 +226,7 @@ func (cmd *CheckDatabase) ManualRun(renv env.Running) (any, error) {
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
-			output, err := cmd.api.DescribeDBInstances(context.Background(), input)
+			output, err := cmd.api.DescribeDBInstances(renv.RequestContext(), input)
 			if err != nil {
 				var awserr smithy.APIError
 				if errors.As(err, &awserr) {
