@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -182,28 +183,38 @@ To get rid of this message, update '%[1]s:2'`, knowHostsFile)},
 }
 
 func TestCLIAndConfig(t *testing.T) {
+	// Client.localExec resolves the binary with exec.LookPath, so the expected
+	// path must be resolved the same way. Hardcoding /usr/bin/ssh made this test
+	// fail on any system where another ssh appears earlier in PATH (for example
+	// /usr/sbin/ssh). Only the binary is derived; every flag below is still
+	// asserted literally.
+	sshBin, err := exec.LookPath("ssh")
+	if err != nil {
+		sshBin = "ssh" // matches localExec's fallback when ssh is absent
+	}
+
 	tcases := []struct {
 		client      *Client
 		cli, config string
 	}{
 		{
 			&Client{Port: 22, IP: "1.2.3.4", User: "ec2-user", StrictHostKeyChecking: true},
-			"/usr/bin/ssh ec2-user@1.2.3.4",
+			sshBin + " ec2-user@1.2.3.4",
 			"\nHost TestHost\n  Hostname 1.2.3.4\n  User ec2-user",
 		},
 		{
 			&Client{Port: 8022, IP: "1.2.3.4", User: "ec2-user", StrictHostKeyChecking: true},
-			"/usr/bin/ssh -p 8022 ec2-user@1.2.3.4",
+			sshBin + " -p 8022 ec2-user@1.2.3.4",
 			"\nHost TestHost\n  Hostname 1.2.3.4\n  User ec2-user\n  Port 8022",
 		},
 		{
 			&Client{Port: 22, IP: "1.2.3.4", User: "ec2-user", StrictHostKeyChecking: true, Keypath: "/path/to/key"},
-			"/usr/bin/ssh -i /path/to/key ec2-user@1.2.3.4",
+			sshBin + " -i /path/to/key ec2-user@1.2.3.4",
 			"\nHost TestHost\n  Hostname 1.2.3.4\n  User ec2-user\n  IdentityFile /path/to/key",
 		},
 		{
 			&Client{Port: 22, IP: "1.2.3.4", User: "ec2-user", StrictHostKeyChecking: false},
-			"/usr/bin/ssh -o StrictHostKeychecking=no ec2-user@1.2.3.4",
+			sshBin + " -o StrictHostKeychecking=no ec2-user@1.2.3.4",
 			"\nHost TestHost\n  Hostname 1.2.3.4\n  User ec2-user\n  StrictHostKeychecking no",
 		},
 	}
