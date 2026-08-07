@@ -1,36 +1,68 @@
+version: "2"
+
 linters:
-  disable-all: true
+  default: none
   enable:
     - govet
     - ineffassign
-    - staticcheck
-    - unused
-    - gosimple
-    - gofmt
-    - goimports
     - misspell
+    - staticcheck
     - unconvert
-
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-      - shadow
-  goimports:
-    local-prefixes: github.com/wallix/awless
-  misspell:
-    locale: US
-  staticcheck:
-    checks:
-      - all
-      - -SA1019  # deprecated usage - too noisy for a migration
-
+    - unused
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+        # 'inline' is a recently added analyzer that enable-all picks up. It is
+        # not part of stock `go vet`, which CI runs separately and passes.
+        # 16 findings, all reflect.Ptr -> reflect.Pointer. Tracked as ISSUES.md
+        # I19; re-enable once that lands.
+        - inline
+    misspell:
+      locale: US
+    staticcheck:
+      checks:
+        - all
+        - -SA1019 # deprecated usage - too noisy for a migration
+        # golangci-lint v2 merged gosimple and stylecheck into staticcheck.
+        # v1 enabled gosimple + staticcheck but NOT stylecheck, so ST* and QF*
+        # checks never ran here. Excluded to keep this a behaviour-preserving
+        # migration: enabling them adds 255 findings. Tracked as ISSUES.md I19.
+        - -ST*
+        - -QF*
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - gen_.*\.go$
+      - awless-template-syntax\.peg\.go$
+      - vendor
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude-dirs:
-    - vendor
-  exclude-files:
-    - "gen_.*\\.go$"
-    - "awless-template-syntax\\.peg\\.go$"
   max-issues-per-linter: 50
   max-same-issues: 5
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/wallix/awless
+  exclusions:
+    generated: lax
+    paths:
+      - gen_.*\.go$
+      - awless-template-syntax\.peg\.go$
+      - vendor
+      - third_party$
+      - builtin$
+      - examples$

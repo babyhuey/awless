@@ -446,6 +446,36 @@ Tests that are permanently skipped are dead weight and may mask regressions.
 
 ## Improvements
 
+### I19: Findings deferred by the golangci-lint v2 migration
+
+**Severity:** Low (one exception, noted below)  
+**File:** `.golangci.yml`
+
+golangci-lint v2 merged `gosimple` and `stylecheck` into `staticcheck`. The v1 config enabled `gosimple` + `staticcheck` but **not** `stylecheck`, so `ST*` checks had never run against this codebase. Separately, `govet`'s `enable-all: true` now picks up a recently added `inline` analyzer that is not part of stock `go vet`.
+
+Enabling all of it produces **271 findings**, so `B5` excluded them to keep that commit a behaviour-preserving migration rather than a 271-fix changeset. Exclusions are `-ST*`, `-QF*`, and `govet: disable: [inline]`, each commented in place.
+
+| Check | Count | What it is |
+|---|---|---|
+| `ST1003` | 175 | Naming — mostly `ALL_CAPS` constants (e.g. `template/env/env.go`) |
+| `QF1012` | 25 | `Writer.Write([]byte(fmt.Sprintf(...)))` → `fmt.Fprintf` |
+| `ST1005` | 20 | Error strings capitalised or ending in punctuation |
+| `QF1008` | 19 | Redundant embedded-field selectors |
+| `inline` (govet) | 16 | `reflect.Ptr` → `reflect.Pointer` (deprecated alias) |
+| `ST1016` | 7 | Inconsistent receiver names |
+| `QF1004` | 5 | `strings.Replace(s, a, b, -1)` → `strings.ReplaceAll` |
+| `ST1012` | 2 | Error variable naming (`errFoo`) |
+| `QF1002` | 1 | Untagged switch could be tagged |
+| **`QF1009`** | **1** | **`time.Time` compared with `==` instead of `.Equal()`** |
+
+**`QF1009` is the one worth attention** — `aws/tailers/scaling_activity.go:102` compares `time.Time` values with `==`, which compares wall clock, monotonic reading, *and* location. Two instants that represent the same moment can compare unequal. Worth fixing on its own merits rather than waiting for a lint sweep.
+
+**Fix:** address these as part of `I9`'s incremental linter expansion, after the `%w` sweep in `I8`. Order by ratio of value to churn: `inline` (16, mechanical, removes deprecated API use) → `QF1009` (1, correctness) → `QF1004`/`QF1008`/`QF1012` (49, mechanical) → `ST1005`/`ST1012`/`ST1016` (29) → `ST1003` (175, largest and purely cosmetic; consider leaving `ALL_CAPS` exported identifiers alone since renaming them is a breaking API change).
+
+Note `ST1003` on exported names cannot be fixed without breaking the public API of `template/env`, so that check may warrant staying disabled permanently rather than being treated as debt.
+
+---
+
 ### I1: Add `arm64` to release builds
 
 **Severity:** Low  
