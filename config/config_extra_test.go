@@ -111,7 +111,6 @@ func TestGetConfigWithPrefixExtra(t *testing.T) {
 		"aws.profile":    "prod",
 		"aws.infra.sync": true,
 		"other.setting":  "value",
-		"scheduler.url":  "http://localhost:8082",
 	}
 
 	t.Run("aws prefix", func(t *testing.T) {
@@ -226,25 +225,6 @@ func TestGetAutosync(t *testing.T) {
 		Defaults = map[string]interface{}{}
 		if got := GetAutosync(); !got {
 			t.Fatal("expected default true")
-		}
-	})
-}
-
-func TestGetSchedulerURL(t *testing.T) {
-	origConfig := Config
-	defer func() { Config = origConfig }()
-
-	t.Run("when set", func(t *testing.T) {
-		Config = map[string]interface{}{"scheduler.url": "http://example.com:9090"}
-		if got := GetSchedulerURL(); got != "http://example.com:9090" {
-			t.Fatalf("got %s, want http://example.com:9090", got)
-		}
-	})
-
-	t.Run("empty when not set", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		if got := GetSchedulerURL(); got != "" {
-			t.Fatalf("got %s, want empty", got)
 		}
 	})
 }

@@ -37,8 +37,6 @@ import (
 	"github.com/chzyer/readline"
 	"github.com/spf13/cobra"
 
-	"github.com/wallix/awless-scheduler/client"
-
 	awsdoc "github.com/bootswithdefer/awless/aws/doc"
 	awsservices "github.com/bootswithdefer/awless/aws/services"
 	awsspec "github.com/bootswithdefer/awless/aws/spec"
@@ -53,8 +51,6 @@ import (
 )
 
 var (
-	scheduleRunInFlag       string
-	scheduleRevertInFlag    string
 	runLogMessage           string
 	listRemoteTemplatesFlag bool
 	noSuggestedParamsFlag   bool
@@ -64,8 +60,6 @@ var (
 func init() {
 	RootCmd.AddCommand(runCmd)
 	runCmd.Flags().BoolVar(&listRemoteTemplatesFlag, "list", false, "List templates available at https://github.com/bootswithdefer/awless-templates")
-	runCmd.Flags().StringVar(&scheduleRunInFlag, "run-in", "", "Postpone the execution of this template")
-	runCmd.Flags().StringVar(&scheduleRevertInFlag, "revert-in", "", "Schedule the revertion of this template")
 	runCmd.Flags().StringVarP(&runLogMessage, "message", "m", "", "Add a message for this template execution to be persisted in your logs")
 
 	var actions []string
@@ -78,8 +72,6 @@ func init() {
 		entities := awsspec.DriverSupportedActions[action]
 		sort.Strings(entities)
 		cmd := createDriverCommands(action, entities)
-		cmd.PersistentFlags().StringVar(&scheduleRunInFlag, "run-in", "", "Postpone the execution of this command")
-		cmd.PersistentFlags().StringVar(&scheduleRevertInFlag, "revert-in", "", "Schedule the revertion of this command")
 		RootCmd.AddCommand(cmd)
 	}
 }
@@ -583,27 +575,6 @@ func isCSV(s string) bool {
 	return true
 }
 
-func scheduleTemplate(t *template.Template, runIn, revertIn string) error {
-	schedClient, err := client.New(config.GetSchedulerURL())
-	if err != nil {
-		return fmt.Errorf("cannot connect to scheduler: %s", err)
-	}
-	logger.Verbosef("sending template to scheduler %s", schedClient.ServiceURL)
-
-	if err := schedClient.Post(client.Form{
-		Region:   config.GetAWSRegion(),
-		RunIn:    runIn,
-		RevertIn: revertIn,
-		Template: t.String(),
-	}); err != nil {
-		return fmt.Errorf("cannot schedule template: %s", err)
-	}
-
-	logger.Info("template scheduled successfully")
-
-	return nil
-}
-
 func suggestFixParsingError(def awsspec.Definition, args []string, matchingProperty string, defaultErr error) (*template.Template, error) {
 	if len(def.Params.Required()) != 1 || len(args) != 1 {
 		return nil, defaultErr
@@ -626,16 +597,6 @@ func suggestFixParsingError(def awsspec.Definition, args []string, matchingPrope
 	}
 
 	return templ, nil
-}
-
-func isSchedulingMode() bool {
-	runin := strings.TrimSpace(scheduleRunInFlag)
-	revertin := strings.TrimSpace(scheduleRevertInFlag)
-
-	if runin != "" || revertin != "" {
-		return true
-	}
-	return false
 }
 
 func joinSentence(arr []string) string {

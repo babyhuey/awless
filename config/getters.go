@@ -38,13 +38,6 @@ func GetAutosync() bool {
 	return true
 }
 
-func GetSchedulerURL() string {
-	if u, ok := Config[schedulerURL].(string); ok {
-		return u
-	}
-	return ""
-}
-
 func GetConfigWithPrefix(prefix string) map[string]interface{} {
 	conf := make(map[string]interface{})
 	for k, v := range Config {

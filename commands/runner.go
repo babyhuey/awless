@@ -63,11 +63,7 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 			yesorno = "y"
 		} else {
 			fmt.Printf("%s\n\n", renderGreenFn(tplExec.Template))
-			if isSchedulingMode() {
-				fmt.Printf("Confirm scheduling (region: %s)? [y/N] ", config.GetAWSRegion())
-			} else {
-				fmt.Printf("Confirm (region: %s)? [y/N] ", config.GetAWSRegion())
-			}
+			fmt.Printf("Confirm (region: %s)? [y/N] ", config.GetAWSRegion())
 			if _, err := fmt.Scanln(&yesorno); err != nil && err.Error() != "unexpected newline" {
 				return false, err
 			}
@@ -80,9 +76,6 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 			} else {
 				tplExec.Author = me.ResourcePath
 				logger.ExtraVerbosef("resolved template author: %s", tplExec.Author)
-			}
-			if isSchedulingMode() {
-				return false, scheduleTemplate(tplExec.Template, scheduleRunInFlag, scheduleRevertInFlag)
 			}
 			return true, nil
 		}

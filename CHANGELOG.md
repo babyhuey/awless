@@ -1,3 +1,25 @@
+## v1.1.0
+
+### Removed
+
+- **Scheduler support.** `awless run --run-in`, `--revert-in`, the hidden `awless scheduler`
+  command and the `scheduler.url` config key are gone, along with the dependency on
+  `github.com/wallix/awless-scheduler`.
+
+  None of them worked: the scheduler daemon imported `awless/aws/driver` and
+  `awless/template/driver`, both removed during the AWS SDK v2 migration, so it could not
+  be built against any recent version of awless. Upstream's README declared it deprecated
+  for that reason. These flags appeared in `--help` but could never succeed.
+
+  For deferred infrastructure changes use EventBridge Scheduler, cron with `awless`, or a
+  CI schedule. `awless revert` on a logged template execution covers the manual case.
+
+### Changed
+
+- **Module path is now `github.com/bootswithdefer/awless`.** Install with
+  `go install github.com/bootswithdefer/awless@latest`. The old path installed upstream's
+  2018 code rather than this fork.
+
 ## v0.1.11 [2018-06-21]
 
 **Check out our new article** on [Simplified Multi-Factor Authentication](https://medium.com/@awlessCLI/simplified-multi-factor-authentication-for-aws-d703e8d9f332) with `awless`
