@@ -868,14 +868,43 @@ The template parser is generated from a PEG grammar and takes untrusted file inp
 
 ---
 
-### I15: Add `--check` mode for generated code drift
+### I15: Generated code is out of sync and the generators produce non-compiling output
 
-**Severity:** Low  
-**Files:** `gen/aws/generators/*.go`, `.github/workflows/ci.yml`
+**Severity:** Medium — raised from Low; both problems are now measured, not hypothetical  
+**Files:** `gen/aws/generators/*.go`, all `gen_*.go`, `.github/workflows/ci.yml`
 
-Nothing verifies that the committed `gen_*.go` files match what the generators currently produce. A contributor can edit a definition in `gen/aws/` and forget to regenerate, or hand-edit a `gen_*.go` file, and CI will not notice.
+Running the generators against the current tree revealed two concrete problems.
 
-**Fix:** Add a CI job that regenerates and fails on diff:
+**1. The generators' output does not compile.**
+
+```
+$ cd gen/aws/generators && go run *.go
+$ go vet ./aws/services/
+vet: aws/services/gen_mocks_test.go:39:3: "github.com/aws/aws-sdk-go-v2/service/s3" imported and not used
+```
+
+The mock template emits an import it does not use, so a fresh regeneration
+breaks the build. The committed `gen_mocks_test.go` compiles, meaning it was
+either produced by an older generator or hand-corrected — either way the
+generators are not currently a usable source of truth.
+
+**2. ~2,400 lines of pre-existing drift.**
+
+Regenerating at an untouched checkout produces `3 files changed, 2381
+insertions(+), 1946 deletions(-)`, almost all in `aws/spec/gen_runs.go`. So the
+committed generated files have not matched their generators for some time.
+
+This is why the module rename in `78e9316f` rewrote generated files in place
+instead of regenerating: regenerating would have mixed an unrelated 2,400-line
+drift correction, plus a compile failure, into that change.
+
+**Fix, in order:**
+
+1. Fix the unused-import bug in the mock generator template so output compiles.
+2. Regenerate everything and commit the drift correction as its own change, so
+   the diff is reviewable in isolation.
+3. Only then add the CI drift check below, which is meaningless until 1 and 2
+   land.
 
 ```yaml
   codegen:
@@ -885,13 +914,15 @@ Nothing verifies that the committed `gen_*.go` files match what the generators c
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version-file: go.mod
       - run: go install golang.org/x/tools/cmd/goimports@latest
       - run: cd gen/aws/generators && go run *.go
       - run: git diff --exit-code || (echo "Generated files are out of date. Run: cd gen/aws/generators && go run *.go" && exit 1)
 ```
 
-This also guards the "never hand-edit `gen_*.go`" convention documented in `AGENTS.md`.
+This also enforces the "never hand-edit `gen_*.go`" rule documented in
+`AGENTS.md`, which the rename commit had to bend precisely because the
+generators were unreliable.
 
 ---
 
