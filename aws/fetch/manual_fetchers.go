@@ -42,7 +42,7 @@ import (
 )
 
 func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["containerinstance"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["containerinstance"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []ecstypes.ContainerInstance
 		var resources []*graph.Resource
 
@@ -88,7 +88,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["container"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["container"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []ecstypes.Container
 		var resources []*graph.Resource
 
@@ -99,7 +99,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 
 		var tasks []ecstypes.Task
 
-		if val, e := cache.Get("getAllTasks", func() (interface{}, error) {
+		if val, e := cache.Get("getAllTasks", func() (any, error) {
 			return getAllTasks(ctx, cache, conf.APIs.Ecs)
 		}); e != nil {
 			return resources, objects, e
@@ -147,7 +147,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["containertask"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["containertask"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []ecstypes.TaskDefinition
 		var resources []*graph.Resource
 
@@ -195,7 +195,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		}()
 
 		var tasks []ecstypes.Task
-		if val, e := cache.Get("getAllTasks", func() (interface{}, error) {
+		if val, e := cache.Get("getAllTasks", func() (any, error) {
 			return getAllTasks(ctx, cache, conf.APIs.Ecs)
 		}); e != nil {
 			return resources, objects, e
@@ -285,7 +285,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, err
 	}
 
-	funcs["containercluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["containercluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ecstypes.Cluster
 
@@ -317,7 +317,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["listener"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["listener"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []elbv2types.Listener
 		var resources []*graph.Resource
 
@@ -382,7 +382,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["user"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["user"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []iamtypes.UserDetail
 
@@ -465,7 +465,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		}
 	}
 
-	funcs["group"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["group"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []iamtypes.GroupDetail
 
@@ -491,7 +491,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["role"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["role"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []iamtypes.RoleDetail
 
@@ -517,7 +517,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["policy"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["policy"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []iamtypes.ManagedPolicyDetail
 
@@ -584,7 +584,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			}
 		}
 	}
-	funcs["accesskey"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["accesskey"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []iamtypes.AccessKeyMetadata
 
@@ -671,7 +671,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	}
 }
 func addManualStorageFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["bucket"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["bucket"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []s3types.Bucket
 
@@ -703,7 +703,7 @@ func addManualStorageFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, err
 	}
 
-	funcs["s3object"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["s3object"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []s3types.Object
 		var resources []*graph.Resource
 
@@ -735,7 +735,7 @@ func addManualStorageFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	}
 }
 func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["queue"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["queue"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []string
 		var resources []*graph.Resource
 
@@ -839,7 +839,7 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	}
 }
 func addManualDnsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["record"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["record"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []route53types.ResourceRecordSet
 		var resources []*graph.Resource
 
@@ -954,7 +954,7 @@ func addManualCloudformationFetchFuncs(conf *Config, funcs map[string]fetch.Func
 }
 
 func addManualEksFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["ekscluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["ekscluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ekstypes.Cluster
 
@@ -987,7 +987,7 @@ func addManualEksFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["eksnodegroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["eksnodegroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ekstypes.Nodegroup
 
@@ -1033,7 +1033,7 @@ func addManualEksFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualDynamodbFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["dynamodbtable"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["dynamodbtable"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []dynamodbtypes.TableDescription
 
@@ -1068,7 +1068,7 @@ func addManualDynamodbFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualSecretsmanagerFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["key"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["key"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []kmstypes.KeyMetadata
 
@@ -1103,7 +1103,7 @@ func addManualSecretsmanagerFetchFuncs(conf *Config, funcs map[string]fetch.Func
 }
 
 func addManualApigatewayFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["apigateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["apigateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []apigatewayv2types.Api
 
@@ -1134,7 +1134,7 @@ func addManualApigatewayFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["apigatewayroute"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["apigatewayroute"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []apigatewayv2types.Route
 
@@ -1166,7 +1166,7 @@ func addManualApigatewayFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 
-	funcs["apigatewaystage"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["apigatewaystage"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []apigatewayv2types.Stage
 
@@ -1206,7 +1206,7 @@ func addManualCloudtrailFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualEfsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
-	funcs["mounttarget"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["mounttarget"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []efstypes.MountTargetDescription
 

@@ -25,14 +25,14 @@ var AWSHomeDir = func() string {
 	return filepath.Join(home, ".aws")
 }
 
-func ParseRegion(i string) (interface{}, error) {
+func ParseRegion(i string) (any, error) {
 	if !IsValidRegion(i) {
 		return i, fmt.Errorf("'%s' is not a valid region", i)
 	}
 	return i, nil
 }
 
-func ParseInstanceType(i string) (interface{}, error) {
+func ParseInstanceType(i string) (any, error) {
 	if !isValidInstanceType(i) {
 		return i, fmt.Errorf("'%s' is not a valid instance type", i)
 	}

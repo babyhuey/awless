@@ -35,19 +35,19 @@ func TestCloneAST(t *testing.T) {
 		Ident: "myvar",
 		Expr: &CommandNode{
 			Action: "create", Entity: "vpc",
-			ParamNodes: map[string]interface{}{"count": InterfaceNode{i: 1}, "myname": RefNode{key: "name"}},
-			Refs:       map[string]interface{}{"here": "there"},
+			ParamNodes: map[string]any{"count": InterfaceNode{i: 1}, "myname": RefNode{key: "name"}},
+			Refs:       map[string]any{"here": "there"},
 		}}}, &Statement{Node: &DeclarationNode{
 		Ident: "myothervar",
 		Expr: &CommandNode{
 			Command: cmd,
 			Action:  "create", Entity: "subnet",
-			ParamNodes: map[string]interface{}{"vpc": HoleNode{key: "myvar"}},
-			Refs:       map[string]interface{}{},
+			ParamNodes: map[string]any{"vpc": HoleNode{key: "myvar"}},
+			Refs:       map[string]any{},
 		}}}, &Statement{Node: &CommandNode{
 		Action: "create", Entity: "instance",
-		ParamNodes: map[string]interface{}{"subnet": HoleNode{key: "myothervar"}},
-		Refs:       map[string]interface{}{"donald": "duck"},
+		ParamNodes: map[string]any{"subnet": HoleNode{key: "myothervar"}},
+		Refs:       map[string]any{"donald": "duck"},
 	}},
 	)
 
@@ -91,11 +91,11 @@ func TestIsQuoted(t *testing.T) {
 func TestCommandNodeString(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": InterfaceNode{i: "myvpc"},
 			"cidr": InterfaceNode{i: "10.0.0.0/16"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	got := cmd.String()
 	if !strings.HasPrefix(got, "create vpc") {
@@ -112,8 +112,8 @@ func TestCommandNodeString(t *testing.T) {
 func TestCommandNodeStringWithRefs(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "subnet",
-		ParamNodes: map[string]interface{}{},
-		Refs:       map[string]interface{}{"vpc": "$myvpc"},
+		ParamNodes: map[string]any{},
+		Refs:       map[string]any{"vpc": "$myvpc"},
 	}
 	got := cmd.String()
 	if !strings.Contains(got, "vpc=$myvpc") {
@@ -124,10 +124,10 @@ func TestCommandNodeStringWithRefs(t *testing.T) {
 func TestCommandNodeStringWithList(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "securitygroup",
-		ParamNodes: map[string]interface{}{
-			"ports": []interface{}{"80", "443"},
+		ParamNodes: map[string]any{
+			"ports": []any{"80", "443"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	got := cmd.String()
 	// String values that look like integers get quoted
@@ -139,10 +139,10 @@ func TestCommandNodeStringWithList(t *testing.T) {
 func TestCommandNodeStringWithInterfaceList(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "securitygroup",
-		ParamNodes: map[string]interface{}{
-			"ports": []interface{}{80, 443},
+		ParamNodes: map[string]any{
+			"ports": []any{80, 443},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	got := cmd.String()
 	if !strings.Contains(got, "ports=[80,443]") {
@@ -153,10 +153,10 @@ func TestCommandNodeStringWithInterfaceList(t *testing.T) {
 func TestCommandNodeStringWithNonStringNonList(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"count": InterfaceNode{i: 5},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	got := cmd.String()
 	if !strings.Contains(got, "count=") {
@@ -167,8 +167,8 @@ func TestCommandNodeStringWithNonStringNonList(t *testing.T) {
 func TestCommandNodeStringNoParams(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "delete", Entity: "vpc",
-		ParamNodes: map[string]interface{}{},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{},
+		Refs:       map[string]any{},
 	}
 	if got, want := cmd.String(), "delete vpc"; got != want {
 		t.Fatalf("got %q, want %q", got, want)
@@ -178,8 +178,8 @@ func TestCommandNodeStringNoParams(t *testing.T) {
 func TestCommandNodeKeys(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"name": InterfaceNode{i: "x"}, "cidr": InterfaceNode{i: "y"}},
-		Refs:       map[string]interface{}{"ref1": "val"},
+		ParamNodes: map[string]any{"name": InterfaceNode{i: "x"}, "cidr": InterfaceNode{i: "y"}},
+		Refs:       map[string]any{"ref1": "val"},
 	}
 	keys := cmd.Keys()
 	sort.Strings(keys)
@@ -193,10 +193,10 @@ func TestCommandNodeResultAndErr(t *testing.T) {
 	cmd := &CommandNode{
 		CmdResult:  "result-value",
 		CmdErr:     nil,
-		ParamNodes: map[string]interface{}{},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{},
+		Refs:       map[string]any{},
 	}
-	if got, want := cmd.Result(), interface{}("result-value"); got != want {
+	if got, want := cmd.Result(), any("result-value"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 	if cmd.Err() != nil {
@@ -207,8 +207,8 @@ func TestCommandNodeResultAndErr(t *testing.T) {
 func TestCommandNodeClone(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"name": InterfaceNode{i: "x"}},
-		Refs:       map[string]interface{}{"ref": "val"},
+		ParamNodes: map[string]any{"name": InterfaceNode{i: "x"}},
+		Refs:       map[string]any{"ref": "val"},
 	}
 	clone := cmd.clone().(*CommandNode)
 	if clone.Action != cmd.Action || clone.Entity != cmd.Entity {
@@ -224,12 +224,12 @@ func TestCommandNodeClone(t *testing.T) {
 func TestCommandNodeProcessRefs(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "subnet",
-		ParamNodes: map[string]interface{}{},
-		Refs:       map[string]interface{}{"vpc": RefNode{key: "myvar"}},
+		ParamNodes: map[string]any{},
+		Refs:       map[string]any{"vpc": RefNode{key: "myvar"}},
 	}
-	cmd.ProcessRefs(map[string]interface{}{"myvar": "vpc-12345"})
+	cmd.ProcessRefs(map[string]any{"myvar": "vpc-12345"})
 
-	if got, want := cmd.ParamNodes["vpc"], interface{}("vpc-12345"); got != want {
+	if got, want := cmd.ParamNodes["vpc"], any("vpc-12345"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
@@ -237,16 +237,16 @@ func TestCommandNodeProcessRefs(t *testing.T) {
 func TestCommandNodeProcessRefsWithList(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "subnet",
-		ParamNodes: map[string]interface{}{},
-		Refs: map[string]interface{}{
-			"ids": ListNode{arr: []interface{}{RefNode{key: "id1"}, InterfaceNode{i: "static"}}},
+		ParamNodes: map[string]any{},
+		Refs: map[string]any{
+			"ids": ListNode{arr: []any{RefNode{key: "id1"}, InterfaceNode{i: "static"}}},
 		},
 	}
-	cmd.ProcessRefs(map[string]interface{}{"id1": "resolved-id"})
+	cmd.ProcessRefs(map[string]any{"id1": "resolved-id"})
 
-	arr, ok := cmd.ParamNodes["ids"].([]interface{})
+	arr, ok := cmd.ParamNodes["ids"].([]any)
 	if !ok {
-		t.Fatalf("expected []interface{}, got %T", cmd.ParamNodes["ids"])
+		t.Fatalf("expected []any, got %T", cmd.ParamNodes["ids"])
 	}
 	if arr[0] != "resolved-id" {
 		t.Fatalf("expected 'resolved-id', got %v", arr[0])
@@ -256,14 +256,14 @@ func TestCommandNodeProcessRefsWithList(t *testing.T) {
 func TestCommandNodeToDriverParams(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name":  InterfaceNode{i: "myvpc"},
 			"ref":   RefNode{key: "x"},
 			"hole":  HoleNode{key: "y"},
 			"alias": AliasNode{key: "z"},
 			"plain": "plain-value",
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	params := cmd.ToDriverParams()
 
@@ -288,12 +288,12 @@ func TestCommandNodeToDriverParams(t *testing.T) {
 func TestCommandNodeToFillerParams(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name":  InterfaceNode{i: "myvpc"},
 			"alias": AliasNode{key: "z"},
 			"ref":   RefNode{key: "x"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	params := cmd.ToFillerParams()
 
@@ -312,10 +312,10 @@ func TestCommandNodeToFillerParams(t *testing.T) {
 func TestCommandNodeToFillerParamsWithList(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
-			"ids": ListNode{arr: []interface{}{InterfaceNode{i: "id1"}, AliasNode{key: "a1"}}},
+		ParamNodes: map[string]any{
+			"ids": ListNode{arr: []any{InterfaceNode{i: "id1"}, AliasNode{key: "a1"}}},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	params := cmd.ToFillerParams()
 	_, ok := params["ids"]
@@ -327,8 +327,8 @@ func TestCommandNodeToFillerParamsWithList(t *testing.T) {
 func TestDeclarationNodeString(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{},
+		Refs:       map[string]any{},
 	}
 	decl := &DeclarationNode{Ident: "myvar", Expr: cmd}
 	got := decl.String()
@@ -340,8 +340,8 @@ func TestDeclarationNodeString(t *testing.T) {
 func TestDeclarationNodeClone(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{},
+		Refs:       map[string]any{},
 	}
 	decl := &DeclarationNode{Ident: "myvar", Expr: cmd}
 	clone := decl.clone().(*DeclarationNode)
@@ -361,8 +361,8 @@ func TestDeclarationNodeCloneNilExpr(t *testing.T) {
 func TestStatementClone(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"k": InterfaceNode{i: "v"}},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"k": InterfaceNode{i: "v"}},
+		Refs:       map[string]any{},
 	}
 	stmt := &Statement{Node: cmd}
 	clone := stmt.Clone()
@@ -378,13 +378,13 @@ func TestASTString(t *testing.T) {
 	tree.Statements = append(tree.Statements,
 		&Statement{Node: &CommandNode{
 			Action: "create", Entity: "vpc",
-			ParamNodes: map[string]interface{}{"name": InterfaceNode{i: "myvpc"}},
-			Refs:       map[string]interface{}{},
+			ParamNodes: map[string]any{"name": InterfaceNode{i: "myvpc"}},
+			Refs:       map[string]any{},
 		}},
 		&Statement{Node: &CommandNode{
 			Action: "delete", Entity: "subnet",
-			ParamNodes: map[string]interface{}{},
-			Refs:       map[string]interface{}{},
+			ParamNodes: map[string]any{},
+			Refs:       map[string]any{},
 		}},
 	)
 	got := tree.String()
@@ -399,8 +399,8 @@ func TestASTCloneNode(t *testing.T) {
 	tree.Statements = append(tree.Statements,
 		&Statement{Node: &CommandNode{
 			Action: "create", Entity: "vpc",
-			ParamNodes: map[string]interface{}{},
-			Refs:       map[string]interface{}{},
+			ParamNodes: map[string]any{},
+			Refs:       map[string]any{},
 		}},
 	)
 	cloneNode := tree.clone()
@@ -415,5 +415,5 @@ func TestASTCloneNode(t *testing.T) {
 
 type fakeCmd struct{}
 
-func (*fakeCmd) ParamsSpec() params.Spec                                      { return nil }
-func (*fakeCmd) Run(env.Running, map[string]interface{}) (interface{}, error) { return nil, nil }
+func (*fakeCmd) ParamsSpec() params.Spec                      { return nil }
+func (*fakeCmd) Run(env.Running, map[string]any) (any, error) { return nil, nil }

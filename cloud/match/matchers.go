@@ -60,7 +60,7 @@ func Or(matchers ...cloud.Matcher) cloud.Matcher {
 
 type propertyMatcher struct {
 	name          string
-	value         interface{}
+	value         any
 	matchOnString bool
 	ignoreCase    bool
 	contains      bool
@@ -94,7 +94,7 @@ func (m propertyMatcher) Match(r cloud.Resource) bool {
 	return reflect.DeepEqual(v, expectVal)
 }
 
-func Property(name string, val interface{}) propertyMatcher {
+func Property(name string, val any) propertyMatcher {
 	return propertyMatcher{name: name, value: val}
 }
 

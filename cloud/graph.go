@@ -22,7 +22,7 @@ import (
 
 type GraphAPI interface {
 	Find(Query) ([]Resource, error)
-	FindWithProperties(map[string]interface{}) ([]Resource, error)
+	FindWithProperties(map[string]any) ([]Resource, error)
 	FilterGraph(Query) (GraphAPI, error)
 	FindOne(Query) (Resource, error)
 	MarshalTo(w io.Writer) error
@@ -37,9 +37,9 @@ type Resource interface {
 	Id() string
 	String() string
 	Format(string) string
-	Properties() map[string]interface{}
-	Property(string) (interface{}, bool)
-	Meta(string) (interface{}, bool)
+	Properties() map[string]any
+	Property(string) (any, bool)
+	Meta(string) (any, bool)
 	Same(Resource) bool
 }
 

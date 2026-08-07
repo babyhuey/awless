@@ -49,7 +49,7 @@ func (cmd *CreateFunction) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateFunction) ExtractResult(i interface{}) string {
+func (cmd *CreateFunction) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*lambda.CreateFunctionOutput).FunctionArn)
 }
 

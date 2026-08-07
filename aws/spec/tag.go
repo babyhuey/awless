@@ -49,7 +49,7 @@ func (cmd *CreateTag) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("key"), params.Key("resource"), params.Key("value")))
 }
 
-func (cmd *CreateTag) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTag) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("dry run: cannot set params on command struct: %w", err)
 	}
@@ -76,7 +76,7 @@ func (cmd *CreateTag) dryRun(renv env.Running, params map[string]interface{}) (i
 	return nil, fmt.Errorf("dry run: %w", err)
 }
 
-func (cmd *CreateTag) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CreateTag) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.CreateTagsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateTagsInput: %w", err)
@@ -115,7 +115,7 @@ func (cmd *DeleteTag) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -142,7 +142,7 @@ func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]interface{}) (i
 	return nil, err
 }
 
-func (cmd *DeleteTag) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DeleteTag) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DeleteTagsInput{}
 	if err := structInjector(cmd, input, renv.Context()); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteTagsInput: %w", err)
@@ -157,7 +157,7 @@ func (cmd *DeleteTag) ManualRun(renv env.Running) (interface{}, error) {
 
 func createNameTag(resource, name *string, renv env.Running) error {
 	createTag := CommandFactory.Build("createtag")().(*CreateTag)
-	entries := map[string]interface{}{
+	entries := map[string]any{
 		"key":      "Name",
 		"value":    name,
 		"resource": resource,

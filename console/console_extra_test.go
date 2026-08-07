@@ -30,7 +30,7 @@ func TestARNLastValueColumnDefinitionFormat(t *testing.T) {
 	}
 
 	tcases := []struct {
-		input    interface{}
+		input    any
 		expected string
 	}{
 		{"arn:aws:ecs:us-east-1:123456789012:cluster/my-cluster", "my-cluster"},

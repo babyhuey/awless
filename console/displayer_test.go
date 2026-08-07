@@ -721,39 +721,39 @@ func TestFilter(t *testing.T) {
 }
 
 func TestCompareInterface(t *testing.T) {
-	if got, want := valueLowerOrEqual(interface{}(1), interface{}(4)), true; got != want {
+	if got, want := valueLowerOrEqual(any(1), any(4)), true; got != want {
 		t.Fatalf("got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}(1), interface{}(1)), true; got != want {
+	if got, want := valueLowerOrEqual(any(1), any(1)), true; got != want {
 		t.Fatalf("got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}(1), interface{}(-3)), false; got != want {
+	if got, want := valueLowerOrEqual(any(1), any(-3)), false; got != want {
 		t.Fatalf("got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}("abc"), interface{}("bbc")), true; got != want {
+	if got, want := valueLowerOrEqual(any("abc"), any("bbc")), true; got != want {
 		t.Fatalf("got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}("abc"), interface{}("aac")), false; got != want {
+	if got, want := valueLowerOrEqual(any("abc"), any("aac")), false; got != want {
 		t.Fatalf("got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}(1.2), interface{}(1.3)), true; got != want {
+	if got, want := valueLowerOrEqual(any(1.2), any(1.3)), true; got != want {
 		t.Fatalf("got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}(1.2), interface{}(1.1)), false; got != want {
+	if got, want := valueLowerOrEqual(any(1.2), any(1.1)), false; got != want {
 		t.Fatalf("got %t want %t", got, want)
 	}
 
 	// #248: bool comparison should not panic
-	if got, want := valueLowerOrEqual(interface{}(false), interface{}(true)), true; got != want {
+	if got, want := valueLowerOrEqual(any(false), any(true)), true; got != want {
 		t.Fatalf("bool: got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}(true), interface{}(false)), false; got != want {
+	if got, want := valueLowerOrEqual(any(true), any(false)), false; got != want {
 		t.Fatalf("bool: got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}(false), interface{}(false)), true; got != want {
+	if got, want := valueLowerOrEqual(any(false), any(false)), true; got != want {
 		t.Fatalf("bool: got %t want %t", got, want)
 	}
-	if got, want := valueLowerOrEqual(interface{}(true), interface{}(true)), true; got != want {
+	if got, want := valueLowerOrEqual(any(true), any(true)), true; got != want {
 		t.Fatalf("bool: got %t want %t", got, want)
 	}
 }

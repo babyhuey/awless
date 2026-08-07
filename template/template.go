@@ -58,7 +58,7 @@ func (s *Template) DryRun(renv env.Running) (tpl *Template, err error) {
 }
 
 func (s *Template) Run(renv env.Running) (*Template, error) {
-	vars := map[string]interface{}{}
+	vars := map[string]any{}
 
 	current := &Template{AST: &ast.AST{}}
 	current.ID = ulid.MustNew(ulid.Timestamp(time.Now()), rand.Reader).String()

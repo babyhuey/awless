@@ -18,21 +18,21 @@ var (
 )
 
 type RightExpressionNode struct {
-	i interface{}
+	i any
 }
 
-func (n *RightExpressionNode) Node() interface{} {
+func (n *RightExpressionNode) Node() any {
 	return n.i
 }
 
-func (n *RightExpressionNode) Result() interface{} {
+func (n *RightExpressionNode) Result() any {
 	switch v := n.i.(type) {
 	case InterfaceNode:
 		return v.i
 	case RefNode, AliasNode, HoleNode:
 		return nil
 	case ListNode:
-		var arr []interface{}
+		var arr []any
 		for _, e := range v.arr {
 			switch ev := e.(type) {
 			case InterfaceNode:
@@ -72,12 +72,12 @@ func (n *RightExpressionNode) clone() Node {
 
 type CommandNode struct {
 	Command
-	CmdResult interface{}
+	CmdResult any
 	CmdErr    error
 
 	Action, Entity string
-	ParamNodes     map[string]interface{}
-	Refs           map[string]interface{}
+	ParamNodes     map[string]any
+	Refs           map[string]any
 }
 
 type RefNode struct {
@@ -150,10 +150,10 @@ func (n HoleNode) clone() Node {
 }
 
 type ListNode struct {
-	arr []interface{}
+	arr []any
 }
 
-func NewListNode(arr []interface{}) ListNode {
+func NewListNode(arr []any) ListNode {
 	return ListNode{arr: arr}
 }
 
@@ -165,7 +165,7 @@ func (n ListNode) String() string {
 	return "[" + strings.Join(a, ",") + "]"
 }
 
-func (n ListNode) Elems() []interface{} {
+func (n ListNode) Elems() []any {
 	return n.arr
 }
 
@@ -174,10 +174,10 @@ func (n ListNode) clone() Node {
 }
 
 type ConcatenationNode struct {
-	arr []interface{}
+	arr []any
 }
 
-func NewConcatenationNode(arr []interface{}) ConcatenationNode {
+func NewConcatenationNode(arr []any) ConcatenationNode {
 	return ConcatenationNode{arr: arr}
 }
 
@@ -231,10 +231,10 @@ func (n ConcatenationNode) clone() Node {
 }
 
 type InterfaceNode struct {
-	i interface{}
+	i any
 }
 
-func (n InterfaceNode) Value() interface{} {
+func (n InterfaceNode) Value() any {
 	return n.i
 }
 

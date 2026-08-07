@@ -69,14 +69,14 @@ func (cmd *AttachAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachAlarm) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachAlarm) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -92,7 +92,7 @@ func (cmd *AttachAlarm) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -116,11 +116,11 @@ func (cmd *AttachAlarm) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *AttachAlarm) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("alarm"), nil
 }
 
-func (cmd *AttachAlarm) inject(params map[string]interface{}) error {
+func (cmd *AttachAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -142,14 +142,14 @@ func (cmd *AttachClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachClassicLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -174,7 +174,7 @@ func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -198,11 +198,11 @@ func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]in
 	return extracted, nil
 }
 
-func (cmd *AttachClassicLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("classicloadbalancer"), nil
 }
 
-func (cmd *AttachClassicLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *AttachClassicLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -224,14 +224,14 @@ func (cmd *AttachContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachContainertask) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachContainertask) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -247,7 +247,7 @@ func (cmd *AttachContainertask) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -271,11 +271,11 @@ func (cmd *AttachContainertask) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *AttachContainertask) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("containertask"), nil
 }
 
-func (cmd *AttachContainertask) inject(params map[string]interface{}) error {
+func (cmd *AttachContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -297,14 +297,14 @@ func (cmd *AttachElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachElasticip) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachElasticip) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachElasticip) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -329,7 +329,7 @@ func (cmd *AttachElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -353,7 +353,7 @@ func (cmd *AttachElasticip) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -382,7 +382,7 @@ func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]interface
 	return nil, err
 }
 
-func (cmd *AttachElasticip) inject(params map[string]interface{}) error {
+func (cmd *AttachElasticip) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -404,14 +404,14 @@ func (cmd *AttachInstance) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -436,7 +436,7 @@ func (cmd *AttachInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -460,11 +460,11 @@ func (cmd *AttachInstance) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *AttachInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("instance"), nil
 }
 
-func (cmd *AttachInstance) inject(params map[string]interface{}) error {
+func (cmd *AttachInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -486,14 +486,14 @@ func (cmd *AttachInstanceprofile) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachInstanceprofile) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInstanceprofile) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -509,7 +509,7 @@ func (cmd *AttachInstanceprofile) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -533,7 +533,7 @@ func (cmd *AttachInstanceprofile) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *AttachInstanceprofile) inject(params map[string]interface{}) error {
+func (cmd *AttachInstanceprofile) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -555,14 +555,14 @@ func (cmd *AttachInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachInternetgateway) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -587,7 +587,7 @@ func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -611,7 +611,7 @@ func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -640,7 +640,7 @@ func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]int
 	return nil, err
 }
 
-func (cmd *AttachInternetgateway) inject(params map[string]interface{}) error {
+func (cmd *AttachInternetgateway) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -662,14 +662,14 @@ func (cmd *AttachListener) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachListener) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachListener) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachListener) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachListener) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -694,7 +694,7 @@ func (cmd *AttachListener) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -718,11 +718,11 @@ func (cmd *AttachListener) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *AttachListener) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachListener) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("listener"), nil
 }
 
-func (cmd *AttachListener) inject(params map[string]interface{}) error {
+func (cmd *AttachListener) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -744,14 +744,14 @@ func (cmd *AttachMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachMfadevice) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachMfadevice) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -776,7 +776,7 @@ func (cmd *AttachMfadevice) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -800,11 +800,11 @@ func (cmd *AttachMfadevice) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *AttachMfadevice) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("mfadevice"), nil
 }
 
-func (cmd *AttachMfadevice) inject(params map[string]interface{}) error {
+func (cmd *AttachMfadevice) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -826,14 +826,14 @@ func (cmd *AttachNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachNetworkinterface) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -858,7 +858,7 @@ func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -882,7 +882,7 @@ func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -911,7 +911,7 @@ func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]in
 	return nil, err
 }
 
-func (cmd *AttachNetworkinterface) inject(params map[string]interface{}) error {
+func (cmd *AttachNetworkinterface) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -933,14 +933,14 @@ func (cmd *AttachPolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachPolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachPolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachPolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachPolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -956,7 +956,7 @@ func (cmd *AttachPolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -980,11 +980,11 @@ func (cmd *AttachPolicy) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *AttachPolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachPolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("policy"), nil
 }
 
-func (cmd *AttachPolicy) inject(params map[string]interface{}) error {
+func (cmd *AttachPolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1006,14 +1006,14 @@ func (cmd *AttachRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachRole) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachRole) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachRole) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1038,7 +1038,7 @@ func (cmd *AttachRole) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1062,11 +1062,11 @@ func (cmd *AttachRole) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *AttachRole) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachRole) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("role"), nil
 }
 
-func (cmd *AttachRole) inject(params map[string]interface{}) error {
+func (cmd *AttachRole) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1088,14 +1088,14 @@ func (cmd *AttachRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachRoutetable) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachRoutetable) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1120,7 +1120,7 @@ func (cmd *AttachRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1144,7 +1144,7 @@ func (cmd *AttachRoutetable) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1173,7 +1173,7 @@ func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]interfac
 	return nil, err
 }
 
-func (cmd *AttachRoutetable) inject(params map[string]interface{}) error {
+func (cmd *AttachRoutetable) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1195,14 +1195,14 @@ func (cmd *AttachSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachSecuritygroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachSecuritygroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1218,7 +1218,7 @@ func (cmd *AttachSecuritygroup) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1242,11 +1242,11 @@ func (cmd *AttachSecuritygroup) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *AttachSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("securitygroup"), nil
 }
 
-func (cmd *AttachSecuritygroup) inject(params map[string]interface{}) error {
+func (cmd *AttachSecuritygroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1268,14 +1268,14 @@ func (cmd *AttachUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachUser) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachUser) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachUser) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1300,7 +1300,7 @@ func (cmd *AttachUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1324,11 +1324,11 @@ func (cmd *AttachUser) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *AttachUser) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachUser) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("user"), nil
 }
 
-func (cmd *AttachUser) inject(params map[string]interface{}) error {
+func (cmd *AttachUser) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1350,14 +1350,14 @@ func (cmd *AttachVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *AttachVolume) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachVolume) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AttachVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachVolume) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1382,7 +1382,7 @@ func (cmd *AttachVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1406,7 +1406,7 @@ func (cmd *AttachVolume) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1435,7 +1435,7 @@ func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *AttachVolume) inject(params map[string]interface{}) error {
+func (cmd *AttachVolume) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1457,14 +1457,14 @@ func (cmd *AuthenticateRegistry) SetApi(api *ecr.Client) {
 	cmd.api = api
 }
 
-func (cmd *AuthenticateRegistry) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AuthenticateRegistry) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *AuthenticateRegistry) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AuthenticateRegistry) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1480,7 +1480,7 @@ func (cmd *AuthenticateRegistry) run(renv env.Running, params map[string]interfa
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1504,11 +1504,11 @@ func (cmd *AuthenticateRegistry) run(renv env.Running, params map[string]interfa
 	return extracted, nil
 }
 
-func (cmd *AuthenticateRegistry) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AuthenticateRegistry) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("registry"), nil
 }
 
-func (cmd *AuthenticateRegistry) inject(params map[string]interface{}) error {
+func (cmd *AuthenticateRegistry) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1530,14 +1530,14 @@ func (cmd *CheckCertificate) SetApi(api *acm.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckCertificate) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckCertificate) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckCertificate) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckCertificate) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1553,7 +1553,7 @@ func (cmd *CheckCertificate) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1577,11 +1577,11 @@ func (cmd *CheckCertificate) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *CheckCertificate) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckCertificate) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("certificate"), nil
 }
 
-func (cmd *CheckCertificate) inject(params map[string]interface{}) error {
+func (cmd *CheckCertificate) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1603,14 +1603,14 @@ func (cmd *CheckDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckDatabase) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckDatabase) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1626,7 +1626,7 @@ func (cmd *CheckDatabase) run(renv env.Running, params map[string]interface{}) (
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1650,11 +1650,11 @@ func (cmd *CheckDatabase) run(renv env.Running, params map[string]interface{}) (
 	return extracted, nil
 }
 
-func (cmd *CheckDatabase) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("database"), nil
 }
 
-func (cmd *CheckDatabase) inject(params map[string]interface{}) error {
+func (cmd *CheckDatabase) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1676,14 +1676,14 @@ func (cmd *CheckDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckDistribution) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckDistribution) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckDistribution) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1699,7 +1699,7 @@ func (cmd *CheckDistribution) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1723,11 +1723,11 @@ func (cmd *CheckDistribution) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *CheckDistribution) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("distribution"), nil
 }
 
-func (cmd *CheckDistribution) inject(params map[string]interface{}) error {
+func (cmd *CheckDistribution) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1749,14 +1749,14 @@ func (cmd *CheckInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1772,7 +1772,7 @@ func (cmd *CheckInstance) run(renv env.Running, params map[string]interface{}) (
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1796,11 +1796,11 @@ func (cmd *CheckInstance) run(renv env.Running, params map[string]interface{}) (
 	return extracted, nil
 }
 
-func (cmd *CheckInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("instance"), nil
 }
 
-func (cmd *CheckInstance) inject(params map[string]interface{}) error {
+func (cmd *CheckInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1822,14 +1822,14 @@ func (cmd *CheckLoadbalancer) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1845,7 +1845,7 @@ func (cmd *CheckLoadbalancer) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1869,11 +1869,11 @@ func (cmd *CheckLoadbalancer) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *CheckLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("loadbalancer"), nil
 }
 
-func (cmd *CheckLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *CheckLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1895,14 +1895,14 @@ func (cmd *CheckNatgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckNatgateway) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckNatgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckNatgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckNatgateway) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1918,7 +1918,7 @@ func (cmd *CheckNatgateway) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -1942,11 +1942,11 @@ func (cmd *CheckNatgateway) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *CheckNatgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckNatgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("natgateway"), nil
 }
 
-func (cmd *CheckNatgateway) inject(params map[string]interface{}) error {
+func (cmd *CheckNatgateway) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -1968,14 +1968,14 @@ func (cmd *CheckNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckNetworkinterface) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckNetworkinterface) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -1991,7 +1991,7 @@ func (cmd *CheckNetworkinterface) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2015,11 +2015,11 @@ func (cmd *CheckNetworkinterface) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *CheckNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckNetworkinterface) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("networkinterface"), nil
 }
 
-func (cmd *CheckNetworkinterface) inject(params map[string]interface{}) error {
+func (cmd *CheckNetworkinterface) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2041,14 +2041,14 @@ func (cmd *CheckScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckScalinggroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckScalinggroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2064,7 +2064,7 @@ func (cmd *CheckScalinggroup) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2088,11 +2088,11 @@ func (cmd *CheckScalinggroup) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *CheckScalinggroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("scalinggroup"), nil
 }
 
-func (cmd *CheckScalinggroup) inject(params map[string]interface{}) error {
+func (cmd *CheckScalinggroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2114,14 +2114,14 @@ func (cmd *CheckSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckSecuritygroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckSecuritygroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2137,7 +2137,7 @@ func (cmd *CheckSecuritygroup) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2161,11 +2161,11 @@ func (cmd *CheckSecuritygroup) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *CheckSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("securitygroup"), nil
 }
 
-func (cmd *CheckSecuritygroup) inject(params map[string]interface{}) error {
+func (cmd *CheckSecuritygroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2187,14 +2187,14 @@ func (cmd *CheckVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CheckVolume) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckVolume) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CheckVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckVolume) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2210,7 +2210,7 @@ func (cmd *CheckVolume) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2234,11 +2234,11 @@ func (cmd *CheckVolume) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CheckVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CheckVolume) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("volume"), nil
 }
 
-func (cmd *CheckVolume) inject(params map[string]interface{}) error {
+func (cmd *CheckVolume) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2260,14 +2260,14 @@ func (cmd *CopyImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CopyImage) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CopyImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CopyImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CopyImage) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2292,7 +2292,7 @@ func (cmd *CopyImage) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2316,7 +2316,7 @@ func (cmd *CopyImage) run(renv env.Running, params map[string]interface{}) (inte
 	return extracted, nil
 }
 
-func (cmd *CopyImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CopyImage) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2345,7 +2345,7 @@ func (cmd *CopyImage) dryRun(renv env.Running, params map[string]interface{}) (i
 	return nil, err
 }
 
-func (cmd *CopyImage) inject(params map[string]interface{}) error {
+func (cmd *CopyImage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2367,14 +2367,14 @@ func (cmd *CopySnapshot) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CopySnapshot) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CopySnapshot) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CopySnapshot) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CopySnapshot) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2399,7 +2399,7 @@ func (cmd *CopySnapshot) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2423,7 +2423,7 @@ func (cmd *CopySnapshot) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2452,7 +2452,7 @@ func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *CopySnapshot) inject(params map[string]interface{}) error {
+func (cmd *CopySnapshot) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2474,14 +2474,14 @@ func (cmd *CreateAccesskey) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateAccesskey) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAccesskey) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateAccesskey) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAccesskey) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2506,7 +2506,7 @@ func (cmd *CreateAccesskey) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2530,11 +2530,11 @@ func (cmd *CreateAccesskey) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *CreateAccesskey) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAccesskey) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("accesskey"), nil
 }
 
-func (cmd *CreateAccesskey) inject(params map[string]interface{}) error {
+func (cmd *CreateAccesskey) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2556,14 +2556,14 @@ func (cmd *CreateAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateAlarm) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAlarm) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2588,7 +2588,7 @@ func (cmd *CreateAlarm) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2612,11 +2612,11 @@ func (cmd *CreateAlarm) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CreateAlarm) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("alarm"), nil
 }
 
-func (cmd *CreateAlarm) inject(params map[string]interface{}) error {
+func (cmd *CreateAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2638,14 +2638,14 @@ func (cmd *CreateAppscalingpolicy) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateAppscalingpolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAppscalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2670,7 +2670,7 @@ func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2694,11 +2694,11 @@ func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *CreateAppscalingpolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAppscalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("appscalingpolicy"), nil
 }
 
-func (cmd *CreateAppscalingpolicy) inject(params map[string]interface{}) error {
+func (cmd *CreateAppscalingpolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2720,14 +2720,14 @@ func (cmd *CreateAppscalingtarget) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateAppscalingtarget) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAppscalingtarget) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2752,7 +2752,7 @@ func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2776,11 +2776,11 @@ func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *CreateAppscalingtarget) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateAppscalingtarget) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("appscalingtarget"), nil
 }
 
-func (cmd *CreateAppscalingtarget) inject(params map[string]interface{}) error {
+func (cmd *CreateAppscalingtarget) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2802,14 +2802,14 @@ func (cmd *CreateBucket) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateBucket) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateBucket) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateBucket) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateBucket) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2834,7 +2834,7 @@ func (cmd *CreateBucket) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2858,11 +2858,11 @@ func (cmd *CreateBucket) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *CreateBucket) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateBucket) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("bucket"), nil
 }
 
-func (cmd *CreateBucket) inject(params map[string]interface{}) error {
+func (cmd *CreateBucket) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2884,14 +2884,14 @@ func (cmd *CreateCertificate) SetApi(api *acm.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateCertificate) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateCertificate) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateCertificate) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateCertificate) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2907,7 +2907,7 @@ func (cmd *CreateCertificate) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -2931,11 +2931,11 @@ func (cmd *CreateCertificate) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *CreateCertificate) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateCertificate) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("certificate"), nil
 }
 
-func (cmd *CreateCertificate) inject(params map[string]interface{}) error {
+func (cmd *CreateCertificate) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -2957,14 +2957,14 @@ func (cmd *CreateClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateClassicLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -2989,7 +2989,7 @@ func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3013,11 +3013,11 @@ func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]in
 	return extracted, nil
 }
 
-func (cmd *CreateClassicLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("classicloadbalancer"), nil
 }
 
-func (cmd *CreateClassicLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *CreateClassicLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3039,14 +3039,14 @@ func (cmd *CreateContainercluster) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateContainercluster) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateContainercluster) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateContainercluster) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateContainercluster) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3071,7 +3071,7 @@ func (cmd *CreateContainercluster) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3095,11 +3095,11 @@ func (cmd *CreateContainercluster) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *CreateContainercluster) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateContainercluster) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("containercluster"), nil
 }
 
-func (cmd *CreateContainercluster) inject(params map[string]interface{}) error {
+func (cmd *CreateContainercluster) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3121,14 +3121,14 @@ func (cmd *CreateDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateDatabase) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDatabase) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3144,7 +3144,7 @@ func (cmd *CreateDatabase) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3168,11 +3168,11 @@ func (cmd *CreateDatabase) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *CreateDatabase) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("database"), nil
 }
 
-func (cmd *CreateDatabase) inject(params map[string]interface{}) error {
+func (cmd *CreateDatabase) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3194,14 +3194,14 @@ func (cmd *CreateDbsubnetgroup) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateDbsubnetgroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDbsubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3226,7 +3226,7 @@ func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3250,11 +3250,11 @@ func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *CreateDbsubnetgroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDbsubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("dbsubnetgroup"), nil
 }
 
-func (cmd *CreateDbsubnetgroup) inject(params map[string]interface{}) error {
+func (cmd *CreateDbsubnetgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3276,14 +3276,14 @@ func (cmd *CreateDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateDistribution) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDistribution) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDistribution) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3299,7 +3299,7 @@ func (cmd *CreateDistribution) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3323,11 +3323,11 @@ func (cmd *CreateDistribution) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *CreateDistribution) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("distribution"), nil
 }
 
-func (cmd *CreateDistribution) inject(params map[string]interface{}) error {
+func (cmd *CreateDistribution) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3349,14 +3349,14 @@ func (cmd *CreateElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateElasticip) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateElasticip) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateElasticip) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3381,7 +3381,7 @@ func (cmd *CreateElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3405,7 +3405,7 @@ func (cmd *CreateElasticip) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3434,7 +3434,7 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]interface
 	return nil, err
 }
 
-func (cmd *CreateElasticip) inject(params map[string]interface{}) error {
+func (cmd *CreateElasticip) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3456,14 +3456,14 @@ func (cmd *CreateFunction) SetApi(api *lambda.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateFunction) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateFunction) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateFunction) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateFunction) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3488,7 +3488,7 @@ func (cmd *CreateFunction) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3512,11 +3512,11 @@ func (cmd *CreateFunction) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *CreateFunction) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateFunction) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("function"), nil
 }
 
-func (cmd *CreateFunction) inject(params map[string]interface{}) error {
+func (cmd *CreateFunction) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3538,14 +3538,14 @@ func (cmd *CreateGroup) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateGroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateGroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateGroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateGroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3570,7 +3570,7 @@ func (cmd *CreateGroup) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3594,11 +3594,11 @@ func (cmd *CreateGroup) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CreateGroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateGroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("group"), nil
 }
 
-func (cmd *CreateGroup) inject(params map[string]interface{}) error {
+func (cmd *CreateGroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3620,14 +3620,14 @@ func (cmd *CreateImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateImage) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateImage) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3652,7 +3652,7 @@ func (cmd *CreateImage) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3676,7 +3676,7 @@ func (cmd *CreateImage) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CreateImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateImage) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3705,7 +3705,7 @@ func (cmd *CreateImage) dryRun(renv env.Running, params map[string]interface{}) 
 	return nil, err
 }
 
-func (cmd *CreateImage) inject(params map[string]interface{}) error {
+func (cmd *CreateImage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3727,14 +3727,14 @@ func (cmd *CreateInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3759,7 +3759,7 @@ func (cmd *CreateInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3783,7 +3783,7 @@ func (cmd *CreateInstance) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3812,7 +3812,7 @@ func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]interface{
 	return nil, err
 }
 
-func (cmd *CreateInstance) inject(params map[string]interface{}) error {
+func (cmd *CreateInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3834,14 +3834,14 @@ func (cmd *CreateInstanceprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateInstanceprofile) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3866,7 +3866,7 @@ func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3890,11 +3890,11 @@ func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *CreateInstanceprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInstanceprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("instanceprofile"), nil
 }
 
-func (cmd *CreateInstanceprofile) inject(params map[string]interface{}) error {
+func (cmd *CreateInstanceprofile) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3916,14 +3916,14 @@ func (cmd *CreateInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateInternetgateway) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -3948,7 +3948,7 @@ func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -3972,7 +3972,7 @@ func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4001,7 +4001,7 @@ func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]int
 	return nil, err
 }
 
-func (cmd *CreateInternetgateway) inject(params map[string]interface{}) error {
+func (cmd *CreateInternetgateway) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4023,14 +4023,14 @@ func (cmd *CreateKeypair) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateKeypair) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateKeypair) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateKeypair) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateKeypair) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4055,7 +4055,7 @@ func (cmd *CreateKeypair) run(renv env.Running, params map[string]interface{}) (
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4079,11 +4079,11 @@ func (cmd *CreateKeypair) run(renv env.Running, params map[string]interface{}) (
 	return extracted, nil
 }
 
-func (cmd *CreateKeypair) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateKeypair) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("keypair"), nil
 }
 
-func (cmd *CreateKeypair) inject(params map[string]interface{}) error {
+func (cmd *CreateKeypair) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4105,14 +4105,14 @@ func (cmd *CreateLaunchconfiguration) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateLaunchconfiguration) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLaunchconfiguration) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4137,7 +4137,7 @@ func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4161,11 +4161,11 @@ func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]in
 	return extracted, nil
 }
 
-func (cmd *CreateLaunchconfiguration) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLaunchconfiguration) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("launchconfiguration"), nil
 }
 
-func (cmd *CreateLaunchconfiguration) inject(params map[string]interface{}) error {
+func (cmd *CreateLaunchconfiguration) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4187,14 +4187,14 @@ func (cmd *CreateListener) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateListener) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateListener) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateListener) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateListener) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4219,7 +4219,7 @@ func (cmd *CreateListener) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4243,11 +4243,11 @@ func (cmd *CreateListener) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *CreateListener) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateListener) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("listener"), nil
 }
 
-func (cmd *CreateListener) inject(params map[string]interface{}) error {
+func (cmd *CreateListener) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4269,14 +4269,14 @@ func (cmd *CreateLoadbalancer) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4301,7 +4301,7 @@ func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4325,11 +4325,11 @@ func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *CreateLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("loadbalancer"), nil
 }
 
-func (cmd *CreateLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *CreateLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4351,14 +4351,14 @@ func (cmd *CreateLoginprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateLoginprofile) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLoginprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4383,7 +4383,7 @@ func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4407,11 +4407,11 @@ func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *CreateLoginprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateLoginprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("loginprofile"), nil
 }
 
-func (cmd *CreateLoginprofile) inject(params map[string]interface{}) error {
+func (cmd *CreateLoginprofile) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4433,14 +4433,14 @@ func (cmd *CreateMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateMfadevice) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateMfadevice) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4456,7 +4456,7 @@ func (cmd *CreateMfadevice) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4480,11 +4480,11 @@ func (cmd *CreateMfadevice) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *CreateMfadevice) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("mfadevice"), nil
 }
 
-func (cmd *CreateMfadevice) inject(params map[string]interface{}) error {
+func (cmd *CreateMfadevice) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4506,14 +4506,14 @@ func (cmd *CreateNatgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateNatgateway) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateNatgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateNatgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateNatgateway) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4538,7 +4538,7 @@ func (cmd *CreateNatgateway) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4562,11 +4562,11 @@ func (cmd *CreateNatgateway) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *CreateNatgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateNatgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("natgateway"), nil
 }
 
-func (cmd *CreateNatgateway) inject(params map[string]interface{}) error {
+func (cmd *CreateNatgateway) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4588,14 +4588,14 @@ func (cmd *CreateNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateNetworkinterface) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4620,7 +4620,7 @@ func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4644,7 +4644,7 @@ func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4673,7 +4673,7 @@ func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]in
 	return nil, err
 }
 
-func (cmd *CreateNetworkinterface) inject(params map[string]interface{}) error {
+func (cmd *CreateNetworkinterface) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4695,14 +4695,14 @@ func (cmd *CreatePolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreatePolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreatePolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreatePolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreatePolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4727,7 +4727,7 @@ func (cmd *CreatePolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4751,11 +4751,11 @@ func (cmd *CreatePolicy) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *CreatePolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreatePolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("policy"), nil
 }
 
-func (cmd *CreatePolicy) inject(params map[string]interface{}) error {
+func (cmd *CreatePolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4777,14 +4777,14 @@ func (cmd *CreateQueue) SetApi(api *sqs.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateQueue) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateQueue) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateQueue) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateQueue) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4809,7 +4809,7 @@ func (cmd *CreateQueue) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4833,11 +4833,11 @@ func (cmd *CreateQueue) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CreateQueue) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateQueue) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("queue"), nil
 }
 
-func (cmd *CreateQueue) inject(params map[string]interface{}) error {
+func (cmd *CreateQueue) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4859,14 +4859,14 @@ func (cmd *CreateRecord) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateRecord) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRecord) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateRecord) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRecord) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4882,7 +4882,7 @@ func (cmd *CreateRecord) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4906,11 +4906,11 @@ func (cmd *CreateRecord) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *CreateRecord) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRecord) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("record"), nil
 }
 
-func (cmd *CreateRecord) inject(params map[string]interface{}) error {
+func (cmd *CreateRecord) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -4932,14 +4932,14 @@ func (cmd *CreateRepository) SetApi(api *ecr.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateRepository) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRepository) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateRepository) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRepository) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -4964,7 +4964,7 @@ func (cmd *CreateRepository) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -4988,11 +4988,11 @@ func (cmd *CreateRepository) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *CreateRepository) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRepository) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("repository"), nil
 }
 
-func (cmd *CreateRepository) inject(params map[string]interface{}) error {
+func (cmd *CreateRepository) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5014,14 +5014,14 @@ func (cmd *CreateRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateRole) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRole) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRole) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5037,7 +5037,7 @@ func (cmd *CreateRole) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5061,11 +5061,11 @@ func (cmd *CreateRole) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *CreateRole) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRole) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("role"), nil
 }
 
-func (cmd *CreateRole) inject(params map[string]interface{}) error {
+func (cmd *CreateRole) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5087,14 +5087,14 @@ func (cmd *CreateRoute) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateRoute) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRoute) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateRoute) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRoute) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5119,7 +5119,7 @@ func (cmd *CreateRoute) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5143,7 +5143,7 @@ func (cmd *CreateRoute) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5172,7 +5172,7 @@ func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]interface{}) 
 	return nil, err
 }
 
-func (cmd *CreateRoute) inject(params map[string]interface{}) error {
+func (cmd *CreateRoute) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5194,14 +5194,14 @@ func (cmd *CreateRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateRoutetable) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRoutetable) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5226,7 +5226,7 @@ func (cmd *CreateRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5250,7 +5250,7 @@ func (cmd *CreateRoutetable) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5279,7 +5279,7 @@ func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]interfac
 	return nil, err
 }
 
-func (cmd *CreateRoutetable) inject(params map[string]interface{}) error {
+func (cmd *CreateRoutetable) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5301,14 +5301,14 @@ func (cmd *CreateS3object) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateS3object) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateS3object) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateS3object) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateS3object) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5324,7 +5324,7 @@ func (cmd *CreateS3object) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5348,11 +5348,11 @@ func (cmd *CreateS3object) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *CreateS3object) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateS3object) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("s3object"), nil
 }
 
-func (cmd *CreateS3object) inject(params map[string]interface{}) error {
+func (cmd *CreateS3object) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5374,14 +5374,14 @@ func (cmd *CreateScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateScalinggroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5406,7 +5406,7 @@ func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5430,11 +5430,11 @@ func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *CreateScalinggroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("scalinggroup"), nil
 }
 
-func (cmd *CreateScalinggroup) inject(params map[string]interface{}) error {
+func (cmd *CreateScalinggroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5456,14 +5456,14 @@ func (cmd *CreateScalingpolicy) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateScalingpolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateScalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5488,7 +5488,7 @@ func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5512,11 +5512,11 @@ func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *CreateScalingpolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateScalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("scalingpolicy"), nil
 }
 
-func (cmd *CreateScalingpolicy) inject(params map[string]interface{}) error {
+func (cmd *CreateScalingpolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5538,14 +5538,14 @@ func (cmd *CreateSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateSecuritygroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5570,7 +5570,7 @@ func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5594,7 +5594,7 @@ func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5623,7 +5623,7 @@ func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]inter
 	return nil, err
 }
 
-func (cmd *CreateSecuritygroup) inject(params map[string]interface{}) error {
+func (cmd *CreateSecuritygroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5645,14 +5645,14 @@ func (cmd *CreateSnapshot) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateSnapshot) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSnapshot) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateSnapshot) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSnapshot) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5677,7 +5677,7 @@ func (cmd *CreateSnapshot) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5701,7 +5701,7 @@ func (cmd *CreateSnapshot) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5730,7 +5730,7 @@ func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]interface{
 	return nil, err
 }
 
-func (cmd *CreateSnapshot) inject(params map[string]interface{}) error {
+func (cmd *CreateSnapshot) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5752,14 +5752,14 @@ func (cmd *CreateStack) SetApi(api *cloudformation.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateStack) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateStack) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateStack) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateStack) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5784,7 +5784,7 @@ func (cmd *CreateStack) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5808,11 +5808,11 @@ func (cmd *CreateStack) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CreateStack) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateStack) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("stack"), nil
 }
 
-func (cmd *CreateStack) inject(params map[string]interface{}) error {
+func (cmd *CreateStack) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5834,14 +5834,14 @@ func (cmd *CreateSubnet) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateSubnet) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSubnet) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateSubnet) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSubnet) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5866,7 +5866,7 @@ func (cmd *CreateSubnet) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5890,7 +5890,7 @@ func (cmd *CreateSubnet) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5919,7 +5919,7 @@ func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *CreateSubnet) inject(params map[string]interface{}) error {
+func (cmd *CreateSubnet) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5941,14 +5941,14 @@ func (cmd *CreateSubscription) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateSubscription) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSubscription) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateSubscription) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSubscription) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -5973,7 +5973,7 @@ func (cmd *CreateSubscription) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -5997,11 +5997,11 @@ func (cmd *CreateSubscription) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *CreateSubscription) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateSubscription) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("subscription"), nil
 }
 
-func (cmd *CreateSubscription) inject(params map[string]interface{}) error {
+func (cmd *CreateSubscription) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6023,14 +6023,14 @@ func (cmd *CreateTag) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateTag) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTag) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateTag) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTag) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6046,7 +6046,7 @@ func (cmd *CreateTag) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6070,7 +6070,7 @@ func (cmd *CreateTag) run(renv env.Running, params map[string]interface{}) (inte
 	return extracted, nil
 }
 
-func (cmd *CreateTag) inject(params map[string]interface{}) error {
+func (cmd *CreateTag) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6092,14 +6092,14 @@ func (cmd *CreateTargetgroup) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateTargetgroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTargetgroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6124,7 +6124,7 @@ func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6148,11 +6148,11 @@ func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *CreateTargetgroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTargetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("targetgroup"), nil
 }
 
-func (cmd *CreateTargetgroup) inject(params map[string]interface{}) error {
+func (cmd *CreateTargetgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6174,14 +6174,14 @@ func (cmd *CreateTopic) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateTopic) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTopic) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateTopic) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTopic) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6206,7 +6206,7 @@ func (cmd *CreateTopic) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6230,11 +6230,11 @@ func (cmd *CreateTopic) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *CreateTopic) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateTopic) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("topic"), nil
 }
 
-func (cmd *CreateTopic) inject(params map[string]interface{}) error {
+func (cmd *CreateTopic) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6256,14 +6256,14 @@ func (cmd *CreateUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateUser) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateUser) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateUser) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6288,7 +6288,7 @@ func (cmd *CreateUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6312,11 +6312,11 @@ func (cmd *CreateUser) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *CreateUser) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateUser) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("user"), nil
 }
 
-func (cmd *CreateUser) inject(params map[string]interface{}) error {
+func (cmd *CreateUser) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6338,14 +6338,14 @@ func (cmd *CreateVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateVolume) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateVolume) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateVolume) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6370,7 +6370,7 @@ func (cmd *CreateVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6394,7 +6394,7 @@ func (cmd *CreateVolume) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6423,7 +6423,7 @@ func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *CreateVolume) inject(params map[string]interface{}) error {
+func (cmd *CreateVolume) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6445,14 +6445,14 @@ func (cmd *CreateVpc) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateVpc) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateVpc) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateVpc) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateVpc) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6477,7 +6477,7 @@ func (cmd *CreateVpc) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6501,7 +6501,7 @@ func (cmd *CreateVpc) run(renv env.Running, params map[string]interface{}) (inte
 	return extracted, nil
 }
 
-func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6530,7 +6530,7 @@ func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]interface{}) (i
 	return nil, err
 }
 
-func (cmd *CreateVpc) inject(params map[string]interface{}) error {
+func (cmd *CreateVpc) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6552,14 +6552,14 @@ func (cmd *CreateZone) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
-func (cmd *CreateZone) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateZone) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *CreateZone) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateZone) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6584,7 +6584,7 @@ func (cmd *CreateZone) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6608,11 +6608,11 @@ func (cmd *CreateZone) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *CreateZone) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *CreateZone) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("zone"), nil
 }
 
-func (cmd *CreateZone) inject(params map[string]interface{}) error {
+func (cmd *CreateZone) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6634,14 +6634,14 @@ func (cmd *DeleteAccesskey) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteAccesskey) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAccesskey) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6666,7 +6666,7 @@ func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6690,11 +6690,11 @@ func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *DeleteAccesskey) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAccesskey) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("accesskey"), nil
 }
 
-func (cmd *DeleteAccesskey) inject(params map[string]interface{}) error {
+func (cmd *DeleteAccesskey) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6716,14 +6716,14 @@ func (cmd *DeleteAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteAlarm) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAlarm) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6748,7 +6748,7 @@ func (cmd *DeleteAlarm) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6772,11 +6772,11 @@ func (cmd *DeleteAlarm) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DeleteAlarm) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("alarm"), nil
 }
 
-func (cmd *DeleteAlarm) inject(params map[string]interface{}) error {
+func (cmd *DeleteAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6798,14 +6798,14 @@ func (cmd *DeleteAppscalingpolicy) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteAppscalingpolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAppscalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6830,7 +6830,7 @@ func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6854,11 +6854,11 @@ func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *DeleteAppscalingpolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAppscalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("appscalingpolicy"), nil
 }
 
-func (cmd *DeleteAppscalingpolicy) inject(params map[string]interface{}) error {
+func (cmd *DeleteAppscalingpolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6880,14 +6880,14 @@ func (cmd *DeleteAppscalingtarget) SetApi(api *applicationautoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteAppscalingtarget) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAppscalingtarget) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6912,7 +6912,7 @@ func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -6936,11 +6936,11 @@ func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *DeleteAppscalingtarget) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteAppscalingtarget) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("appscalingtarget"), nil
 }
 
-func (cmd *DeleteAppscalingtarget) inject(params map[string]interface{}) error {
+func (cmd *DeleteAppscalingtarget) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6962,14 +6962,14 @@ func (cmd *DeleteBucket) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteBucket) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteBucket) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteBucket) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteBucket) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -6994,7 +6994,7 @@ func (cmd *DeleteBucket) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7018,11 +7018,11 @@ func (cmd *DeleteBucket) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *DeleteBucket) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteBucket) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("bucket"), nil
 }
 
-func (cmd *DeleteBucket) inject(params map[string]interface{}) error {
+func (cmd *DeleteBucket) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7044,14 +7044,14 @@ func (cmd *DeleteCertificate) SetApi(api *acm.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteCertificate) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteCertificate) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteCertificate) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteCertificate) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7076,7 +7076,7 @@ func (cmd *DeleteCertificate) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7100,11 +7100,11 @@ func (cmd *DeleteCertificate) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *DeleteCertificate) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteCertificate) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("certificate"), nil
 }
 
-func (cmd *DeleteCertificate) inject(params map[string]interface{}) error {
+func (cmd *DeleteCertificate) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7126,14 +7126,14 @@ func (cmd *DeleteClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteClassicLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7158,7 +7158,7 @@ func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7182,11 +7182,11 @@ func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]in
 	return extracted, nil
 }
 
-func (cmd *DeleteClassicLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("classicloadbalancer"), nil
 }
 
-func (cmd *DeleteClassicLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *DeleteClassicLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7208,14 +7208,14 @@ func (cmd *DeleteContainercluster) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteContainercluster) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteContainercluster) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7240,7 +7240,7 @@ func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7264,11 +7264,11 @@ func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *DeleteContainercluster) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteContainercluster) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("containercluster"), nil
 }
 
-func (cmd *DeleteContainercluster) inject(params map[string]interface{}) error {
+func (cmd *DeleteContainercluster) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7290,14 +7290,14 @@ func (cmd *DeleteContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteContainertask) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteContainertask) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7313,7 +7313,7 @@ func (cmd *DeleteContainertask) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7337,7 +7337,7 @@ func (cmd *DeleteContainertask) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *DeleteContainertask) inject(params map[string]interface{}) error {
+func (cmd *DeleteContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7359,14 +7359,14 @@ func (cmd *DeleteDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteDatabase) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDatabase) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7391,7 +7391,7 @@ func (cmd *DeleteDatabase) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7415,11 +7415,11 @@ func (cmd *DeleteDatabase) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *DeleteDatabase) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("database"), nil
 }
 
-func (cmd *DeleteDatabase) inject(params map[string]interface{}) error {
+func (cmd *DeleteDatabase) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7441,14 +7441,14 @@ func (cmd *DeleteDbsubnetgroup) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteDbsubnetgroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDbsubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7473,7 +7473,7 @@ func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7497,11 +7497,11 @@ func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *DeleteDbsubnetgroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDbsubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("dbsubnetgroup"), nil
 }
 
-func (cmd *DeleteDbsubnetgroup) inject(params map[string]interface{}) error {
+func (cmd *DeleteDbsubnetgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7523,14 +7523,14 @@ func (cmd *DeleteDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteDistribution) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDistribution) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDistribution) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7546,7 +7546,7 @@ func (cmd *DeleteDistribution) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7570,11 +7570,11 @@ func (cmd *DeleteDistribution) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *DeleteDistribution) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("distribution"), nil
 }
 
-func (cmd *DeleteDistribution) inject(params map[string]interface{}) error {
+func (cmd *DeleteDistribution) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7596,14 +7596,14 @@ func (cmd *DeleteElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteElasticip) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteElasticip) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteElasticip) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7628,7 +7628,7 @@ func (cmd *DeleteElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7652,7 +7652,7 @@ func (cmd *DeleteElasticip) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7681,7 +7681,7 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]interface
 	return nil, err
 }
 
-func (cmd *DeleteElasticip) inject(params map[string]interface{}) error {
+func (cmd *DeleteElasticip) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7703,14 +7703,14 @@ func (cmd *DeleteFunction) SetApi(api *lambda.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteFunction) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteFunction) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteFunction) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteFunction) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7735,7 +7735,7 @@ func (cmd *DeleteFunction) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7759,11 +7759,11 @@ func (cmd *DeleteFunction) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *DeleteFunction) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteFunction) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("function"), nil
 }
 
-func (cmd *DeleteFunction) inject(params map[string]interface{}) error {
+func (cmd *DeleteFunction) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7785,14 +7785,14 @@ func (cmd *DeleteGroup) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteGroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteGroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteGroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteGroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7817,7 +7817,7 @@ func (cmd *DeleteGroup) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7841,11 +7841,11 @@ func (cmd *DeleteGroup) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DeleteGroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteGroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("group"), nil
 }
 
-func (cmd *DeleteGroup) inject(params map[string]interface{}) error {
+func (cmd *DeleteGroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7867,14 +7867,14 @@ func (cmd *DeleteImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteImage) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteImage) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7890,7 +7890,7 @@ func (cmd *DeleteImage) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7914,7 +7914,7 @@ func (cmd *DeleteImage) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DeleteImage) inject(params map[string]interface{}) error {
+func (cmd *DeleteImage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7936,14 +7936,14 @@ func (cmd *DeleteInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -7968,7 +7968,7 @@ func (cmd *DeleteInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -7992,7 +7992,7 @@ func (cmd *DeleteInstance) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8021,7 +8021,7 @@ func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]interface{
 	return nil, err
 }
 
-func (cmd *DeleteInstance) inject(params map[string]interface{}) error {
+func (cmd *DeleteInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8043,14 +8043,14 @@ func (cmd *DeleteInstanceprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteInstanceprofile) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8075,7 +8075,7 @@ func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8099,11 +8099,11 @@ func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *DeleteInstanceprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInstanceprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("instanceprofile"), nil
 }
 
-func (cmd *DeleteInstanceprofile) inject(params map[string]interface{}) error {
+func (cmd *DeleteInstanceprofile) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8125,14 +8125,14 @@ func (cmd *DeleteInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteInternetgateway) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8157,7 +8157,7 @@ func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8181,7 +8181,7 @@ func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8210,7 +8210,7 @@ func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]int
 	return nil, err
 }
 
-func (cmd *DeleteInternetgateway) inject(params map[string]interface{}) error {
+func (cmd *DeleteInternetgateway) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8232,14 +8232,14 @@ func (cmd *DeleteKeypair) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteKeypair) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteKeypair) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteKeypair) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteKeypair) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8264,7 +8264,7 @@ func (cmd *DeleteKeypair) run(renv env.Running, params map[string]interface{}) (
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8288,7 +8288,7 @@ func (cmd *DeleteKeypair) run(renv env.Running, params map[string]interface{}) (
 	return extracted, nil
 }
 
-func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8317,7 +8317,7 @@ func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]interface{}
 	return nil, err
 }
 
-func (cmd *DeleteKeypair) inject(params map[string]interface{}) error {
+func (cmd *DeleteKeypair) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8339,14 +8339,14 @@ func (cmd *DeleteLaunchconfiguration) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteLaunchconfiguration) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLaunchconfiguration) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8371,7 +8371,7 @@ func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8395,11 +8395,11 @@ func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]in
 	return extracted, nil
 }
 
-func (cmd *DeleteLaunchconfiguration) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLaunchconfiguration) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("launchconfiguration"), nil
 }
 
-func (cmd *DeleteLaunchconfiguration) inject(params map[string]interface{}) error {
+func (cmd *DeleteLaunchconfiguration) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8421,14 +8421,14 @@ func (cmd *DeleteListener) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteListener) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteListener) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteListener) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteListener) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8453,7 +8453,7 @@ func (cmd *DeleteListener) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8477,11 +8477,11 @@ func (cmd *DeleteListener) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *DeleteListener) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteListener) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("listener"), nil
 }
 
-func (cmd *DeleteListener) inject(params map[string]interface{}) error {
+func (cmd *DeleteListener) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8503,14 +8503,14 @@ func (cmd *DeleteLoadbalancer) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8535,7 +8535,7 @@ func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8559,11 +8559,11 @@ func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *DeleteLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("loadbalancer"), nil
 }
 
-func (cmd *DeleteLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *DeleteLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8585,14 +8585,14 @@ func (cmd *DeleteLoginprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteLoginprofile) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLoginprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8617,7 +8617,7 @@ func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8641,11 +8641,11 @@ func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *DeleteLoginprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteLoginprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("loginprofile"), nil
 }
 
-func (cmd *DeleteLoginprofile) inject(params map[string]interface{}) error {
+func (cmd *DeleteLoginprofile) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8667,14 +8667,14 @@ func (cmd *DeleteMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteMfadevice) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8699,7 +8699,7 @@ func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8723,11 +8723,11 @@ func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *DeleteMfadevice) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("mfadevice"), nil
 }
 
-func (cmd *DeleteMfadevice) inject(params map[string]interface{}) error {
+func (cmd *DeleteMfadevice) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8749,14 +8749,14 @@ func (cmd *DeleteNatgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteNatgateway) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteNatgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8781,7 +8781,7 @@ func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8805,11 +8805,11 @@ func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *DeleteNatgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteNatgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("natgateway"), nil
 }
 
-func (cmd *DeleteNatgateway) inject(params map[string]interface{}) error {
+func (cmd *DeleteNatgateway) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8831,14 +8831,14 @@ func (cmd *DeleteNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteNetworkinterface) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8863,7 +8863,7 @@ func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8887,7 +8887,7 @@ func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8916,7 +8916,7 @@ func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]in
 	return nil, err
 }
 
-func (cmd *DeleteNetworkinterface) inject(params map[string]interface{}) error {
+func (cmd *DeleteNetworkinterface) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8938,14 +8938,14 @@ func (cmd *DeletePolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeletePolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeletePolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeletePolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeletePolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -8970,7 +8970,7 @@ func (cmd *DeletePolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -8994,11 +8994,11 @@ func (cmd *DeletePolicy) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *DeletePolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeletePolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("policy"), nil
 }
 
-func (cmd *DeletePolicy) inject(params map[string]interface{}) error {
+func (cmd *DeletePolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9020,14 +9020,14 @@ func (cmd *DeleteQueue) SetApi(api *sqs.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteQueue) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteQueue) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteQueue) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteQueue) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9052,7 +9052,7 @@ func (cmd *DeleteQueue) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9076,11 +9076,11 @@ func (cmd *DeleteQueue) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DeleteQueue) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteQueue) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("queue"), nil
 }
 
-func (cmd *DeleteQueue) inject(params map[string]interface{}) error {
+func (cmd *DeleteQueue) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9102,14 +9102,14 @@ func (cmd *DeleteRecord) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteRecord) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRecord) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteRecord) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRecord) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9125,7 +9125,7 @@ func (cmd *DeleteRecord) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9149,11 +9149,11 @@ func (cmd *DeleteRecord) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *DeleteRecord) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRecord) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("record"), nil
 }
 
-func (cmd *DeleteRecord) inject(params map[string]interface{}) error {
+func (cmd *DeleteRecord) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9175,14 +9175,14 @@ func (cmd *DeleteRepository) SetApi(api *ecr.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteRepository) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRepository) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteRepository) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRepository) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9207,7 +9207,7 @@ func (cmd *DeleteRepository) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9231,11 +9231,11 @@ func (cmd *DeleteRepository) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *DeleteRepository) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRepository) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("repository"), nil
 }
 
-func (cmd *DeleteRepository) inject(params map[string]interface{}) error {
+func (cmd *DeleteRepository) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9257,14 +9257,14 @@ func (cmd *DeleteRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteRole) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRole) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRole) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9280,7 +9280,7 @@ func (cmd *DeleteRole) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9304,11 +9304,11 @@ func (cmd *DeleteRole) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *DeleteRole) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRole) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("role"), nil
 }
 
-func (cmd *DeleteRole) inject(params map[string]interface{}) error {
+func (cmd *DeleteRole) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9330,14 +9330,14 @@ func (cmd *DeleteRoute) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteRoute) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRoute) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteRoute) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRoute) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9362,7 +9362,7 @@ func (cmd *DeleteRoute) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9386,7 +9386,7 @@ func (cmd *DeleteRoute) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9415,7 +9415,7 @@ func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]interface{}) 
 	return nil, err
 }
 
-func (cmd *DeleteRoute) inject(params map[string]interface{}) error {
+func (cmd *DeleteRoute) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9437,14 +9437,14 @@ func (cmd *DeleteRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteRoutetable) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9469,7 +9469,7 @@ func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9493,7 +9493,7 @@ func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9522,7 +9522,7 @@ func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]interfac
 	return nil, err
 }
 
-func (cmd *DeleteRoutetable) inject(params map[string]interface{}) error {
+func (cmd *DeleteRoutetable) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9544,14 +9544,14 @@ func (cmd *DeleteS3object) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteS3object) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteS3object) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteS3object) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteS3object) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9576,7 +9576,7 @@ func (cmd *DeleteS3object) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9600,11 +9600,11 @@ func (cmd *DeleteS3object) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *DeleteS3object) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteS3object) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("s3object"), nil
 }
 
-func (cmd *DeleteS3object) inject(params map[string]interface{}) error {
+func (cmd *DeleteS3object) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9626,14 +9626,14 @@ func (cmd *DeleteScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteScalinggroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9658,7 +9658,7 @@ func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9682,11 +9682,11 @@ func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *DeleteScalinggroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("scalinggroup"), nil
 }
 
-func (cmd *DeleteScalinggroup) inject(params map[string]interface{}) error {
+func (cmd *DeleteScalinggroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9708,14 +9708,14 @@ func (cmd *DeleteScalingpolicy) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteScalingpolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteScalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9740,7 +9740,7 @@ func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9764,11 +9764,11 @@ func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *DeleteScalingpolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteScalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("scalingpolicy"), nil
 }
 
-func (cmd *DeleteScalingpolicy) inject(params map[string]interface{}) error {
+func (cmd *DeleteScalingpolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9790,14 +9790,14 @@ func (cmd *DeleteSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteSecuritygroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9822,7 +9822,7 @@ func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9846,7 +9846,7 @@ func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9875,7 +9875,7 @@ func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]inter
 	return nil, err
 }
 
-func (cmd *DeleteSecuritygroup) inject(params map[string]interface{}) error {
+func (cmd *DeleteSecuritygroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9897,14 +9897,14 @@ func (cmd *DeleteSnapshot) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteSnapshot) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSnapshot) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9929,7 +9929,7 @@ func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -9953,7 +9953,7 @@ func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -9982,7 +9982,7 @@ func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]interface{
 	return nil, err
 }
 
-func (cmd *DeleteSnapshot) inject(params map[string]interface{}) error {
+func (cmd *DeleteSnapshot) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10004,14 +10004,14 @@ func (cmd *DeleteStack) SetApi(api *cloudformation.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteStack) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteStack) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteStack) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteStack) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10036,7 +10036,7 @@ func (cmd *DeleteStack) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10060,11 +10060,11 @@ func (cmd *DeleteStack) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DeleteStack) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteStack) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("stack"), nil
 }
 
-func (cmd *DeleteStack) inject(params map[string]interface{}) error {
+func (cmd *DeleteStack) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10086,14 +10086,14 @@ func (cmd *DeleteSubnet) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteSubnet) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSubnet) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteSubnet) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSubnet) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10118,7 +10118,7 @@ func (cmd *DeleteSubnet) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10142,7 +10142,7 @@ func (cmd *DeleteSubnet) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10171,7 +10171,7 @@ func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *DeleteSubnet) inject(params map[string]interface{}) error {
+func (cmd *DeleteSubnet) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10193,14 +10193,14 @@ func (cmd *DeleteSubscription) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteSubscription) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSubscription) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteSubscription) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSubscription) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10225,7 +10225,7 @@ func (cmd *DeleteSubscription) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10249,11 +10249,11 @@ func (cmd *DeleteSubscription) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *DeleteSubscription) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteSubscription) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("subscription"), nil
 }
 
-func (cmd *DeleteSubscription) inject(params map[string]interface{}) error {
+func (cmd *DeleteSubscription) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10275,14 +10275,14 @@ func (cmd *DeleteTag) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteTag) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTag) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteTag) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTag) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10298,7 +10298,7 @@ func (cmd *DeleteTag) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10322,7 +10322,7 @@ func (cmd *DeleteTag) run(renv env.Running, params map[string]interface{}) (inte
 	return extracted, nil
 }
 
-func (cmd *DeleteTag) inject(params map[string]interface{}) error {
+func (cmd *DeleteTag) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10344,14 +10344,14 @@ func (cmd *DeleteTargetgroup) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteTargetgroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTargetgroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10376,7 +10376,7 @@ func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10400,11 +10400,11 @@ func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *DeleteTargetgroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTargetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("targetgroup"), nil
 }
 
-func (cmd *DeleteTargetgroup) inject(params map[string]interface{}) error {
+func (cmd *DeleteTargetgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10426,14 +10426,14 @@ func (cmd *DeleteTopic) SetApi(api *sns.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteTopic) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTopic) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteTopic) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTopic) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10458,7 +10458,7 @@ func (cmd *DeleteTopic) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10482,11 +10482,11 @@ func (cmd *DeleteTopic) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DeleteTopic) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteTopic) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("topic"), nil
 }
 
-func (cmd *DeleteTopic) inject(params map[string]interface{}) error {
+func (cmd *DeleteTopic) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10508,14 +10508,14 @@ func (cmd *DeleteUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteUser) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteUser) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteUser) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10540,7 +10540,7 @@ func (cmd *DeleteUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10564,11 +10564,11 @@ func (cmd *DeleteUser) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *DeleteUser) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteUser) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("user"), nil
 }
 
-func (cmd *DeleteUser) inject(params map[string]interface{}) error {
+func (cmd *DeleteUser) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10590,14 +10590,14 @@ func (cmd *DeleteVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteVolume) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteVolume) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteVolume) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10622,7 +10622,7 @@ func (cmd *DeleteVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10646,7 +10646,7 @@ func (cmd *DeleteVolume) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10675,7 +10675,7 @@ func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *DeleteVolume) inject(params map[string]interface{}) error {
+func (cmd *DeleteVolume) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10697,14 +10697,14 @@ func (cmd *DeleteVpc) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteVpc) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteVpc) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteVpc) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteVpc) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10729,7 +10729,7 @@ func (cmd *DeleteVpc) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10753,7 +10753,7 @@ func (cmd *DeleteVpc) run(renv env.Running, params map[string]interface{}) (inte
 	return extracted, nil
 }
 
-func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10782,7 +10782,7 @@ func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]interface{}) (i
 	return nil, err
 }
 
-func (cmd *DeleteVpc) inject(params map[string]interface{}) error {
+func (cmd *DeleteVpc) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10804,14 +10804,14 @@ func (cmd *DeleteZone) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
-func (cmd *DeleteZone) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteZone) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DeleteZone) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteZone) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10836,7 +10836,7 @@ func (cmd *DeleteZone) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10860,11 +10860,11 @@ func (cmd *DeleteZone) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *DeleteZone) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteZone) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("zone"), nil
 }
 
-func (cmd *DeleteZone) inject(params map[string]interface{}) error {
+func (cmd *DeleteZone) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10886,14 +10886,14 @@ func (cmd *DetachAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachAlarm) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachAlarm) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10909,7 +10909,7 @@ func (cmd *DetachAlarm) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -10933,11 +10933,11 @@ func (cmd *DetachAlarm) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *DetachAlarm) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("alarm"), nil
 }
 
-func (cmd *DetachAlarm) inject(params map[string]interface{}) error {
+func (cmd *DetachAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10959,14 +10959,14 @@ func (cmd *DetachClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachClassicLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -10991,7 +10991,7 @@ func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11015,11 +11015,11 @@ func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]in
 	return extracted, nil
 }
 
-func (cmd *DetachClassicLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("classicloadbalancer"), nil
 }
 
-func (cmd *DetachClassicLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *DetachClassicLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11041,14 +11041,14 @@ func (cmd *DetachContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachContainertask) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachContainertask) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11064,7 +11064,7 @@ func (cmd *DetachContainertask) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11088,11 +11088,11 @@ func (cmd *DetachContainertask) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *DetachContainertask) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("containertask"), nil
 }
 
-func (cmd *DetachContainertask) inject(params map[string]interface{}) error {
+func (cmd *DetachContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11114,14 +11114,14 @@ func (cmd *DetachElasticip) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachElasticip) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachElasticip) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachElasticip) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachElasticip) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11146,7 +11146,7 @@ func (cmd *DetachElasticip) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11170,7 +11170,7 @@ func (cmd *DetachElasticip) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11199,7 +11199,7 @@ func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]interface
 	return nil, err
 }
 
-func (cmd *DetachElasticip) inject(params map[string]interface{}) error {
+func (cmd *DetachElasticip) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11221,14 +11221,14 @@ func (cmd *DetachInstance) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11253,7 +11253,7 @@ func (cmd *DetachInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11277,11 +11277,11 @@ func (cmd *DetachInstance) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *DetachInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("instance"), nil
 }
 
-func (cmd *DetachInstance) inject(params map[string]interface{}) error {
+func (cmd *DetachInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11303,14 +11303,14 @@ func (cmd *DetachInstanceprofile) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachInstanceprofile) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachInstanceprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInstanceprofile) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11326,7 +11326,7 @@ func (cmd *DetachInstanceprofile) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11350,11 +11350,11 @@ func (cmd *DetachInstanceprofile) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *DetachInstanceprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInstanceprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("instanceprofile"), nil
 }
 
-func (cmd *DetachInstanceprofile) inject(params map[string]interface{}) error {
+func (cmd *DetachInstanceprofile) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11376,14 +11376,14 @@ func (cmd *DetachInternetgateway) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachInternetgateway) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11408,7 +11408,7 @@ func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]interf
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11432,7 +11432,7 @@ func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]interf
 	return extracted, nil
 }
 
-func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11461,7 +11461,7 @@ func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]int
 	return nil, err
 }
 
-func (cmd *DetachInternetgateway) inject(params map[string]interface{}) error {
+func (cmd *DetachInternetgateway) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11483,14 +11483,14 @@ func (cmd *DetachMfadevice) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachMfadevice) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachMfadevice) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachMfadevice) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11515,7 +11515,7 @@ func (cmd *DetachMfadevice) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11539,11 +11539,11 @@ func (cmd *DetachMfadevice) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *DetachMfadevice) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("mfadevice"), nil
 }
 
-func (cmd *DetachMfadevice) inject(params map[string]interface{}) error {
+func (cmd *DetachMfadevice) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11565,14 +11565,14 @@ func (cmd *DetachNetworkinterface) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachNetworkinterface) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachNetworkinterface) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachNetworkinterface) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11588,7 +11588,7 @@ func (cmd *DetachNetworkinterface) run(renv env.Running, params map[string]inter
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11612,7 +11612,7 @@ func (cmd *DetachNetworkinterface) run(renv env.Running, params map[string]inter
 	return extracted, nil
 }
 
-func (cmd *DetachNetworkinterface) inject(params map[string]interface{}) error {
+func (cmd *DetachNetworkinterface) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11634,14 +11634,14 @@ func (cmd *DetachPolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachPolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachPolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachPolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachPolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11657,7 +11657,7 @@ func (cmd *DetachPolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11681,11 +11681,11 @@ func (cmd *DetachPolicy) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *DetachPolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachPolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("policy"), nil
 }
 
-func (cmd *DetachPolicy) inject(params map[string]interface{}) error {
+func (cmd *DetachPolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11707,14 +11707,14 @@ func (cmd *DetachRole) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachRole) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachRole) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachRole) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachRole) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11739,7 +11739,7 @@ func (cmd *DetachRole) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11763,11 +11763,11 @@ func (cmd *DetachRole) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *DetachRole) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachRole) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("role"), nil
 }
 
-func (cmd *DetachRole) inject(params map[string]interface{}) error {
+func (cmd *DetachRole) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11789,14 +11789,14 @@ func (cmd *DetachRoutetable) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachRoutetable) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachRoutetable) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachRoutetable) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11821,7 +11821,7 @@ func (cmd *DetachRoutetable) run(renv env.Running, params map[string]interface{}
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11845,7 +11845,7 @@ func (cmd *DetachRoutetable) run(renv env.Running, params map[string]interface{}
 	return extracted, nil
 }
 
-func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11874,7 +11874,7 @@ func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]interfac
 	return nil, err
 }
 
-func (cmd *DetachRoutetable) inject(params map[string]interface{}) error {
+func (cmd *DetachRoutetable) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11896,14 +11896,14 @@ func (cmd *DetachSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachSecuritygroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachSecuritygroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -11919,7 +11919,7 @@ func (cmd *DetachSecuritygroup) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -11943,11 +11943,11 @@ func (cmd *DetachSecuritygroup) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *DetachSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("securitygroup"), nil
 }
 
-func (cmd *DetachSecuritygroup) inject(params map[string]interface{}) error {
+func (cmd *DetachSecuritygroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11969,14 +11969,14 @@ func (cmd *DetachUser) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachUser) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachUser) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachUser) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachUser) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12001,7 +12001,7 @@ func (cmd *DetachUser) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12025,11 +12025,11 @@ func (cmd *DetachUser) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *DetachUser) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachUser) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("user"), nil
 }
 
-func (cmd *DetachUser) inject(params map[string]interface{}) error {
+func (cmd *DetachUser) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12051,14 +12051,14 @@ func (cmd *DetachVolume) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *DetachVolume) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachVolume) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *DetachVolume) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachVolume) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12083,7 +12083,7 @@ func (cmd *DetachVolume) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12107,7 +12107,7 @@ func (cmd *DetachVolume) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12136,7 +12136,7 @@ func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *DetachVolume) inject(params map[string]interface{}) error {
+func (cmd *DetachVolume) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12158,14 +12158,14 @@ func (cmd *ImportImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *ImportImage) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *ImportImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *ImportImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *ImportImage) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12190,7 +12190,7 @@ func (cmd *ImportImage) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12214,7 +12214,7 @@ func (cmd *ImportImage) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *ImportImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *ImportImage) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12243,7 +12243,7 @@ func (cmd *ImportImage) dryRun(renv env.Running, params map[string]interface{}) 
 	return nil, err
 }
 
-func (cmd *ImportImage) inject(params map[string]interface{}) error {
+func (cmd *ImportImage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12265,14 +12265,14 @@ func (cmd *RestartDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *RestartDatabase) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *RestartDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *RestartDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *RestartDatabase) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12297,7 +12297,7 @@ func (cmd *RestartDatabase) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12321,11 +12321,11 @@ func (cmd *RestartDatabase) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *RestartDatabase) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *RestartDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("database"), nil
 }
 
-func (cmd *RestartDatabase) inject(params map[string]interface{}) error {
+func (cmd *RestartDatabase) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12347,14 +12347,14 @@ func (cmd *RestartInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *RestartInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *RestartInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *RestartInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *RestartInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12379,7 +12379,7 @@ func (cmd *RestartInstance) run(renv env.Running, params map[string]interface{})
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12403,7 +12403,7 @@ func (cmd *RestartInstance) run(renv env.Running, params map[string]interface{})
 	return extracted, nil
 }
 
-func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12432,7 +12432,7 @@ func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]interface
 	return nil, err
 }
 
-func (cmd *RestartInstance) inject(params map[string]interface{}) error {
+func (cmd *RestartInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12454,14 +12454,14 @@ func (cmd *StartAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
-func (cmd *StartAlarm) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StartAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartAlarm) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12486,7 +12486,7 @@ func (cmd *StartAlarm) run(renv env.Running, params map[string]interface{}) (int
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12510,11 +12510,11 @@ func (cmd *StartAlarm) run(renv env.Running, params map[string]interface{}) (int
 	return extracted, nil
 }
 
-func (cmd *StartAlarm) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("alarm"), nil
 }
 
-func (cmd *StartAlarm) inject(params map[string]interface{}) error {
+func (cmd *StartAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12536,14 +12536,14 @@ func (cmd *StartContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *StartContainertask) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StartContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartContainertask) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12559,7 +12559,7 @@ func (cmd *StartContainertask) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12583,11 +12583,11 @@ func (cmd *StartContainertask) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *StartContainertask) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("containertask"), nil
 }
 
-func (cmd *StartContainertask) inject(params map[string]interface{}) error {
+func (cmd *StartContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12609,14 +12609,14 @@ func (cmd *StartDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *StartDatabase) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StartDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartDatabase) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12641,7 +12641,7 @@ func (cmd *StartDatabase) run(renv env.Running, params map[string]interface{}) (
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12665,11 +12665,11 @@ func (cmd *StartDatabase) run(renv env.Running, params map[string]interface{}) (
 	return extracted, nil
 }
 
-func (cmd *StartDatabase) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("database"), nil
 }
 
-func (cmd *StartDatabase) inject(params map[string]interface{}) error {
+func (cmd *StartDatabase) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12691,14 +12691,14 @@ func (cmd *StartInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *StartInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StartInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12723,7 +12723,7 @@ func (cmd *StartInstance) run(renv env.Running, params map[string]interface{}) (
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12747,7 +12747,7 @@ func (cmd *StartInstance) run(renv env.Running, params map[string]interface{}) (
 	return extracted, nil
 }
 
-func (cmd *StartInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StartInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12776,7 +12776,7 @@ func (cmd *StartInstance) dryRun(renv env.Running, params map[string]interface{}
 	return nil, err
 }
 
-func (cmd *StartInstance) inject(params map[string]interface{}) error {
+func (cmd *StartInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12798,14 +12798,14 @@ func (cmd *StopAlarm) SetApi(api *cloudwatch.Client) {
 	cmd.api = api
 }
 
-func (cmd *StopAlarm) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StopAlarm) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopAlarm) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12830,7 +12830,7 @@ func (cmd *StopAlarm) run(renv env.Running, params map[string]interface{}) (inte
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12854,11 +12854,11 @@ func (cmd *StopAlarm) run(renv env.Running, params map[string]interface{}) (inte
 	return extracted, nil
 }
 
-func (cmd *StopAlarm) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("alarm"), nil
 }
 
-func (cmd *StopAlarm) inject(params map[string]interface{}) error {
+func (cmd *StopAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12880,14 +12880,14 @@ func (cmd *StopContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *StopContainertask) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StopContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopContainertask) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12903,7 +12903,7 @@ func (cmd *StopContainertask) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -12927,11 +12927,11 @@ func (cmd *StopContainertask) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *StopContainertask) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("containertask"), nil
 }
 
-func (cmd *StopContainertask) inject(params map[string]interface{}) error {
+func (cmd *StopContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12953,14 +12953,14 @@ func (cmd *StopDatabase) SetApi(api *rds.Client) {
 	cmd.api = api
 }
 
-func (cmd *StopDatabase) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StopDatabase) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopDatabase) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -12985,7 +12985,7 @@ func (cmd *StopDatabase) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13009,11 +13009,11 @@ func (cmd *StopDatabase) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *StopDatabase) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("database"), nil
 }
 
-func (cmd *StopDatabase) inject(params map[string]interface{}) error {
+func (cmd *StopDatabase) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13035,14 +13035,14 @@ func (cmd *StopInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *StopInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *StopInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13067,7 +13067,7 @@ func (cmd *StopInstance) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13091,7 +13091,7 @@ func (cmd *StopInstance) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *StopInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *StopInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13120,7 +13120,7 @@ func (cmd *StopInstance) dryRun(renv env.Running, params map[string]interface{})
 	return nil, err
 }
 
-func (cmd *StopInstance) inject(params map[string]interface{}) error {
+func (cmd *StopInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13142,14 +13142,14 @@ func (cmd *UpdateBucket) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateBucket) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateBucket) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateBucket) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateBucket) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13165,7 +13165,7 @@ func (cmd *UpdateBucket) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13189,11 +13189,11 @@ func (cmd *UpdateBucket) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *UpdateBucket) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateBucket) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("bucket"), nil
 }
 
-func (cmd *UpdateBucket) inject(params map[string]interface{}) error {
+func (cmd *UpdateBucket) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13215,14 +13215,14 @@ func (cmd *UpdateClassicLoadbalancer) SetApi(api *elb.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateClassicLoadbalancer) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13247,7 +13247,7 @@ func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13271,11 +13271,11 @@ func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]in
 	return extracted, nil
 }
 
-func (cmd *UpdateClassicLoadbalancer) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("classicloadbalancer"), nil
 }
 
-func (cmd *UpdateClassicLoadbalancer) inject(params map[string]interface{}) error {
+func (cmd *UpdateClassicLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13297,14 +13297,14 @@ func (cmd *UpdateContainertask) SetApi(api *ecs.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateContainertask) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateContainertask) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateContainertask) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13329,7 +13329,7 @@ func (cmd *UpdateContainertask) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13353,11 +13353,11 @@ func (cmd *UpdateContainertask) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *UpdateContainertask) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("containertask"), nil
 }
 
-func (cmd *UpdateContainertask) inject(params map[string]interface{}) error {
+func (cmd *UpdateContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13379,14 +13379,14 @@ func (cmd *UpdateDistribution) SetApi(api *cloudfront.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateDistribution) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateDistribution) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateDistribution) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateDistribution) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13402,7 +13402,7 @@ func (cmd *UpdateDistribution) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13426,11 +13426,11 @@ func (cmd *UpdateDistribution) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *UpdateDistribution) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("distribution"), nil
 }
 
-func (cmd *UpdateDistribution) inject(params map[string]interface{}) error {
+func (cmd *UpdateDistribution) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13452,14 +13452,14 @@ func (cmd *UpdateImage) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateImage) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateImage) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateImage) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13475,7 +13475,7 @@ func (cmd *UpdateImage) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13499,7 +13499,7 @@ func (cmd *UpdateImage) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *UpdateImage) inject(params map[string]interface{}) error {
+func (cmd *UpdateImage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13521,14 +13521,14 @@ func (cmd *UpdateInstance) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateInstance) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateInstance) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateInstance) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13553,7 +13553,7 @@ func (cmd *UpdateInstance) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13577,7 +13577,7 @@ func (cmd *UpdateInstance) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13606,7 +13606,7 @@ func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]interface{
 	return nil, err
 }
 
-func (cmd *UpdateInstance) inject(params map[string]interface{}) error {
+func (cmd *UpdateInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13628,14 +13628,14 @@ func (cmd *UpdateLoginprofile) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateLoginprofile) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateLoginprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13660,7 +13660,7 @@ func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13684,11 +13684,11 @@ func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *UpdateLoginprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateLoginprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("loginprofile"), nil
 }
 
-func (cmd *UpdateLoginprofile) inject(params map[string]interface{}) error {
+func (cmd *UpdateLoginprofile) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13710,14 +13710,14 @@ func (cmd *UpdatePolicy) SetApi(api *iam.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdatePolicy) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdatePolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdatePolicy) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdatePolicy) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13742,7 +13742,7 @@ func (cmd *UpdatePolicy) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13766,11 +13766,11 @@ func (cmd *UpdatePolicy) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *UpdatePolicy) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdatePolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("policy"), nil
 }
 
-func (cmd *UpdatePolicy) inject(params map[string]interface{}) error {
+func (cmd *UpdatePolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13792,14 +13792,14 @@ func (cmd *UpdateRecord) SetApi(api *route53.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateRecord) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateRecord) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateRecord) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateRecord) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13815,7 +13815,7 @@ func (cmd *UpdateRecord) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13839,11 +13839,11 @@ func (cmd *UpdateRecord) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *UpdateRecord) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateRecord) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("record"), nil
 }
 
-func (cmd *UpdateRecord) inject(params map[string]interface{}) error {
+func (cmd *UpdateRecord) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13865,14 +13865,14 @@ func (cmd *UpdateS3object) SetApi(api *s3.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateS3object) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateS3object) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateS3object) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateS3object) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13897,7 +13897,7 @@ func (cmd *UpdateS3object) run(renv env.Running, params map[string]interface{}) 
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -13921,11 +13921,11 @@ func (cmd *UpdateS3object) run(renv env.Running, params map[string]interface{}) 
 	return extracted, nil
 }
 
-func (cmd *UpdateS3object) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateS3object) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("s3object"), nil
 }
 
-func (cmd *UpdateS3object) inject(params map[string]interface{}) error {
+func (cmd *UpdateS3object) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13947,14 +13947,14 @@ func (cmd *UpdateScalinggroup) SetApi(api *autoscaling.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateScalinggroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -13979,7 +13979,7 @@ func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]interface
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -14003,11 +14003,11 @@ func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]interface
 	return extracted, nil
 }
 
-func (cmd *UpdateScalinggroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("scalinggroup"), nil
 }
 
-func (cmd *UpdateScalinggroup) inject(params map[string]interface{}) error {
+func (cmd *UpdateScalinggroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14029,14 +14029,14 @@ func (cmd *UpdateSecuritygroup) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateSecuritygroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateSecuritygroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateSecuritygroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -14052,7 +14052,7 @@ func (cmd *UpdateSecuritygroup) run(renv env.Running, params map[string]interfac
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -14076,7 +14076,7 @@ func (cmd *UpdateSecuritygroup) run(renv env.Running, params map[string]interfac
 	return extracted, nil
 }
 
-func (cmd *UpdateSecuritygroup) inject(params map[string]interface{}) error {
+func (cmd *UpdateSecuritygroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14098,14 +14098,14 @@ func (cmd *UpdateStack) SetApi(api *cloudformation.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateStack) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateStack) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateStack) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateStack) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -14130,7 +14130,7 @@ func (cmd *UpdateStack) run(renv env.Running, params map[string]interface{}) (in
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -14154,11 +14154,11 @@ func (cmd *UpdateStack) run(renv env.Running, params map[string]interface{}) (in
 	return extracted, nil
 }
 
-func (cmd *UpdateStack) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateStack) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("stack"), nil
 }
 
-func (cmd *UpdateStack) inject(params map[string]interface{}) error {
+func (cmd *UpdateStack) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14180,14 +14180,14 @@ func (cmd *UpdateSubnet) SetApi(api *ec2.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateSubnet) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateSubnet) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateSubnet) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateSubnet) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -14212,7 +14212,7 @@ func (cmd *UpdateSubnet) run(renv env.Running, params map[string]interface{}) (i
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -14236,11 +14236,11 @@ func (cmd *UpdateSubnet) run(renv env.Running, params map[string]interface{}) (i
 	return extracted, nil
 }
 
-func (cmd *UpdateSubnet) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateSubnet) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("subnet"), nil
 }
 
-func (cmd *UpdateSubnet) inject(params map[string]interface{}) error {
+func (cmd *UpdateSubnet) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14262,14 +14262,14 @@ func (cmd *UpdateTargetgroup) SetApi(api *elbv2.Client) {
 	cmd.api = api
 }
 
-func (cmd *UpdateTargetgroup) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateTargetgroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *UpdateTargetgroup) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateTargetgroup) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -14285,7 +14285,7 @@ func (cmd *UpdateTargetgroup) run(renv env.Running, params map[string]interface{
 		return nil, decorateAWSError(err)
 	}
 
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -14309,10 +14309,10 @@ func (cmd *UpdateTargetgroup) run(renv env.Running, params map[string]interface{
 	return extracted, nil
 }
 
-func (cmd *UpdateTargetgroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateTargetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("targetgroup"), nil
 }
 
-func (cmd *UpdateTargetgroup) inject(params map[string]interface{}) error {
+func (cmd *UpdateTargetgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }

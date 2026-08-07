@@ -21,7 +21,7 @@ import (
 	"encoding/gob"
 )
 
-type configs map[string]interface{}
+type configs map[string]any
 
 func (db *DB) GetConfigs(key string) (configs, error) {
 	d := make(configs)
@@ -36,7 +36,7 @@ func (db *DB) GetConfigs(key string) (configs, error) {
 	return d, gob.NewDecoder(bytes.NewReader(b)).Decode(&d)
 }
 
-func (db *DB) SetConfig(configsKey, k string, v interface{}) error {
+func (db *DB) SetConfig(configsKey, k string, v any) error {
 	d, err := db.GetConfigs(configsKey)
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (db *DB) UnsetConfig(configsKey, k string) error {
 	return db.saveConfigs(configsKey, d)
 }
 
-func (db *DB) GetConfig(configsKey, k string) (interface{}, bool) {
+func (db *DB) GetConfig(configsKey, k string) (any, bool) {
 	d, err := db.GetConfigs(configsKey)
 	if err != nil {
 		return nil, false

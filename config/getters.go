@@ -38,8 +38,8 @@ func GetAutosync() bool {
 	return true
 }
 
-func GetConfigWithPrefix(prefix string) map[string]interface{} {
-	conf := make(map[string]interface{})
+func GetConfigWithPrefix(prefix string) map[string]any {
+	conf := make(map[string]any)
 	for k, v := range Config {
 		if strings.HasPrefix(k, prefix) {
 			conf[k] = v

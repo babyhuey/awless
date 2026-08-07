@@ -21,1023 +21,908 @@ package awsservices
 // DO NOT EDIT - This file was automatically generated with go generate
 
 import (
-  "context"
-  ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
-  ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-  elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-  elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-  elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
-  elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
-  rds "github.com/aws/aws-sdk-go-v2/service/rds"
-  rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
-  autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
-  autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
-  acm "github.com/aws/aws-sdk-go-v2/service/acm"
-  acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
-  iam "github.com/aws/aws-sdk-go-v2/service/iam"
-  iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
-  _ "github.com/aws/aws-sdk-go-v2/service/s3"
-  s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
-  sns "github.com/aws/aws-sdk-go-v2/service/sns"
-  snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
-  sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
-  route53 "github.com/aws/aws-sdk-go-v2/service/route53"
-  route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
-  lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
-  lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
-  cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-  cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-  _ "github.com/aws/aws-sdk-go-v2/service/cloudfront"
-  cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-  cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
-  cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
-  ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
-  ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
-  ecs "github.com/aws/aws-sdk-go-v2/service/ecs"
-  ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
-  "github.com/bootswithdefer/awless/cloud"
+	"context"
+	acm "github.com/aws/aws-sdk-go-v2/service/acm"
+	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
+	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+	_ "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
+	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
+	ecs "github.com/aws/aws-sdk-go-v2/service/ecs"
+	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	iam "github.com/aws/aws-sdk-go-v2/service/iam"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	rds "github.com/aws/aws-sdk-go-v2/service/rds"
+	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
+	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
+	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
+	_ "github.com/aws/aws-sdk-go-v2/service/s3"
+	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+	sns "github.com/aws/aws-sdk-go-v2/service/sns"
+	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
+	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/bootswithdefer/awless/cloud"
 )
 
-
-
 type mockEc2 struct {
-		instances []ec2types.Instance
-		subnets []ec2types.Subnet
-		vpcs []ec2types.Vpc
-		keypairinfos []ec2types.KeyPairInfo
-		securitygroups []ec2types.SecurityGroup
-		volumes []ec2types.Volume
-		internetgateways []ec2types.InternetGateway
-		natgateways []ec2types.NatGateway
-		routetables []ec2types.RouteTable
-		availabilityzones []ec2types.AvailabilityZone
-		images []ec2types.Image
-		importimagetasks []ec2types.ImportImageTask
-		addresss []ec2types.Address
-		snapshots []ec2types.Snapshot
-		networkinterfaces []ec2types.NetworkInterface
+	instances         []ec2types.Instance
+	subnets           []ec2types.Subnet
+	vpcs              []ec2types.Vpc
+	keypairinfos      []ec2types.KeyPairInfo
+	securitygroups    []ec2types.SecurityGroup
+	volumes           []ec2types.Volume
+	internetgateways  []ec2types.InternetGateway
+	natgateways       []ec2types.NatGateway
+	routetables       []ec2types.RouteTable
+	availabilityzones []ec2types.AvailabilityZone
+	images            []ec2types.Image
+	importimagetasks  []ec2types.ImportImageTask
+	addresss          []ec2types.Address
+	snapshots         []ec2types.Snapshot
+	networkinterfaces []ec2types.NetworkInterface
 }
 
-func (m * mockEc2) Name() string {
+func (m *mockEc2) Name() string {
 	return ""
 }
 
-func (m * mockEc2) Region() string {
+func (m *mockEc2) Region() string {
 	return ""
 }
 
-func (m * mockEc2) Profile() string {
+func (m *mockEc2) Profile() string {
 	return ""
 }
 
-func (m * mockEc2) Provider() string {
+func (m *mockEc2) Provider() string {
 	return ""
 }
 
-func (m * mockEc2) ProviderAPI() string {
+func (m *mockEc2) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockEc2) ResourceTypes() []string {
+func (m *mockEc2) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockEc2) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockEc2) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockEc2) IsSyncDisabled() bool {
+func (m *mockEc2) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockEc2) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockEc2) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockEc2) DescribeSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSubnetsOutput, error) {
+	return &ec2.DescribeSubnetsOutput{Subnets: m.subnets}, nil
+}
 
+func (m *mockEc2) DescribeVpcs(ctx context.Context, input *ec2.DescribeVpcsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVpcsOutput, error) {
+	return &ec2.DescribeVpcsOutput{Vpcs: m.vpcs}, nil
+}
 
+func (m *mockEc2) DescribeKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeKeyPairsOutput, error) {
+	return &ec2.DescribeKeyPairsOutput{KeyPairs: m.keypairinfos}, nil
+}
 
-			func (m * mockEc2) DescribeSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSubnetsOutput, error) {
-				return &ec2.DescribeSubnetsOutput{ Subnets: m.subnets }, nil
-			}
+func (m *mockEc2) DescribeSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error) {
+	return &ec2.DescribeSecurityGroupsOutput{SecurityGroups: m.securitygroups}, nil
+}
 
+func (m *mockEc2) DescribeVolumes(ctx context.Context, input *ec2.DescribeVolumesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVolumesOutput, error) {
+	return &ec2.DescribeVolumesOutput{Volumes: m.volumes}, nil
+}
 
-			func (m * mockEc2) DescribeVpcs(ctx context.Context, input *ec2.DescribeVpcsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVpcsOutput, error) {
-				return &ec2.DescribeVpcsOutput{ Vpcs: m.vpcs }, nil
-			}
+func (m *mockEc2) DescribeInternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInternetGatewaysOutput, error) {
+	return &ec2.DescribeInternetGatewaysOutput{InternetGateways: m.internetgateways}, nil
+}
 
+func (m *mockEc2) DescribeNatGateways(ctx context.Context, input *ec2.DescribeNatGatewaysInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNatGatewaysOutput, error) {
+	return &ec2.DescribeNatGatewaysOutput{NatGateways: m.natgateways}, nil
+}
 
-			func (m * mockEc2) DescribeKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeKeyPairsOutput, error) {
-				return &ec2.DescribeKeyPairsOutput{ KeyPairs: m.keypairinfos }, nil
-			}
+func (m *mockEc2) DescribeRouteTables(ctx context.Context, input *ec2.DescribeRouteTablesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRouteTablesOutput, error) {
+	return &ec2.DescribeRouteTablesOutput{RouteTables: m.routetables}, nil
+}
 
+func (m *mockEc2) DescribeAvailabilityZones(ctx context.Context, input *ec2.DescribeAvailabilityZonesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAvailabilityZonesOutput, error) {
+	return &ec2.DescribeAvailabilityZonesOutput{AvailabilityZones: m.availabilityzones}, nil
+}
 
-			func (m * mockEc2) DescribeSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error) {
-				return &ec2.DescribeSecurityGroupsOutput{ SecurityGroups: m.securitygroups }, nil
-			}
+func (m *mockEc2) DescribeImages(ctx context.Context, input *ec2.DescribeImagesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeImagesOutput, error) {
+	return &ec2.DescribeImagesOutput{Images: m.images}, nil
+}
 
+func (m *mockEc2) DescribeImportImageTasks(ctx context.Context, input *ec2.DescribeImportImageTasksInput, optFns ...func(*ec2.Options)) (*ec2.DescribeImportImageTasksOutput, error) {
+	return &ec2.DescribeImportImageTasksOutput{ImportImageTasks: m.importimagetasks}, nil
+}
 
-			func (m * mockEc2) DescribeVolumes(ctx context.Context, input *ec2.DescribeVolumesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVolumesOutput, error) {
-				return &ec2.DescribeVolumesOutput{ Volumes: m.volumes }, nil
-			}
+func (m *mockEc2) DescribeAddresses(ctx context.Context, input *ec2.DescribeAddressesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAddressesOutput, error) {
+	return &ec2.DescribeAddressesOutput{Addresses: m.addresss}, nil
+}
 
+func (m *mockEc2) DescribeSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSnapshotsOutput, error) {
+	return &ec2.DescribeSnapshotsOutput{Snapshots: m.snapshots}, nil
+}
 
-			func (m * mockEc2) DescribeInternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInternetGatewaysOutput, error) {
-				return &ec2.DescribeInternetGatewaysOutput{ InternetGateways: m.internetgateways }, nil
-			}
-
-
-			func (m * mockEc2) DescribeNatGateways(ctx context.Context, input *ec2.DescribeNatGatewaysInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNatGatewaysOutput, error) {
-				return &ec2.DescribeNatGatewaysOutput{ NatGateways: m.natgateways }, nil
-			}
-
-
-			func (m * mockEc2) DescribeRouteTables(ctx context.Context, input *ec2.DescribeRouteTablesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRouteTablesOutput, error) {
-				return &ec2.DescribeRouteTablesOutput{ RouteTables: m.routetables }, nil
-			}
-
-
-			func (m * mockEc2) DescribeAvailabilityZones(ctx context.Context, input *ec2.DescribeAvailabilityZonesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAvailabilityZonesOutput, error) {
-				return &ec2.DescribeAvailabilityZonesOutput{ AvailabilityZones: m.availabilityzones }, nil
-			}
-
-
-			func (m * mockEc2) DescribeImages(ctx context.Context, input *ec2.DescribeImagesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeImagesOutput, error) {
-				return &ec2.DescribeImagesOutput{ Images: m.images }, nil
-			}
-
-
-			func (m * mockEc2) DescribeImportImageTasks(ctx context.Context, input *ec2.DescribeImportImageTasksInput, optFns ...func(*ec2.Options)) (*ec2.DescribeImportImageTasksOutput, error) {
-				return &ec2.DescribeImportImageTasksOutput{ ImportImageTasks: m.importimagetasks }, nil
-			}
-
-
-			func (m * mockEc2) DescribeAddresses(ctx context.Context, input *ec2.DescribeAddressesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAddressesOutput, error) {
-				return &ec2.DescribeAddressesOutput{ Addresses: m.addresss }, nil
-			}
-
-
-			func (m * mockEc2) DescribeSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSnapshotsOutput, error) {
-				return &ec2.DescribeSnapshotsOutput{ Snapshots: m.snapshots }, nil
-			}
-
-
-			func (m * mockEc2) DescribeNetworkInterfaces(ctx context.Context, input *ec2.DescribeNetworkInterfacesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNetworkInterfacesOutput, error) {
-				return &ec2.DescribeNetworkInterfacesOutput{ NetworkInterfaces: m.networkinterfaces }, nil
-			}
-
-
+func (m *mockEc2) DescribeNetworkInterfaces(ctx context.Context, input *ec2.DescribeNetworkInterfacesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNetworkInterfacesOutput, error) {
+	return &ec2.DescribeNetworkInterfacesOutput{NetworkInterfaces: m.networkinterfaces}, nil
+}
 
 type mockElbv2 struct {
-		loadbalancers []elbv2types.LoadBalancer
-		targetgroups []elbv2types.TargetGroup
-		listeners []elbv2types.Listener
-		targethealthdescriptions map[string][]elbv2types.TargetHealthDescription
+	loadbalancers            []elbv2types.LoadBalancer
+	targetgroups             []elbv2types.TargetGroup
+	listeners                []elbv2types.Listener
+	targethealthdescriptions map[string][]elbv2types.TargetHealthDescription
 }
 
-func (m * mockElbv2) Name() string {
+func (m *mockElbv2) Name() string {
 	return ""
 }
 
-func (m * mockElbv2) Region() string {
+func (m *mockElbv2) Region() string {
 	return ""
 }
 
-func (m * mockElbv2) Profile() string {
+func (m *mockElbv2) Profile() string {
 	return ""
 }
 
-func (m * mockElbv2) Provider() string {
+func (m *mockElbv2) Provider() string {
 	return ""
 }
 
-func (m * mockElbv2) ProviderAPI() string {
+func (m *mockElbv2) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockElbv2) ResourceTypes() []string {
+func (m *mockElbv2) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockElbv2) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockElbv2) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockElbv2) IsSyncDisabled() bool {
+func (m *mockElbv2) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockElbv2) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockElbv2) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockElbv2) DescribeLoadBalancers(ctx context.Context, input *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
+	return &elbv2.DescribeLoadBalancersOutput{LoadBalancers: m.loadbalancers}, nil
+}
 
-			func (m * mockElbv2) DescribeLoadBalancers(ctx context.Context, input *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
-				return &elbv2.DescribeLoadBalancersOutput{ LoadBalancers: m.loadbalancers }, nil
-			}
-
-
-			func (m * mockElbv2) DescribeTargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
-				return &elbv2.DescribeTargetGroupsOutput{ TargetGroups: m.targetgroups }, nil
-			}
-
-
-
-
-
-
+func (m *mockElbv2) DescribeTargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
+	return &elbv2.DescribeTargetGroupsOutput{TargetGroups: m.targetgroups}, nil
+}
 
 type mockElb struct {
-		loadbalancerdescriptions []elbtypes.LoadBalancerDescription
+	loadbalancerdescriptions []elbtypes.LoadBalancerDescription
 }
 
-func (m * mockElb) Name() string {
+func (m *mockElb) Name() string {
 	return ""
 }
 
-func (m * mockElb) Region() string {
+func (m *mockElb) Region() string {
 	return ""
 }
 
-func (m * mockElb) Profile() string {
+func (m *mockElb) Profile() string {
 	return ""
 }
 
-func (m * mockElb) Provider() string {
+func (m *mockElb) Provider() string {
 	return ""
 }
 
-func (m * mockElb) ProviderAPI() string {
+func (m *mockElb) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockElb) ResourceTypes() []string {
+func (m *mockElb) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockElb) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockElb) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockElb) IsSyncDisabled() bool {
+func (m *mockElb) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockElb) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockElb) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-
-			func (m * mockElb) DescribeLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
-				return &elb.DescribeLoadBalancersOutput{ LoadBalancerDescriptions: m.loadbalancerdescriptions }, nil
-			}
-
-
+func (m *mockElb) DescribeLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
+	return &elb.DescribeLoadBalancersOutput{LoadBalancerDescriptions: m.loadbalancerdescriptions}, nil
+}
 
 type mockRds struct {
-		dbinstances []rdstypes.DBInstance
-		dbsubnetgroups []rdstypes.DBSubnetGroup
+	dbinstances    []rdstypes.DBInstance
+	dbsubnetgroups []rdstypes.DBSubnetGroup
 }
 
-func (m * mockRds) Name() string {
+func (m *mockRds) Name() string {
 	return ""
 }
 
-func (m * mockRds) Region() string {
+func (m *mockRds) Region() string {
 	return ""
 }
 
-func (m * mockRds) Profile() string {
+func (m *mockRds) Profile() string {
 	return ""
 }
 
-func (m * mockRds) Provider() string {
+func (m *mockRds) Provider() string {
 	return ""
 }
 
-func (m * mockRds) ProviderAPI() string {
+func (m *mockRds) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockRds) ResourceTypes() []string {
+func (m *mockRds) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockRds) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockRds) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockRds) IsSyncDisabled() bool {
+func (m *mockRds) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockRds) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockRds) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockRds) DescribeDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput, optFns ...func(*rds.Options)) (*rds.DescribeDBInstancesOutput, error) {
+	return &rds.DescribeDBInstancesOutput{DBInstances: m.dbinstances}, nil
+}
 
-			func (m * mockRds) DescribeDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput, optFns ...func(*rds.Options)) (*rds.DescribeDBInstancesOutput, error) {
-				return &rds.DescribeDBInstancesOutput{ DBInstances: m.dbinstances }, nil
-			}
-
-
-			func (m * mockRds) DescribeDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput, optFns ...func(*rds.Options)) (*rds.DescribeDBSubnetGroupsOutput, error) {
-				return &rds.DescribeDBSubnetGroupsOutput{ DBSubnetGroups: m.dbsubnetgroups }, nil
-			}
-
-
+func (m *mockRds) DescribeDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput, optFns ...func(*rds.Options)) (*rds.DescribeDBSubnetGroupsOutput, error) {
+	return &rds.DescribeDBSubnetGroupsOutput{DBSubnetGroups: m.dbsubnetgroups}, nil
+}
 
 type mockAutoscaling struct {
-		launchconfigurations []autoscalingtypes.LaunchConfiguration
-		autoscalinggroups []autoscalingtypes.AutoScalingGroup
-		scalingpolicys []autoscalingtypes.ScalingPolicy
+	launchconfigurations []autoscalingtypes.LaunchConfiguration
+	autoscalinggroups    []autoscalingtypes.AutoScalingGroup
+	scalingpolicys       []autoscalingtypes.ScalingPolicy
 }
 
-func (m * mockAutoscaling) Name() string {
+func (m *mockAutoscaling) Name() string {
 	return ""
 }
 
-func (m * mockAutoscaling) Region() string {
+func (m *mockAutoscaling) Region() string {
 	return ""
 }
 
-func (m * mockAutoscaling) Profile() string {
+func (m *mockAutoscaling) Profile() string {
 	return ""
 }
 
-func (m * mockAutoscaling) Provider() string {
+func (m *mockAutoscaling) Provider() string {
 	return ""
 }
 
-func (m * mockAutoscaling) ProviderAPI() string {
+func (m *mockAutoscaling) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockAutoscaling) ResourceTypes() []string {
+func (m *mockAutoscaling) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockAutoscaling) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockAutoscaling) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockAutoscaling) IsSyncDisabled() bool {
+func (m *mockAutoscaling) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockAutoscaling) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockAutoscaling) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockAutoscaling) DescribeLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribeLaunchConfigurationsOutput, error) {
+	return &autoscaling.DescribeLaunchConfigurationsOutput{LaunchConfigurations: m.launchconfigurations}, nil
+}
 
-			func (m * mockAutoscaling) DescribeLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribeLaunchConfigurationsOutput, error) {
-				return &autoscaling.DescribeLaunchConfigurationsOutput{ LaunchConfigurations: m.launchconfigurations }, nil
-			}
+func (m *mockAutoscaling) DescribeAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
+	return &autoscaling.DescribeAutoScalingGroupsOutput{AutoScalingGroups: m.autoscalinggroups}, nil
+}
 
-
-			func (m * mockAutoscaling) DescribeAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
-				return &autoscaling.DescribeAutoScalingGroupsOutput{ AutoScalingGroups: m.autoscalinggroups }, nil
-			}
-
-
-			func (m * mockAutoscaling) DescribePolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribePoliciesOutput, error) {
-				return &autoscaling.DescribePoliciesOutput{ ScalingPolicies: m.scalingpolicys }, nil
-			}
-
-
+func (m *mockAutoscaling) DescribePolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput, optFns ...func(*autoscaling.Options)) (*autoscaling.DescribePoliciesOutput, error) {
+	return &autoscaling.DescribePoliciesOutput{ScalingPolicies: m.scalingpolicys}, nil
+}
 
 type mockAcm struct {
-		certificatesummarys []acmtypes.CertificateSummary
+	certificatesummarys []acmtypes.CertificateSummary
 }
 
-func (m * mockAcm) Name() string {
+func (m *mockAcm) Name() string {
 	return ""
 }
 
-func (m * mockAcm) Region() string {
+func (m *mockAcm) Region() string {
 	return ""
 }
 
-func (m * mockAcm) Profile() string {
+func (m *mockAcm) Profile() string {
 	return ""
 }
 
-func (m * mockAcm) Provider() string {
+func (m *mockAcm) Provider() string {
 	return ""
 }
 
-func (m * mockAcm) ProviderAPI() string {
+func (m *mockAcm) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockAcm) ResourceTypes() []string {
+func (m *mockAcm) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockAcm) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockAcm) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockAcm) IsSyncDisabled() bool {
+func (m *mockAcm) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockAcm) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockAcm) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-
-			func (m * mockAcm) ListCertificates(ctx context.Context, input *acm.ListCertificatesInput, optFns ...func(*acm.Options)) (*acm.ListCertificatesOutput, error) {
-				return &acm.ListCertificatesOutput{ CertificateSummaryList: m.certificatesummarys }, nil
-			}
-
-
+func (m *mockAcm) ListCertificates(ctx context.Context, input *acm.ListCertificatesInput, optFns ...func(*acm.Options)) (*acm.ListCertificatesOutput, error) {
+	return &acm.ListCertificatesOutput{CertificateSummaryList: m.certificatesummarys}, nil
+}
 
 type mockIam struct {
-		userdetails []iamtypes.UserDetail
-		groupdetails []iamtypes.GroupDetail
-		roledetails []iamtypes.RoleDetail
-		policys []iamtypes.Policy
-		accesskeymetadatas []iamtypes.AccessKeyMetadata
-		instanceprofiles []iamtypes.InstanceProfile
-		managedpolicydetails []iamtypes.ManagedPolicyDetail
-		users []iamtypes.User
-		virtualmfadevices []iamtypes.VirtualMFADevice
+	userdetails          []iamtypes.UserDetail
+	groupdetails         []iamtypes.GroupDetail
+	roledetails          []iamtypes.RoleDetail
+	policys              []iamtypes.Policy
+	accesskeymetadatas   []iamtypes.AccessKeyMetadata
+	instanceprofiles     []iamtypes.InstanceProfile
+	managedpolicydetails []iamtypes.ManagedPolicyDetail
+	users                []iamtypes.User
+	virtualmfadevices    []iamtypes.VirtualMFADevice
 }
 
-func (m * mockIam) Name() string {
+func (m *mockIam) Name() string {
 	return ""
 }
 
-func (m * mockIam) Region() string {
+func (m *mockIam) Region() string {
 	return ""
 }
 
-func (m * mockIam) Profile() string {
+func (m *mockIam) Profile() string {
 	return ""
 }
 
-func (m * mockIam) Provider() string {
+func (m *mockIam) Provider() string {
 	return ""
 }
 
-func (m * mockIam) ProviderAPI() string {
+func (m *mockIam) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockIam) ResourceTypes() []string {
+func (m *mockIam) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockIam) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockIam) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockIam) IsSyncDisabled() bool {
+func (m *mockIam) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockIam) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockIam) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockIam) ListAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput, optFns ...func(*iam.Options)) (*iam.ListAccessKeysOutput, error) {
+	return &iam.ListAccessKeysOutput{AccessKeyMetadata: m.accesskeymetadatas}, nil
+}
 
+func (m *mockIam) ListInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput, optFns ...func(*iam.Options)) (*iam.ListInstanceProfilesOutput, error) {
+	return &iam.ListInstanceProfilesOutput{InstanceProfiles: m.instanceprofiles}, nil
+}
 
-
-
-
-
-
-
-
-			func (m * mockIam) ListAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput, optFns ...func(*iam.Options)) (*iam.ListAccessKeysOutput, error) {
-				return &iam.ListAccessKeysOutput{ AccessKeyMetadata: m.accesskeymetadatas }, nil
-			}
-
-
-			func (m * mockIam) ListInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput, optFns ...func(*iam.Options)) (*iam.ListInstanceProfilesOutput, error) {
-				return &iam.ListInstanceProfilesOutput{ InstanceProfiles: m.instanceprofiles }, nil
-			}
-
-
-
-
-
-
-			func (m * mockIam) ListVirtualMFADevices(ctx context.Context, input *iam.ListVirtualMFADevicesInput, optFns ...func(*iam.Options)) (*iam.ListVirtualMFADevicesOutput, error) {
-				return &iam.ListVirtualMFADevicesOutput{ VirtualMFADevices: m.virtualmfadevices }, nil
-			}
-
-
+func (m *mockIam) ListVirtualMFADevices(ctx context.Context, input *iam.ListVirtualMFADevicesInput, optFns ...func(*iam.Options)) (*iam.ListVirtualMFADevicesOutput, error) {
+	return &iam.ListVirtualMFADevicesOutput{VirtualMFADevices: m.virtualmfadevices}, nil
+}
 
 type mockS3 struct {
-		buckets map[string][]s3types.Bucket
-		objects map[string][]s3types.Object
-		grants map[string][]s3types.Grant
+	buckets map[string][]s3types.Bucket
+	objects map[string][]s3types.Object
+	grants  map[string][]s3types.Grant
 }
 
-func (m * mockS3) Name() string {
+func (m *mockS3) Name() string {
 	return ""
 }
 
-func (m * mockS3) Region() string {
+func (m *mockS3) Region() string {
 	return ""
 }
 
-func (m * mockS3) Profile() string {
+func (m *mockS3) Profile() string {
 	return ""
 }
 
-func (m * mockS3) Provider() string {
+func (m *mockS3) Provider() string {
 	return ""
 }
 
-func (m * mockS3) ProviderAPI() string {
+func (m *mockS3) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockS3) ResourceTypes() []string {
+func (m *mockS3) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockS3) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockS3) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockS3) IsSyncDisabled() bool {
+func (m *mockS3) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockS3) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockS3) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
-
-
-
-
-
-
-
-
 
 type mockSns struct {
-		subscriptions []snstypes.Subscription
-		topics []snstypes.Topic
+	subscriptions []snstypes.Subscription
+	topics        []snstypes.Topic
 }
 
-func (m * mockSns) Name() string {
+func (m *mockSns) Name() string {
 	return ""
 }
 
-func (m * mockSns) Region() string {
+func (m *mockSns) Region() string {
 	return ""
 }
 
-func (m * mockSns) Profile() string {
+func (m *mockSns) Profile() string {
 	return ""
 }
 
-func (m * mockSns) Provider() string {
+func (m *mockSns) Provider() string {
 	return ""
 }
 
-func (m * mockSns) ProviderAPI() string {
+func (m *mockSns) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockSns) ResourceTypes() []string {
+func (m *mockSns) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockSns) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockSns) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockSns) IsSyncDisabled() bool {
+func (m *mockSns) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockSns) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockSns) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockSns) ListSubscriptions(ctx context.Context, input *sns.ListSubscriptionsInput, optFns ...func(*sns.Options)) (*sns.ListSubscriptionsOutput, error) {
+	return &sns.ListSubscriptionsOutput{Subscriptions: m.subscriptions}, nil
+}
 
-			func (m * mockSns) ListSubscriptions(ctx context.Context, input *sns.ListSubscriptionsInput, optFns ...func(*sns.Options)) (*sns.ListSubscriptionsOutput, error) {
-				return &sns.ListSubscriptionsOutput{ Subscriptions: m.subscriptions }, nil
-			}
-
-
-			func (m * mockSns) ListTopics(ctx context.Context, input *sns.ListTopicsInput, optFns ...func(*sns.Options)) (*sns.ListTopicsOutput, error) {
-				return &sns.ListTopicsOutput{ Topics: m.topics }, nil
-			}
-
-
+func (m *mockSns) ListTopics(ctx context.Context, input *sns.ListTopicsInput, optFns ...func(*sns.Options)) (*sns.ListTopicsOutput, error) {
+	return &sns.ListTopicsOutput{Topics: m.topics}, nil
+}
 
 type mockSqs struct {
-		strings []string
-			attributes map[string]map[string]string
+	strings    []string
+	attributes map[string]map[string]string
 }
 
-func (m * mockSqs) Name() string {
+func (m *mockSqs) Name() string {
 	return ""
 }
 
-func (m * mockSqs) Region() string {
+func (m *mockSqs) Region() string {
 	return ""
 }
 
-func (m * mockSqs) Profile() string {
+func (m *mockSqs) Profile() string {
 	return ""
 }
 
-func (m * mockSqs) Provider() string {
+func (m *mockSqs) Provider() string {
 	return ""
 }
 
-func (m * mockSqs) ProviderAPI() string {
+func (m *mockSqs) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockSqs) ResourceTypes() []string {
+func (m *mockSqs) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockSqs) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockSqs) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockSqs) IsSyncDisabled() bool {
+func (m *mockSqs) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockSqs) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockSqs) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-
-			func (m * mockSqs) ListQueues(ctx context.Context, input *sqs.ListQueuesInput, optFns ...func(*sqs.Options)) (*sqs.ListQueuesOutput, error) {
-				return &sqs.ListQueuesOutput{ QueueUrls: m.strings }, nil
-			}
-
-
-
-
+func (m *mockSqs) ListQueues(ctx context.Context, input *sqs.ListQueuesInput, optFns ...func(*sqs.Options)) (*sqs.ListQueuesOutput, error) {
+	return &sqs.ListQueuesOutput{QueueUrls: m.strings}, nil
+}
 
 type mockRoute53 struct {
-		hostedzones []route53types.HostedZone
-		resourcerecordsets map[string][]route53types.ResourceRecordSet
+	hostedzones        []route53types.HostedZone
+	resourcerecordsets map[string][]route53types.ResourceRecordSet
 }
 
-func (m * mockRoute53) Name() string {
+func (m *mockRoute53) Name() string {
 	return ""
 }
 
-func (m * mockRoute53) Region() string {
+func (m *mockRoute53) Region() string {
 	return ""
 }
 
-func (m * mockRoute53) Profile() string {
+func (m *mockRoute53) Profile() string {
 	return ""
 }
 
-func (m * mockRoute53) Provider() string {
+func (m *mockRoute53) Provider() string {
 	return ""
 }
 
-func (m * mockRoute53) ProviderAPI() string {
+func (m *mockRoute53) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockRoute53) ResourceTypes() []string {
+func (m *mockRoute53) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockRoute53) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockRoute53) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockRoute53) IsSyncDisabled() bool {
+func (m *mockRoute53) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockRoute53) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockRoute53) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-
-			func (m * mockRoute53) ListHostedZones(ctx context.Context, input *route53.ListHostedZonesInput, optFns ...func(*route53.Options)) (*route53.ListHostedZonesOutput, error) {
-				return &route53.ListHostedZonesOutput{ HostedZones: m.hostedzones }, nil
-			}
-
-
-
-
+func (m *mockRoute53) ListHostedZones(ctx context.Context, input *route53.ListHostedZonesInput, optFns ...func(*route53.Options)) (*route53.ListHostedZonesOutput, error) {
+	return &route53.ListHostedZonesOutput{HostedZones: m.hostedzones}, nil
+}
 
 type mockLambda struct {
-		functionconfigurations []lambdatypes.FunctionConfiguration
+	functionconfigurations []lambdatypes.FunctionConfiguration
 }
 
-func (m * mockLambda) Name() string {
+func (m *mockLambda) Name() string {
 	return ""
 }
 
-func (m * mockLambda) Region() string {
+func (m *mockLambda) Region() string {
 	return ""
 }
 
-func (m * mockLambda) Profile() string {
+func (m *mockLambda) Profile() string {
 	return ""
 }
 
-func (m * mockLambda) Provider() string {
+func (m *mockLambda) Provider() string {
 	return ""
 }
 
-func (m * mockLambda) ProviderAPI() string {
+func (m *mockLambda) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockLambda) ResourceTypes() []string {
+func (m *mockLambda) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockLambda) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockLambda) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockLambda) IsSyncDisabled() bool {
+func (m *mockLambda) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockLambda) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockLambda) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-
-			func (m * mockLambda) ListFunctions(ctx context.Context, input *lambda.ListFunctionsInput, optFns ...func(*lambda.Options)) (*lambda.ListFunctionsOutput, error) {
-				return &lambda.ListFunctionsOutput{ Functions: m.functionconfigurations }, nil
-			}
-
-
+func (m *mockLambda) ListFunctions(ctx context.Context, input *lambda.ListFunctionsInput, optFns ...func(*lambda.Options)) (*lambda.ListFunctionsOutput, error) {
+	return &lambda.ListFunctionsOutput{Functions: m.functionconfigurations}, nil
+}
 
 type mockCloudwatch struct {
-		metrics []cloudwatchtypes.Metric
-		metricalarms []cloudwatchtypes.MetricAlarm
+	metrics      []cloudwatchtypes.Metric
+	metricalarms []cloudwatchtypes.MetricAlarm
 }
 
-func (m * mockCloudwatch) Name() string {
+func (m *mockCloudwatch) Name() string {
 	return ""
 }
 
-func (m * mockCloudwatch) Region() string {
+func (m *mockCloudwatch) Region() string {
 	return ""
 }
 
-func (m * mockCloudwatch) Profile() string {
+func (m *mockCloudwatch) Profile() string {
 	return ""
 }
 
-func (m * mockCloudwatch) Provider() string {
+func (m *mockCloudwatch) Provider() string {
 	return ""
 }
 
-func (m * mockCloudwatch) ProviderAPI() string {
+func (m *mockCloudwatch) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockCloudwatch) ResourceTypes() []string {
+func (m *mockCloudwatch) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockCloudwatch) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockCloudwatch) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockCloudwatch) IsSyncDisabled() bool {
+func (m *mockCloudwatch) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockCloudwatch) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockCloudwatch) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockCloudwatch) ListMetrics(ctx context.Context, input *cloudwatch.ListMetricsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	return &cloudwatch.ListMetricsOutput{Metrics: m.metrics}, nil
+}
 
-			func (m * mockCloudwatch) ListMetrics(ctx context.Context, input *cloudwatch.ListMetricsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
-				return &cloudwatch.ListMetricsOutput{ Metrics: m.metrics }, nil
-			}
-
-
-			func (m * mockCloudwatch) DescribeAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsOutput, error) {
-				return &cloudwatch.DescribeAlarmsOutput{ MetricAlarms: m.metricalarms }, nil
-			}
-
-
+func (m *mockCloudwatch) DescribeAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsOutput, error) {
+	return &cloudwatch.DescribeAlarmsOutput{MetricAlarms: m.metricalarms}, nil
+}
 
 type mockCloudfront struct {
-		distributionsummarys []cloudfronttypes.DistributionSummary
+	distributionsummarys []cloudfronttypes.DistributionSummary
 }
 
-func (m * mockCloudfront) Name() string {
+func (m *mockCloudfront) Name() string {
 	return ""
 }
 
-func (m * mockCloudfront) Region() string {
+func (m *mockCloudfront) Region() string {
 	return ""
 }
 
-func (m * mockCloudfront) Profile() string {
+func (m *mockCloudfront) Profile() string {
 	return ""
 }
 
-func (m * mockCloudfront) Provider() string {
+func (m *mockCloudfront) Provider() string {
 	return ""
 }
 
-func (m * mockCloudfront) ProviderAPI() string {
+func (m *mockCloudfront) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockCloudfront) ResourceTypes() []string {
+func (m *mockCloudfront) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockCloudfront) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockCloudfront) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockCloudfront) IsSyncDisabled() bool {
+func (m *mockCloudfront) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockCloudfront) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockCloudfront) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
-
-
-
-
 
 type mockCloudformation struct {
-		stacks []cloudformationtypes.Stack
+	stacks []cloudformationtypes.Stack
 }
 
-func (m * mockCloudformation) Name() string {
+func (m *mockCloudformation) Name() string {
 	return ""
 }
 
-func (m * mockCloudformation) Region() string {
+func (m *mockCloudformation) Region() string {
 	return ""
 }
 
-func (m * mockCloudformation) Profile() string {
+func (m *mockCloudformation) Profile() string {
 	return ""
 }
 
-func (m * mockCloudformation) Provider() string {
+func (m *mockCloudformation) Provider() string {
 	return ""
 }
 
-func (m * mockCloudformation) ProviderAPI() string {
+func (m *mockCloudformation) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockCloudformation) ResourceTypes() []string {
+func (m *mockCloudformation) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockCloudformation) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockCloudformation) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockCloudformation) IsSyncDisabled() bool {
+func (m *mockCloudformation) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockCloudformation) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockCloudformation) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-
-			func (m * mockCloudformation) DescribeStacks(ctx context.Context, input *cloudformation.DescribeStacksInput, optFns ...func(*cloudformation.Options)) (*cloudformation.DescribeStacksOutput, error) {
-				return &cloudformation.DescribeStacksOutput{ Stacks: m.stacks }, nil
-			}
-
-
+func (m *mockCloudformation) DescribeStacks(ctx context.Context, input *cloudformation.DescribeStacksInput, optFns ...func(*cloudformation.Options)) (*cloudformation.DescribeStacksOutput, error) {
+	return &cloudformation.DescribeStacksOutput{Stacks: m.stacks}, nil
+}
 
 type mockEcr struct {
-		repositorys []ecrtypes.Repository
+	repositorys []ecrtypes.Repository
 }
 
-func (m * mockEcr) Name() string {
+func (m *mockEcr) Name() string {
 	return ""
 }
 
-func (m * mockEcr) Region() string {
+func (m *mockEcr) Region() string {
 	return ""
 }
 
-func (m * mockEcr) Profile() string {
+func (m *mockEcr) Profile() string {
 	return ""
 }
 
-func (m * mockEcr) Provider() string {
+func (m *mockEcr) Provider() string {
 	return ""
 }
 
-func (m * mockEcr) ProviderAPI() string {
+func (m *mockEcr) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockEcr) ResourceTypes() []string {
+func (m *mockEcr) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockEcr) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockEcr) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockEcr) IsSyncDisabled() bool {
+func (m *mockEcr) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockEcr) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockEcr) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-
-			func (m * mockEcr) DescribeRepositories(ctx context.Context, input *ecr.DescribeRepositoriesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeRepositoriesOutput, error) {
-				return &ecr.DescribeRepositoriesOutput{ Repositories: m.repositorys }, nil
-			}
-
-
+func (m *mockEcr) DescribeRepositories(ctx context.Context, input *ecr.DescribeRepositoriesInput, optFns ...func(*ecr.Options)) (*ecr.DescribeRepositoriesOutput, error) {
+	return &ecr.DescribeRepositoriesOutput{Repositories: m.repositorys}, nil
+}
 
 type mockEcs struct {
-		clusters []ecstypes.Cluster
-		clusterNames []string
-		taskdefinitions []ecstypes.TaskDefinition
-		taskdefinitionNames []string
-		tasks map[string][]ecstypes.Task
-		tasksNames map[string][]string
-		containerinstancesNames map[string][]string
-		containerinstances map[string][]ecstypes.ContainerInstance
+	clusters                []ecstypes.Cluster
+	clusterNames            []string
+	taskdefinitions         []ecstypes.TaskDefinition
+	taskdefinitionNames     []string
+	tasks                   map[string][]ecstypes.Task
+	tasksNames              map[string][]string
+	containerinstancesNames map[string][]string
+	containerinstances      map[string][]ecstypes.ContainerInstance
 }
 
-func (m * mockEcs) Name() string {
+func (m *mockEcs) Name() string {
 	return ""
 }
 
-func (m * mockEcs) Region() string {
+func (m *mockEcs) Region() string {
 	return ""
 }
 
-func (m * mockEcs) Profile() string {
+func (m *mockEcs) Profile() string {
 	return ""
 }
 
-func (m * mockEcs) Provider() string {
+func (m *mockEcs) Provider() string {
 	return ""
 }
 
-func (m * mockEcs) ProviderAPI() string {
+func (m *mockEcs) ProviderAPI() string {
 	return ""
 }
 
-func (m * mockEcs) ResourceTypes() []string {
+func (m *mockEcs) ResourceTypes() []string {
 	return []string{}
 }
 
-func (m * mockEcs) Fetch(context.Context) (cloud.GraphAPI, error) {
+func (m *mockEcs) Fetch(context.Context) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
-func (m * mockEcs) IsSyncDisabled() bool {
+func (m *mockEcs) IsSyncDisabled() bool {
 	return false
 }
 
-func (m * mockEcs) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
+func (m *mockEcs) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
 }
 
+func (m *mockEcs) ListClusters(ctx context.Context, input *ecs.ListClustersInput, optFns ...func(*ecs.Options)) (*ecs.ListClustersOutput, error) {
+	return &ecs.ListClustersOutput{ClusterArns: m.clusterNames}, nil
+}
 
-
-
-			func (m * mockEcs) ListClusters(ctx context.Context, input *ecs.ListClustersInput, optFns ...func(*ecs.Options)) (*ecs.ListClustersOutput, error) {
-				return &ecs.ListClustersOutput{ ClusterArns: m.clusterNames }, nil
-			}
-
-
-
-
-			func (m * mockEcs) ListTaskDefinitions(ctx context.Context, input *ecs.ListTaskDefinitionsInput, optFns ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error) {
-				return &ecs.ListTaskDefinitionsOutput{ TaskDefinitionArns: m.taskdefinitionNames }, nil
-			}
-
-
-
-
-
-
-
-
-
-
+func (m *mockEcs) ListTaskDefinitions(ctx context.Context, input *ecs.ListTaskDefinitionsInput, optFns ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error) {
+	return &ecs.ListTaskDefinitionsOutput{TaskDefinitionArns: m.taskdefinitionNames}, nil
+}

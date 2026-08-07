@@ -45,7 +45,7 @@ func (cmd *CreateQueue) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateQueue) ExtractResult(i interface{}) string {
+func (cmd *CreateQueue) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*sqs.CreateQueueOutput).QueueUrl)
 }
 

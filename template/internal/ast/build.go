@@ -10,9 +10,9 @@ type statementBuilder struct {
 	entity                string
 	declarationIdentifier string
 	isValue               bool
-	newparams             map[string]interface{}
+	newparams             map[string]any
 	currentKey            string
-	currentNode           interface{}
+	currentNode           any
 	listBuilder           *listValueBuilder
 	concatenationBuilder  *concatenationValueBuilder
 }
@@ -26,13 +26,13 @@ func (b *statementBuilder) build() *Statement {
 		expr = &RightExpressionNode{i: b.currentNode}
 	} else {
 		if b.newparams == nil {
-			b.newparams = make(map[string]interface{})
+			b.newparams = make(map[string]any)
 		}
 		expr = &CommandNode{
 			Action:     b.action,
 			Entity:     b.entity,
 			ParamNodes: b.newparams,
-			Refs:       make(map[string]interface{}),
+			Refs:       make(map[string]any),
 		}
 	}
 	if b.declarationIdentifier != "" {
@@ -47,9 +47,9 @@ func (b *statementBuilder) addParamKey(key string) *statementBuilder {
 	return b
 }
 
-func (b *statementBuilder) addParamValue(node interface{}) *statementBuilder {
+func (b *statementBuilder) addParamValue(node any) *statementBuilder {
 	if b.newparams == nil {
-		b.newparams = make(map[string]interface{})
+		b.newparams = make(map[string]any)
 	}
 	b.currentNode = node
 	if b.concatenationBuilder != nil {
@@ -122,7 +122,7 @@ func (a *AST) addParamKey(text string) {
 }
 
 func (a *AST) addParamValue(text string) {
-	var val interface{}
+	var val any
 	i, err := strconv.Atoi(text)
 	if err == nil {
 		if len(text) > 1 && text[0] == '0' {
@@ -178,10 +178,10 @@ func (a *AST) addAliasParam(text string) {
 }
 
 type listValueBuilder struct {
-	elements []interface{}
+	elements []any
 }
 
-func (c *listValueBuilder) add(node interface{}) *listValueBuilder {
+func (c *listValueBuilder) add(node any) *listValueBuilder {
 	c.elements = append(c.elements, node)
 	return c
 }
@@ -192,10 +192,10 @@ func (c *listValueBuilder) build() ListNode {
 }
 
 type concatenationValueBuilder struct {
-	elements []interface{}
+	elements []any
 }
 
-func (c *concatenationValueBuilder) add(node interface{}) *concatenationValueBuilder {
+func (c *concatenationValueBuilder) add(node any) *concatenationValueBuilder {
 	c.elements = append(c.elements, node)
 	return c
 }

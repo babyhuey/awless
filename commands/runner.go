@@ -16,13 +16,13 @@ import (
 	"github.com/bootswithdefer/awless/template/env"
 )
 
-func NewRunnerRequiredParamsOnly(tpl *template.Template, msg, tplPath string, fillers ...map[string]interface{}) *template.Runner {
+func NewRunnerRequiredParamsOnly(tpl *template.Template, msg, tplPath string, fillers ...map[string]any) *template.Runner {
 	r := NewRunner(tpl, msg, tplPath, fillers...)
 	r.ParamsSuggested = env.REQUIRED_PARAMS_ONLY
 	return r
 }
 
-func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[string]interface{}) *template.Runner {
+func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[string]any) *template.Runner {
 	runner := &template.Runner{}
 
 	runner.Template = tpl
@@ -49,7 +49,7 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 		&template.ParamIsSetValidator{Action: "create", Entity: "instance", Param: "keypair", WarningMessage: "This instance has no access keypair. You might not be able to connect to it. Use `awless create instance keypair=my-keypair ...`"},
 	}
 
-	runner.CmdLookuper = func(tokens ...string) interface{} {
+	runner.CmdLookuper = func(tokens ...string) any {
 		newCommandFunc := awsspec.CommandFactory.Build(strings.Join(tokens, ""))
 		if newCommandFunc == nil {
 			return nil

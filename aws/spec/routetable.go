@@ -36,7 +36,7 @@ func (cmd *CreateRoutetable) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("vpc")))
 }
 
-func (cmd *CreateRoutetable) ExtractResult(i interface{}) string {
+func (cmd *CreateRoutetable) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateRouteTableOutput).RouteTable.RouteTableId)
 }
 
@@ -65,7 +65,7 @@ func (cmd *AttachRoutetable) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("id"), params.Key("subnet")))
 }
 
-func (cmd *AttachRoutetable) ExtractResult(i interface{}) string {
+func (cmd *AttachRoutetable) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.AssociateRouteTableOutput).AssociationId)
 }
 

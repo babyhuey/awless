@@ -52,7 +52,7 @@ func TestMarshalJSONRedactsFillers(t *testing.T) {
 
 	texec := &TemplateExecution{
 		Template: tpl,
-		Fillers:  map[string]interface{}{"password": secret, "username": "jsmith"},
+		Fillers:  map[string]any{"password": secret, "username": "jsmith"},
 	}
 
 	b, err := texec.MarshalJSON()
@@ -64,11 +64,11 @@ func TestMarshalJSONRedactsFillers(t *testing.T) {
 	}
 
 	// Non-sensitive fillers must survive untouched.
-	var out map[string]interface{}
+	var out map[string]any
 	if err := json.Unmarshal(b, &out); err != nil {
 		t.Fatal(err)
 	}
-	fillers, ok := out["fillers"].(map[string]interface{})
+	fillers, ok := out["fillers"].(map[string]any)
 	if !ok {
 		t.Fatalf("fillers missing or wrong type: %#v", out["fillers"])
 	}

@@ -21,55 +21,56 @@ package awsfetch
 // DO NOT EDIT - This file was automatically generated with go generate
 
 import (
-  "context"
-  ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
-  ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
-  elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
-  elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
-  elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-  elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-  rds "github.com/aws/aws-sdk-go-v2/service/rds"
-  rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
-  autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
-  autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
-  ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
-  ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
-  acm "github.com/aws/aws-sdk-go-v2/service/acm"
-  acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
-  iam "github.com/aws/aws-sdk-go-v2/service/iam"
-  iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
-  sns "github.com/aws/aws-sdk-go-v2/service/sns"
-  snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
-  route53 "github.com/aws/aws-sdk-go-v2/service/route53"
-  route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
-  lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
-  lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
-  cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-  cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-  cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
-  cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-  cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
-  cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
-  secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-  secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
-  ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
-  ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
-  efs "github.com/aws/aws-sdk-go-v2/service/efs"
-  efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
-  cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
-  cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
-  cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-  cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
-  "github.com/bootswithdefer/awless/fetch"
-  "github.com/bootswithdefer/awless/graph"
-  awsconv "github.com/bootswithdefer/awless/aws/conv"
+	"context"
+	acm "github.com/aws/aws-sdk-go-v2/service/acm"
+	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
+	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
+	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
+	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
+	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
+	efs "github.com/aws/aws-sdk-go-v2/service/efs"
+	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
+	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	iam "github.com/aws/aws-sdk-go-v2/service/iam"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	rds "github.com/aws/aws-sdk-go-v2/service/rds"
+	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
+	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
+	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
+	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sns "github.com/aws/aws-sdk-go-v2/service/sns"
+	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
+	ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
+	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
+	awsconv "github.com/bootswithdefer/awless/aws/conv"
+	"github.com/bootswithdefer/awless/fetch"
+	"github.com/bootswithdefer/awless/graph"
 )
+
 func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
 	addManualInfraFetchFuncs(conf, funcs)
 
-	funcs["instance"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["instance"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Instance
 
@@ -99,7 +100,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["subnet"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["subnet"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Subnet
 
@@ -125,7 +126,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["vpc"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["vpc"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Vpc
 
@@ -151,7 +152,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["keypair"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["keypair"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.KeyPairInfo
 
@@ -177,7 +178,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["securitygroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["securitygroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.SecurityGroup
 
@@ -203,7 +204,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["volume"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["volume"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Volume
 
@@ -217,21 +218,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Volumes {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Volumes {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["internetgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["internetgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.InternetGateway
 
@@ -257,7 +258,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["natgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["natgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.NatGateway
 
@@ -283,7 +284,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["routetable"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["routetable"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.RouteTable
 
@@ -309,7 +310,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["availabilityzone"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["availabilityzone"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.AvailabilityZone
 
@@ -335,7 +336,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["image"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["image"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Image
 
@@ -361,7 +362,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["importimagetask"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["importimagetask"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.ImportImageTask
 
@@ -387,7 +388,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["elasticip"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["elasticip"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Address
 
@@ -413,7 +414,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["snapshot"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["snapshot"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Snapshot
 
@@ -427,21 +428,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Snapshots {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Snapshots {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["networkinterface"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["networkinterface"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.NetworkInterface
 
@@ -467,7 +468,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["classicloadbalancer"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["classicloadbalancer"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []elbtypes.LoadBalancerDescription
 
@@ -481,21 +482,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.LoadBalancerDescriptions {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.LoadBalancerDescriptions {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["loadbalancer"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["loadbalancer"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []elbv2types.LoadBalancer
 
@@ -509,21 +510,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.LoadBalancers {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.LoadBalancers {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["targetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["targetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []elbv2types.TargetGroup
 
@@ -549,7 +550,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 	}
 
-	funcs["database"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["database"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []rdstypes.DBInstance
 
@@ -563,21 +564,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.DBInstances {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.DBInstances {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["dbsubnetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["dbsubnetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []rdstypes.DBSubnetGroup
 
@@ -591,21 +592,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.DBSubnetGroups {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.DBSubnetGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["launchconfiguration"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["launchconfiguration"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []autoscalingtypes.LaunchConfiguration
 
@@ -619,21 +620,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.LaunchConfigurations {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.LaunchConfigurations {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["scalinggroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["scalinggroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []autoscalingtypes.AutoScalingGroup
 
@@ -647,21 +648,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.AutoScalingGroups {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.AutoScalingGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["scalingpolicy"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["scalingpolicy"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []autoscalingtypes.ScalingPolicy
 
@@ -675,21 +676,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.ScalingPolicies {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.ScalingPolicies {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["repository"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["repository"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ecrtypes.Repository
 
@@ -703,21 +704,21 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Repositories {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Repositories {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["certificate"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["certificate"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []acmtypes.CertificateSummary
 
@@ -731,15 +732,15 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.CertificateSummaryList {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.CertificateSummaryList {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -751,7 +752,7 @@ func BuildAccessFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualAccessFetchFuncs(conf, funcs)
 
-	funcs["instanceprofile"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["instanceprofile"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []iamtypes.InstanceProfile
 
@@ -765,21 +766,21 @@ func BuildAccessFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.InstanceProfiles {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.InstanceProfiles {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["mfadevice"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["mfadevice"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []iamtypes.VirtualMFADevice
 
@@ -793,15 +794,15 @@ func BuildAccessFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.VirtualMFADevices {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.VirtualMFADevices {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -819,7 +820,7 @@ func BuildMessagingFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualMessagingFetchFuncs(conf, funcs)
 
-	funcs["subscription"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["subscription"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []snstypes.Subscription
 
@@ -833,21 +834,21 @@ func BuildMessagingFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Subscriptions {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Subscriptions {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["topic"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["topic"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []snstypes.Topic
 
@@ -861,15 +862,15 @@ func BuildMessagingFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Topics {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Topics {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -881,7 +882,7 @@ func BuildDnsFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualDnsFetchFuncs(conf, funcs)
 
-	funcs["zone"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["zone"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []route53types.HostedZone
 
@@ -895,15 +896,15 @@ func BuildDnsFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.HostedZones {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.HostedZones {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -915,7 +916,7 @@ func BuildLambdaFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualLambdaFetchFuncs(conf, funcs)
 
-	funcs["function"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["function"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []lambdatypes.FunctionConfiguration
 
@@ -929,15 +930,15 @@ func BuildLambdaFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Functions {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Functions {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -949,7 +950,7 @@ func BuildMonitoringFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualMonitoringFetchFuncs(conf, funcs)
 
-	funcs["metric"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["metric"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []cloudwatchtypes.Metric
 
@@ -963,21 +964,21 @@ func BuildMonitoringFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Metrics {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Metrics {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
 	}
 
-	funcs["alarm"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["alarm"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []cloudwatchtypes.MetricAlarm
 
@@ -991,15 +992,15 @@ func BuildMonitoringFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.MetricAlarms {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.MetricAlarms {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -1011,7 +1012,7 @@ func BuildCdnFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualCdnFetchFuncs(conf, funcs)
 
-	funcs["distribution"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["distribution"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []cloudfronttypes.DistributionSummary
 
@@ -1025,15 +1026,15 @@ func BuildCdnFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.DistributionList.Items {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.DistributionList.Items {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -1045,7 +1046,7 @@ func BuildCloudformationFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualCloudformationFetchFuncs(conf, funcs)
 
-	funcs["stack"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["stack"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []cloudformationtypes.Stack
 
@@ -1059,15 +1060,15 @@ func BuildCloudformationFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Stacks {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Stacks {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -1091,7 +1092,7 @@ func BuildSecretsmanagerFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualSecretsmanagerFetchFuncs(conf, funcs)
 
-	funcs["secret"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["secret"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []secretsmanagertypes.SecretListEntry
 
@@ -1105,15 +1106,15 @@ func BuildSecretsmanagerFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.SecretList {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.SecretList {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -1131,7 +1132,7 @@ func BuildSsmFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualSsmFetchFuncs(conf, funcs)
 
-	funcs["ssmparameter"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["ssmparameter"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ssmtypes.ParameterMetadata
 
@@ -1145,15 +1146,15 @@ func BuildSsmFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.Parameters {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.Parameters {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -1165,7 +1166,7 @@ func BuildEfsFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualEfsFetchFuncs(conf, funcs)
 
-	funcs["filesystem"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["filesystem"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []efstypes.FileSystemDescription
 
@@ -1179,15 +1180,15 @@ func BuildEfsFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.FileSystems {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.FileSystems {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil
@@ -1199,7 +1200,7 @@ func BuildCloudtrailFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualCloudtrailFetchFuncs(conf, funcs)
 
-	funcs["trail"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["trail"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []cloudtrailtypes.Trail
 
@@ -1231,7 +1232,7 @@ func BuildCloudwatchlogsFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualCloudwatchlogsFetchFuncs(conf, funcs)
 
-	funcs["loggroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["loggroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []cloudwatchlogstypes.LogGroup
 
@@ -1245,15 +1246,15 @@ func BuildCloudwatchlogsFetchFuncs(conf *Config) fetch.Funcs {
 			if err != nil {
 				return resources, objects, err
 			}
-				for _, output := range out.LogGroups {
-					objects = append(objects, output)
-					var res *graph.Resource
-					res, err = awsconv.NewResource(output)
-					if err != nil {
-						return resources, objects, err
-					}
-					resources = append(resources, res)
+			for _, output := range out.LogGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
 				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil

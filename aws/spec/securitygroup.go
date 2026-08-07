@@ -49,7 +49,7 @@ func (cmd *CreateSecuritygroup) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("description"), params.Key("name"), params.Key("vpc")))
 }
 
-func (cmd *CreateSecuritygroup) ExtractResult(i interface{}) string {
+func (cmd *CreateSecuritygroup) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateSecurityGroupOutput).GroupId)
 }
 
@@ -78,7 +78,7 @@ func (cmd *UpdateSecuritygroup) ParamsSpec() params.Spec {
 			// Fail fast when protocol is TCP/UDP and port range is missing, instead of waiting
 			// for AWS server validation error:
 			//     InvalidParameterValue: Invalid value 'Must specify both from and to ports with TCP/UDP.' for portRange.
-			"protocol": func(protocol interface{}, others map[string]interface{}) error {
+			"protocol": func(protocol any, others map[string]any) error {
 				_, hasPortRange := others["portrange"]
 				if isTCPorUDP(fmt.Sprint(protocol)) && !hasPortRange {
 					return errors.New("missing 'portrange' when protocol is TCP/UDP")
@@ -88,7 +88,7 @@ func (cmd *UpdateSecuritygroup) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -96,7 +96,7 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]inter
 	if err != nil {
 		return nil, err
 	}
-	var input interface{}
+	var input any
 	switch StringValue(cmd.Inbound) {
 	case "authorize":
 		input = &ec2.AuthorizeSecurityGroupIngressInput{DryRun: Bool(true), IpPermissions: ipPerms}
@@ -139,12 +139,12 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]inter
 	return nil, fmt.Errorf("dry run: update securitygroup: %w", err)
 }
 
-func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	ipPerms, err := cmd.buildIpPermissions()
 	if err != nil {
 		return nil, err
 	}
-	var input interface{}
+	var input any
 	if inbound := cmd.Inbound; inbound != nil {
 		switch StringValue(inbound) {
 		case "authorize":
@@ -175,7 +175,7 @@ func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (interface{}, error)
 		return nil, err
 	}
 
-	var output interface{}
+	var output any
 	start := time.Now()
 	switch ii := input.(type) {
 	case *ec2.AuthorizeSecurityGroupIngressInput:
@@ -225,7 +225,7 @@ func (cmd *CheckSecuritygroup) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *CheckSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeNetworkInterfacesInput{
 		Filters: []ec2types.Filter{
 			{Name: String("group-id"), Values: []string{awssdk.ToString(cmd.Id)}},
@@ -269,7 +269,7 @@ func (cmd *AttachSecuritygroup) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("id"), params.Key("instance")))
 }
 
-func (cmd *AttachSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *AttachSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	groups, err := fetchInstanceSecurityGroups(cmd.api, StringValue(cmd.Instance))
 	if err != nil {
 		return nil, fmt.Errorf("fetching securitygroups for instance %s: %w", StringValue(cmd.Instance), err)
@@ -301,7 +301,7 @@ func (cmd *DetachSecuritygroup) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("id"), params.Key("instance")))
 }
 
-func (cmd *DetachSecuritygroup) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DetachSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	groups, err := fetchInstanceSecurityGroups(cmd.api, StringValue(cmd.Instance))
 	if err != nil {
 		return nil, fmt.Errorf("fetching securitygroups for instance %s: %w", StringValue(cmd.Instance), err)

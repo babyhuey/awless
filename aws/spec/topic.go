@@ -36,7 +36,7 @@ func (cmd *CreateTopic) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name")))
 }
 
-func (cmd *CreateTopic) ExtractResult(i interface{}) string {
+func (cmd *CreateTopic) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*sns.CreateTopicOutput).TopicArn)
 }
 

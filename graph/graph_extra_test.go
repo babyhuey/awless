@@ -322,44 +322,44 @@ func TestResolveResourcesWithProp(t *testing.T) {
 
 func TestSubtractEmptyAndIdentical(t *testing.T) {
 	// Subtract from empty
-	result := Subtract(map[string]interface{}{}, map[string]interface{}{"a": 1})
+	result := Subtract(map[string]any{}, map[string]any{"a": 1})
 	if len(result) != 0 {
 		t.Fatalf("expected empty result, got %v", result)
 	}
 
 	// Subtract empty from non-empty
-	one := map[string]interface{}{"a": 1, "b": "two"}
-	result = Subtract(one, map[string]interface{}{})
+	one := map[string]any{"a": 1, "b": "two"}
+	result = Subtract(one, map[string]any{})
 	if got, want := result, one; !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
 	// Subtract identical maps
-	m := map[string]interface{}{"x": 10, "y": "hello"}
+	m := map[string]any{"x": 10, "y": "hello"}
 	result = Subtract(m, m)
 	if len(result) != 0 {
 		t.Fatalf("expected empty result for identical maps, got %v", result)
 	}
 
 	// Both empty
-	result = Subtract(map[string]interface{}{}, map[string]interface{}{})
+	result = Subtract(map[string]any{}, map[string]any{})
 	if len(result) != 0 {
 		t.Fatalf("expected empty result, got %v", result)
 	}
 }
 
 func TestSubtractWithSliceValues(t *testing.T) {
-	one := map[string]interface{}{
+	one := map[string]any{
 		"tags": []string{"a", "b"},
 		"id":   "123",
 	}
-	other := map[string]interface{}{
+	other := map[string]any{
 		"tags": []string{"a", "b"},
 		"id":   "456",
 	}
 	result := Subtract(one, other)
 	// tags are equal (DeepEqual), so only id should remain
-	expected := map[string]interface{}{"id": "123"}
+	expected := map[string]any{"id": "123"}
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("got %v, want %v", result, expected)
 	}

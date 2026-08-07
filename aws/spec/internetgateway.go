@@ -35,7 +35,7 @@ func (cmd *CreateInternetgateway) ParamsSpec() params.Spec {
 	return params.NewSpec(params.None())
 }
 
-func (cmd *CreateInternetgateway) ExtractResult(i interface{}) string {
+func (cmd *CreateInternetgateway) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateInternetGatewayOutput).InternetGateway.InternetGatewayId)
 }
 

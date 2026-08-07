@@ -77,7 +77,7 @@ func TestNewFetcherFetchReturnsResources(t *testing.T) {
 	}
 
 	f := fetch.NewFetcher(fetch.Funcs{
-		"thing": func(ctx context.Context, c fetch.Cache) ([]*graph.Resource, interface{}, error) {
+		"thing": func(ctx context.Context, c fetch.Cache) ([]*graph.Resource, any, error) {
 			return resources, nil, nil
 		},
 	})
@@ -111,7 +111,7 @@ func TestNewFetcherGetAndReset(t *testing.T) {
 	}
 
 	// Get with func
-	val, err = f.Get("computed", func() (interface{}, error) {
+	val, err = f.Get("computed", func() (any, error) {
 		return 42, nil
 	})
 	if err != nil {
@@ -134,7 +134,7 @@ func TestNewFetcherGetAndReset(t *testing.T) {
 
 func TestFetcherFetchCollectsErrors(t *testing.T) {
 	f := fetch.NewFetcher(fetch.Funcs{
-		"failing": func(ctx context.Context, c fetch.Cache) ([]*graph.Resource, interface{}, error) {
+		"failing": func(ctx context.Context, c fetch.Cache) ([]*graph.Resource, any, error) {
 			return nil, nil, errors.New("boom")
 		},
 	})

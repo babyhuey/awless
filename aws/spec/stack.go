@@ -63,7 +63,7 @@ func (cmd *CreateStack) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CreateStack) ExtractResult(i interface{}) string {
+func (cmd *CreateStack) ExtractResult(i any) string {
 	return StringValue(i.(*cloudformation.CreateStackOutput).StackId)
 }
 
@@ -103,7 +103,7 @@ func (cmd *UpdateStack) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *UpdateStack) ExtractResult(i interface{}) string {
+func (cmd *UpdateStack) ExtractResult(i any) string {
 	return StringValue(i.(*cloudformation.UpdateStackOutput).StackId)
 }
 
@@ -116,9 +116,9 @@ func (cmd *UpdateStack) BeforeRun(renv env.Running) (err error) {
 }
 
 type stackFile struct {
-	Parameters  map[string]string      `yaml:"Parameters"`
-	Tags        map[string]string      `yaml:"Tags"`
-	StackPolicy map[string]interface{} `yaml:"StackPolicy"`
+	Parameters  map[string]string `yaml:"Parameters"`
+	Tags        map[string]string `yaml:"Tags"`
+	StackPolicy map[string]any    `yaml:"StackPolicy"`
 }
 
 func processStackFile(stackFilePath, policyFile *string, parameters, tags []*string) (newParams, newTags []*string, policyData *string, err error) {

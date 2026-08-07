@@ -10,11 +10,11 @@ import (
 
 type rBuilder struct {
 	id, typ string
-	props   map[string]interface{}
+	props   map[string]any
 }
 
 func new(typ, id string) *rBuilder {
-	r := &rBuilder{id: id, typ: typ, props: make(map[string]interface{})}
+	r := &rBuilder{id: id, typ: typ, props: make(map[string]any)}
 	return r.Prop(properties.ID, id)
 }
 
@@ -182,7 +182,7 @@ func AccessKey(id string) *rBuilder {
 	return new("accesskey", id)
 }
 
-func (b *rBuilder) Prop(key string, value interface{}) *rBuilder {
+func (b *rBuilder) Prop(key string, value any) *rBuilder {
 	b.props[key] = value
 	return b
 }

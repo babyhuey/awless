@@ -91,8 +91,8 @@ func TestExtractPolicyDocument(t *testing.T) {
 						Effect:    "Allow",
 						Actions:   []string{"ec2:AttachVolume", "ec2:DetachVolume"},
 						Resources: []string{"arn:aws:ec2:<REGION>:<ACCOUNTNUMBER>:volume/*", "arn:aws:ec2:<REGION>:<ACCOUNTNUMBER>:instance/*"},
-						Condition: map[string]interface{}{
-							"ArnEquals": map[string]interface{}{
+						Condition: map[string]any{
+							"ArnEquals": map[string]any{
 								"ec2:SourceInstanceARN": "arn:aws:ec2:<REGION>:<ACCOUNTNUMBER>:instance/<INSTANCE-ID>",
 							},
 						},
@@ -131,8 +131,8 @@ func TestExtractPolicyDocument(t *testing.T) {
 						Effect:    "Allow",
 						Actions:   []string{"ec2:AttachVolume", "ec2:DetachVolume"},
 						Resources: []string{"arn:aws:ec2:<REGION>:<ACCOUNTNUMBER>:instance/*"},
-						Condition: map[string]interface{}{
-							"StringEquals": map[string]interface{}{
+						Condition: map[string]any{
+							"StringEquals": map[string]any{
 								"ec2:ResourceTag/department": "dev",
 							},
 						},
@@ -141,8 +141,8 @@ func TestExtractPolicyDocument(t *testing.T) {
 						Effect:    "Allow",
 						Actions:   []string{"ec2:AttachVolume", "ec2:DetachVolume"},
 						Resources: []string{"arn:aws:ec2:<REGION>:<ACCOUNTNUMBER>:volume/*"},
-						Condition: map[string]interface{}{
-							"StringEquals": map[string]interface{}{
+						Condition: map[string]any{
+							"StringEquals": map[string]any{
 								"ec2:ResourceTag/volume_user": "${aws:username}",
 							},
 						},

@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	Config   = map[string]interface{}{}
-	Defaults = map[string]interface{}{}
+	Config   = map[string]any{}
+	Defaults = map[string]any{}
 )
 
 const (
@@ -70,11 +70,11 @@ var deprecated = map[string]string{
 
 var TriggerSyncOnConfigUpdate bool
 
-type onUpdateFunc func(interface{})
+type onUpdateFunc func(any)
 
 type Definition struct {
 	help                 string
-	parseParamFn         func(string) (interface{}, error)
+	parseParamFn         func(string) (any, error)
 	stdinParamProviderFn func() string
 	onUpdateFns          []onUpdateFunc
 	defaultValue         string
@@ -175,7 +175,7 @@ func Unset(key string) error {
 	return nil
 }
 
-func Get(key string) (interface{}, bool) {
+func Get(key string) (any, bool) {
 	if v, ok := Config[key]; ok {
 		return v, ok
 	}
@@ -200,7 +200,7 @@ func InteractiveSet(key string) error {
 	return Set(key, val)
 }
 
-func parseBool(i string) (interface{}, error) {
+func parseBool(i string) (any, error) {
 	b, err := strconv.ParseBool(i)
 	if err != nil {
 		return b, fmt.Errorf("invalid value, expected a boolean, got '%s'", i)
@@ -208,7 +208,7 @@ func parseBool(i string) (interface{}, error) {
 	return b, nil
 }
 
-func parseInt(a string) (interface{}, error) {
+func parseInt(a string) (any, error) {
 	i, err := strconv.Atoi(a)
 	if err != nil {
 		return i, fmt.Errorf("invalid value, expected an int, got '%s'", a)
@@ -216,7 +216,7 @@ func parseInt(a string) (interface{}, error) {
 	return i, nil
 }
 
-func defaultParser(value string) (interface{}, error) {
+func defaultParser(value string) (any, error) {
 	if num, err := strconv.Atoi(value); err == nil {
 		return num, nil
 	}
@@ -226,7 +226,7 @@ func defaultParser(value string) (interface{}, error) {
 	return value, nil
 }
 
-func parseDistroQuery(v string) (interface{}, error) {
+func parseDistroQuery(v string) (any, error) {
 	_, err := awsspec.ParseImageQuery(v)
 	return v, err
 }
@@ -240,7 +240,7 @@ func defaultStdinParamProvider() string {
 	return value
 }
 
-func setVolatile(key, value string) (interface{}, *Definition, bool, error) {
+func setVolatile(key, value string) (any, *Definition, bool, error) {
 	var isConf bool
 	confDef, confOk := configDefinitions[key]
 	defDef, defOk := defaultsDefinitions[key]
@@ -258,7 +258,7 @@ func setVolatile(key, value string) (interface{}, *Definition, bool, error) {
 			isConf = true
 		}
 	}
-	var v interface{}
+	var v any
 	var err error
 	if def != nil && def.parseParamFn != nil {
 		if v, err = def.parseParamFn(value); err != nil {
@@ -357,7 +357,7 @@ func displayDefaults() string {
 	return b.String()
 }
 
-func runSyncWithUpdatedRegion(i interface{}) {
+func runSyncWithUpdatedRegion(i any) {
 	if !GetAutosync() {
 		return
 	}

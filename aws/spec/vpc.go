@@ -41,11 +41,11 @@ func (cmd *CreateVpc) ParamsSpec() params.Spec {
 		params.Validators{"cidr": params.IsCIDR})
 }
 
-func (cmd *CreateVpc) ExtractResult(i interface{}) string {
+func (cmd *CreateVpc) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateVpcOutput).Vpc.VpcId)
 }
 
-func (cmd *CreateVpc) AfterRun(renv env.Running, output interface{}) error {
+func (cmd *CreateVpc) AfterRun(renv env.Running, output any) error {
 	return createNameTag(awssdk.String(cmd.ExtractResult(output)), cmd.Name, renv)
 }
 

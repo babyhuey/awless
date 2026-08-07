@@ -134,7 +134,7 @@ func (s *server) showResourceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resId := mux.Vars(r)["id"]
-	res, err := s.gph.FindWithProperties(map[string]interface{}{properties.ID: resId})
+	res, err := s.gph.FindWithProperties(map[string]any{properties.ID: resId})
 	if err != nil && len(res) != 1 {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -185,7 +185,7 @@ func (s *server) listResourcesHandler(w http.ResponseWriter, r *http.Request) {
 
 type Resource struct {
 	Id, Type   string
-	Properties map[string]interface{}
+	Properties map[string]any
 	Parents    []*Resource
 	Children   []*Resource
 	DependsOn  []*Resource

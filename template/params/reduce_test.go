@@ -7,13 +7,13 @@ import (
 )
 
 func TestReduce(t *testing.T) {
-	data := map[string]interface{}{
+	data := map[string]any{
 		"one":   1,
 		"two":   2,
 		"three": 3,
 	}
-	plusOne := func(in map[string]interface{}) (out map[string]interface{}, err error) {
-		out = make(map[string]interface{})
+	plusOne := func(in map[string]any) (out map[string]any, err error) {
+		out = make(map[string]any)
 		for k, i := range in {
 			out[k] = i.(int) + 1
 		}
@@ -39,11 +39,11 @@ func TestReduce(t *testing.T) {
 }
 
 func TestReduceNoMatchingKeys(t *testing.T) {
-	data := map[string]interface{}{
+	data := map[string]any{
 		"a": 1,
 		"b": 2,
 	}
-	identity := func(in map[string]interface{}) (map[string]interface{}, error) {
+	identity := func(in map[string]any) (map[string]any, error) {
 		return in, nil
 	}
 	red := newReducer(identity, "x", "y")
@@ -57,8 +57,8 @@ func TestReduceNoMatchingKeys(t *testing.T) {
 }
 
 func TestReduceError(t *testing.T) {
-	data := map[string]interface{}{"key": "val"}
-	errFn := func(in map[string]interface{}) (map[string]interface{}, error) {
+	data := map[string]any{"key": "val"}
+	errFn := func(in map[string]any) (map[string]any, error) {
 		return nil, errors.New("reduce error")
 	}
 	red := newReducer(errFn, "key")
@@ -72,14 +72,14 @@ func TestReduceError(t *testing.T) {
 }
 
 func TestReduceEmptyKeys(t *testing.T) {
-	identity := func(in map[string]interface{}) (map[string]interface{}, error) {
+	identity := func(in map[string]any) (map[string]any, error) {
 		return in, nil
 	}
 	red := newReducer(identity)
 	if got := len(red.Keys()); got != 0 {
 		t.Fatalf("expected 0 keys, got %d", got)
 	}
-	out, err := red.Reduce(map[string]interface{}{"a": 1})
+	out, err := red.Reduce(map[string]any{"a": 1})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,11 +89,11 @@ func TestReduceEmptyKeys(t *testing.T) {
 }
 
 func TestReducePartialKeyMatch(t *testing.T) {
-	data := map[string]interface{}{
+	data := map[string]any{
 		"one": 1,
 		"two": 2,
 	}
-	identity := func(in map[string]interface{}) (map[string]interface{}, error) {
+	identity := func(in map[string]any) (map[string]any, error) {
 		return in, nil
 	}
 	red := newReducer(identity, "one", "missing")
@@ -160,7 +160,7 @@ func TestSpecReducers(t *testing.T) {
 }
 
 func TestSpecBuilder(t *testing.T) {
-	identity := func(in map[string]interface{}) (map[string]interface{}, error) {
+	identity := func(in map[string]any) (map[string]any, error) {
 		return in, nil
 	}
 	s := SpecBuilder(AllOf(Key("a")), Validators{"a": MinLengthOf(1)}).

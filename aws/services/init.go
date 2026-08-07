@@ -31,7 +31,7 @@ var (
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService        cloud.Service
 )
 
-func Init(profile, region string, extraConf map[string]interface{}, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
+func Init(profile, region string, extraConf map[string]any, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
 	if region == "" {
 		return errors.New("empty AWS region. Set it with `awless config set aws.region`")
 	}
@@ -95,7 +95,7 @@ func Init(profile, region string, extraConf map[string]interface{}, log *logger.
 	return nil
 }
 
-func getBool(m map[string]interface{}, key string, def bool) bool {
+func getBool(m map[string]any, key string, def bool) bool {
 	if b, ok := m[key].(bool); ok {
 		return b
 	}

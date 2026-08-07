@@ -80,16 +80,16 @@ var (
 )
 
 type setter struct {
-	val       interface{}
+	val       any
 	fieldPath string
 	fieldType string
 }
 
-func (s setter) set(i interface{}) error {
+func (s setter) set(i any) error {
 	return setFieldWithType(s.val, i, s.fieldPath, s.fieldType)
 }
 
-func setFieldWithType(v, i interface{}, fieldPath string, destType string, interfs ...interface{}) (err error) {
+func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...any) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("set field %s for %T object: %s", fieldPath, i, e)
@@ -279,7 +279,7 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 		}
 		v = stepAdjustments
 	case awsuserdatatobase64:
-		var tplData interface{}
+		var tplData any
 		if len(interfs) > 0 {
 			tplData = interfs[0]
 		}
@@ -418,7 +418,7 @@ func setFieldWithType(v, i interface{}, fieldPath string, destType string, inter
 	return nil
 }
 
-func castString(v interface{}) string {
+func castString(v any) string {
 	switch vv := v.(type) {
 	case []string:
 		return strings.Join(vv, ",")
@@ -429,7 +429,7 @@ func castString(v interface{}) string {
 	}
 }
 
-func castFloat(v interface{}) (float64, error) {
+func castFloat(v any) (float64, error) {
 	switch vv := v.(type) {
 	case string:
 		f, err := strconv.ParseFloat(vv, 64)
@@ -452,7 +452,7 @@ func castFloat(v interface{}) (float64, error) {
 	}
 }
 
-func castInt(v interface{}) (int, error) {
+func castInt(v any) (int, error) {
 	switch vv := v.(type) {
 	case *string:
 		i, err := strconv.Atoi(aws.ToString(vv))
@@ -479,7 +479,7 @@ func castInt(v interface{}) (int, error) {
 	}
 }
 
-func castBool(v interface{}) (bool, error) {
+func castBool(v any) (bool, error) {
 	switch vv := v.(type) {
 	case string:
 		b, err := strconv.ParseBool(vv)
@@ -496,7 +496,7 @@ func castBool(v interface{}) (bool, error) {
 	}
 }
 
-func castInt64(v interface{}) (int64, error) {
+func castInt64(v any) (int64, error) {
 	switch vv := v.(type) {
 	case string:
 		i, err := strconv.Atoi(vv)
@@ -517,7 +517,7 @@ func castInt64(v interface{}) (int64, error) {
 	}
 }
 
-func castStringSlice(v interface{}) []string {
+func castStringSlice(v any) []string {
 	switch vv := v.(type) {
 	case string:
 		return []string{vv}
@@ -527,7 +527,7 @@ func castStringSlice(v interface{}) []string {
 		return aws.ToStringSlice(vv)
 	case []string:
 		return vv
-	case []interface{}:
+	case []any:
 		var slice []string
 		for _, i := range vv {
 			switch ii := i.(type) {
@@ -545,7 +545,7 @@ func castStringSlice(v interface{}) []string {
 	}
 }
 
-func castStringPointerSlice(v interface{}) []*string {
+func castStringPointerSlice(v any) []*string {
 	switch vv := v.(type) {
 	case string:
 		return []*string{&vv}
@@ -555,7 +555,7 @@ func castStringPointerSlice(v interface{}) []*string {
 		return vv
 	case []string:
 		return aws.StringSlice(vv)
-	case []interface{}:
+	case []any:
 		var slice []*string
 		for _, i := range vv {
 			switch ii := i.(type) {
@@ -575,7 +575,7 @@ func castStringPointerSlice(v interface{}) []*string {
 	}
 }
 
-func userDataContentAsBase64(v interface{}, tplData interface{}) (string, error) {
+func userDataContentAsBase64(v any, tplData any) (string, error) {
 	userdata := castString(v)
 
 	var readErr error
@@ -618,7 +618,7 @@ func userDataContentAsBase64(v interface{}, tplData interface{}) (string, error)
 	return base64.StdEncoding.EncodeToString(content), nil
 }
 
-func structSetter(s interface{}, params map[string]interface{}) error {
+func structSetter(s any, params map[string]any) error {
 	if params == nil {
 		return nil
 	}
@@ -662,7 +662,7 @@ func structSetter(s interface{}, params map[string]interface{}) error {
 	return nil
 }
 
-func structInjector(src, dest interface{}, ctx map[string]interface{}) error {
+func structInjector(src, dest any, ctx map[string]any) error {
 	val := reflect.ValueOf(src).Elem()
 	stru := val.Type()
 
@@ -701,7 +701,7 @@ func contains(arr []string, e string) bool {
 
 // setValueAtPath sets a value at a dot-separated field path in a struct.
 // Replaces awsutil.SetValueAtPath from SDK v1.
-func setValueAtPath(i interface{}, path string, v interface{}) {
+func setValueAtPath(i any, path string, v any) {
 	path = strings.TrimPrefix(path, ".")
 	if path == "" {
 		return

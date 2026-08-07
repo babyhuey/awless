@@ -57,47 +57,47 @@ func New(prefix string, flag int, w ...io.Writer) *Logger {
 	return &Logger{out: log.New(out, prefix, flag), w: out}
 }
 
-func (l *Logger) Verbosef(format string, v ...interface{}) {
+func (l *Logger) Verbosef(format string, v ...any) {
 	if l.verbosity() > 0 {
 		l.out.Println(prepend(verbosePrefix, fmt.Sprintf(format, v...))...)
 	}
 }
 
-func (l *Logger) Verbose(v ...interface{}) {
+func (l *Logger) Verbose(v ...any) {
 	if l.verbosity() > 0 {
 		l.out.Println(prepend(verbosePrefix, v...)...)
 	}
 }
 
-func (l *Logger) ExtraVerbosef(format string, v ...interface{}) {
+func (l *Logger) ExtraVerbosef(format string, v ...any) {
 	if l.verbosity() > 1 {
 		l.out.Println(prepend(extraVerbosePrefix, fmt.Sprintf(format, v...))...)
 	}
 }
 
-func (l *Logger) ExtraVerbose(v ...interface{}) {
+func (l *Logger) ExtraVerbose(v ...any) {
 	if l.verbosity() > 1 {
 		l.out.Println(prepend(extraVerbosePrefix, v...)...)
 	}
 }
 
-func (l *Logger) Info(v ...interface{}) {
+func (l *Logger) Info(v ...any) {
 	l.out.Println(prepend(infoPrefix, v...)...)
 }
 
-func (l *Logger) Infof(format string, v ...interface{}) {
+func (l *Logger) Infof(format string, v ...any) {
 	l.out.Println(prepend(infoPrefix, fmt.Sprintf(format, v...))...)
 }
 
-func (l *Logger) InteractiveInfof(format string, v ...interface{}) {
+func (l *Logger) InteractiveInfof(format string, v ...any) {
 	fmt.Fprint(l.w, prepend("\r\033[K"+infoPrefix, " ", fmt.Sprintf(format, v...))...)
 }
 
-func (l *Logger) Error(v ...interface{}) {
+func (l *Logger) Error(v ...any) {
 	l.out.Println(prepend(errorPrefix, v...)...)
 }
 
-func (l *Logger) Errorf(format string, v ...interface{}) {
+func (l *Logger) Errorf(format string, v ...any) {
 	l.out.Println(prepend(errorPrefix, fmt.Sprintf(format, v...))...)
 }
 
@@ -109,11 +109,11 @@ func (l *Logger) MultiLineError(err error) {
 	}
 }
 
-func (l *Logger) Warning(v ...interface{}) {
+func (l *Logger) Warning(v ...any) {
 	l.out.Println(prepend(warningPrefix, v...)...)
 }
 
-func (l *Logger) Warningf(format string, v ...interface{}) {
+func (l *Logger) Warningf(format string, v ...any) {
 	l.out.Println(prepend(warningPrefix, fmt.Sprintf(format, v...))...)
 }
 
@@ -129,43 +129,43 @@ func (l *Logger) verbosity() uint32 {
 	return atomic.LoadUint32(&l.verbose)
 }
 
-func Verbosef(format string, v ...interface{}) {
+func Verbosef(format string, v ...any) {
 	DefaultLogger.Verbosef(format, v...)
 }
 
-func Verbose(v ...interface{}) {
+func Verbose(v ...any) {
 	DefaultLogger.Verbose(v...)
 }
 
-func ExtraVerbosef(format string, v ...interface{}) {
+func ExtraVerbosef(format string, v ...any) {
 	DefaultLogger.ExtraVerbosef(format, v...)
 }
 
-func ExtraVerbose(v ...interface{}) {
+func ExtraVerbose(v ...any) {
 	DefaultLogger.ExtraVerbose(v...)
 }
 
-func Info(v ...interface{}) {
+func Info(v ...any) {
 	DefaultLogger.Info(v...)
 }
 
-func Infof(format string, v ...interface{}) {
+func Infof(format string, v ...any) {
 	DefaultLogger.Infof(format, v...)
 }
 
-func Error(v ...interface{}) {
+func Error(v ...any) {
 	DefaultLogger.Error(v...)
 }
 
-func Errorf(format string, v ...interface{}) {
+func Errorf(format string, v ...any) {
 	DefaultLogger.Errorf(format, v...)
 }
 
-func Warning(v ...interface{}) {
+func Warning(v ...any) {
 	DefaultLogger.Warning(v...)
 }
 
-func Warningf(format string, v ...interface{}) {
+func Warningf(format string, v ...any) {
 	DefaultLogger.Warningf(format, v...)
 }
 
@@ -173,8 +173,8 @@ func MultiLineError(err error) {
 	DefaultLogger.MultiLineError(err)
 }
 
-func prepend(s interface{}, v ...interface{}) []interface{} {
-	return append([]interface{}{s}, v...)
+func prepend(s any, v ...any) []any {
+	return append([]any{s}, v...)
 }
 
 func formatMultiLineErrMsg(msg string) []string {

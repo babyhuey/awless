@@ -71,7 +71,7 @@ func (cmd *CreateInstance) ParamsSpec() params.Spec {
 // requested. Because AssociatePublicIpAddress must live inside
 // NetworkInterfaces[0], SecurityGroupIds and SubnetId must also be moved there
 // (AWS rejects mixing top-level and NetworkInterfaces for these fields).
-func (cmd *CreateInstance) PostProcessInput(iface interface{}) {
+func (cmd *CreateInstance) PostProcessInput(iface any) {
 	input, ok := iface.(*ec2.RunInstancesInput)
 	if !ok || cmd.AssociatePublicIP == nil {
 		return
@@ -95,7 +95,7 @@ func (cmd *CreateInstance) PostProcessInput(iface interface{}) {
 	input.NetworkInterfaces = []ec2types.InstanceNetworkInterfaceSpecification{nic}
 }
 
-func (cmd *CreateInstance) convertDistroToAMI(values map[string]interface{}) (map[string]interface{}, error) {
+func (cmd *CreateInstance) convertDistroToAMI(values map[string]any) (map[string]any, error) {
 	if distro, ok := values["distro"].(string); ok {
 		query, err := ParseImageQuery(distro)
 		if err != nil {
@@ -113,7 +113,7 @@ func (cmd *CreateInstance) convertDistroToAMI(values map[string]interface{}) (ma
 				caching = " from cache"
 			}
 			cmd.logger.Infof("Image %s resolved%s for distro '%s' (expanded to '%s')", images[0].Id, caching, distro, query)
-			return map[string]interface{}{"image": images[0].Id}, nil
+			return map[string]any{"image": images[0].Id}, nil
 		} else {
 			return nil, fmt.Errorf("distro: no image id found for query '%s'", query)
 		}
@@ -121,11 +121,11 @@ func (cmd *CreateInstance) convertDistroToAMI(values map[string]interface{}) (ma
 	return nil, nil
 }
 
-func (cmd *CreateInstance) ExtractResult(i interface{}) string {
+func (cmd *CreateInstance) ExtractResult(i any) string {
 	return StringValue(i.(*ec2.RunInstancesOutput).Instances[0].InstanceId)
 }
 
-func (cmd *CreateInstance) AfterRun(renv env.Running, output interface{}) error {
+func (cmd *CreateInstance) AfterRun(renv env.Running, output any) error {
 	return createNameTag(String(cmd.ExtractResult(output)), cmd.Name, renv)
 }
 
@@ -171,7 +171,7 @@ func (cmd *StartInstance) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *StartInstance) ExtractResult(i interface{}) string {
+func (cmd *StartInstance) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.StartInstancesOutput).StartingInstances[0].InstanceId)
 }
 
@@ -189,7 +189,7 @@ func (cmd *StopInstance) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *StopInstance) ExtractResult(i interface{}) string {
+func (cmd *StopInstance) ExtractResult(i any) string {
 	return StringValue(i.(*ec2.StopInstancesOutput).StoppingInstances[0].InstanceId)
 }
 
@@ -230,7 +230,7 @@ func (cmd *CheckInstance) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CheckInstance) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckInstance) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeInstancesInput{
 		InstanceIds: []string{awssdk.ToString(cmd.Id)},
 	}
@@ -298,9 +298,9 @@ func (cmd *DetachInstance) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("id"), params.Key("targetgroup")))
 }
 
-func idToIds(values map[string]interface{}) (map[string]interface{}, error) {
+func idToIds(values map[string]any) (map[string]any, error) {
 	if id, hasID := values["id"]; hasID {
-		return map[string]interface{}{"ids": id}, nil
+		return map[string]any{"ids": id}, nil
 	} else {
 		return nil, nil
 	}

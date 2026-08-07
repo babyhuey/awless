@@ -90,7 +90,7 @@ func (cmd *CreateDatabase) ParamsSpec() params.Spec {
 			"port", "backupwindow", "maintenancewindow", "public", "encrypted", "storagetype", "timezone", "vpcsecuritygroups")),
 		params.Validators{
 			"password": params.MinLengthOf(8),
-			"replica": func(i interface{}, others map[string]interface{}) error {
+			"replica": func(i any, others map[string]any) error {
 				msg := "param not allowed in replica (either not applicable or directly inherited from the source DB)"
 				if _, ok := others["backupretention"]; ok {
 					return fmt.Errorf("'backupretention' %s", msg)
@@ -143,7 +143,7 @@ func (cmd *CreateDatabase) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err error) {
+func (cmd *CreateDatabase) ManualRun(renv env.Running) (output any, err error) {
 	if replica := cmd.ReadReplicaIdentifier; replica != nil {
 		input := &rds.CreateDBInstanceReadReplicaInput{}
 		if ierr := structInjector(cmd, input, renv.Context()); ierr != nil {
@@ -167,7 +167,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err 
 	return output, nil
 }
 
-func (cmd *CreateDatabase) ExtractResult(i interface{}) string {
+func (cmd *CreateDatabase) ExtractResult(i any) string {
 	switch v := i.(type) {
 	case *rds.CreateDBInstanceOutput:
 		return awssdk.ToString(v.DBInstance.DBInstanceIdentifier)
@@ -217,7 +217,7 @@ func (cmd *CheckDatabase) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CheckDatabase) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckDatabase) ManualRun(renv env.Running) (any, error) {
 	input := &rds.DescribeDBInstancesInput{
 		DBInstanceIdentifier: cmd.Id,
 	}

@@ -394,7 +394,7 @@ func resolveAliasFunc(paramPath, alias string) string {
 	case 1:
 		matchingResource = resources[0]
 	default:
-		resources, err := gph.FindWithProperties(map[string]interface{}{"Name": alias})
+		resources, err := gph.FindWithProperties(map[string]any{"Name": alias})
 		if err != nil {
 			return ""
 		}
@@ -635,7 +635,7 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
 `
 
-func promptConfirmDefaultYes(msg string, a ...interface{}) bool {
+func promptConfirmDefaultYes(msg string, a ...any) bool {
 	var yesorno string
 	fmt.Fprintf(os.Stderr, "%s [Y/n] ", fmt.Sprintf(msg, a...))
 	fmt.Scanln(&yesorno)

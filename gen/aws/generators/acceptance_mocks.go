@@ -102,12 +102,12 @@ import (
 )
 
 type AcceptanceFactory struct {
-	Mock   interface{}
+	Mock   any
 	Logger *logger.Logger
 	Graph cloud.GraphAPI
 }
 
-func NewAcceptanceFactory(mock interface{}, g cloud.GraphAPI, l ...*logger.Logger) *AcceptanceFactory {
+func NewAcceptanceFactory(mock any, g cloud.GraphAPI, l ...*logger.Logger) *AcceptanceFactory {
 	lg := logger.DiscardLogger
 	if len(l) > 0 {
 		lg = l[0]
@@ -115,11 +115,11 @@ func NewAcceptanceFactory(mock interface{}, g cloud.GraphAPI, l ...*logger.Logge
 	return &AcceptanceFactory{Mock: mock, Graph:g, Logger: lg}
 }
 
-func (f *AcceptanceFactory) Build(key string) func() interface{} {
+func (f *AcceptanceFactory) Build(key string) func() any {
 	switch key {
 		{{- range $cmdName, $cmd := . }}
 		case "{{ $cmd.Action }}{{ $cmd.Entity }}":
-			return func() interface{} {
+			return func() any {
 				cmd := awsspec.New{{ $cmdName }}(aws.Config{}, f.Graph, f.Logger)
 				// TODO: SDK v2 mocking needs rework - SetApi expects *service.Client
 				_ = cmd

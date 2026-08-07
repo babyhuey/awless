@@ -39,7 +39,7 @@ func (g *LazyGraph) Find(q Query) ([]Resource, error) {
 	return g.api.Find(q)
 }
 
-func (g *LazyGraph) FindWithProperties(props map[string]interface{}) ([]Resource, error) {
+func (g *LazyGraph) FindWithProperties(props map[string]any) ([]Resource, error) {
 	g.load()
 	return g.api.FindWithProperties(props)
 }

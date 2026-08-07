@@ -50,11 +50,11 @@ func (cmd *CreateClassicLoadbalancer) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateClassicLoadbalancer) ExtractResult(i interface{}) string {
+func (cmd *CreateClassicLoadbalancer) ExtractResult(i any) string {
 	return awssdk.ToString(cmd.Name)
 }
 
-func (cmd *CreateClassicLoadbalancer) AfterRun(renv env.Running, output interface{}) (err error) {
+func (cmd *CreateClassicLoadbalancer) AfterRun(renv env.Running, output any) (err error) {
 	var target string
 	if len(cmd.Listeners) > 0 {
 		splits := strings.SplitN(*cmd.Listeners[0], ":", 3) // format validated on previous command
@@ -76,7 +76,7 @@ func (cmd *CreateClassicLoadbalancer) AfterRun(renv env.Running, output interfac
 	target = target + path
 
 	updateClassic := CommandFactory.Build("updateclassicloadbalancer")().(*UpdateClassicLoadbalancer)
-	entries := map[string]interface{}{
+	entries := map[string]any{
 		"name":                *cmd.Name,
 		"healthy-threshold":   10,
 		"unhealthy-threshold": 2,
@@ -136,7 +136,7 @@ func (cmd *AttachClassicLoadbalancer) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name"), params.Key("instance")))
 }
 
-func (cmd *AttachClassicLoadbalancer) ExtractResult(interface{}) string {
+func (cmd *AttachClassicLoadbalancer) ExtractResult(any) string {
 	return awssdk.ToString(cmd.Instance)
 }
 
@@ -153,6 +153,6 @@ func (cmd *DetachClassicLoadbalancer) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name"), params.Key("instance")))
 }
 
-func (cmd *DetachClassicLoadbalancer) ExtractResult(interface{}) string {
+func (cmd *DetachClassicLoadbalancer) ExtractResult(any) string {
 	return awssdk.ToString(cmd.Instance)
 }

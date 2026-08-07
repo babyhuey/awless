@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func Validate(all Validators, paramValues map[string]interface{}) error {
+func Validate(all Validators, paramValues map[string]any) error {
 	msg := bytes.NewBufferString("param validation:")
 	var hasErr bool
 	for key, vFn := range all {
@@ -26,7 +26,7 @@ func Validate(all Validators, paramValues map[string]interface{}) error {
 	return nil
 }
 
-type validatorFunc func(val interface{}, others map[string]interface{}) error
+type validatorFunc func(val any, others map[string]any) error
 
 type Validators map[string]validatorFunc
 
@@ -39,7 +39,7 @@ func IsInEnumIgnoreCase(items ...string) validatorFunc {
 		}
 		return false
 	}
-	return func(i interface{}, others map[string]interface{}) error {
+	return func(i any, others map[string]any) error {
 		s, err := toString(i)
 		if err != nil {
 			return err
@@ -52,7 +52,7 @@ func IsInEnumIgnoreCase(items ...string) validatorFunc {
 }
 
 func MaxLengthOf(l int) validatorFunc {
-	return func(i interface{}, others map[string]interface{}) error {
+	return func(i any, others map[string]any) error {
 		s, err := toString(i)
 		if err != nil {
 			return err
@@ -65,7 +65,7 @@ func MaxLengthOf(l int) validatorFunc {
 }
 
 func MinLengthOf(l int) validatorFunc {
-	return func(i interface{}, others map[string]interface{}) error {
+	return func(i any, others map[string]any) error {
 		s, err := toString(i)
 		if err != nil {
 			return err
@@ -77,7 +77,7 @@ func MinLengthOf(l int) validatorFunc {
 	}
 }
 
-func IsFilepath(i interface{}, others map[string]interface{}) error {
+func IsFilepath(i any, others map[string]any) error {
 	filepath, err := toString(i)
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func IsFilepath(i interface{}, others map[string]interface{}) error {
 	return nil
 }
 
-func IsCIDR(i interface{}, others map[string]interface{}) error {
+func IsCIDR(i any, others map[string]any) error {
 	s, err := toString(i)
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func IsCIDR(i interface{}, others map[string]interface{}) error {
 
 }
 
-func IsIP(i interface{}, others map[string]interface{}) (err error) {
+func IsIP(i any, others map[string]any) (err error) {
 	s, err := toString(i)
 	if err != nil {
 		return
@@ -116,7 +116,7 @@ func IsIP(i interface{}, others map[string]interface{}) (err error) {
 	return
 }
 
-func toString(i interface{}) (string, error) {
+func toString(i any) (string, error) {
 	s, ok := i.(string)
 	if !ok {
 		return s, fmt.Errorf("expected a string but got %T", i)

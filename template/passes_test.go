@@ -16,7 +16,7 @@ import (
 func TestCommandsPasses(t *testing.T) {
 	cmd1, cmd2, cmd3 := &mockCommand{"1"}, &mockCommand{"2"}, &mockCommand{"3"}
 	var count int
-	env := NewEnv().WithLookupCommandFunc(func(...string) interface{} {
+	env := NewEnv().WithLookupCommandFunc(func(...string) any {
 		count++
 		switch count {
 		case 1:
@@ -111,29 +111,29 @@ func TestResolveParamsAndExtractRefsPass(t *testing.T) {
 	env := NewEnv().Build()
 	tcases := []struct {
 		tpl                string
-		expStatementParams []map[string]interface{}
-		expStatementRefs   []map[string]interface{}
+		expStatementParams []map[string]any
+		expStatementRefs   []map[string]any
 	}{
 		{
 			tpl: "sub = create subnet name=my-sub cidr=10.0.0.0/16\ncreate instance subnet=$sub count=10 type=t2.nano",
-			expStatementParams: []map[string]interface{}{
+			expStatementParams: []map[string]any{
 				{"name": "my-sub", "cidr": "10.0.0.0/16"},
 				{"count": 10, "type": "t2.nano"},
 			},
-			expStatementRefs: []map[string]interface{}{
+			expStatementRefs: []map[string]any{
 				{},
 				{"subnet": ast.NewRefNode("sub")},
 			},
 		},
 		{
 			tpl: "sub = create subnet list=[id-1234,24,id-2345]\ncreate instance list-with-ref=[id-3456,42.0,$sub]",
-			expStatementParams: []map[string]interface{}{
-				{"list": []interface{}{"id-1234", 24, "id-2345"}},
+			expStatementParams: []map[string]any{
+				{"list": []any{"id-1234", 24, "id-2345"}},
 				{},
 			},
-			expStatementRefs: []map[string]interface{}{
+			expStatementRefs: []map[string]any{
 				{},
-				{"list-with-ref": ast.NewListNode([]interface{}{"id-3456", 42.0, ast.NewRefNode("sub")})},
+				{"list-with-ref": ast.NewListNode([]any{"id-3456", 42.0, ast.NewRefNode("sub")})},
 			},
 		},
 		//list
@@ -158,13 +158,13 @@ func TestResolveParamsAndExtractRefsPass(t *testing.T) {
 type mockCommandWithResult struct{ id string }
 
 func (c *mockCommandWithResult) ParamsSpec() params.Spec { return nil }
-func (c *mockCommandWithResult) Run(env.Running, map[string]interface{}) (interface{}, error) {
+func (c *mockCommandWithResult) Run(env.Running, map[string]any) (any, error) {
 	return nil, nil
 }
-func (c *mockCommandWithResult) ExtractResult(i interface{}) string { return "" }
+func (c *mockCommandWithResult) ExtractResult(i any) string { return "" }
 
 func TestFailOnDeclarationWithNoResultPass(t *testing.T) {
-	env := NewEnv().WithLookupCommandFunc(func(tokens ...string) interface{} {
+	env := NewEnv().WithLookupCommandFunc(func(tokens ...string) any {
 		switch strings.Join(tokens, "") {
 		case "createinstance":
 			return &mockCommandWithResult{"create instance"}
@@ -233,7 +233,7 @@ func TestResolveMissingHolesPass(t *testing.T) {
 		}
 	}).Build()
 
-	cenv.Push(env.FILLERS, map[string]interface{}{"instance.type": "t2.micro"})
+	cenv.Push(env.FILLERS, map[string]any{"instance.type": "t2.micro"})
 
 	pass := newMultiPass(resolveHolesPass, resolveMissingHolesPass)
 
@@ -250,9 +250,9 @@ func TestResolveMissingHolesPass(t *testing.T) {
 		"1.2.3.4",
 	)
 	assertCmdParams(t, tpl,
-		map[string]interface{}{"type": "t2.micro", "name": "redis-124.32.34.54", "subnet": "sub-98765"},
-		map[string]interface{}{"cidr": "10.0.0.0/24"},
-		map[string]interface{}{"id": "redis-124.32.34.54", "name": "redis-124.32.34.54", "count": 3},
+		map[string]any{"type": "t2.micro", "name": "redis-124.32.34.54", "subnet": "sub-98765"},
+		map[string]any{"cidr": "10.0.0.0/24"},
+		map[string]any{"id": "redis-124.32.34.54", "name": "redis-124.32.34.54", "count": 3},
 	)
 }
 
@@ -284,7 +284,7 @@ func TestResolveMissingSuggestedPass(t *testing.T) {
 			t.Fatalf("unexepected optional parameter %s: %v", in, paramPaths)
 			return ""
 		}
-	}).WithLookupCommandFunc(func(tokens ...string) interface{} {
+	}).WithLookupCommandFunc(func(tokens ...string) any {
 		return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 	})
 	cenv := buildingEnv.Build()
@@ -343,7 +343,7 @@ func TestResolveAliasPass(t *testing.T) {
 		return vals[v]
 	}).Build()
 
-	cenv.Push(env.FILLERS, map[string]interface{}{"instance.ami": ast.NewAliasNode("my-ami")})
+	cenv.Push(env.FILLERS, map[string]any{"instance.ami": ast.NewAliasNode("my-ami")})
 
 	pass := newMultiPass(resolveHolesPass, resolveAliasPass)
 
@@ -352,14 +352,14 @@ func TestResolveAliasPass(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assertCmdParams(t, tpl, map[string]interface{}{"subnet": "sub-12345", "ami": "ami-12345", "count": 3})
+	assertCmdParams(t, tpl, map[string]any{"subnet": "sub-12345", "ami": "ami-12345", "count": 3})
 }
 
 func TestResolveHolesPass(t *testing.T) {
 	tpl := MustParse("create instance count={instance.count} type={instance.type}")
 
 	cenv := NewEnv().Build()
-	cenv.Push(env.FILLERS, map[string]interface{}{
+	cenv.Push(env.FILLERS, map[string]any{
 		"instance.count": 3,
 		"instance.type":  "t2.micro",
 	})
@@ -372,7 +372,7 @@ func TestResolveHolesPass(t *testing.T) {
 	if holes := ast.CollectHoles(tpl.AST); len(holes) > 0 {
 		t.Fatalf("expected no holes got: %v", holes)
 	}
-	assertCmdParams(t, tpl, map[string]interface{}{"type": "t2.micro", "count": 3})
+	assertCmdParams(t, tpl, map[string]any{"type": "t2.micro", "count": 3})
 }
 
 func TestInlineVariableWithValue(t *testing.T) {
@@ -425,15 +425,15 @@ func TestDefaultEnvWithNilFunc(t *testing.T) {
 func TestCmdErr(t *testing.T) {
 	tcases := []struct {
 		cmd    *ast.CommandNode
-		err    interface{}
-		ifaces []interface{}
+		err    any
+		ifaces []any
 		expErr error
 	}{
 		{&ast.CommandNode{Action: "create", Entity: "instance"}, nil, nil, nil},
 		{&ast.CommandNode{Action: "create", Entity: "instance"}, "my error", nil, errors.New("create instance: my error")},
 		{&ast.CommandNode{Action: "create", Entity: "instance"}, errors.New("my error"), nil, errors.New("create instance: my error")},
 		{nil, "my error", nil, errors.New("my error")},
-		{&ast.CommandNode{Action: "create", Entity: "instance"}, "my error with %s %d", []interface{}{"Donald", 1}, errors.New("create instance: my error with Donald 1")},
+		{&ast.CommandNode{Action: "create", Entity: "instance"}, "my error with %s %d", []any{"Donald", 1}, errors.New("create instance: my error with Donald 1")},
 	}
 	for i, tcase := range tcases {
 		if got, want := cmdErr(tcase.cmd, tcase.err, tcase.ifaces...), tcase.expErr; !reflect.DeepEqual(got, want) { //nolint:govet
@@ -444,10 +444,10 @@ func TestCmdErr(t *testing.T) {
 
 type mockCommand struct{ id string }
 
-func (c *mockCommand) Run(env.Running, map[string]interface{}) (interface{}, error) { return nil, nil }
-func (c *mockCommand) ParamsSpec() params.Spec                                      { return params.NewSpec(nil) }
+func (c *mockCommand) Run(env.Running, map[string]any) (any, error) { return nil, nil }
+func (c *mockCommand) ParamsSpec() params.Spec                      { return params.NewSpec(nil) }
 
-func assertRightExpressionValue(t *testing.T, tpl *Template, exp ...interface{}) {
+func assertRightExpressionValue(t *testing.T, tpl *Template, exp ...any) {
 	t.Helper()
 	for i, decl := range tpl.expressionNodesIterator() {
 		if node, ok := decl.(*ast.RightExpressionNode); ok {
@@ -459,7 +459,7 @@ func assertRightExpressionValue(t *testing.T, tpl *Template, exp ...interface{})
 	}
 }
 
-func assertCmdParams(t *testing.T, tpl *Template, exp ...map[string]interface{}) {
+func assertCmdParams(t *testing.T, tpl *Template, exp ...map[string]any) {
 	t.Helper()
 	for i, cmd := range tpl.CommandNodesIterator() {
 		if got, want := cmd.ToDriverParams(), exp[i]; !reflect.DeepEqual(got, want) {

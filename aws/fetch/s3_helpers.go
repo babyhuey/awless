@@ -20,7 +20,7 @@ import (
 func forEachBucketParallel(ctx context.Context, cache fetch.Cache, api *s3.Client, f func(b s3types.Bucket) error) error {
 	var buckets []s3types.Bucket
 
-	if val, e := cache.Get("getBucketsPerRegion", func() (interface{}, error) {
+	if val, e := cache.Get("getBucketsPerRegion", func() (any, error) {
 		return getBucketsPerRegion(ctx, api)
 	}); e != nil {
 		return e

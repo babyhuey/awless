@@ -40,7 +40,7 @@ func (cmd *CreateLoginprofile) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateLoginprofile) ExtractResult(i interface{}) string {
+func (cmd *CreateLoginprofile) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*iam.CreateLoginProfileOutput).LoginProfile.UserName)
 }
 

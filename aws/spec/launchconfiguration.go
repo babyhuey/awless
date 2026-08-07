@@ -46,14 +46,14 @@ func (cmd *CreateLaunchconfiguration) ParamsSpec() params.Spec {
 		params.Key("name"), params.Key("type"),
 		params.Opt("keypair", "public", "role", "securitygroups", "spotprice", "userdata"),
 	))
-	builder.AddReducer(func(values map[string]interface{}) (map[string]interface{}, error) {
+	builder.AddReducer(func(values map[string]any) (map[string]any, error) {
 		fn := CommandFactory.Build("createinstance")().(*CreateInstance).convertDistroToAMI
 		return fn(values)
 	}, "distro")
 	return builder.Done()
 }
 
-func (cmd *CreateLaunchconfiguration) ExtractResult(i interface{}) string {
+func (cmd *CreateLaunchconfiguration) ExtractResult(i any) string {
 	return StringValue(cmd.Name)
 }
 

@@ -29,39 +29,39 @@ type BeforeRunner interface {
 }
 
 type AfterRunner interface {
-	AfterRun(env.Running, interface{}) error
+	AfterRun(env.Running, any) error
 }
 
 type ResultExtractor interface {
-	ExtractResult(interface{}) string
+	ExtractResult(any) string
 }
 
 type InputPostProcessor interface {
-	PostProcessInput(interface{})
+	PostProcessInput(any)
 }
 
 type command interface {
 	ParamsSpec() params.Spec
-	inject(map[string]interface{}) error
-	Run(env.Running, map[string]interface{}) (interface{}, error)
+	inject(map[string]any) error
+	Run(env.Running, map[string]any) (any, error)
 }
 
-func implementsBeforeRun(i interface{}) (BeforeRunner, bool) {
+func implementsBeforeRun(i any) (BeforeRunner, bool) {
 	v, ok := i.(BeforeRunner)
 	return v, ok
 }
 
-func implementsAfterRun(i interface{}) (AfterRunner, bool) {
+func implementsAfterRun(i any) (AfterRunner, bool) {
 	v, ok := i.(AfterRunner)
 	return v, ok
 }
 
-func implementsResultExtractor(i interface{}) (ResultExtractor, bool) {
+func implementsResultExtractor(i any) (ResultExtractor, bool) {
 	v, ok := i.(ResultExtractor)
 	return v, ok
 }
 
-func implementsInputPostProcessor(i interface{}) (InputPostProcessor, bool) {
+func implementsInputPostProcessor(i any) (InputPostProcessor, bool) {
 	v, ok := i.(InputPostProcessor)
 	return v, ok
 }
@@ -92,12 +92,12 @@ func fakeDryRunId(entity string) string {
 
 type awsCall struct {
 	fnName  string
-	fn      interface{}
+	fn      any
 	logger  *logger.Logger
 	setters []setter
 }
 
-func (dc *awsCall) execute(input interface{}) (output interface{}, err error) {
+func (dc *awsCall) execute(input any) (output any, err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			output = nil

@@ -69,10 +69,10 @@ func TestPrintResource(t *testing.T) {
 		exp string
 	}{
 		{res: &Resource{id: "inst_1", kind: "instance"}, exp: "inst_1[instance]"},
-		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]interface{}{"ID": "notthis"}}, exp: "inst_1[instance]"},
-		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]interface{}{"ID": "notthis", "Name": "to-display"}}, exp: "@to-display[instance]"},
-		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]interface{}{"Name": ""}}, exp: "inst_1[instance]"},
-		{res: &Resource{kind: "instance", properties: map[string]interface{}{"ID": "notthis", "Name": "to-display"}}, exp: "@to-display[instance]"},
+		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]any{"ID": "notthis"}}, exp: "inst_1[instance]"},
+		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]any{"ID": "notthis", "Name": "to-display"}}, exp: "@to-display[instance]"},
+		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]any{"Name": ""}}, exp: "inst_1[instance]"},
+		{res: &Resource{kind: "instance", properties: map[string]any{"ID": "notthis", "Name": "to-display"}}, exp: "@to-display[instance]"},
 		{res: &Resource{}, exp: "[<none>]"},
 		{res: nil, exp: "[<none>]"},
 	}
@@ -89,10 +89,10 @@ func TestFormatResource(t *testing.T) {
 		layout, exp string
 	}{
 		{res: &Resource{id: "inst_1", kind: "instance"}, layout: "%i[%t]", exp: "inst_1[instance]"},
-		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]interface{}{"Name": "to-display"}}, layout: "%n[%t]", exp: "@to-display[instance]"},
-		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]interface{}{"Name": "to-display"}}, layout: "@%[Name]p[%t]", exp: "@to-display[instance]"},
-		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]interface{}{"Test": "my-test-prop"}}, layout: "%i:%t:%[Test]p:%[Missing]p:", exp: "inst_1:instance:my-test-prop::"},
-		{res: &Resource{id: "prop%n", kind: "instance", properties: map[string]interface{}{"Name": "to-display"}}, layout: "%i", exp: "prop%n"},
+		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]any{"Name": "to-display"}}, layout: "%n[%t]", exp: "@to-display[instance]"},
+		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]any{"Name": "to-display"}}, layout: "@%[Name]p[%t]", exp: "@to-display[instance]"},
+		{res: &Resource{id: "inst_1", kind: "instance", properties: map[string]any{"Test": "my-test-prop"}}, layout: "%i:%t:%[Test]p:%[Missing]p:", exp: "inst_1:instance:my-test-prop::"},
+		{res: &Resource{id: "prop%n", kind: "instance", properties: map[string]any{"Name": "to-display"}}, layout: "%i", exp: "prop%n"},
 		{res: &Resource{id: "inst_1", kind: "instance"}, layout: "", exp: ""},
 		{res: &Resource{id: "inst_1", kind: ""}, layout: "%i:%t", exp: "inst_1:<none>"},
 		{res: &Resource{}, layout: "%i:%t", exp: "<none>:<none>"},
@@ -112,13 +112,13 @@ func TestReduceResources(t *testing.T) {
 }
 
 func TestCompareProperties(t *testing.T) {
-	props1 := map[string]interface{}{
+	props1 := map[string]any{
 		"one":   1,
 		"two":   2,
 		"three": "3",
 		"four":  4,
 	}
-	props2 := map[string]interface{}{
+	props2 := map[string]any{
 		"zero":  0,
 		"two":   2,
 		"three": "3",
@@ -126,12 +126,12 @@ func TestCompareProperties(t *testing.T) {
 		"five":  "5",
 	}
 
-	exp := map[string]interface{}{"one": 1, "four": 4}
+	exp := map[string]any{"one": 1, "four": 4}
 	if got, want := Subtract(props1, props2), exp; !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %#v, want %#v", got, want)
 	}
 
-	exp = map[string]interface{}{"zero": 0, "four": "4", "five": "5"}
+	exp = map[string]any{"zero": 0, "four": "4", "five": "5"}
 	if got, want := Subtract(props2, props1), exp; !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %#v, want %#v", got, want)
 	}
@@ -163,7 +163,7 @@ func TestMarshalUnmarshalFullRdf(t *testing.T) {
 
 func TestResourceMarshalWithoutProps(t *testing.T) {
 	res := InitResource("mytype", "myid")
-	if got, want := res.Properties(), map[string]interface{}{properties.ID: "myid"}; !reflect.DeepEqual(got, want) {
+	if got, want := res.Properties(), map[string]any{properties.ID: "myid"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("got\n%#v\nwant\n%#v\n", got, want)
 	}
 }

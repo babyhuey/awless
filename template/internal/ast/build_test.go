@@ -8,7 +8,7 @@ func TestStatementBuilderBuildCommand(t *testing.T) {
 	b := &statementBuilder{
 		action: "create",
 		entity: "vpc",
-		newparams: map[string]interface{}{
+		newparams: map[string]any{
 			"name": InterfaceNode{i: "myvpc"},
 		},
 	}

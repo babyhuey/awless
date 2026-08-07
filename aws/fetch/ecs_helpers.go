@@ -24,7 +24,7 @@ func getClusterArns(ctx context.Context, cache fetch.Cache, api *ecs.Client) ([]
 			arns = append(arns, awssdk.ToString(c.ClusterArn))
 		}
 	} else {
-		if val, cerr := cache.Get("getClustersNames", func() (interface{}, error) {
+		if val, cerr := cache.Get("getClustersNames", func() (any, error) {
 			paginator := ecs.NewListClustersPaginator(api, &ecs.ListClustersInput{})
 			for paginator.HasMorePages() {
 				out, err := paginator.NextPage(ctx)

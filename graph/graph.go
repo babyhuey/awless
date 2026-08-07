@@ -127,7 +127,7 @@ func (g *Graph) FindResource(id string) (*Resource, error) {
 	return nil, nil
 }
 
-func (g *Graph) FindResourcesByProperty(key string, value interface{}) ([]*Resource, error) {
+func (g *Graph) FindResourcesByProperty(key string, value any) ([]*Resource, error) {
 	byProperty := ByProperty{key, value}
 	return byProperty.Resolve(g.store.Snapshot())
 }
@@ -209,7 +209,7 @@ func (g *Graph) Find(q cloud.Query) ([]cloud.Resource, error) {
 	return res, nil
 }
 
-func (g *Graph) FindWithProperties(props map[string]interface{}) ([]cloud.Resource, error) {
+func (g *Graph) FindWithProperties(props map[string]any) ([]cloud.Resource, error) {
 	var resolvers []Resolver
 	for k, v := range props {
 		resolvers = append(resolvers, &ByProperty{Key: k, Value: v})

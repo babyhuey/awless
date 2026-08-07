@@ -39,7 +39,7 @@ const (
 type ColumnDefinition interface {
 	propKey() string
 	title(...string) string
-	format(i interface{}) string
+	format(i any) string
 }
 
 type ColumnDefinitions []ColumnDefinition
@@ -59,7 +59,7 @@ type StringColumnDefinition struct {
 	Prop, Friendly string
 }
 
-func (h StringColumnDefinition) format(i interface{}) string {
+func (h StringColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}
@@ -82,7 +82,7 @@ type ColoredValueColumnDefinition struct {
 	ColoredValues map[string]color.Attribute
 }
 
-func (h ColoredValueColumnDefinition) format(i interface{}) string {
+func (h ColoredValueColumnDefinition) format(i any) string {
 	str := h.StringColumnDefinition.format(i)
 	col, ok := h.ColoredValues[str]
 	if ok {
@@ -96,7 +96,7 @@ type ARNLastValueColumnDefinition struct {
 	Separator string
 }
 
-func (h ARNLastValueColumnDefinition) format(i interface{}) string {
+func (h ARNLastValueColumnDefinition) format(i any) string {
 	str := h.StringColumnDefinition.format(i)
 	splits := strings.Split(str, h.Separator)
 	if len(splits) > 1 {
@@ -118,7 +118,7 @@ type SliceColumnDefinition struct {
 	StringColumnDefinition
 }
 
-func (h SliceColumnDefinition) format(i interface{}) string {
+func (h SliceColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}
@@ -144,7 +144,7 @@ type KeyValuesColumnDefinition struct {
 	StringColumnDefinition
 }
 
-func (h KeyValuesColumnDefinition) format(i interface{}) string {
+func (h KeyValuesColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}
@@ -167,7 +167,7 @@ type TimeColumnDefinition struct {
 	Format TimeFormat
 }
 
-func (h TimeColumnDefinition) format(i interface{}) string {
+func (h TimeColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}
@@ -190,7 +190,7 @@ type StorageColumnDefinition struct {
 	Unit storageUnit
 }
 
-func (h StorageColumnDefinition) format(i interface{}) string {
+func (h StorageColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}
@@ -208,7 +208,7 @@ type FirewallRulesColumnDefinition struct {
 	StringColumnDefinition
 }
 
-func (h FirewallRulesColumnDefinition) format(i interface{}) string {
+func (h FirewallRulesColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}
@@ -249,7 +249,7 @@ type RoutesColumnDefinition struct {
 	StringColumnDefinition
 }
 
-func (h RoutesColumnDefinition) format(i interface{}) string {
+func (h RoutesColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}
@@ -305,7 +305,7 @@ type GrantsColumnDefinition struct {
 	StringColumnDefinition
 }
 
-func (h GrantsColumnDefinition) format(i interface{}) string {
+func (h GrantsColumnDefinition) format(i any) string {
 	if i == nil {
 		return ""
 	}

@@ -64,12 +64,12 @@ type Builder struct {
 	sort              []int
 	reverseSort       bool
 	maxwidth          int
-	dataSource        interface{}
+	dataSource        any
 	root              cloud.Resource
 	noHeaders         bool
 }
 
-func (b *Builder) SetSource(i interface{}) *Builder {
+func (b *Builder) SetSource(i any) *Builder {
 	b.dataSource = i
 	return b
 }
@@ -354,7 +354,7 @@ func WithNoHeaders(nh bool) optsFn {
 	}
 }
 
-type table [][]interface{}
+type table [][]any
 
 type fromGraphDisplayer struct {
 	sorter
@@ -386,7 +386,7 @@ func (d *csvDisplayer) Print(w io.Writer) error {
 	values := make(table, len(resources))
 	for i, res := range resources {
 		if v := values[i]; v == nil {
-			values[i] = make([]interface{}, len(d.columnDefinitions))
+			values[i] = make([]any, len(d.columnDefinitions))
 		}
 		for j, h := range d.columnDefinitions {
 			values[i][j] = res.Properties()[h.propKey()]
@@ -442,7 +442,7 @@ func (d *tsvDisplayer) Print(w io.Writer) error {
 	values := make(table, len(resources))
 	for i, res := range resources {
 		if v := values[i]; v == nil {
-			values[i] = make([]interface{}, len(d.columnDefinitions))
+			values[i] = make([]any, len(d.columnDefinitions))
 		}
 		for j, h := range d.columnDefinitions {
 			values[i][j] = res.Properties()[h.propKey()]
@@ -483,7 +483,7 @@ func (d *jsonDisplayer) Print(w io.Writer) error {
 
 	sort.Slice(resources, func(i, j int) bool { return resources[i].Id() < resources[j].Id() })
 
-	var props []map[string]interface{}
+	var props []map[string]any
 	for _, res := range resources {
 		props = append(props, res.Properties())
 	}
@@ -515,7 +515,7 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 	values := make(table, len(resources))
 	for i, res := range resources {
 		if v := values[i]; v == nil {
-			values[i] = make([]interface{}, len(d.columnDefinitions))
+			values[i] = make([]any, len(d.columnDefinitions))
 		}
 		for j, h := range d.columnDefinitions {
 			values[i][j] = res.Properties()[h.propKey()]
@@ -628,7 +628,7 @@ func (d *porcelainDisplayer) Print(w io.Writer) error {
 		}
 
 		for _, res := range resources {
-			var row = make([]interface{}, len(d.columnDefinitions))
+			var row = make([]any, len(d.columnDefinitions))
 			for j, h := range d.columnDefinitions {
 				row[j] = res.Properties()[h.propKey()]
 			}
@@ -680,7 +680,7 @@ func (d *multiResourcesTableDisplayer) Print(w io.Writer) error {
 				if header == nil {
 					header = &StringColumnDefinition{Prop: prop}
 				}
-				var row [4]interface{}
+				var row [4]any
 				row[0] = t
 				row[1] = nameOrID(res)
 				row[2] = header.title()
@@ -730,13 +730,13 @@ func (d *multiResourcesJSONDisplayer) Print(w io.Writer) error {
 	var resources []cloud.Resource
 	var err error
 
-	all := make(map[string]interface{})
+	all := make(map[string]any)
 	for t := range DefaultsColumnDefinitions {
 		resources, err = d.g.Find(cloud.NewQuery(t))
 		if err != nil {
 			return err
 		}
-		var props []map[string]interface{}
+		var props []map[string]any
 		for _, res := range resources {
 			props = append(props, res.Properties())
 		}
@@ -773,7 +773,7 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 		diff, _ := res.Meta("diff")
 		switch diff {
 		case "extra":
-			values = append(values, []interface{}{
+			values = append(values, []any{
 				res.Type(), color.New(color.FgRed).SprintFunc()("- " + nameOrID(res)), "", "",
 			})
 		default:
@@ -790,7 +790,7 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 		meta, _ := res.Meta("diff")
 		switch meta {
 		case "extra":
-			values = append(values, []interface{}{
+			values = append(values, []any{
 				res.Type(), color.New(color.FgGreen).SprintFunc()("+ " + nameOrID(res)), "", "",
 			})
 		default:
@@ -810,14 +810,14 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 		if rem, ok := toCommons[common.Id()]; ok {
 			added := graph.Subtract(rem.Properties(), common.Properties())
 			for k, v := range added {
-				values = append(values, []interface{}{
+				values = append(values, []any{
 					resType, naming, k, color.New(color.FgGreen).SprintFunc()("+ " + fmt.Sprint(v)),
 				})
 			}
 
 			deleted := graph.Subtract(common.Properties(), rem.Properties())
 			for k, v := range deleted {
-				values = append(values, []interface{}{
+				values = append(values, []any{
 					resType, naming, k, color.New(color.FgRed).SprintFunc()("- " + fmt.Sprint(v)),
 				})
 			}
@@ -959,13 +959,13 @@ func (d *defaultSorter) symbol() string {
 
 // valueLowerOrEqual orders two resource property values for display sorting.
 //
-// Resource properties are interface{} sourced from heterogeneous AWS responses,
+// Resource properties are any sourced from heterogeneous AWS responses,
 // so a single column can hold different types across resources (and types this
 // function has no case for). It therefore never panics: unknown or mismatched
 // types fall back to comparing their rendered form, which yields a stable if
 // arbitrary order. Panicking here would crash the CLI mid-render, and a sort
 // panic of this class has already been fixed once (commit 71665081).
-func valueLowerOrEqual(a, b interface{}) bool {
+func valueLowerOrEqual(a, b any) bool {
 	if a == nil && b == nil {
 		return true
 	}

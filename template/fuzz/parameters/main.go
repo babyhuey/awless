@@ -12,13 +12,13 @@ import (
 func Fuzz(data []byte) int {
 	var ok bool
 	for _, def := range awsspec.AWSTemplatesDefinitions {
-		fillers := make(map[string]interface{})
+		fillers := make(map[string]any)
 		for _, param := range def.Params.Required() {
 			fillers[param] = "default"
 		}
 
 		cenv := template.NewEnv().WithAliasFunc(func(p, v string) string { return "" }).
-			WithLookupCommandFunc(func(tokens ...string) interface{} {
+			WithLookupCommandFunc(func(tokens ...string) any {
 				return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 			}).Build()
 		cenv.Push(env.FILLERS, fillers)

@@ -39,7 +39,7 @@ func TestInitResource(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		input        interface{}
+		input        any
 		expectedType string
 		expectedID   string
 	}{

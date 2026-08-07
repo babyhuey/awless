@@ -49,7 +49,7 @@ func (d *tableResourceDisplayer) Print(w io.Writer) error {
 		}
 
 		if v := values[i]; v == nil {
-			values[i] = make([]interface{}, 2)
+			values[i] = make([]any, 2)
 		}
 		values[i][0] = header.title()
 		if l := len(header.title()); l > propertyNameMaxWith {

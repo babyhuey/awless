@@ -107,7 +107,7 @@ func TestGetConfigWithPrefixExtra(t *testing.T) {
 	origConfig := Config
 	defer func() { Config = origConfig }()
 
-	Config = map[string]interface{}{
+	Config = map[string]any{
 		"aws.region":     "us-east-1",
 		"aws.profile":    "prod",
 		"aws.infra.sync": true,
@@ -148,24 +148,24 @@ func TestGetAWSRegion(t *testing.T) {
 	}()
 
 	t.Run("from config", func(t *testing.T) {
-		Config = map[string]interface{}{RegionConfigKey: "eu-west-1"}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{RegionConfigKey: "eu-west-1"}
+		Defaults = map[string]any{}
 		if got := GetAWSRegion(); got != "eu-west-1" {
 			t.Fatalf("got %s, want eu-west-1", got)
 		}
 	})
 
 	t.Run("from defaults legacy key", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		Defaults = map[string]interface{}{"region": "us-west-2"}
+		Config = map[string]any{}
+		Defaults = map[string]any{"region": "us-west-2"}
 		if got := GetAWSRegion(); got != "us-west-2" {
 			t.Fatalf("got %s, want us-west-2", got)
 		}
 	})
 
 	t.Run("empty when not set", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{}
+		Defaults = map[string]any{}
 		if got := GetAWSRegion(); got != "" {
 			t.Fatalf("got %s, want empty", got)
 		}
@@ -181,16 +181,16 @@ func TestGetAWSProfile(t *testing.T) {
 	}()
 
 	t.Run("from config", func(t *testing.T) {
-		Config = map[string]interface{}{ProfileConfigKey: "staging"}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{ProfileConfigKey: "staging"}
+		Defaults = map[string]any{}
 		if got := GetAWSProfile(); got != "staging" {
 			t.Fatalf("got %s, want staging", got)
 		}
 	})
 
 	t.Run("default profile", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{}
+		Defaults = map[string]any{}
 		if got := GetAWSProfile(); got != "default" {
 			t.Fatalf("got %s, want default", got)
 		}
@@ -206,24 +206,24 @@ func TestGetAutosync(t *testing.T) {
 	}()
 
 	t.Run("true from config", func(t *testing.T) {
-		Config = map[string]interface{}{"autosync": true}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{"autosync": true}
+		Defaults = map[string]any{}
 		if got := GetAutosync(); !got {
 			t.Fatal("expected true")
 		}
 	})
 
 	t.Run("false from config", func(t *testing.T) {
-		Config = map[string]interface{}{"autosync": false}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{"autosync": false}
+		Defaults = map[string]any{}
 		if got := GetAutosync(); got {
 			t.Fatal("expected false")
 		}
 	})
 
 	t.Run("default true when not set", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{}
+		Defaults = map[string]any{}
 		if got := GetAutosync(); !got {
 			t.Fatal("expected default true")
 		}
@@ -233,7 +233,7 @@ func TestGetAutosync(t *testing.T) {
 func TestDefaultParser(t *testing.T) {
 	tcases := []struct {
 		input string
-		exp   interface{}
+		exp   any
 	}{
 		{"42", 42},
 		{"true", true},
@@ -308,7 +308,7 @@ func TestBuildInfoString(t *testing.T) {
 func TestParseBool(t *testing.T) {
 	tcases := []struct {
 		input string
-		exp   interface{}
+		exp   any
 		isErr bool
 	}{
 		{"true", true, false},
@@ -341,7 +341,7 @@ func TestParseBool(t *testing.T) {
 func TestParseInt(t *testing.T) {
 	tcases := []struct {
 		input string
-		exp   interface{}
+		exp   any
 		isErr bool
 	}{
 		{"0", 0, false},
@@ -375,7 +375,7 @@ func TestGetCheckUpgradeFrequency(t *testing.T) {
 	defer func() { Config = origConfig }()
 
 	t.Run("default 8 hours when not set", func(t *testing.T) {
-		Config = map[string]interface{}{}
+		Config = map[string]any{}
 		got := getCheckUpgradeFrequency()
 		if got != 8*time.Hour {
 			t.Fatalf("got %v, want %v", got, 8*time.Hour)
@@ -383,7 +383,7 @@ func TestGetCheckUpgradeFrequency(t *testing.T) {
 	})
 
 	t.Run("custom value", func(t *testing.T) {
-		Config = map[string]interface{}{"upgrade.checkfrequency": 24}
+		Config = map[string]any{"upgrade.checkfrequency": 24}
 		got := getCheckUpgradeFrequency()
 		if got != 24*time.Hour {
 			t.Fatalf("got %v, want %v", got, 24*time.Hour)
@@ -391,7 +391,7 @@ func TestGetCheckUpgradeFrequency(t *testing.T) {
 	})
 
 	t.Run("negative value", func(t *testing.T) {
-		Config = map[string]interface{}{"upgrade.checkfrequency": -1}
+		Config = map[string]any{"upgrade.checkfrequency": -1}
 		got := getCheckUpgradeFrequency()
 		if got != -1*time.Hour {
 			t.Fatalf("got %v, want %v", got, -1*time.Hour)
@@ -399,7 +399,7 @@ func TestGetCheckUpgradeFrequency(t *testing.T) {
 	})
 
 	t.Run("wrong type returns default", func(t *testing.T) {
-		Config = map[string]interface{}{"upgrade.checkfrequency": "not-int"}
+		Config = map[string]any{"upgrade.checkfrequency": "not-int"}
 		got := getCheckUpgradeFrequency()
 		if got != 8*time.Hour {
 			t.Fatalf("got %v, want %v", got, 8*time.Hour)
@@ -416,24 +416,24 @@ func TestGetAutosyncLegacyKey(t *testing.T) {
 	}()
 
 	t.Run("from legacy defaults key sync.auto true", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		Defaults = map[string]interface{}{"sync.auto": true}
+		Config = map[string]any{}
+		Defaults = map[string]any{"sync.auto": true}
 		if got := GetAutosync(); !got {
 			t.Fatal("expected true from legacy key")
 		}
 	})
 
 	t.Run("from legacy defaults key sync.auto false", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		Defaults = map[string]interface{}{"sync.auto": false}
+		Config = map[string]any{}
+		Defaults = map[string]any{"sync.auto": false}
 		if got := GetAutosync(); got {
 			t.Fatal("expected false from legacy key")
 		}
 	})
 
 	t.Run("non-bool type in config returns default true", func(t *testing.T) {
-		Config = map[string]interface{}{"autosync": "not-a-bool"}
-		Defaults = map[string]interface{}{}
+		Config = map[string]any{"autosync": "not-a-bool"}
+		Defaults = map[string]any{}
 		if got := GetAutosync(); !got {
 			t.Fatal("expected default true when type assertion fails")
 		}
@@ -449,24 +449,24 @@ func TestGetAWSProfileLegacyKey(t *testing.T) {
 	}()
 
 	t.Run("from legacy defaults key", func(t *testing.T) {
-		Config = map[string]interface{}{}
-		Defaults = map[string]interface{}{ProfileConfigKey: "legacy-profile"}
+		Config = map[string]any{}
+		Defaults = map[string]any{ProfileConfigKey: "legacy-profile"}
 		if got := GetAWSProfile(); got != "legacy-profile" {
 			t.Fatalf("got %s, want legacy-profile", got)
 		}
 	})
 
 	t.Run("config takes priority over defaults", func(t *testing.T) {
-		Config = map[string]interface{}{ProfileConfigKey: "config-profile"}
-		Defaults = map[string]interface{}{ProfileConfigKey: "default-profile"}
+		Config = map[string]any{ProfileConfigKey: "config-profile"}
+		Defaults = map[string]any{ProfileConfigKey: "default-profile"}
 		if got := GetAWSProfile(); got != "config-profile" {
 			t.Fatalf("got %s, want config-profile", got)
 		}
 	})
 
 	t.Run("empty config key falls to defaults", func(t *testing.T) {
-		Config = map[string]interface{}{ProfileConfigKey: ""}
-		Defaults = map[string]interface{}{ProfileConfigKey: "fallback"}
+		Config = map[string]any{ProfileConfigKey: ""}
+		Defaults = map[string]any{ProfileConfigKey: "fallback"}
 		if got := GetAWSProfile(); got != "fallback" {
 			t.Fatalf("got %s, want fallback", got)
 		}
@@ -499,8 +499,8 @@ func TestGetNotFound(t *testing.T) {
 		Defaults = origDefaults
 	}()
 
-	Config = map[string]interface{}{}
-	Defaults = map[string]interface{}{}
+	Config = map[string]any{}
+	Defaults = map[string]any{}
 
 	_, ok := Get("nonexistent.key")
 	if ok {
@@ -516,8 +516,8 @@ func TestGetFromConfigBeforeDefaults(t *testing.T) {
 		Defaults = origDefaults
 	}()
 
-	Config = map[string]interface{}{"shared.key": "from-config"}
-	Defaults = map[string]interface{}{"shared.key": "from-defaults"}
+	Config = map[string]any{"shared.key": "from-config"}
+	Defaults = map[string]any{"shared.key": "from-defaults"}
 
 	v, ok := Get("shared.key")
 	if !ok {
@@ -536,8 +536,8 @@ func TestGetFromDefaultsWhenNotInConfig(t *testing.T) {
 		Defaults = origDefaults
 	}()
 
-	Config = map[string]interface{}{}
-	Defaults = map[string]interface{}{"only.in.defaults": "default-val"}
+	Config = map[string]any{}
+	Defaults = map[string]any{"only.in.defaults": "default-val"}
 
 	v, ok := Get("only.in.defaults")
 	if !ok {
@@ -589,7 +589,7 @@ func TestRunSyncWithUpdatedRegion(t *testing.T) {
 	}()
 
 	t.Run("does not trigger when autosync is false", func(t *testing.T) {
-		Config = map[string]interface{}{"autosync": false}
+		Config = map[string]any{"autosync": false}
 		TriggerSyncOnConfigUpdate = false
 		runSyncWithUpdatedRegion("us-east-1")
 		if TriggerSyncOnConfigUpdate {
@@ -598,7 +598,7 @@ func TestRunSyncWithUpdatedRegion(t *testing.T) {
 	})
 
 	t.Run("does not trigger for invalid region", func(t *testing.T) {
-		Config = map[string]interface{}{"autosync": true}
+		Config = map[string]any{"autosync": true}
 		TriggerSyncOnConfigUpdate = false
 		runSyncWithUpdatedRegion("invalid-region-xyz")
 		if TriggerSyncOnConfigUpdate {
@@ -607,7 +607,7 @@ func TestRunSyncWithUpdatedRegion(t *testing.T) {
 	})
 
 	t.Run("triggers for valid region with autosync", func(t *testing.T) {
-		Config = map[string]interface{}{"autosync": true}
+		Config = map[string]any{"autosync": true}
 		TriggerSyncOnConfigUpdate = false
 		runSyncWithUpdatedRegion("us-east-1")
 		if !TriggerSyncOnConfigUpdate {
@@ -638,8 +638,8 @@ func TestSetVolatileWithAWSPrefix(t *testing.T) {
 	configDefinitions = map[string]*Definition{}
 	defaultsDefinitions = map[string]*Definition{}
 
-	Config = map[string]interface{}{}
-	Defaults = map[string]interface{}{}
+	Config = map[string]any{}
+	Defaults = map[string]any{}
 
 	// Key with "aws." prefix but not in any definition should go to Config
 	if err := SetVolatile("aws.custom.setting", "value"); err != nil {
@@ -675,8 +675,8 @@ func TestSetVolatileWithoutAWSPrefix(t *testing.T) {
 	configDefinitions = map[string]*Definition{}
 	defaultsDefinitions = map[string]*Definition{}
 
-	Config = map[string]interface{}{}
-	Defaults = map[string]interface{}{}
+	Config = map[string]any{}
+	Defaults = map[string]any{}
 
 	// Key without "aws." prefix and not in any definition should go to Defaults
 	if err := SetVolatile("custom.setting", "value"); err != nil {

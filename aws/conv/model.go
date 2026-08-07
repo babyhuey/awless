@@ -44,7 +44,7 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Architecture:     {name: "Architecture", transform: extractValueFn},
 		properties.Hypervisor:       {name: "Hypervisor", transform: extractValueFn},
 		properties.Profile:          {name: "IamInstanceProfile", transform: extractFieldFn("Arn")},
-		properties.Lifecycle: {fetch: func(i interface{}) (interface{}, error) {
+		properties.Lifecycle: {fetch: func(i any) (any, error) {
 			val := reflect.ValueOf(i)
 			field := val.FieldByName("InstanceLifecycle")
 			if field.IsValid() {

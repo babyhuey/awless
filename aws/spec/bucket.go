@@ -45,7 +45,7 @@ func (cmd *CreateBucket) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateBucket) ExtractResult(i interface{}) string {
+func (cmd *CreateBucket) ExtractResult(i any) string {
 	return StringValue(cmd.Name)
 }
 
@@ -68,7 +68,7 @@ func (cmd *UpdateBucket) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *UpdateBucket) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *UpdateBucket) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 
 	if cmd.Acl != nil { // Update the canned ACL to apply to the bucket

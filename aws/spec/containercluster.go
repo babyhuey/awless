@@ -36,7 +36,7 @@ func (cmd *CreateContainercluster) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name")))
 }
 
-func (cmd *CreateContainercluster) ExtractResult(i interface{}) string {
+func (cmd *CreateContainercluster) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ecs.CreateClusterOutput).Cluster.ClusterArn)
 }
 

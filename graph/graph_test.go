@@ -213,19 +213,19 @@ func TestFindWithProperties(t *testing.T) {
 	v1 := vpcResource("v1").prop("Name", "prod").prop(properties.Tags, []string{"TagKey2=TagValue2"}).build()
 	g.AddResource(i1, i2, s1, s2, v1)
 	tcases := []struct {
-		props     map[string]interface{}
+		props     map[string]any
 		expectRes []cloud.Resource
 	}{
 		{
-			props:     map[string]interface{}{"Name": "redis"},
+			props:     map[string]any{"Name": "redis"},
 			expectRes: []cloud.Resource{i1},
 		},
 		{
-			props:     map[string]interface{}{"Name": "prod"},
+			props:     map[string]any{"Name": "prod"},
 			expectRes: []cloud.Resource{s2, v1},
 		},
 		{
-			props:     map[string]interface{}{"Name": "nothing"},
+			props:     map[string]any{"Name": "nothing"},
 			expectRes: nil,
 		},
 	}

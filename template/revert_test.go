@@ -12,7 +12,7 @@ import (
 func TestRevertOneliner(t *testing.T) {
 	tcases := []struct {
 		in, exp   string
-		cmdResult interface{}
+		cmdResult any
 	}{
 		{in: "create instanceprofile name=stuff", exp: "delete instanceprofile name=stuff"},
 		{in: "delete instanceprofile name=stuff", exp: "create instanceprofile name=stuff"},
@@ -55,7 +55,7 @@ func TestRevertOneliner(t *testing.T) {
 }
 
 func TestRevertTemplate(t *testing.T) {
-	env := NewEnv().WithLookupCommandFunc(func(tokens ...string) interface{} {
+	env := NewEnv().WithLookupCommandFunc(func(tokens ...string) any {
 		return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 	}).Build()
 	t.Run("Simple template", func(t *testing.T) {
@@ -412,7 +412,7 @@ stop containertask cluster=cl deployment-name=dpname type=service`
 func TestCmdNodeIsRevertible(t *testing.T) {
 	tcases := []struct {
 		line, result string
-		params       map[string]interface{}
+		params       map[string]any
 		err          error
 		revertible   bool
 	}{
@@ -431,8 +431,8 @@ func TestCmdNodeIsRevertible(t *testing.T) {
 		{line: "detach routetable", revertible: false},
 		{line: "start alarm", revertible: true},
 		{line: "stop alarm", revertible: true},
-		{line: "start containertask", params: map[string]interface{}{"type": "service"}, revertible: true},
-		{line: "start containertask", params: map[string]interface{}{"type": "task"}, revertible: true},
+		{line: "start containertask", params: map[string]any{"type": "service"}, revertible: true},
+		{line: "start containertask", params: map[string]any{"type": "task"}, revertible: true},
 	}
 
 	for _, tc := range tcases {

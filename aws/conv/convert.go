@@ -63,7 +63,7 @@ import (
 	"github.com/bootswithdefer/awless/graph"
 )
 
-func InitResource(source interface{}) (*graph.Resource, error) {
+func InitResource(source any) (*graph.Resource, error) {
 	var res *graph.Resource
 	switch ss := source.(type) {
 	// EC2
@@ -227,7 +227,7 @@ func InitResource(source interface{}) (*graph.Resource, error) {
 	return res, nil
 }
 
-func NewResource(source interface{}) (*graph.Resource, error) {
+func NewResource(source any) (*graph.Resource, error) {
 	res, err := InitResource(source)
 	if err != nil {
 		return res, err
@@ -262,7 +262,7 @@ func NewResource(source interface{}) (*graph.Resource, error) {
 	for prop, trans := range awsResourcesDef[res.Type()] {
 		p, t := prop, trans
 		g.Go(func() error {
-			setProp := func(val interface{}) {
+			setProp := func(val any) {
 				mu.Lock()
 				res.Properties()[p] = val
 				mu.Unlock()
@@ -311,10 +311,10 @@ type propertyTransform struct {
 	fetch     fetchFn
 }
 
-type transformFn func(i interface{}) (interface{}, error)
-type fetchFn func(i interface{}) (interface{}, error)
+type transformFn func(i any) (any, error)
+type fetchFn func(i any) (any, error)
 
-var extractValueFn = func(i interface{}) (interface{}, error) {
+var extractValueFn = func(i any) (any, error) {
 	iv := reflect.ValueOf(i)
 	if iv.Kind() == reflect.Ptr {
 		if iv.IsNil() {
@@ -343,13 +343,13 @@ var extractValueFn = func(i interface{}) (interface{}, error) {
 	return nil, fmt.Errorf("extract value: not a pointer or known type but a %T", i)
 }
 
-var extractValueAsStringFn = func(i interface{}) (interface{}, error) {
+var extractValueAsStringFn = func(i any) (any, error) {
 	val, err := extractValueFn(i)
 	return fmt.Sprint(val), err
 }
 
 // Extract time forcing timezone to UTC (friendlier when running test in different timezones i.e. travis)
-var extractTimeFn = func(i interface{}) (interface{}, error) {
+var extractTimeFn = func(i any) (any, error) {
 	t, ok := i.(*time.Time)
 	if ok {
 		return t.UTC(), nil
@@ -374,7 +374,7 @@ var extractTimeFn = func(i interface{}) (interface{}, error) {
 }
 
 // Extract time from *int64 representing milliseconds since epoch (e.g., CloudWatch Logs CreationTime)
-var extractMillisecondEpochTimeFn = func(i interface{}) (interface{}, error) {
+var extractMillisecondEpochTimeFn = func(i any) (any, error) {
 	p, ok := i.(*int64)
 	if ok {
 		if p == nil {
@@ -391,7 +391,7 @@ var extractMillisecondEpochTimeFn = func(i interface{}) (interface{}, error) {
 
 // Extract time that have a Z directly after the time without a space which means UTC
 // (https://en.wikipedia.org/wiki/ISO_8601#UTC)
-var extractTimeWithZSuffixFn = func(i interface{}) (interface{}, error) {
+var extractTimeWithZSuffixFn = func(i any) (any, error) {
 	t, ok := i.(*time.Time)
 	if ok {
 		return t.UTC(), nil
@@ -415,7 +415,7 @@ var extractTimeWithZSuffixFn = func(i interface{}) (interface{}, error) {
 	return nil, fmt.Errorf("extract time: expected time pointer, got: %T", i)
 }
 
-var extractIpPermissionSliceFn = func(i interface{}) (interface{}, error) {
+var extractIpPermissionSliceFn = func(i any) (any, error) {
 	if _, ok := i.([]ec2types.IpPermission); !ok {
 		return nil, fmt.Errorf("extract ip permission: not a permission slice but a %T", i)
 	}
@@ -466,7 +466,7 @@ var extractIpPermissionSliceFn = func(i interface{}) (interface{}, error) {
 
 }
 
-var extractNameValueFn = func(i interface{}) (interface{}, error) {
+var extractNameValueFn = func(i any) (any, error) {
 	if _, ok := i.([]cloudwatchtypes.Dimension); !ok {
 		return nil, fmt.Errorf("extract ip namevalue: not a dimension slice but a %T", i)
 	}
@@ -479,7 +479,7 @@ var extractNameValueFn = func(i interface{}) (interface{}, error) {
 	return nameValues, nil
 }
 
-var extractECSAttributesFn = func(i interface{}) (interface{}, error) {
+var extractECSAttributesFn = func(i any) (any, error) {
 	if _, ok := i.([]ecstypes.Attribute); !ok {
 		return nil, fmt.Errorf("extract ECS attributes: not an attribute slice but a %T", i)
 	}
@@ -492,7 +492,7 @@ var extractECSAttributesFn = func(i interface{}) (interface{}, error) {
 	return keyVals, nil
 }
 
-var extractRouteTableAssociationsFn = func(i interface{}) (interface{}, error) {
+var extractRouteTableAssociationsFn = func(i any) (any, error) {
 	if _, ok := i.([]ec2types.RouteTableAssociation); !ok {
 		return nil, fmt.Errorf("extract route table associations: not an association slice but a %T", i)
 	}
@@ -505,7 +505,7 @@ var extractRouteTableAssociationsFn = func(i interface{}) (interface{}, error) {
 }
 
 var extractFieldFn = func(field string) transformFn {
-	return func(i interface{}) (interface{}, error) {
+	return func(i any) (any, error) {
 		value := reflect.ValueOf(i)
 		var struc reflect.Value
 		if value.Kind() == reflect.Ptr {
@@ -529,7 +529,7 @@ var extractFieldFn = func(field string) transformFn {
 	}
 }
 
-var extractTagsFn = func(i interface{}) (interface{}, error) {
+var extractTagsFn = func(i any) (any, error) {
 	var out []string
 	switch tags := i.(type) {
 	case []ec2types.Tag:
@@ -547,7 +547,7 @@ var extractTagsFn = func(i interface{}) (interface{}, error) {
 	return out, nil
 }
 
-var extractMapTagsFn = func(i interface{}) (interface{}, error) {
+var extractMapTagsFn = func(i any) (any, error) {
 	tags, ok := i.(map[string]string)
 	if !ok {
 		return nil, fmt.Errorf("extract map tags: not a map[string]string, but a %T", i)
@@ -559,7 +559,7 @@ var extractMapTagsFn = func(i interface{}) (interface{}, error) {
 	return out, nil
 }
 
-var extractSecretsManagerTagsFn = func(i interface{}) (interface{}, error) {
+var extractSecretsManagerTagsFn = func(i any) (any, error) {
 	tags, ok := i.([]secretsmanagertypes.Tag)
 	if !ok {
 		return nil, fmt.Errorf("extract secrets manager tags: not a tag slice, but a %T", i)
@@ -571,7 +571,7 @@ var extractSecretsManagerTagsFn = func(i interface{}) (interface{}, error) {
 	return out, nil
 }
 
-var extractEFSTagsFn = func(i interface{}) (interface{}, error) {
+var extractEFSTagsFn = func(i any) (any, error) {
 	tags, ok := i.([]efstypes.Tag)
 	if !ok {
 		return nil, fmt.Errorf("extract EFS tags: not a tag slice, but a %T", i)
@@ -584,7 +584,7 @@ var extractEFSTagsFn = func(i interface{}) (interface{}, error) {
 }
 
 var extractEFSTagFn = func(key string) transformFn {
-	return func(i interface{}) (interface{}, error) {
+	return func(i any) (any, error) {
 		tags, ok := i.([]efstypes.Tag)
 		if !ok {
 			return nil, fmt.Errorf("extract EFS tag: not a tag slice, but a %T", i)
@@ -598,7 +598,7 @@ var extractEFSTagFn = func(key string) transformFn {
 	}
 }
 
-var extractDynamoDBKeySchemaFn = func(i interface{}) (interface{}, error) {
+var extractDynamoDBKeySchemaFn = func(i any) (any, error) {
 	keys, ok := i.([]dynamodbtypes.KeySchemaElement)
 	if !ok {
 		return nil, fmt.Errorf("extract key schema: not a KeySchemaElement slice, but a %T", i)
@@ -610,7 +610,7 @@ var extractDynamoDBKeySchemaFn = func(i interface{}) (interface{}, error) {
 	return out, nil
 }
 
-var extractEKSScalingConfigFn = func(i interface{}) (interface{}, error) {
+var extractEKSScalingConfigFn = func(i any) (any, error) {
 	sc, ok := i.(*ekstypes.NodegroupScalingConfig)
 	if !ok {
 		return nil, fmt.Errorf("extract scaling config: not a NodegroupScalingConfig pointer, but a %T", i)
@@ -622,7 +622,7 @@ var extractEKSScalingConfigFn = func(i interface{}) (interface{}, error) {
 }
 
 var extractTagFn = func(key string) transformFn {
-	return func(i interface{}) (interface{}, error) {
+	return func(i any) (any, error) {
 		tags, ok := i.([]ec2types.Tag)
 		if !ok {
 			return nil, fmt.Errorf("extract tag: not a tag slice, but a %T", i)
@@ -637,7 +637,7 @@ var extractTagFn = func(key string) transformFn {
 	}
 }
 
-var extractStringPointerSliceValues = func(i interface{}) (interface{}, error) {
+var extractStringPointerSliceValues = func(i any) (any, error) {
 	switch ss := i.(type) {
 	case []string:
 		return ss, nil
@@ -648,7 +648,7 @@ var extractStringPointerSliceValues = func(i interface{}) (interface{}, error) {
 }
 
 var extractStringSliceValues = func(key string) transformFn {
-	return func(i interface{}) (interface{}, error) {
+	return func(i any) (any, error) {
 		var res []string
 		value := reflect.ValueOf(i)
 		if value.Kind() != reflect.Slice {
@@ -670,7 +670,7 @@ var extractStringSliceValues = func(key string) transformFn {
 	}
 }
 
-var extractClassicLoadbListenerDescriptionsFn = func(i interface{}) (interface{}, error) {
+var extractClassicLoadbListenerDescriptionsFn = func(i any) (any, error) {
 	listeners, ok := i.([]elbtypes.ListenerDescription)
 	if !ok {
 		return nil, fmt.Errorf("extract classic loadb listener descriptions: unexpected type %T", i)
@@ -684,7 +684,7 @@ var extractClassicLoadbListenerDescriptionsFn = func(i interface{}) (interface{}
 	return out, nil
 }
 
-var extractRoutesSliceFn = func(i interface{}) (interface{}, error) {
+var extractRoutesSliceFn = func(i any) (any, error) {
 	if _, ok := i.([]ec2types.Route); !ok {
 		return nil, fmt.Errorf("extract route: not a route slice but a %T", i)
 	}
@@ -736,7 +736,7 @@ var extractRoutesSliceFn = func(i interface{}) (interface{}, error) {
 }
 
 var extractHasATrueBoolInStructSliceFn = func(key string) transformFn {
-	return func(i interface{}) (interface{}, error) {
+	return func(i any) (any, error) {
 		var res bool
 		value := reflect.ValueOf(i)
 		if value.Kind() != reflect.Slice {
@@ -763,7 +763,7 @@ var extractHasATrueBoolInStructSliceFn = func(key string) transformFn {
 	}
 }
 
-var extractDistributionOriginFn = func(i interface{}) (interface{}, error) {
+var extractDistributionOriginFn = func(i any) (any, error) {
 	if _, ok := i.(*cloudfronttypes.Origins); !ok {
 		return nil, fmt.Errorf("extract origins: not a origins pointer but a %T", i)
 	}
@@ -784,7 +784,7 @@ var extractDistributionOriginFn = func(i interface{}) (interface{}, error) {
 	return origins, nil
 }
 
-var extractStackOutputsFn = func(i interface{}) (interface{}, error) {
+var extractStackOutputsFn = func(i any) (any, error) {
 	if _, ok := i.([]cloudformationtypes.Output); !ok {
 		return nil, fmt.Errorf("extract ouutputs not an output slice but a %T", i)
 	}
@@ -797,7 +797,7 @@ var extractStackOutputsFn = func(i interface{}) (interface{}, error) {
 	return keyVals, nil
 }
 
-var extractStackParametersFn = func(i interface{}) (interface{}, error) {
+var extractStackParametersFn = func(i any) (any, error) {
 	if _, ok := i.([]cloudformationtypes.Parameter); !ok {
 		return nil, fmt.Errorf("extract parameters not a parameter slice but a %T", i)
 	}
@@ -810,7 +810,7 @@ var extractStackParametersFn = func(i interface{}) (interface{}, error) {
 	return keyVals, nil
 }
 
-var extractContainersImagesFn = func(i interface{}) (interface{}, error) {
+var extractContainersImagesFn = func(i any) (any, error) {
 	if _, ok := i.([]ecstypes.ContainerDefinition); !ok {
 		return nil, fmt.Errorf("extract containers images, not a container definition slice but a %T", i)
 	}
@@ -823,7 +823,7 @@ var extractContainersImagesFn = func(i interface{}) (interface{}, error) {
 	return keyVals, nil
 }
 
-func extractDocumentDefaultVersion(i interface{}) (interface{}, error) {
+func extractDocumentDefaultVersion(i any) (any, error) {
 	if _, ok := i.([]iamtypes.PolicyVersion); !ok {
 		return nil, fmt.Errorf("extract default version of document, not a policy version slice but a %T", i)
 	}
@@ -841,7 +841,7 @@ func extractDocumentDefaultVersion(i interface{}) (interface{}, error) {
 	return "", nil
 }
 
-func extractURLEncodedJson(i interface{}) (interface{}, error) {
+func extractURLEncodedJson(i any) (any, error) {
 	var docStr string
 	switch v := i.(type) {
 	case *string:
@@ -872,7 +872,7 @@ func isNilValue(v reflect.Value) bool {
 	}
 }
 
-func HashFields(fields ...interface{}) string {
+func HashFields(fields ...any) string {
 	var buf bytes.Buffer
 	for _, field := range fields {
 		buf.WriteString(fmt.Sprint(field))

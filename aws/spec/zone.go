@@ -44,7 +44,7 @@ func (cmd *CreateZone) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateZone) ExtractResult(i interface{}) string {
+func (cmd *CreateZone) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*route53.CreateHostedZoneOutput).HostedZone.Id)
 }
 

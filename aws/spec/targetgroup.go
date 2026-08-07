@@ -56,7 +56,7 @@ func (cmd *CreateTargetgroup) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateTargetgroup) ExtractResult(i interface{}) string {
+func (cmd *CreateTargetgroup) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*elbv2.CreateTargetGroupOutput).TargetGroups[0].TargetGroupArn)
 }
 
@@ -85,7 +85,7 @@ func (cmd *UpdateTargetgroup) ParamsSpec() params.Spec {
 	))
 }
 
-func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (interface{}, error) {
+func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
 	tgArn := StringValue(tg.Id)
 
 	attrsInput := &elbv2.ModifyTargetGroupAttributesInput{}

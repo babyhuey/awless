@@ -280,25 +280,25 @@ func resolveResourceFromRef(g cloud.GraphAPI, ref string) (cloud.GraphAPI, []clo
 
 	if strings.HasPrefix(ref, "@") {
 		logger.Verbosef("prefixed with @: forcing research by name '%s'", name)
-		rs, err := g.FindWithProperties(map[string]interface{}{properties.Name: name})
+		rs, err := g.FindWithProperties(map[string]any{properties.Name: name})
 		exitOn(err)
 		return g, rs, properties.Name
 	}
-	rs, err := g.FindWithProperties(map[string]interface{}{properties.ID: name})
+	rs, err := g.FindWithProperties(map[string]any{properties.ID: name})
 	exitOn(err)
 
 	if len(rs) > 0 {
 		return g, rs, properties.ID
 	}
 
-	rs, err = g.FindWithProperties(map[string]interface{}{properties.Arn: name})
+	rs, err = g.FindWithProperties(map[string]any{properties.Arn: name})
 	exitOn(err)
 
 	if len(rs) > 0 {
 		return g, rs, properties.Arn
 	}
 
-	rs, err = g.FindWithProperties(map[string]interface{}{properties.Name: name})
+	rs, err = g.FindWithProperties(map[string]any{properties.Name: name})
 	exitOn(err)
 
 	return g, rs, properties.Name
@@ -340,7 +340,7 @@ func printResourceList(title string, list []cloud.Resource, shortenListMsg ...st
 	}
 }
 
-func printResourceRef(r cloud.Resource, idRenderFunc ...func(a ...interface{}) string) string {
+func printResourceRef(r cloud.Resource, idRenderFunc ...func(a ...any) string) string {
 	render := fmt.Sprint
 	if len(idRenderFunc) > 0 {
 		render = idRenderFunc[0]

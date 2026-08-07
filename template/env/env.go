@@ -22,17 +22,17 @@ type log interface {
 
 type Running interface {
 	log
-	Context() map[string]interface{}
+	Context() map[string]any
 	IsDryRun() bool
 	SetDryRun(b bool)
 }
 
 type Compiling interface {
 	log
-	LookupCommandFunc() func(...string) interface{}
+	LookupCommandFunc() func(...string) any
 	AliasFunc() func(paramPath, alias string) string
 	MissingHolesFunc() func(string, []string, bool) string
 	ParamsMode() int
-	Push(int, ...map[string]interface{})
-	Get(int) map[string]interface{}
+	Push(int, ...map[string]any)
+	Get(int) map[string]any
 }

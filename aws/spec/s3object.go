@@ -49,7 +49,7 @@ func (cmd *CreateS3object) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CreateS3object) ManualRun(env.Running) (interface{}, error) {
+func (cmd *CreateS3object) ManualRun(env.Running) (any, error) {
 	input := &s3.PutObjectInput{}
 
 	f, err := os.Open(StringValue(cmd.File))
@@ -97,7 +97,7 @@ func (cmd *CreateS3object) ManualRun(env.Running) (interface{}, error) {
 	return fileName, nil
 }
 
-func (cmd *CreateS3object) ExtractResult(i interface{}) string {
+func (cmd *CreateS3object) ExtractResult(i any) string {
 	return i.(string)
 }
 

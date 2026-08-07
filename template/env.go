@@ -15,13 +15,13 @@ var (
 type runEnv struct {
 	log    *logger.Logger
 	dryRun bool
-	ctx    map[string]interface{}
+	ctx    map[string]any
 }
 
-func NewRunEnv(cenv env.Compiling, context ...map[string]interface{}) env.Running {
+func NewRunEnv(cenv env.Compiling, context ...map[string]any) env.Running {
 	renv := new(runEnv)
 	renv.log = cenv.Log()
-	renv.ctx = make(map[string]interface{})
+	renv.ctx = make(map[string]any)
 	for _, m := range context {
 		for k, v := range m {
 			renv.ctx[k] = v
@@ -43,8 +43,8 @@ func (e *runEnv) SetDryRun(b bool) {
 	e.dryRun = b
 }
 
-func (e *runEnv) Context() (out map[string]interface{}) {
-	out = make(map[string]interface{})
+func (e *runEnv) Context() (out map[string]any) {
+	out = make(map[string]any)
 	for k, v := range e.ctx {
 		out[k] = v
 	}
@@ -57,14 +57,14 @@ func (e *runEnv) Log() *logger.Logger {
 
 type compileEnv struct {
 	*dataMap
-	lookupCommandFunc func(...string) interface{}
+	lookupCommandFunc func(...string) any
 	aliasFunc         func(paramPath, alias string) string
 	missingHolesFunc  func(string, []string, bool) string
 	log               *logger.Logger
 	paramsSuggested   int
 }
 
-func (e *compileEnv) LookupCommandFunc() func(...string) interface{} {
+func (e *compileEnv) LookupCommandFunc() func(...string) any {
 	return e.lookupCommandFunc
 }
 
@@ -86,17 +86,17 @@ func (e *compileEnv) Log() *logger.Logger {
 
 type noopCompileEnv struct{}
 
-func (*noopCompileEnv) LookupCommandFunc() func(...string) interface{}        { return nil }
+func (*noopCompileEnv) LookupCommandFunc() func(...string) any                { return nil }
 func (*noopCompileEnv) AliasFunc() func(paramPath, alias string) string       { return nil }
 func (*noopCompileEnv) MissingHolesFunc() func(string, []string, bool) string { return nil }
 func (*noopCompileEnv) ParamsMode() int                                       { return -1 }
 func (*noopCompileEnv) Log() *logger.Logger                                   { return logger.DiscardLogger }
-func (*noopCompileEnv) Push(int, ...map[string]interface{})                   {}
-func (*noopCompileEnv) Get(int) map[string]interface{}                        { return make(map[string]interface{}) }
+func (*noopCompileEnv) Push(int, ...map[string]any)                           {}
+func (*noopCompileEnv) Get(int) map[string]any                                { return make(map[string]any) }
 
 func NewEnv() *envBuilder {
 	b := &envBuilder{new(compileEnv)}
-	b.E.lookupCommandFunc = func(...string) interface{} { return nil }
+	b.E.lookupCommandFunc = func(...string) any { return nil }
 	b.E.log = logger.DiscardLogger
 	b.E.dataMap = new(dataMap)
 	return b
@@ -104,17 +104,17 @@ func NewEnv() *envBuilder {
 
 type dataMap struct {
 	mu sync.Mutex
-	M  map[int]map[string]interface{}
+	M  map[int]map[string]any
 }
 
-func (d *dataMap) Push(typ int, data ...map[string]interface{}) {
+func (d *dataMap) Push(typ int, data ...map[string]any) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if d.M == nil {
-		d.M = make(map[int]map[string]interface{})
+		d.M = make(map[int]map[string]any)
 	}
 	if d.M[typ] == nil {
-		d.M[typ] = make(map[string]interface{})
+		d.M[typ] = make(map[string]any)
 	}
 	for _, m := range data {
 		for k, v := range m {
@@ -123,10 +123,10 @@ func (d *dataMap) Push(typ int, data ...map[string]interface{}) {
 	}
 }
 
-func (d *dataMap) Get(typ int) (out map[string]interface{}) {
+func (d *dataMap) Get(typ int) (out map[string]any) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	out = make(map[string]interface{})
+	out = make(map[string]any)
 	if d.M[typ] == nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (b *envBuilder) WithMissingHolesFunc(fn func(string, []string, bool) string
 	return b
 }
 
-func (b *envBuilder) WithLookupCommandFunc(fn func(...string) interface{}) *envBuilder {
+func (b *envBuilder) WithLookupCommandFunc(fn func(...string) any) *envBuilder {
 	b.E.lookupCommandFunc = fn
 	return b
 }

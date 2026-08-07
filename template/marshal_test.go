@@ -109,7 +109,7 @@ func TestTemplateExecutionUnmarshalFromJSON(t *testing.T) {
 	if got, want := tplExec.Source, "create stuff"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := tplExec.Fillers, map[string]interface{}{"mykey": "myvalue", "mysecondkey": "mysecondvalue"}; !reflect.DeepEqual(got, want) {
+	if got, want := tplExec.Fillers, map[string]any{"mykey": "myvalue", "mysecondkey": "mysecondvalue"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
@@ -143,7 +143,7 @@ func TestTemplateExecutionUnmarshalFromJSON(t *testing.T) {
 	if got, want := cmds[0].Entity, "vpc"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	exp := map[string]interface{}{"cidr": "10.0.0.0/24"}
+	exp := map[string]any{"cidr": "10.0.0.0/24"}
 	if got, want := cmds[0].ToDriverParams(), exp; !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
@@ -173,7 +173,7 @@ func TestTemplateExecutionUnmarshalFromJSON(t *testing.T) {
 	if got, want := cmds[2].Entity, "instance"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	exp = map[string]interface{}{"type": "t2.micro", "count": 4}
+	exp = map[string]any{"type": "t2.micro", "count": 4}
 	if got, want := cmds[2].ToDriverParams(), exp; !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
@@ -200,7 +200,7 @@ func TestTemplateExecutionMarshalToJSON(t *testing.T) {
 		source, locale, author string
 		profile, message, path string
 		templ                  *Template
-		fillers                map[string]interface{}
+		fillers                map[string]any
 		out                    string
 	}{
 		{
@@ -227,7 +227,7 @@ func TestTemplateExecutionMarshalToJSON(t *testing.T) {
 			"create subnet cidr=10.0.0.0/24\ncreate instance name=@myinst",
 			"us-west-1", "", "admin", "bijour", "http://gist.com",
 			MustParse("create subnet cidr=10.0.0.0/24\ncreate instance name=@myinst"),
-			map[string]interface{}{"two": "2"},
+			map[string]any{"two": "2"},
 			`{"source": "create subnet cidr=10.0.0.0/24\ncreate instance name=@myinst",
 			  "locale": "us-west-1",
 			  "profile": "admin",
@@ -245,7 +245,7 @@ func TestTemplateExecutionMarshalToJSON(t *testing.T) {
 			"create instance name='my instance'",
 			"eu-central-2", "michael", "admin", "bijour", "http://gist.com",
 			MustParse("create instance name='my instance'"),
-			map[string]interface{}{"three": "3"},
+			map[string]any{"three": "3"},
 			`{"source": "create instance name='my instance'",
 			  "locale": "eu-central-2",
 			  "profile": "admin",
@@ -263,7 +263,7 @@ func TestTemplateExecutionMarshalToJSON(t *testing.T) {
 			"create instance name=\"my instance '$&\\ special) chars\"",
 			"eu-central-1", "michael", "", "", "",
 			MustParse("create instance name=\"my instance '$&\\ special) chars\""),
-			map[string]interface{}{"four": 4},
+			map[string]any{"four": 4},
 			`{"source": "create instance name=\"my instance '$&\\ special) chars\"",
 			  "fillers": {"four": 4},
 			  "author": "michael",
@@ -278,7 +278,7 @@ func TestTemplateExecutionMarshalToJSON(t *testing.T) {
 			"create loadbalancer subnets={private.subnets}",
 			"eu-central-1", "michael", "", "bijour", "",
 			MustParse("create loadbalancer subnets=[subnet-1234,subnet-2345]"),
-			map[string]interface{}{"private.subnets": []interface{}{"subnet-1234", "subnet-2345"}},
+			map[string]any{"private.subnets": []any{"subnet-1234", "subnet-2345"}},
 			`{"source": "create loadbalancer subnets={private.subnets}",
 			  "fillers": {"private.subnets": ["subnet-1234","subnet-2345"]},
 			  "author": "michael",
@@ -306,7 +306,7 @@ func TestTemplateExecutionMarshalToJSON(t *testing.T) {
 }
 
 func identJSON(content []byte) string {
-	var v interface{}
+	var v any
 	err := json.Unmarshal(content, &v)
 	if err != nil {
 		fmt.Println("", string(content))

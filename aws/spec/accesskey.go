@@ -51,13 +51,13 @@ func (cmd *CreateAccesskey) ParamsSpec() params.Spec {
 		params.Opt("save", "no-prompt"),
 	))
 	builder.AddReducer(
-		func(values map[string]interface{}) (map[string]interface{}, error) {
+		func(values map[string]any) (map[string]any, error) {
 			if noPrompt, hasNoPrompt := values["no-prompt"]; hasNoPrompt {
 				b, err := castBool(noPrompt)
 				if err != nil {
 					return nil, fmt.Errorf("no-prompt: %w", err)
 				}
-				return map[string]interface{}{"save": !b}, nil
+				return map[string]any{"save": !b}, nil
 			} else {
 				return nil, nil
 			}
@@ -67,7 +67,7 @@ func (cmd *CreateAccesskey) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *CreateAccesskey) AfterRun(renv env.Running, output interface{}) error {
+func (cmd *CreateAccesskey) AfterRun(renv env.Running, output any) error {
 	accessKey := output.(*iam.CreateAccessKeyOutput).AccessKey
 	if !BoolValue(cmd.Save) {
 		cmd.logger.Infof("Access key created. Here are the crendentials for user %s:", aws.ToString(accessKey.UserName))
@@ -109,7 +109,7 @@ func (cmd *CreateAccesskey) AfterRun(renv env.Running, output interface{}) error
 	return nil
 }
 
-func (cmd *CreateAccesskey) ExtractResult(i interface{}) string {
+func (cmd *CreateAccesskey) ExtractResult(i any) string {
 	return StringValue(i.(*iam.CreateAccessKeyOutput).AccessKey.AccessKeyId)
 }
 
@@ -125,7 +125,7 @@ type DeleteAccesskey struct {
 func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 	builder := params.SpecBuilder(params.AtLeastOneOf(params.Key("id"), params.Key("user")))
 	builder.AddReducer(
-		func(values map[string]interface{}) (map[string]interface{}, error) {
+		func(values map[string]any) (map[string]any, error) {
 			user, hasUser := values["user"].(string)
 			id, hasId := values["id"].(string)
 			if !hasUser && hasId {
@@ -247,7 +247,7 @@ func appendToAwsFile(content string, awsFilePath string) (bool, error) {
 	return created, nil
 }
 
-func promptConfirm(msg string, a ...interface{}) bool {
+func promptConfirm(msg string, a ...any) bool {
 	var yesorno string
 	fmt.Fprintf(os.Stderr, "%s [y/N] ", fmt.Sprintf(msg, a...))
 	fmt.Scanln(&yesorno)

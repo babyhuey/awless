@@ -172,7 +172,7 @@ func TestSetValueAtPathLeadingDot(t *testing.T) {
 func TestCastString(t *testing.T) {
 	tests := []struct {
 		name string
-		in   interface{}
+		in   any
 		want string
 	}{
 		{"plain string", "hello", "hello"},
@@ -197,7 +197,7 @@ func TestCastString(t *testing.T) {
 func TestCastInt(t *testing.T) {
 	tests := []struct {
 		name    string
-		in      interface{}
+		in      any
 		want    int
 		wantErr bool
 	}{
@@ -229,7 +229,7 @@ func TestCastInt(t *testing.T) {
 func TestCastInt64(t *testing.T) {
 	tests := []struct {
 		name    string
-		in      interface{}
+		in      any
 		want    int64
 		wantErr bool
 	}{
@@ -259,7 +259,7 @@ func TestCastInt64(t *testing.T) {
 func TestCastFloat(t *testing.T) {
 	tests := []struct {
 		name    string
-		in      interface{}
+		in      any
 		want    float64
 		wantErr bool
 	}{
@@ -290,7 +290,7 @@ func TestCastFloat(t *testing.T) {
 func TestCastBool(t *testing.T) {
 	tests := []struct {
 		name    string
-		in      interface{}
+		in      any
 		want    bool
 		wantErr bool
 	}{
@@ -350,7 +350,7 @@ func TestCastStringSlice(t *testing.T) {
 	})
 
 	t.Run("interface slice", func(t *testing.T) {
-		got := castStringSlice([]interface{}{"str", aws.String("ptr"), 123})
+		got := castStringSlice([]any{"str", aws.String("ptr"), 123})
 		if len(got) != 3 || got[0] != "str" || got[1] != "ptr" || got[2] != "123" {
 			t.Errorf("expected [str ptr 123], got %v", got)
 		}

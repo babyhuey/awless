@@ -26,7 +26,7 @@ func (v *UniqueNameValidator) Execute(t *Template) (errs []error) {
 			if !ok {
 				continue
 			}
-			resources, err := g.FindWithProperties(map[string]interface{}{"Name": name})
+			resources, err := g.FindWithProperties(map[string]any{"Name": name})
 			if err != nil {
 				errs = append(errs, err)
 			}

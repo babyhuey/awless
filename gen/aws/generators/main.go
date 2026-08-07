@@ -66,7 +66,7 @@ func main() {
 	generateRDFProperties()
 }
 
-func writeTemplateToFile(templ *template.Template, data interface{}, dir, filename string) {
+func writeTemplateToFile(templ *template.Template, data any, dir, filename string) {
 	var buff bytes.Buffer
 	if err := templ.Execute(&buff, data); err != nil {
 		log.Fatal(err)

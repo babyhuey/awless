@@ -46,7 +46,7 @@ func (g *StubGraph) Find(Query) ([]Resource, error) {
 	return nil, nil
 }
 
-func (g *StubGraph) FindWithProperties(props map[string]interface{}) ([]Resource, error) {
+func (g *StubGraph) FindWithProperties(props map[string]any) ([]Resource, error) {
 	return nil, nil
 }
 
@@ -99,7 +99,7 @@ func TestLazyGraphFind(t *testing.T) {
 
 func TestLazyGraphFindWithProperties(t *testing.T) {
 	lazy, _ := newLazyWithStub()
-	res, err := lazy.FindWithProperties(map[string]interface{}{"key": "val"})
+	res, err := lazy.FindWithProperties(map[string]any{"key": "val"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

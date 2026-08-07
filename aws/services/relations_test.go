@@ -21,9 +21,9 @@ func strPtr(s string) *string { return &s }
 func TestValueAtPath(t *testing.T) {
 	tests := []struct {
 		name    string
-		input   interface{}
+		input   any
 		path    string
-		want    interface{}
+		want    any
 		wantErr bool
 	}{
 		{
@@ -110,7 +110,7 @@ func TestVerifyValidStructField(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		input     interface{}
+		input     any
 		fieldName string
 		wantValid bool
 		wantErr   bool

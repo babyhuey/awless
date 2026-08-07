@@ -138,14 +138,14 @@ var APIPerResourceType = map[string]string {
 type {{ Title $service.Name }} struct {
 	fetcher fetch.Fetcher
   region, profile string
-	config map[string]interface{}
+	config map[string]any
 	log *logger.Logger
 	{{- range $, $api := $service.Api }}
 		{{ Title $api }}Client *{{ $api }}.Client
 	{{- end }}
 }
 
-func New{{ Title $service.Name }}(cfg aws.Config, profile string, extraConf map[string]interface{}, log *logger.Logger) cloud.Service {
+func New{{ Title $service.Name }}(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
   {{- if $service.Global }}
 	region := "global"
 	{{- else}}

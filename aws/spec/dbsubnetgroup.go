@@ -38,7 +38,7 @@ func (cmd *CreateDbsubnetgroup) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("description"), params.Key("name"), params.Key("subnets")))
 }
 
-func (cmd *CreateDbsubnetgroup) ExtractResult(i interface{}) string {
+func (cmd *CreateDbsubnetgroup) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*rds.CreateDBSubnetGroupOutput).DBSubnetGroup.DBSubnetGroupName)
 }
 

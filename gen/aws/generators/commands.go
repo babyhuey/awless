@@ -276,14 +276,14 @@ func (cmd *{{ $cmdName }}) SetApi(api *{{$tag.API}}.Client) {
 	cmd.api = api
 }
 
-func (cmd *{{ $cmdName }}) Run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *{{ $cmdName }}) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
 	}
 	return cmd.run(renv, params)
 }
 
-func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -316,7 +316,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 	}
 	{{- end }}
 	
-	var extracted interface{}
+	var extracted any
 	if v, ok := implementsResultExtractor(cmd); ok {
 		if output != nil {
 			extracted = v.ExtractResult(output)
@@ -342,7 +342,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 
 {{ if $tag.HasDryRun }}
 	{{ if $tag.GenDryRun }}
-	func (cmd *{{ $cmdName }}) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+	func (cmd *{{ $cmdName }}) dryRun(renv env.Running, params map[string]any) (any, error) {
 		if err := cmd.inject(params); err != nil {
 			return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 		}
@@ -372,12 +372,12 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]interface{}) 
 	}
 	{{- end }}
 {{- else }}
-func (cmd *{{ $cmdName }}) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *{{ $cmdName }}) dryRun(renv env.Running, params map[string]any) (any, error) {
 	return fakeDryRunId("{{ $tag.Entity }}"), nil
 }
 {{- end }}
 
-func (cmd *{{ $cmdName }}) inject(params map[string]interface{}) error {
+func (cmd *{{ $cmdName }}) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 {{ end }}
@@ -409,7 +409,7 @@ import (
 )
 
 type Factory interface {
-	Build(key string) func() interface{}
+	Build(key string) func() any
 }
 
 var CommandFactory Factory
@@ -425,11 +425,11 @@ type AWSFactory struct {
 	Graph cloud.GraphAPI
 }
 
-func (f *AWSFactory) Build(key string) func() interface{} {
+func (f *AWSFactory) Build(key string) func() any {
 	switch key {
 	{{- range $cmdName, $tag := . }}
 	case "{{ $tag.Action }}{{ $tag.Entity }}":
-		return func() interface{} { return New{{ $cmdName }}(f.Cfg, f.Graph, f.Log) }
+		return func() any { return New{{ $cmdName }}(f.Cfg, f.Graph, f.Log) }
 	{{- end}}
 	}
 	return nil

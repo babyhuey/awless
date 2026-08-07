@@ -146,7 +146,7 @@ func TestSetFieldsOnAwsStruct(t *testing.T) {
 }
 
 func TestSetFieldWithMultiType(t *testing.T) {
-	any := struct {
+	subject := struct {
 		Field               string
 		IntField            int
 		FloatField          *float64
@@ -178,107 +178,107 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		ByteSlice             []byte
 	}{Field: "initial", MapAttribute: map[string]*string{"test": aws.String("1234")}}
 
-	err := setFieldWithType("expected", &any, "Field", awsstr)
+	err := setFieldWithType("expected", &subject, "Field", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := any.Field, "expected"; got != want {
+	if got, want := subject.Field, "expected"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(5, &any, "IntField", awsint)
+	err = setFieldWithType(5, &subject, "IntField", awsint)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := any.IntField, 5; got != want {
+	if got, want := subject.IntField, 5; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(42.21, &any, "FloatField", awsfloat)
+	err = setFieldWithType(42.21, &subject, "FloatField", awsfloat)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.FloatField, 42.21; got != want {
+	if got, want := *subject.FloatField, 42.21; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("5", &any, "IntField", awsint)
+	err = setFieldWithType("5", &subject, "IntField", awsint)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := any.IntField, 5; got != want {
+	if got, want := subject.IntField, 5; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(nil, &any, "IntField", awsint)
+	err = setFieldWithType(nil, &subject, "IntField", awsint)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := any.IntField, 5; got != want {
+	if got, want := subject.IntField, 5; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("first", &any, "StringArrayField", awsstringslice)
+	err = setFieldWithType("first", &subject, "StringArrayField", awsstringslice)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.StringArrayField), 1; got != want {
+	if got, want := len(subject.StringArrayField), 1; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := aws.ToString(any.StringArrayField[0]), "first"; got != want {
+	if got, want := aws.ToString(subject.StringArrayField[0]), "first"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType([]string{"one", "two", "three"}, &any, "StringArrayField", awsstringslice)
+	err = setFieldWithType([]string{"one", "two", "three"}, &subject, "StringArrayField", awsstringslice)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.StringArrayField), 3; got != want {
+	if got, want := len(subject.StringArrayField), 3; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := aws.ToString(any.StringArrayField[0]), "one"; got != want {
+	if got, want := aws.ToString(subject.StringArrayField[0]), "one"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := aws.ToString(any.StringArrayField[1]), "two"; got != want {
+	if got, want := aws.ToString(subject.StringArrayField[1]), "two"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := aws.ToString(any.StringArrayField[2]), "three"; got != want {
+	if got, want := aws.ToString(subject.StringArrayField[2]), "three"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType([]interface{}{"four", "five"}, &any, "StringArrayField", awsstringslice)
+	err = setFieldWithType([]any{"four", "five"}, &subject, "StringArrayField", awsstringslice)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.StringArrayField), 2; got != want {
+	if got, want := len(subject.StringArrayField), 2; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := aws.ToString(any.StringArrayField[0]), "four"; got != want {
+	if got, want := aws.ToString(subject.StringArrayField[0]), "four"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := aws.ToString(any.StringArrayField[1]), "five"; got != want {
-		t.Fatalf("got %v, want %v", got, want)
-	}
-
-	err = setFieldWithType(int64(321), &any, "Int64ArrayField", awsint64slice)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got, want := len(any.Int64ArrayField), 1; got != want {
-		t.Fatalf("len: got %d, want %d", got, want)
-	}
-	if got, want := aws.ToInt64(any.Int64ArrayField[0]), int64(321); got != want {
+	if got, want := aws.ToString(subject.StringArrayField[1]), "five"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(567, &any, "Int64ArrayField", awsint64slice)
+	err = setFieldWithType(int64(321), &subject, "Int64ArrayField", awsint64slice)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.Int64ArrayField), 1; got != want {
+	if got, want := len(subject.Int64ArrayField), 1; got != want {
 		t.Fatalf("len: got %d, want %d", got, want)
 	}
-	if got, want := aws.ToInt64(any.Int64ArrayField[0]), int64(567); got != want {
+	if got, want := aws.ToInt64(subject.Int64ArrayField[0]), int64(321); got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+
+	err = setFieldWithType(567, &subject, "Int64ArrayField", awsint64slice)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(subject.Int64ArrayField), 1; got != want {
+		t.Fatalf("len: got %d, want %d", got, want)
+	}
+	if got, want := aws.ToInt64(subject.Int64ArrayField[0]), int64(567); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
@@ -287,29 +287,29 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = setFieldWithType("true", &any, "BooleanValueField", awsboolattribute)
+	err = setFieldWithType("true", &subject, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := aws.ToBool(any.BooleanValueField.Value), true; got != want {
+	if got, want := aws.ToBool(subject.BooleanValueField.Value), true; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
-	err = setFieldWithType(nil, &any, "BooleanValueField", awsboolattribute)
+	err = setFieldWithType(nil, &subject, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := aws.ToBool(any.BooleanValueField.Value), true; got != want {
+	if got, want := aws.ToBool(subject.BooleanValueField.Value), true; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
-	err = setFieldWithType(false, &any, "BooleanValueField", awsboolattribute)
+	err = setFieldWithType(false, &subject, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := aws.ToBool(any.BooleanValueField.Value), false; got != want {
+	if got, want := aws.ToBool(subject.BooleanValueField.Value), false; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
 
-	err = setFieldWithType("true", &any, "BooleanValueField", awsbool)
+	err = setFieldWithType("true", &subject, "BooleanValueField", awsbool)
 	if err == nil {
 		t.Fatalf("expected error got nil")
 	}
@@ -317,358 +317,358 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType("abcd", &any, "StringValueField", awsstringattribute)
+	err = setFieldWithType("abcd", &subject, "StringValueField", awsstringattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := aws.ToString(any.StringValueField.Value), "abcd"; got != want {
+	if got, want := aws.ToString(subject.StringValueField.Value), "abcd"; got != want {
 		t.Fatalf("len: got %s, want %s", got, want)
 	}
-	err = setFieldWithType(nil, &any, "StringValueField", awsstringattribute)
+	err = setFieldWithType(nil, &subject, "StringValueField", awsstringattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := aws.ToString(any.StringValueField.Value), "abcd"; got != want {
+	if got, want := aws.ToString(subject.StringValueField.Value), "abcd"; got != want {
 		t.Fatalf("len: got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType(true, &any, "BoolField", awsbool)
+	err = setFieldWithType(true, &subject, "BoolField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := any.BoolField, true; got != want {
+	if got, want := subject.BoolField, true; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType(false, &any, "BoolField", awsbool)
+	err = setFieldWithType(false, &subject, "BoolField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := any.BoolField, false; got != want {
-		t.Fatalf("got %v, want %v", got, want)
-	}
-
-	err = setFieldWithType("true", &any, "BoolPointerField", awsbool)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got, want := *any.BoolPointerField, true; got != want {
-		t.Fatalf("got %v, want %v", got, want)
-	}
-	err = setFieldWithType(false, &any, "BoolPointerField", awsbool)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got, want := *any.BoolPointerField, false; got != want {
+	if got, want := subject.BoolField, false; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("fieldValue", &any, "StructAttribute.Str", awsstr)
+	err = setFieldWithType("true", &subject, "BoolPointerField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.StructAttribute.Str, "fieldValue"; got != want {
+	if got, want := *subject.BoolPointerField, true; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType([]string{"one", "two", "three"}, &any, "StructAttribute.Str", awsstr)
+	err = setFieldWithType(false, &subject, "BoolPointerField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.StructAttribute.Str, "one,two,three"; got != want {
-		t.Fatalf("got %v, want %v", got, want)
-	}
-	err = setFieldWithType("true", &any, "StructAttribute.Bool", awsbool)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got, want := *any.StructAttribute.Bool, true; got != want {
+	if got, want := *subject.BoolPointerField, false; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("abc", &any, "MapAttribute[Field1]", awsstringpointermap)
+	err = setFieldWithType("fieldValue", &subject, "StructAttribute.Str", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.MapAttribute), 1+1; got != want { //First "test" key + Field1
-		t.Fatalf("got %d, want %d", got, want)
-	}
-	if got, want := *any.MapAttribute["Field1"], "abc"; got != want {
+	if got, want := *subject.StructAttribute.Str, "fieldValue"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("def", &any, "MapAttribute[Field2]", awsstringpointermap)
+	err = setFieldWithType([]string{"one", "two", "three"}, &subject, "StructAttribute.Str", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.MapAttribute), 1+2; got != want { //First "test" key + Field1 and Field2
-		t.Fatalf("got %d, want %d", got, want)
-	}
-	if got, want := *any.MapAttribute["Field1"], "abc"; got != want {
+	if got, want := *subject.StructAttribute.Str, "one,two,three"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := *any.MapAttribute["Field2"], "def"; got != want {
+	err = setFieldWithType("true", &subject, "StructAttribute.Bool", awsbool)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := *subject.StructAttribute.Bool, true; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("abcd", &any, "EmptyMapAttribute[Field1]", awsstringpointermap)
+
+	err = setFieldWithType("abc", &subject, "MapAttribute[Field1]", awsstringpointermap)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.EmptyMapAttribute), 1; got != want {
+	if got, want := len(subject.MapAttribute), 1+1; got != want { //First "test" key + Field1
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.EmptyMapAttribute["Field1"], "abcd"; got != want {
+	if got, want := *subject.MapAttribute["Field1"], "abc"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("tata", &any, "SliceStructPointerAttribute[0]Str1", awsslicestruct)
+	err = setFieldWithType("def", &subject, "MapAttribute[Field2]", awsstringpointermap)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.SliceStructPointerAttribute), 1; got != want {
+	if got, want := len(subject.MapAttribute), 1+2; got != want { //First "test" key + Field1 and Field2
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.SliceStructPointerAttribute[0].Str1, "tata"; got != want {
-		t.Fatalf("got %s, want %s", got, want)
+	if got, want := *subject.MapAttribute["Field1"], "abc"; got != want {
+		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("toto", &any, "SliceStructPointerAttribute[0]Str2", awsslicestruct)
+	if got, want := *subject.MapAttribute["Field2"], "def"; got != want {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+	err = setFieldWithType("abcd", &subject, "EmptyMapAttribute[Field1]", awsstringpointermap)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.SliceStructPointerAttribute), 1; got != want {
+	if got, want := len(subject.EmptyMapAttribute), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.SliceStructPointerAttribute[0].Str2, "toto"; got != want {
-		t.Fatalf("got %s, want %s", got, want)
+	if got, want := *subject.EmptyMapAttribute["Field1"], "abcd"; got != want {
+		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType(10, &any, "SliceStructPointerAttribute[0]Integer", awsslicestructint64)
+	err = setFieldWithType("tata", &subject, "SliceStructPointerAttribute[0]Str1", awsslicestruct)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.SliceStructPointerAttribute), 1; got != want {
+	if got, want := len(subject.SliceStructPointerAttribute), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.SliceStructPointerAttribute[0].Integer, int64(10); got != want {
-		t.Fatalf("got %d, want %d", got, want)
+	if got, want := *subject.SliceStructPointerAttribute[0].Str1, "tata"; got != want {
+		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("key:value", &any, "DimensionSliceField", awsdimensionslice)
+	err = setFieldWithType("toto", &subject, "SliceStructPointerAttribute[0]Str2", awsslicestruct)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.DimensionSliceField), 1; got != want {
+	if got, want := len(subject.SliceStructPointerAttribute), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.DimensionSliceField[0].Name, "key"; got != want {
+	if got, want := *subject.SliceStructPointerAttribute[0].Str2, "toto"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.DimensionSliceField[0].Value, "value"; got != want {
-		t.Fatalf("got %s, want %s", got, want)
-	}
-	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &any, "DimensionSliceField", awsdimensionslice)
+	err = setFieldWithType(10, &subject, "SliceStructPointerAttribute[0]Integer", awsslicestructint64)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.DimensionSliceField), 2; got != want {
+	if got, want := len(subject.SliceStructPointerAttribute), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.DimensionSliceField[0].Name, "key"; got != want {
+	if got, want := *subject.SliceStructPointerAttribute[0].Integer, int64(10); got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
+	err = setFieldWithType("key:value", &subject, "DimensionSliceField", awsdimensionslice)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(subject.DimensionSliceField), 1; got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
+	if got, want := *subject.DimensionSliceField[0].Name, "key"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.DimensionSliceField[0].Value, "value"; got != want {
+	if got, want := *subject.DimensionSliceField[0].Value, "value"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.DimensionSliceField[1].Name, "key1"; got != want {
+	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &subject, "DimensionSliceField", awsdimensionslice)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(subject.DimensionSliceField), 2; got != want {
+		t.Fatalf("got %d, want %d", got, want)
+	}
+	if got, want := *subject.DimensionSliceField[0].Name, "key"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.DimensionSliceField[1].Value, "value1:with:"; got != want {
+	if got, want := *subject.DimensionSliceField[0].Value, "value"; got != want {
+		t.Fatalf("got %s, want %s", got, want)
+	}
+	if got, want := *subject.DimensionSliceField[1].Name, "key1"; got != want {
+		t.Fatalf("got %s, want %s", got, want)
+	}
+	if got, want := *subject.DimensionSliceField[1].Value, "value1:with:"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &any, "ParameterList", awsparameterslice)
+	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &subject, "ParameterList", awsparameterslice)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.ParameterList), 2; got != want {
+	if got, want := len(subject.ParameterList), 2; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.ParameterList[0].ParameterKey, "key"; got != want {
+	if got, want := *subject.ParameterList[0].ParameterKey, "key"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.ParameterList[0].ParameterValue, "value"; got != want {
+	if got, want := *subject.ParameterList[0].ParameterValue, "value"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.ParameterList[1].ParameterKey, "key1"; got != want {
+	if got, want := *subject.ParameterList[1].ParameterKey, "key1"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.ParameterList[1].ParameterValue, "value1:with:"; got != want {
+	if got, want := *subject.ParameterList[1].ParameterValue, "value1:with:"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &any, "KeyValueSliceField", awsecskeyvalue)
+	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &subject, "KeyValueSliceField", awsecskeyvalue)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.KeyValueSliceField), 2; got != want {
+	if got, want := len(subject.KeyValueSliceField), 2; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.KeyValueSliceField[0].Name, "key"; got != want {
+	if got, want := *subject.KeyValueSliceField[0].Name, "key"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.KeyValueSliceField[0].Value, "value"; got != want {
+	if got, want := *subject.KeyValueSliceField[0].Value, "value"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.KeyValueSliceField[1].Name, "key1"; got != want {
+	if got, want := *subject.KeyValueSliceField[1].Name, "key1"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.KeyValueSliceField[1].Value, "value1:with:"; got != want {
+	if got, want := *subject.KeyValueSliceField[1].Value, "value1:with:"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"80:8080", "8082", "1234:8083/udp"}, &any, "PortMappings", awsportmappings)
+	err = setFieldWithType([]string{"80:8080", "8082", "1234:8083/udp"}, &subject, "PortMappings", awsportmappings)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.PortMappings), 3; got != want {
+	if got, want := len(subject.PortMappings), 3; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[0].HostPort, int32(80); got != want {
+	if got, want := *subject.PortMappings[0].HostPort, int32(80); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[0].ContainerPort, int32(8080); got != want {
+	if got, want := *subject.PortMappings[0].ContainerPort, int32(8080); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[1].ContainerPort, int32(8082); got != want {
+	if got, want := *subject.PortMappings[1].ContainerPort, int32(8082); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[2].HostPort, int32(1234); got != want {
+	if got, want := *subject.PortMappings[2].HostPort, int32(1234); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.PortMappings[2].ContainerPort, int32(8083); got != want {
+	if got, want := *subject.PortMappings[2].ContainerPort, int32(8083); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := string(any.PortMappings[2].Protocol), "udp"; got != want {
+	if got, want := string(subject.PortMappings[2].Protocol), "udp"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"subnet-123:eipalloc-123", "subnet-456:eipalloc-456"}, &any, "SubnetMappings", awssubnetmappings)
+	err = setFieldWithType([]string{"subnet-123:eipalloc-123", "subnet-456:eipalloc-456"}, &subject, "SubnetMappings", awssubnetmappings)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.SubnetMappings), 2; got != want {
+	if got, want := len(subject.SubnetMappings), 2; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.SubnetMappings[0].SubnetId, "subnet-123"; got != want {
+	if got, want := *subject.SubnetMappings[0].SubnetId, "subnet-123"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.SubnetMappings[0].AllocationId, "eipalloc-123"; got != want {
+	if got, want := *subject.SubnetMappings[0].AllocationId, "eipalloc-123"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.SubnetMappings[1].SubnetId, "subnet-456"; got != want {
+	if got, want := *subject.SubnetMappings[1].SubnetId, "subnet-456"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.SubnetMappings[1].AllocationId, "eipalloc-456"; got != want {
+	if got, want := *subject.SubnetMappings[1].AllocationId, "eipalloc-456"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"HTTP:80:UDP:8080", "HTTPS:443:TCP:12345"}, &any, "LoadBalancerListeners", awsclassicloadblisteners)
+	err = setFieldWithType([]string{"HTTP:80:UDP:8080", "HTTPS:443:TCP:12345"}, &subject, "LoadBalancerListeners", awsclassicloadblisteners)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.LoadBalancerListeners), 2; got != want {
+	if got, want := len(subject.LoadBalancerListeners), 2; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[0].Protocol, "HTTP"; got != want {
+	if got, want := *subject.LoadBalancerListeners[0].Protocol, "HTTP"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := any.LoadBalancerListeners[0].LoadBalancerPort, int32(80); got != want {
+	if got, want := subject.LoadBalancerListeners[0].LoadBalancerPort, int32(80); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[0].InstanceProtocol, "UDP"; got != want {
+	if got, want := *subject.LoadBalancerListeners[0].InstanceProtocol, "UDP"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[0].InstancePort, int32(8080); got != want {
+	if got, want := *subject.LoadBalancerListeners[0].InstancePort, int32(8080); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[1].Protocol, "HTTPS"; got != want {
+	if got, want := *subject.LoadBalancerListeners[1].Protocol, "HTTPS"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := any.LoadBalancerListeners[1].LoadBalancerPort, int32(443); got != want {
+	if got, want := subject.LoadBalancerListeners[1].LoadBalancerPort, int32(443); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[1].InstanceProtocol, "TCP"; got != want {
+	if got, want := *subject.LoadBalancerListeners[1].InstanceProtocol, "TCP"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := *any.LoadBalancerListeners[1].InstancePort, int32(12345); got != want {
+	if got, want := *subject.LoadBalancerListeners[1].InstancePort, int32(12345); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 
-	err = setFieldWithType([]string{"0:0.25:-1", "0.75:1:+1"}, &any, "StepAdjustments", awsstepadjustments)
+	err = setFieldWithType([]string{"0:0.25:-1", "0.75:1:+1"}, &subject, "StepAdjustments", awsstepadjustments)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(any.StepAdjustments), 2; got != want {
+	if got, want := len(subject.StepAdjustments), 2; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.StepAdjustments[0].MetricIntervalLowerBound, float64(0); got != want {
+	if got, want := *subject.StepAdjustments[0].MetricIntervalLowerBound, float64(0); got != want {
 		t.Fatalf("got %f, want %f", got, want)
 	}
-	if got, want := *any.StepAdjustments[0].MetricIntervalUpperBound, float64(0.25); got != want {
+	if got, want := *subject.StepAdjustments[0].MetricIntervalUpperBound, float64(0.25); got != want {
 		t.Fatalf("got %f, want %f", got, want)
 	}
-	if got, want := *any.StepAdjustments[0].ScalingAdjustment, int32(-1); got != want {
+	if got, want := *subject.StepAdjustments[0].ScalingAdjustment, int32(-1); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := *any.StepAdjustments[1].MetricIntervalLowerBound, float64(0.75); got != want {
+	if got, want := *subject.StepAdjustments[1].MetricIntervalLowerBound, float64(0.75); got != want {
 		t.Fatalf("got %f, want %f", got, want)
 	}
-	if got, want := *any.StepAdjustments[1].MetricIntervalUpperBound, float64(1); got != want {
+	if got, want := *subject.StepAdjustments[1].MetricIntervalUpperBound, float64(1); got != want {
 		t.Fatalf("got %f, want %f", got, want)
 	}
-	if got, want := *any.StepAdjustments[1].ScalingAdjustment, int32(+1); got != want {
+	if got, want := *subject.StepAdjustments[1].ScalingAdjustment, int32(+1); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	err = setFieldWithType([]interface{}{"abcdef", "ghijk"}, &any, "CSVString", awscsvstr)
+	err = setFieldWithType([]any{"abcdef", "ghijk"}, &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.CSVString, "abcdef,ghijk"; got != want {
+	if got, want := *subject.CSVString, "abcdef,ghijk"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType([]string{"abcdef", "ghijk"}, &any, "CSVString", awscsvstr)
+	err = setFieldWithType([]string{"abcdef", "ghijk"}, &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.CSVString, "abcdef,ghijk"; got != want {
+	if got, want := *subject.CSVString, "abcdef,ghijk"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("abcdef", &any, "CSVString", awscsvstr)
+	err = setFieldWithType("abcdef", &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.CSVString, "abcdef"; got != want {
+	if got, want := *subject.CSVString, "abcdef"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("abcdef,ghijk", &any, "CSVString", awscsvstr)
+	err = setFieldWithType("abcdef,ghijk", &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.CSVString, "abcdef,ghijk"; got != want {
+	if got, want := *subject.CSVString, "abcdef,ghijk"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("123456", &any, "SixDigitsString", aws6digitsstring)
+	err = setFieldWithType("123456", &subject, "SixDigitsString", aws6digitsstring)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.SixDigitsString, "123456"; got != want {
+	if got, want := *subject.SixDigitsString, "123456"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("2345", &any, "SixDigitsString", aws6digitsstring)
+	err = setFieldWithType("2345", &subject, "SixDigitsString", aws6digitsstring)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := *any.SixDigitsString, "002345"; got != want {
+	if got, want := *subject.SixDigitsString, "002345"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType([]byte("hello"), &any, "ByteSlice", awsbyteslice)
+	err = setFieldWithType([]byte("hello"), &subject, "ByteSlice", awsbyteslice)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := any.ByteSlice, []byte("hello"); !reflect.DeepEqual(got, want) {
+	if got, want := subject.ByteSlice, []byte("hello"); !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 }
@@ -705,11 +705,11 @@ func (ts *TestStruct) Validate_FieldInt64() (err error) {
 }
 
 func TestStructDynamicSetter(t *testing.T) {
-	params := map[string]interface{}{
+	params := map[string]any{
 		"fstringrequired": "jdoe",
 		"fint":            "345",
 		"fbool":           "true",
-		"fstrslice":       []interface{}{"one", "two", 3},
+		"fstrslice":       []any{"one", "two", 3},
 	}
 
 	in := &TestStruct{}

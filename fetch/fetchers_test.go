@@ -29,8 +29,8 @@ func TestFetcher(t *testing.T) {
 		graph.InitResource("subnet", "sub_2"),
 	}
 	funcs := map[string]fetch.Func{
-		"instance": func(context.Context, fetch.Cache) ([]*graph.Resource, interface{}, error) { return instances, nil, nil },
-		"subnet":   func(context.Context, fetch.Cache) ([]*graph.Resource, interface{}, error) { return subnets, nil, nil },
+		"instance": func(context.Context, fetch.Cache) ([]*graph.Resource, any, error) { return instances, nil, nil },
+		"subnet":   func(context.Context, fetch.Cache) ([]*graph.Resource, any, error) { return subnets, nil, nil },
 	}
 
 	t.Run("fetch all", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestFetcher(t *testing.T) {
 	t.Run("fetch when fetchfunc returns nils", func(t *testing.T) {
 		f := fetch.NewFetcher(
 			fetch.Funcs{
-				"nils": func(context.Context, fetch.Cache) ([]*graph.Resource, interface{}, error) { return nil, nil, nil },
+				"nils": func(context.Context, fetch.Cache) ([]*graph.Resource, any, error) { return nil, nil, nil },
 			},
 		)
 
@@ -100,7 +100,7 @@ func TestFetcher(t *testing.T) {
 	t.Run("fetch when fetchfunc returns error", func(t *testing.T) {
 		f := fetch.NewFetcher(
 			fetch.Funcs{
-				"errors": func(context.Context, fetch.Cache) ([]*graph.Resource, interface{}, error) {
+				"errors": func(context.Context, fetch.Cache) ([]*graph.Resource, any, error) {
 					return nil, nil, errors.New("fetch func error")
 				}},
 		)

@@ -13,7 +13,7 @@ func VerifyRefs(tree Node) error {
 	}
 
 	v := newVisitor()
-	v.onRefs = func(parent interface{}, node RefNode) {
+	v.onRefs = func(parent any, node RefNode) {
 		if !contains(v.declaredVariables, node.key) {
 			addErr(fmt.Sprintf("using reference '$%s' but '%[1]s' is undefined in template", node.key))
 		}
@@ -33,11 +33,11 @@ func VerifyRefs(tree Node) error {
 	return nil
 }
 
-func ProcessRefs(tree Node, fillers map[string]interface{}) {
+func ProcessRefs(tree Node, fillers map[string]any) {
 	v := newVisitor()
-	v.onRefs = func(parent interface{}, node RefNode) {
+	v.onRefs = func(parent any, node RefNode) {
 		var done bool
-		var val interface{}
+		var val any
 		for k, v := range fillers {
 			if k == node.key {
 				done = true
@@ -61,7 +61,7 @@ func ProcessRefs(tree Node, fillers map[string]interface{}) {
 
 func RemoveOptionalHoles(tree Node) {
 	v := newVisitor()
-	v.onHoles = func(parent interface{}, node HoleNode) {
+	v.onHoles = func(parent any, node HoleNode) {
 		if node.IsOptional() {
 			switch p := parent.(type) {
 			case ListNode:
@@ -80,7 +80,7 @@ func CollectUniqueHoles(tree Node) map[HoleNode][]string {
 	uniqueHoles := make(map[HoleNode][]string)
 
 	v := newVisitor()
-	v.onHoles = func(parent interface{}, node HoleNode) {
+	v.onHoles = func(parent any, node HoleNode) {
 		if _, ok := uniqueHoles[node]; !ok {
 			uniqueHoles[node] = []string{}
 		}
@@ -98,20 +98,20 @@ func CollectUniqueHoles(tree Node) map[HoleNode][]string {
 
 func CollectHoles(tree Node) (holes []HoleNode) {
 	v := newVisitor()
-	v.onHoles = func(parent interface{}, node HoleNode) {
+	v.onHoles = func(parent any, node HoleNode) {
 		holes = append(holes, node)
 	}
 	v.visit(tree)
 	return
 }
 
-func ProcessHoles(tree Node, fillers map[string]interface{}) map[string]interface{} {
-	processed := make(map[string]interface{})
+func ProcessHoles(tree Node, fillers map[string]any) map[string]any {
+	processed := make(map[string]any)
 
 	v := newVisitor()
-	v.onHoles = func(parent interface{}, node HoleNode) {
+	v.onHoles = func(parent any, node HoleNode) {
 		var done bool
-		var val interface{}
+		var val any
 		for k, v := range fillers {
 			if k == node.key {
 				done = true
@@ -120,7 +120,7 @@ func ProcessHoles(tree Node, fillers map[string]interface{}) map[string]interfac
 				case AliasNode, RefNode, HoleNode, ConcatenationNode:
 					processed[k] = fmt.Sprint(v)
 				case ListNode:
-					var arr []interface{}
+					var arr []any
 					for _, a := range vv.arr {
 						switch e := a.(type) {
 						case AliasNode, RefNode, HoleNode:
@@ -157,7 +157,7 @@ func ProcessHoles(tree Node, fillers map[string]interface{}) map[string]interfac
 
 func CollectAliases(tree Node) (aliases []AliasNode) {
 	v := newVisitor()
-	v.onAliases = func(parent interface{}, node AliasNode) {
+	v.onAliases = func(parent any, node AliasNode) {
 		aliases = append(aliases, node)
 	}
 	v.visit(tree)
@@ -166,7 +166,7 @@ func CollectAliases(tree Node) (aliases []AliasNode) {
 
 func ProcessAliases(tree Node, aliasFunc func(action, entity string, key string) func(string) (string, bool)) {
 	v := newVisitor()
-	v.onAliases = func(parent interface{}, node AliasNode) {
+	v.onAliases = func(parent any, node AliasNode) {
 		if resolv, hasResolv := aliasFunc(v.action, v.entity, v.key)(node.key); hasResolv {
 			switch p := parent.(type) {
 			case ListNode:
@@ -185,9 +185,9 @@ func ProcessAliases(tree Node, aliasFunc func(action, entity string, key string)
 }
 
 type visitor struct {
-	onRefs    func(parent interface{}, n RefNode)
-	onAliases func(parent interface{}, n AliasNode)
-	onHoles   func(parent interface{}, n HoleNode)
+	onRefs    func(parent any, n RefNode)
+	onAliases func(parent any, n AliasNode)
+	onHoles   func(parent any, n HoleNode)
 
 	parent                     Node
 	declaredVariables          []string
@@ -197,9 +197,9 @@ type visitor struct {
 
 func newVisitor() *visitor {
 	return &visitor{
-		onRefs:    func(interface{}, RefNode) {},
-		onAliases: func(interface{}, AliasNode) {},
-		onHoles:   func(interface{}, HoleNode) {},
+		onRefs:    func(any, RefNode) {},
+		onAliases: func(any, AliasNode) {},
+		onHoles:   func(any, HoleNode) {},
 	}
 }
 

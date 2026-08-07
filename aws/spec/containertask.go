@@ -54,7 +54,7 @@ func (cmd *StartContainertask) ParamsSpec() params.Spec {
 	return params.NewSpec(
 		params.AllOf(params.Key("cluster"), params.Key("desired-count"), params.Key("name"), params.Key("type"), params.Opt("deployment-name", "loadbalancer.container-name", "loadbalancer.container-port", "loadbalancer.targetgroup", "role")),
 		params.Validators{
-			"type": func(i interface{}, others map[string]interface{}) error {
+			"type": func(i any, others map[string]any) error {
 				typ := fmt.Sprint(i)
 				if typ != "task" && typ != "service" {
 					return fmt.Errorf("expected any of [task service] but got %s", typ)
@@ -68,7 +68,7 @@ func (cmd *StartContainertask) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *StartContainertask) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *StartContainertask) ManualRun(renv env.Running) (any, error) {
 	switch StringValue(cmd.Type) {
 	case "service":
 		setters := []setter{
@@ -125,7 +125,7 @@ func (cmd *StartContainertask) ManualRun(renv env.Running) (interface{}, error) 
 	return nil, fmt.Errorf("invalid type '%s'", StringValue(cmd.Type))
 }
 
-func (cmd *StartContainertask) ExtractResult(i interface{}) string {
+func (cmd *StartContainertask) ExtractResult(i any) string {
 	switch ii := i.(type) {
 	case *ecs.CreateServiceOutput:
 		return StringValue(ii.Service.ServiceArn)
@@ -151,7 +151,7 @@ func (cmd *StopContainertask) ParamsSpec() params.Spec {
 	return params.NewSpec(
 		params.AllOf(params.Key("cluster"), params.Key("type"), params.Opt("deployment-name", "run-arn")),
 		params.Validators{
-			"type": func(i interface{}, others map[string]interface{}) error {
+			"type": func(i any, others map[string]any) error {
 				typ := fmt.Sprint(i)
 				if typ != "task" && typ != "service" {
 					return fmt.Errorf("expected any of [task service] but got %s", typ)
@@ -169,7 +169,7 @@ func (cmd *StopContainertask) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *StopContainertask) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *StopContainertask) ManualRun(renv env.Running) (any, error) {
 	switch StringValue(cmd.Type) {
 	case "service":
 		call := &awsCall{
@@ -237,7 +237,7 @@ func (cmd *AttachContainertask) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *AttachContainertask) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *AttachContainertask) ManualRun(renv env.Running) (any, error) {
 	var taskDefinitionInput *ecs.RegisterTaskDefinitionInput
 	taskDefinitionName := StringValue(cmd.Name)
 
@@ -322,7 +322,7 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (interface{}, error)
 	return taskDefOutput, nil
 }
 
-func (cmd *AttachContainertask) ExtractResult(i interface{}) string {
+func (cmd *AttachContainertask) ExtractResult(i any) string {
 	return StringValue(i.(*ecs.RegisterTaskDefinitionOutput).TaskDefinition.TaskDefinitionArn)
 }
 
@@ -339,7 +339,7 @@ func (cmd *DetachContainertask) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("container-name"), params.Key("name")))
 }
 
-func (cmd *DetachContainertask) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DetachContainertask) ManualRun(renv env.Running) (any, error) {
 	taskdefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: cmd.Name,
 	})
@@ -410,7 +410,7 @@ func (cmd *DeleteContainertask) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *DeleteContainertask) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -438,7 +438,7 @@ func (cmd *DeleteContainertask) dryRun(renv env.Running, params map[string]inter
 	return nil, nil
 }
 
-func (cmd *DeleteContainertask) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DeleteContainertask) ManualRun(renv env.Running) (any, error) {
 	taskDefinitionName := StringValue(cmd.Name)
 
 	if BoolValue(cmd.AllVersions) {

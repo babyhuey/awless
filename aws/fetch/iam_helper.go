@@ -42,7 +42,7 @@ func getAccountAuthorizationDetails(ctx context.Context, cache fetch.Cache, api 
 		entities = append(entities, iamtypes.EntityTypeLocalManagedPolicy, iamtypes.EntityTypeAWSManagedPolicy)
 	}
 
-	if val, err := cache.Get(cacheKey, func() (interface{}, error) {
+	if val, err := cache.Get(cacheKey, func() (any, error) {
 		return fetchAccountAuthorizationDetails(ctx, entities, api)
 	}); err != nil {
 		return nil, err

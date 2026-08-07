@@ -225,14 +225,14 @@ func runCmd(env environment, name string, args ...string) (string, error) {
 	return string(out), nil
 }
 
-func printOk(s string, a ...interface{}) {
+func printOk(s string, a ...any) {
 	fmt.Printf("\033[32m[OK]\033[m %s\n", fmt.Sprintf(s, a...))
 }
 
-func printKo(s string, a ...interface{}) {
+func printKo(s string, a ...any) {
 	fmt.Fprintf(os.Stderr, "\033[31m[KO]\033[m %s\n", fmt.Sprintf(s, a...))
 }
 
-func printInfo(s string, a ...interface{}) {
+func printInfo(s string, a ...any) {
 	fmt.Printf("[+] %s\n", fmt.Sprintf(s, a...))
 }

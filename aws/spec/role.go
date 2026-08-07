@@ -49,7 +49,7 @@ func (cmd *CreateRole) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateRole) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CreateRole) ManualRun(renv env.Running) (any, error) {
 	princ := new(principal)
 	if cmd.PrincipalAccount != nil {
 		princ.AWS = StringValue(cmd.PrincipalAccount)
@@ -110,7 +110,7 @@ func (cmd *CreateRole) ManualRun(renv env.Running) (interface{}, error) {
 	return output, nil
 }
 
-func (cmd *CreateRole) ExtractResult(i interface{}) string {
+func (cmd *CreateRole) ExtractResult(i any) string {
 	return StringValue(i.(*iam.CreateRoleOutput).Role.Arn)
 }
 
@@ -126,7 +126,7 @@ func (cmd *DeleteRole) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name")))
 }
 
-func (cmd *DeleteRole) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DeleteRole) ManualRun(renv env.Running) (any, error) {
 	detachRole := CommandFactory.Build("detachrole")().(*DetachRole)
 	detachRole.Name = cmd.Name
 	detachRole.Instanceprofile = cmd.Name

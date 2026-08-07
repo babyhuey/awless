@@ -36,7 +36,7 @@ func (cmd *CreateRepository) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name")))
 }
 
-func (cmd *CreateRepository) ExtractResult(i interface{}) string {
+func (cmd *CreateRepository) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ecr.CreateRepositoryOutput).Repository.RepositoryArn)
 }
 

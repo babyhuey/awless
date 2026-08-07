@@ -64,7 +64,7 @@ func (cmd *CreateDistribution) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateDistribution) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CreateDistribution) ManualRun(renv env.Running) (any, error) {
 	originId := "orig_1"
 	input := &cloudfront.CreateDistributionInput{
 		DistributionConfig: &cloudfronttypes.DistributionConfig{
@@ -146,7 +146,7 @@ func (cmd *CreateDistribution) ManualRun(renv env.Running) (interface{}, error) 
 	return call.execute(input)
 }
 
-func (cmd *CreateDistribution) ExtractResult(i interface{}) string {
+func (cmd *CreateDistribution) ExtractResult(i any) string {
 	return StringValue(i.(*cloudfront.CreateDistributionOutput).Distribution.Id)
 }
 
@@ -168,7 +168,7 @@ func (cmd *CheckDistribution) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *CheckDistribution) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckDistribution) ManualRun(renv env.Running) (any, error) {
 	input := &cloudfront.GetDistributionInput{
 		Id: cmd.Id,
 	}
@@ -225,7 +225,7 @@ func (cmd *UpdateDistribution) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *UpdateDistribution) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 	distribOutput, err := cmd.api.GetDistribution(context.Background(), &cloudfront.GetDistributionInput{
 		Id: cmd.Id,
 	})
@@ -345,7 +345,7 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (interface{}, error) 
 	return output, err
 }
 
-func (cmd *UpdateDistribution) ExtractResult(i interface{}) string {
+func (cmd *UpdateDistribution) ExtractResult(i any) string {
 	switch ii := i.(type) {
 	case *cloudfront.GetDistributionOutput:
 		return StringValue(ii.ETag)
@@ -368,10 +368,10 @@ func (cmd *DeleteDistribution) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("id")))
 }
 
-func (cmd *DeleteDistribution) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DeleteDistribution) ManualRun(renv env.Running) (any, error) {
 	cmd.logger.Info("disabling distribution")
 	updateDistribution := CommandFactory.Build("updatedistribution")().(*UpdateDistribution)
-	entries := map[string]interface{}{
+	entries := map[string]any{
 		"id":     cmd.Id,
 		"enable": false,
 	}
@@ -388,7 +388,7 @@ func (cmd *DeleteDistribution) ManualRun(renv env.Running) (interface{}, error) 
 
 	cmd.logger.Info("check distribution disabling has been propagated")
 	checkDistribution := CommandFactory.Build("checkdistribution")().(*CheckDistribution)
-	entries = map[string]interface{}{
+	entries = map[string]any{
 		"id":      cmd.Id,
 		"state":   "Deployed",
 		"timeout": 1800,

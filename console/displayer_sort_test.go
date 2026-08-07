@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-// Resource properties are interface{} from heterogeneous AWS responses, so a
+// Resource properties are any from heterogeneous AWS responses, so a
 // column can hold mixed or unexpected types. Display code must degrade to a
 // stable order rather than crash the CLI.
 func TestValueLowerOrEqualNeverPanics(t *testing.T) {
-	values := []interface{}{
+	values := []any{
 		nil,
 		"str", "",
 		1, 0, -3,
@@ -21,7 +21,7 @@ func TestValueLowerOrEqualNeverPanics(t *testing.T) {
 		[]int{1, 2},
 		map[string]string{"k": "v"},        // no case for this type
 		struct{ A int }{1},                 // nor this
-		[]interface{}{1, "mixed"},          // nor this
+		[]any{1, "mixed"},                  // nor this
 		uint64(7), int64(9), float32(1.25), // numeric types with no case
 	}
 
@@ -42,13 +42,13 @@ func TestValueLowerOrEqualNeverPanics(t *testing.T) {
 // The mixed-type case that used to panic: a column holding a string for one
 // resource and a number for another.
 func TestValueLowerOrEqualMixedTypes(t *testing.T) {
-	if _, ok := interface{}(valueLowerOrEqual("10", 10)).(bool); !ok {
+	if _, ok := any(valueLowerOrEqual("10", 10)).(bool); !ok {
 		t.Fatal("expected a bool result")
 	}
 
 	// Must be antisymmetric so it remains a usable sort predicate: for a != b,
 	// at most one direction may report "lower or equal".
-	a, b := interface{}("abc"), interface{}(42)
+	a, b := any("abc"), any(42)
 	if valueLowerOrEqual(a, b) && valueLowerOrEqual(b, a) {
 		t.Error("comparator reports both directions lower-or-equal for distinct values")
 	}
@@ -57,7 +57,7 @@ func TestValueLowerOrEqualMixedTypes(t *testing.T) {
 // sort.Slice with a comparator that panics aborts the whole program; confirm a
 // mixed-type column sorts cleanly instead.
 func TestSortMixedColumnDoesNotPanic(t *testing.T) {
-	col := []interface{}{"beta", 3, nil, true, 1.5, "alpha", []string{"x"}}
+	col := []any{"beta", 3, nil, true, 1.5, "alpha", []string{"x"}}
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -76,7 +76,7 @@ func TestSortMixedColumnDoesNotPanic(t *testing.T) {
 func TestValueLowerOrEqualSameTypeOrdering(t *testing.T) {
 	tcases := []struct {
 		desc string
-		a, b interface{}
+		a, b any
 		want bool
 	}{
 		{desc: "ints ascending", a: 1, b: 2, want: true},

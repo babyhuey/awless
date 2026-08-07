@@ -36,7 +36,7 @@ func (cmd *CreateUser) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name")))
 }
 
-func (cmd *CreateUser) ExtractResult(i interface{}) string {
+func (cmd *CreateUser) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*iam.CreateUserOutput).User.UserId)
 }
 

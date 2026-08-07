@@ -12,14 +12,14 @@ func TestVerifyRefsValid(t *testing.T) {
 			Ident: "myvar",
 			Expr: &CommandNode{
 				Action: "create", Entity: "vpc",
-				ParamNodes: map[string]interface{}{},
-				Refs:       map[string]interface{}{},
+				ParamNodes: map[string]any{},
+				Refs:       map[string]any{},
 			},
 		}},
 		&Statement{Node: &CommandNode{
 			Action: "create", Entity: "subnet",
-			ParamNodes: map[string]interface{}{"vpc": RefNode{key: "myvar"}},
-			Refs:       map[string]interface{}{},
+			ParamNodes: map[string]any{"vpc": RefNode{key: "myvar"}},
+			Refs:       map[string]any{},
 		}},
 	)
 
@@ -33,8 +33,8 @@ func TestVerifyRefsUndefined(t *testing.T) {
 	tree.Statements = append(tree.Statements,
 		&Statement{Node: &CommandNode{
 			Action: "create", Entity: "vpc",
-			ParamNodes: map[string]interface{}{"id": RefNode{key: "undefined"}},
-			Refs:       map[string]interface{}{},
+			ParamNodes: map[string]any{"id": RefNode{key: "undefined"}},
+			Refs:       map[string]any{},
 		}},
 	)
 
@@ -54,16 +54,16 @@ func TestVerifyRefsDuplicateDeclaration(t *testing.T) {
 			Ident: "myvar",
 			Expr: &CommandNode{
 				Action: "create", Entity: "vpc",
-				ParamNodes: map[string]interface{}{},
-				Refs:       map[string]interface{}{},
+				ParamNodes: map[string]any{},
+				Refs:       map[string]any{},
 			},
 		}},
 		&Statement{Node: &DeclarationNode{
 			Ident: "myvar",
 			Expr: &CommandNode{
 				Action: "create", Entity: "subnet",
-				ParamNodes: map[string]interface{}{},
-				Refs:       map[string]interface{}{},
+				ParamNodes: map[string]any{},
+				Refs:       map[string]any{},
 			},
 		}},
 	)
@@ -80,28 +80,28 @@ func TestVerifyRefsDuplicateDeclaration(t *testing.T) {
 func TestProcessRefs(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"id": RefNode{key: "myvar"}},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"id": RefNode{key: "myvar"}},
+		Refs:       map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	ProcessRefs(tree, map[string]interface{}{"myvar": "resolved-value"})
+	ProcessRefs(tree, map[string]any{"myvar": "resolved-value"})
 
-	if got, want := cmd.ParamNodes["id"], interface{}("resolved-value"); got != want {
+	if got, want := cmd.ParamNodes["id"], any("resolved-value"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
 
 func TestProcessRefsInList(t *testing.T) {
-	list := ListNode{arr: []interface{}{RefNode{key: "x"}, InterfaceNode{i: "keep"}}}
+	list := ListNode{arr: []any{RefNode{key: "x"}, InterfaceNode{i: "keep"}}}
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"ids": list},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"ids": list},
+		Refs:       map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	ProcessRefs(tree, map[string]interface{}{"x": "resolved"})
+	ProcessRefs(tree, map[string]any{"x": "resolved"})
 
 	if got := list.arr[0]; got != "resolved" {
 		t.Fatalf("got %v, want 'resolved'", got)
@@ -112,9 +112,9 @@ func TestProcessRefsInRightExpression(t *testing.T) {
 	expr := &RightExpressionNode{i: RefNode{key: "myref"}}
 	tree := &AST{Statements: []*Statement{{Node: &DeclarationNode{Ident: "a", Expr: expr}}}}
 
-	ProcessRefs(tree, map[string]interface{}{"myref": "resolved"})
+	ProcessRefs(tree, map[string]any{"myref": "resolved"})
 
-	if got, want := expr.i, interface{}("resolved"); got != want {
+	if got, want := expr.i, any("resolved"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
@@ -122,11 +122,11 @@ func TestProcessRefsInRightExpression(t *testing.T) {
 func TestCollectHoles(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 			"id":   HoleNode{key: "hole2"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -139,11 +139,11 @@ func TestCollectHoles(t *testing.T) {
 func TestCollectUniqueHoles(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 			"id":   HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -156,10 +156,10 @@ func TestCollectUniqueHoles(t *testing.T) {
 func TestCollectUniqueHolesWithPaths(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -174,19 +174,19 @@ func TestCollectUniqueHolesWithPaths(t *testing.T) {
 func TestProcessHoles(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	processed := ProcessHoles(tree, map[string]interface{}{"hole1": "filled-value"})
+	processed := ProcessHoles(tree, map[string]any{"hole1": "filled-value"})
 
-	if got, want := cmd.ParamNodes["name"], interface{}("filled-value"); got != want {
+	if got, want := cmd.ParamNodes["name"], any("filled-value"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	if got, want := processed["hole1"], interface{}("filled-value"); got != want {
+	if got, want := processed["hole1"], any("filled-value"); got != want {
 		t.Fatalf("processed: got %v, want %v", got, want)
 	}
 }
@@ -194,14 +194,14 @@ func TestProcessHoles(t *testing.T) {
 func TestProcessHolesWithAliasValue(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	processed := ProcessHoles(tree, map[string]interface{}{"hole1": AliasNode{key: "myalias"}})
+	processed := ProcessHoles(tree, map[string]any{"hole1": AliasNode{key: "myalias"}})
 	if _, ok := processed["hole1"]; !ok {
 		t.Fatal("expected hole1 in processed map")
 	}
@@ -210,14 +210,14 @@ func TestProcessHolesWithAliasValue(t *testing.T) {
 func TestProcessHolesWithRefValue(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	processed := ProcessHoles(tree, map[string]interface{}{"hole1": RefNode{key: "myref"}})
+	processed := ProcessHoles(tree, map[string]any{"hole1": RefNode{key: "myref"}})
 	if _, ok := processed["hole1"]; !ok {
 		t.Fatal("expected hole1 in processed map")
 	}
@@ -226,14 +226,14 @@ func TestProcessHolesWithRefValue(t *testing.T) {
 func TestProcessHolesWithHoleValue(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	processed := ProcessHoles(tree, map[string]interface{}{"hole1": HoleNode{key: "another"}})
+	processed := ProcessHoles(tree, map[string]any{"hole1": HoleNode{key: "another"}})
 	if _, ok := processed["hole1"]; !ok {
 		t.Fatal("expected hole1 in processed map")
 	}
@@ -242,14 +242,14 @@ func TestProcessHolesWithHoleValue(t *testing.T) {
 func TestProcessHolesWithConcatenationValue(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	processed := ProcessHoles(tree, map[string]interface{}{"hole1": ConcatenationNode{arr: []interface{}{InterfaceNode{i: "a"}}}})
+	processed := ProcessHoles(tree, map[string]any{"hole1": ConcatenationNode{arr: []any{InterfaceNode{i: "a"}}}})
 	if _, ok := processed["hole1"]; !ok {
 		t.Fatal("expected hole1 in processed map")
 	}
@@ -258,18 +258,18 @@ func TestProcessHolesWithConcatenationValue(t *testing.T) {
 func TestProcessHolesWithListValue(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": HoleNode{key: "hole1"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	listVal := ListNode{arr: []interface{}{AliasNode{key: "a"}, "plain", RefNode{key: "r"}, HoleNode{key: "h"}}}
-	processed := ProcessHoles(tree, map[string]interface{}{"hole1": listVal})
-	arr, ok := processed["hole1"].([]interface{})
+	listVal := ListNode{arr: []any{AliasNode{key: "a"}, "plain", RefNode{key: "r"}, HoleNode{key: "h"}}}
+	processed := ProcessHoles(tree, map[string]any{"hole1": listVal})
+	arr, ok := processed["hole1"].([]any)
 	if !ok {
-		t.Fatalf("expected []interface{}, got %T", processed["hole1"])
+		t.Fatalf("expected []any, got %T", processed["hole1"])
 	}
 	if len(arr) != 4 {
 		t.Fatalf("expected 4 elements, got %d", len(arr))
@@ -277,15 +277,15 @@ func TestProcessHolesWithListValue(t *testing.T) {
 }
 
 func TestProcessHolesInList(t *testing.T) {
-	list := ListNode{arr: []interface{}{HoleNode{key: "h1"}, InterfaceNode{i: "keep"}}}
+	list := ListNode{arr: []any{HoleNode{key: "h1"}, InterfaceNode{i: "keep"}}}
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"ids": list},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"ids": list},
+		Refs:       map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	ProcessHoles(tree, map[string]interface{}{"h1": "filled"})
+	ProcessHoles(tree, map[string]any{"h1": "filled"})
 
 	if got := list.arr[0]; got != "filled" {
 		t.Fatalf("got %v, want 'filled'", got)
@@ -293,15 +293,15 @@ func TestProcessHolesInList(t *testing.T) {
 }
 
 func TestProcessHolesInConcatenation(t *testing.T) {
-	concat := ConcatenationNode{arr: []interface{}{InterfaceNode{i: "prefix-"}, HoleNode{key: "h1"}}}
+	concat := ConcatenationNode{arr: []any{InterfaceNode{i: "prefix-"}, HoleNode{key: "h1"}}}
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"name": concat},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"name": concat},
+		Refs:       map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
-	ProcessHoles(tree, map[string]interface{}{"h1": "suffix"})
+	ProcessHoles(tree, map[string]any{"h1": "suffix"})
 
 	if got := concat.arr[1]; got != "suffix" {
 		t.Fatalf("got %v, want 'suffix'", got)
@@ -312,9 +312,9 @@ func TestProcessHolesInRightExpression(t *testing.T) {
 	expr := &RightExpressionNode{i: HoleNode{key: "h1"}}
 	tree := &AST{Statements: []*Statement{{Node: &DeclarationNode{Ident: "x", Expr: expr}}}}
 
-	ProcessHoles(tree, map[string]interface{}{"h1": "value"})
+	ProcessHoles(tree, map[string]any{"h1": "value"})
 
-	if got, want := expr.i, interface{}("value"); got != want {
+	if got, want := expr.i, any("value"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
@@ -322,11 +322,11 @@ func TestProcessHolesInRightExpression(t *testing.T) {
 func TestRemoveOptionalHoles(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name":     HoleNode{key: "required", optional: false},
 			"optional": HoleNode{key: "opt", optional: true},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -355,14 +355,14 @@ func TestRemoveOptionalHolesInList(t *testing.T) {
 	// Exercise the ListNode branch of RemoveOptionalHoles.
 	// Note: ListNode is a value type, so removal within the visitor
 	// modifies the local copy's arr slice. We just verify no panic.
-	list := ListNode{arr: []interface{}{
+	list := ListNode{arr: []any{
 		HoleNode{key: "opt", optional: true},
 		InterfaceNode{i: "keep"},
 	}}
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"ids": list},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"ids": list},
+		Refs:       map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -372,10 +372,10 @@ func TestRemoveOptionalHolesInList(t *testing.T) {
 func TestCollectAliases(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": AliasNode{key: "myalias"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -391,10 +391,10 @@ func TestCollectAliases(t *testing.T) {
 func TestProcessAliases(t *testing.T) {
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{
+		ParamNodes: map[string]any{
 			"name": AliasNode{key: "myalias"},
 		},
-		Refs: map[string]interface{}{},
+		Refs: map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -409,17 +409,17 @@ func TestProcessAliases(t *testing.T) {
 
 	ProcessAliases(tree, aliasFunc)
 
-	if got, want := cmd.ParamNodes["name"], interface{}("resolved-id"); got != want {
+	if got, want := cmd.ParamNodes["name"], any("resolved-id"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
 
 func TestProcessAliasesInList(t *testing.T) {
-	list := ListNode{arr: []interface{}{AliasNode{key: "a1"}}}
+	list := ListNode{arr: []any{AliasNode{key: "a1"}}}
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"ids": list},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"ids": list},
+		Refs:       map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -437,11 +437,11 @@ func TestProcessAliasesInList(t *testing.T) {
 }
 
 func TestProcessAliasesInConcatenation(t *testing.T) {
-	concat := ConcatenationNode{arr: []interface{}{AliasNode{key: "a1"}, InterfaceNode{i: "-suffix"}}}
+	concat := ConcatenationNode{arr: []any{AliasNode{key: "a1"}, InterfaceNode{i: "-suffix"}}}
 	cmd := &CommandNode{
 		Action: "create", Entity: "vpc",
-		ParamNodes: map[string]interface{}{"name": concat},
-		Refs:       map[string]interface{}{},
+		ParamNodes: map[string]any{"name": concat},
+		Refs:       map[string]any{},
 	}
 	tree := &AST{Statements: []*Statement{{Node: cmd}}}
 
@@ -470,7 +470,7 @@ func TestProcessAliasesInRightExpression(t *testing.T) {
 
 	ProcessAliases(tree, aliasFunc)
 
-	if got, want := expr.i, interface{}("resolved"); got != want {
+	if got, want := expr.i, any("resolved"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }

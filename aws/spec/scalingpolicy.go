@@ -43,7 +43,7 @@ func (cmd *CreateScalingpolicy) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateScalingpolicy) ExtractResult(i interface{}) string {
+func (cmd *CreateScalingpolicy) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*autoscaling.PutScalingPolicyOutput).PolicyARN)
 }
 

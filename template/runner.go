@@ -13,10 +13,10 @@ type Runner struct {
 	Template                               *Template
 	Locale, Profile, Message, TemplatePath string
 	Log                                    *logger.Logger
-	Fillers                                []map[string]interface{}
+	Fillers                                []map[string]any
 	AliasFunc                              func(paramPath, alias string) string
 	MissingHolesFunc                       func(string, []string, bool) string
-	CmdLookuper                            func(tokens ...string) interface{}
+	CmdLookuper                            func(tokens ...string) any
 	Validators                             []Validator
 	ParamsSuggested                        int
 

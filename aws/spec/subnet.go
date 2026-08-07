@@ -43,11 +43,11 @@ func (cmd *CreateSubnet) ParamsSpec() params.Spec {
 		params.Validators{"cidr": params.IsCIDR})
 }
 
-func (cmd *CreateSubnet) ExtractResult(i interface{}) string {
+func (cmd *CreateSubnet) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateSubnetOutput).Subnet.SubnetId)
 }
 
-func (cmd *CreateSubnet) AfterRun(renv env.Running, output interface{}) error {
+func (cmd *CreateSubnet) AfterRun(renv env.Running, output any) error {
 	subnetId := awssdk.String(cmd.ExtractResult(output))
 	if err := createNameTag(subnetId, cmd.Name, renv); err != nil {
 		return err

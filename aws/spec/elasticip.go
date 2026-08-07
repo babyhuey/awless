@@ -36,7 +36,7 @@ func (cmd *CreateElasticip) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("domain")))
 }
 
-func (cmd *CreateElasticip) ExtractResult(i interface{}) string {
+func (cmd *CreateElasticip) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.AllocateAddressOutput).AllocationId)
 }
 
@@ -75,7 +75,7 @@ func (cmd *AttachElasticip) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *AttachElasticip) ExtractResult(i interface{}) string {
+func (cmd *AttachElasticip) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.AssociateAddressOutput).AssociationId)
 }
 

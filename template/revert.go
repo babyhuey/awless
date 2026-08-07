@@ -194,7 +194,7 @@ func (temp *Template) Revert() (*Template, error) {
 				switch vv := cmd.ParamNodes["ids"].(type) {
 				case string:
 					lines = append(lines, fmt.Sprintf("check instance id=%s state=running timeout=180", printItem(vv)))
-				case []interface{}:
+				case []any:
 					for _, s := range vv {
 						lines = append(lines, fmt.Sprintf("check instance id=%v state=running timeout=180", printItem(s)))
 					}
@@ -206,7 +206,7 @@ func (temp *Template) Revert() (*Template, error) {
 				switch vv := cmd.ParamNodes["ids"].(type) {
 				case string:
 					lines = append(lines, fmt.Sprintf("check instance id=%s state=stopped timeout=180", printItem(vv)))
-				case []interface{}:
+				case []any:
 					for _, s := range vv {
 						lines = append(lines, fmt.Sprintf("check instance id=%v state=stopped timeout=180", printItem(s)))
 					}
@@ -320,7 +320,7 @@ func isRevertible(cmd *ast.CommandNode) bool {
 		(cmd.Action == "create" && cmd.Entity == "tag") || (cmd.Action == "create" && cmd.Entity == "route")
 }
 
-func printItem(i interface{}) string {
+func printItem(i any) string {
 	switch ii := i.(type) {
 	case string:
 		if _, err := strconv.Atoi(ii); err == nil {
@@ -330,7 +330,7 @@ func printItem(i interface{}) string {
 			return "'" + ii + "'"
 		}
 		return quoteParamIfNeeded(i)
-	case []interface{}:
+	case []any:
 		var out []string
 		for _, e := range ii {
 			out = append(out, printItem(e))
@@ -341,7 +341,7 @@ func printItem(i interface{}) string {
 	}
 }
 
-func quoteParamIfNeeded(param interface{}) string {
+func quoteParamIfNeeded(param any) string {
 	input := fmt.Sprint(param)
 	if ast.SimpleStringValue.MatchString(input) {
 		return input

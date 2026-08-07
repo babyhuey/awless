@@ -52,7 +52,7 @@ func (cmd *CreateLoadbalancer) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateLoadbalancer) ExtractResult(i interface{}) string {
+func (cmd *CreateLoadbalancer) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*elbv2.CreateLoadBalancerOutput).LoadBalancers[0].LoadBalancerArn)
 }
 
@@ -86,7 +86,7 @@ func (cmd *CheckLoadbalancer) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *CheckLoadbalancer) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckLoadbalancer) ManualRun(renv env.Running) (any, error) {
 	input := &elbv2.DescribeLoadBalancersInput{
 		LoadBalancerArns: []string{awssdk.ToString(cmd.Id)},
 	}

@@ -36,7 +36,7 @@ func (cmd *CreateGroup) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name")))
 }
 
-func (cmd *CreateGroup) ExtractResult(i interface{}) string {
+func (cmd *CreateGroup) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*iam.CreateGroupOutput).Group.GroupId)
 }
 

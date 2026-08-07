@@ -67,7 +67,7 @@ func MustParse(text string) *Template {
 	return t
 }
 
-func ParseParams(text string) (map[string]interface{}, error) {
+func ParseParams(text string) (map[string]any, error) {
 	node, err := parseParamsAsCommandNode(text)
 	if err != nil {
 		return nil, err

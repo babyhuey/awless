@@ -7,7 +7,7 @@ import (
 
 type mock interface {
 	Calls() map[string]int
-	SetInputs(map[string]interface{})
+	SetInputs(map[string]any)
 	SetIgnored(map[string]struct{})
 	SetTesting(*testing.T)
 }
@@ -15,7 +15,7 @@ type mock interface {
 type basicMock struct { //nolint:unused // embedded in generated mock types
 	t       *testing.T
 	calls   map[string]int
-	inputs  map[string]interface{}
+	inputs  map[string]any
 	ignored map[string]struct{}
 }
 
@@ -34,7 +34,7 @@ func (m *basicMock) SetTesting(t *testing.T) { //nolint:unused
 	m.t = t
 }
 
-func (m *basicMock) SetInputs(inputs map[string]interface{}) { //nolint:unused
+func (m *basicMock) SetInputs(inputs map[string]any) { //nolint:unused
 	m.inputs = inputs
 }
 
@@ -42,7 +42,7 @@ func (m *basicMock) SetIgnored(ignored map[string]struct{}) { //nolint:unused
 	m.ignored = ignored
 }
 
-func (m *basicMock) verifyInput(call string, got interface{}) { //nolint:unused
+func (m *basicMock) verifyInput(call string, got any) { //nolint:unused
 	if m.t == nil {
 		return
 	}

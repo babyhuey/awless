@@ -9,7 +9,7 @@ import (
 	"github.com/bootswithdefer/awless/cloud/rdf"
 )
 
-func getPropertyValue(gph tstore.RDFGraph, propObj tstore.Object, prop string) (interface{}, error) {
+func getPropertyValue(gph tstore.RDFGraph, propObj tstore.Object, prop string) (any, error) {
 	rdfProp, err := rdf.Properties.Get(prop)
 	if err != nil {
 		return "", err

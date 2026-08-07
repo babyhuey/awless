@@ -61,7 +61,7 @@ func (cmd *CreateImage) BeforeRun(renv env.Running) error {
 	return nil
 }
 
-func (cmd *CreateImage) ExtractResult(i interface{}) string {
+func (cmd *CreateImage) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateImageOutput).ImageId)
 }
 
@@ -84,7 +84,7 @@ func (cmd *UpdateImage) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *UpdateImage) prepareImageAttributeInput(ctx map[string]interface{}) (*ec2.ModifyImageAttributeInput, error) {
+func (cmd *UpdateImage) prepareImageAttributeInput(ctx map[string]any) (*ec2.ModifyImageAttributeInput, error) {
 	input := &ec2.ModifyImageAttributeInput{}
 	if err := structInjector(cmd, input, ctx); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %w", err)
@@ -101,7 +101,7 @@ func (cmd *UpdateImage) prepareImageAttributeInput(ctx map[string]interface{}) (
 	return input, nil
 }
 
-func (cmd *UpdateImage) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *UpdateImage) ManualRun(renv env.Running) (any, error) {
 	input, err := cmd.prepareImageAttributeInput(renv.Context())
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ func (cmd *UpdateImage) ManualRun(renv env.Running) (interface{}, error) {
 	return output, err
 }
 
-func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("dry run: cannot set params on command struct: %w", err)
 	}
@@ -161,7 +161,7 @@ func (cmd *CopyImage) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CopyImage) ExtractResult(i interface{}) string {
+func (cmd *CopyImage) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CopyImageOutput).ImageId)
 }
 
@@ -189,7 +189,7 @@ func (cmd *ImportImage) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *ImportImage) ExtractResult(i interface{}) string {
+func (cmd *ImportImage) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.ImportImageOutput).ImportTaskId)
 }
 
@@ -208,7 +208,7 @@ func (cmd *DeleteImage) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -244,7 +244,7 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]interface{}) 
 	return nil, err
 }
 
-func (cmd *DeleteImage) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DeleteImage) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DeregisterImageInput{}
 
 	if err := setFieldWithType(cmd.Id, input, "ImageId", awsstr); err != nil {
@@ -269,7 +269,7 @@ func (cmd *DeleteImage) ManualRun(renv env.Running) (interface{}, error) {
 	if BoolValue(cmd.DeleteSnapshots) {
 		for _, snap := range snaps {
 			deleteSnapshot := CommandFactory.Build("deletesnapshot")().(*DeleteSnapshot)
-			entries := map[string]interface{}{
+			entries := map[string]any{
 				"id": snap,
 			}
 			if err := params.Validate(deleteSnapshot.ParamsSpec().Validators(), entries); err != nil {

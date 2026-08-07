@@ -61,7 +61,7 @@ func TestOptionalHoleNode(t *testing.T) {
 }
 
 func TestListNode(t *testing.T) {
-	arr := []interface{}{"a", "b", "c"}
+	arr := []any{"a", "b", "c"}
 	n := NewListNode(arr)
 	if got, want := n.String(), "[a,b,c]"; got != want {
 		t.Fatalf("got %q, want %q", got, want)
@@ -85,7 +85,7 @@ func TestListNodeEmpty(t *testing.T) {
 
 func TestInterfaceNodeString(t *testing.T) {
 	tcases := []struct {
-		val    interface{}
+		val    any
 		expect string
 	}{
 		{"simple", "simple"},
@@ -105,7 +105,7 @@ func TestInterfaceNodeString(t *testing.T) {
 
 func TestInterfaceNodeValue(t *testing.T) {
 	n := InterfaceNode{i: "hello"}
-	if got, want := n.Value(), interface{}("hello"); got != want {
+	if got, want := n.Value(), any("hello"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
@@ -119,7 +119,7 @@ func TestInterfaceNodeClone(t *testing.T) {
 }
 
 func TestConcatenationNodeConcat(t *testing.T) {
-	arr := []interface{}{
+	arr := []any{
 		InterfaceNode{i: "hello"},
 		InterfaceNode{i: "-"},
 		InterfaceNode{i: "world"},
@@ -131,7 +131,7 @@ func TestConcatenationNodeConcat(t *testing.T) {
 }
 
 func TestConcatenationNodeConcatWithNonInterface(t *testing.T) {
-	arr := []interface{}{
+	arr := []any{
 		InterfaceNode{i: "prefix"},
 		"suffix",
 	}
@@ -142,7 +142,7 @@ func TestConcatenationNodeConcatWithNonInterface(t *testing.T) {
 }
 
 func TestConcatenationNodeStringNoHoles(t *testing.T) {
-	arr := []interface{}{
+	arr := []any{
 		InterfaceNode{i: "hello"},
 		InterfaceNode{i: "world"},
 	}
@@ -154,7 +154,7 @@ func TestConcatenationNodeStringNoHoles(t *testing.T) {
 }
 
 func TestConcatenationNodeStringWithHoles(t *testing.T) {
-	arr := []interface{}{
+	arr := []any{
 		InterfaceNode{i: "prefix"},
 		HoleNode{key: "myhole"},
 	}
@@ -167,7 +167,7 @@ func TestConcatenationNodeStringWithHoles(t *testing.T) {
 }
 
 func TestConcatenationNodeClone(t *testing.T) {
-	arr := []interface{}{InterfaceNode{i: "a"}}
+	arr := []any{InterfaceNode{i: "a"}}
 	n := NewConcatenationNode(arr)
 	clone := n.clone()
 	if got, want := clone, Node(n); !reflect.DeepEqual(got, want) {
@@ -177,7 +177,7 @@ func TestConcatenationNodeClone(t *testing.T) {
 
 func TestRightExpressionNodeResultInterfaceNode(t *testing.T) {
 	n := &RightExpressionNode{i: InterfaceNode{i: "hello"}}
-	if got, want := n.Result(), interface{}("hello"); got != want {
+	if got, want := n.Result(), any("hello"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 	if n.Err() != nil {
@@ -207,11 +207,11 @@ func TestRightExpressionNodeResultHoleNode(t *testing.T) {
 }
 
 func TestRightExpressionNodeResultListNode(t *testing.T) {
-	n := &RightExpressionNode{i: ListNode{arr: []interface{}{InterfaceNode{i: 1}, InterfaceNode{i: 2}}}}
+	n := &RightExpressionNode{i: ListNode{arr: []any{InterfaceNode{i: 1}, InterfaceNode{i: 2}}}}
 	result := n.Result()
-	arr, ok := result.([]interface{})
+	arr, ok := result.([]any)
 	if !ok {
-		t.Fatalf("expected []interface{}, got %T", result)
+		t.Fatalf("expected []any, got %T", result)
 	}
 	if len(arr) != 2 || arr[0] != 1 || arr[1] != 2 {
 		t.Fatalf("unexpected result: %v", arr)
@@ -219,32 +219,32 @@ func TestRightExpressionNodeResultListNode(t *testing.T) {
 }
 
 func TestRightExpressionNodeResultListWithRef(t *testing.T) {
-	n := &RightExpressionNode{i: ListNode{arr: []interface{}{RefNode{key: "x"}}}}
+	n := &RightExpressionNode{i: ListNode{arr: []any{RefNode{key: "x"}}}}
 	if n.Result() != nil {
 		t.Fatal("expected nil result for list containing ref")
 	}
 }
 
 func TestRightExpressionNodeResultListWithAlias(t *testing.T) {
-	n := &RightExpressionNode{i: ListNode{arr: []interface{}{AliasNode{key: "x"}}}}
+	n := &RightExpressionNode{i: ListNode{arr: []any{AliasNode{key: "x"}}}}
 	if n.Result() != nil {
 		t.Fatal("expected nil result for list containing alias")
 	}
 }
 
 func TestRightExpressionNodeResultListWithHole(t *testing.T) {
-	n := &RightExpressionNode{i: ListNode{arr: []interface{}{HoleNode{key: "x"}}}}
+	n := &RightExpressionNode{i: ListNode{arr: []any{HoleNode{key: "x"}}}}
 	if n.Result() != nil {
 		t.Fatal("expected nil result for list containing hole")
 	}
 }
 
 func TestRightExpressionNodeResultListWithPlainValue(t *testing.T) {
-	n := &RightExpressionNode{i: ListNode{arr: []interface{}{"plain"}}}
+	n := &RightExpressionNode{i: ListNode{arr: []any{"plain"}}}
 	result := n.Result()
-	arr, ok := result.([]interface{})
+	arr, ok := result.([]any)
 	if !ok {
-		t.Fatalf("expected []interface{}, got %T", result)
+		t.Fatalf("expected []any, got %T", result)
 	}
 	if len(arr) != 1 || arr[0] != "plain" {
 		t.Fatalf("unexpected result: %v", arr)
@@ -252,15 +252,15 @@ func TestRightExpressionNodeResultListWithPlainValue(t *testing.T) {
 }
 
 func TestRightExpressionNodeResultConcatenation(t *testing.T) {
-	n := &RightExpressionNode{i: ConcatenationNode{arr: []interface{}{InterfaceNode{i: "a"}, InterfaceNode{i: "b"}}}}
-	if got, want := n.Result(), interface{}("ab"); got != want {
+	n := &RightExpressionNode{i: ConcatenationNode{arr: []any{InterfaceNode{i: "a"}, InterfaceNode{i: "b"}}}}
+	if got, want := n.Result(), any("ab"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
 
 func TestRightExpressionNodeResultDefault(t *testing.T) {
 	n := &RightExpressionNode{i: "plain-string"}
-	if got, want := n.Result(), interface{}("plain-string"); got != want {
+	if got, want := n.Result(), any("plain-string"); got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }
@@ -283,7 +283,7 @@ func TestRightExpressionNodeString(t *testing.T) {
 func TestRightExpressionNodeNode(t *testing.T) {
 	inner := InterfaceNode{i: 42}
 	n := &RightExpressionNode{i: inner}
-	if got, want := n.Node(), interface{}(inner); !reflect.DeepEqual(got, want) {
+	if got, want := n.Node(), any(inner); !reflect.DeepEqual(got, want) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 }

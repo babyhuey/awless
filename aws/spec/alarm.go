@@ -63,7 +63,7 @@ func (cmd *CreateAlarm) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *CreateAlarm) ExtractResult(i interface{}) string {
+func (cmd *CreateAlarm) ExtractResult(i any) string {
 	return StringValue(cmd.Name)
 }
 
@@ -116,7 +116,7 @@ func (cmd *AttachAlarm) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("action-arn"), params.Key("name")))
 }
 
-func (cmd *AttachAlarm) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *AttachAlarm) ManualRun(renv env.Running) (any, error) {
 	alarm, err := getAlarm(cmd.api, cmd.Name)
 	if err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func (cmd *DetachAlarm) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("action-arn"), params.Key("name")))
 }
 
-func (cmd *DetachAlarm) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DetachAlarm) ManualRun(renv env.Running) (any, error) {
 	alarm, err := getAlarm(cmd.api, cmd.Name)
 	if err != nil {
 		return nil, err

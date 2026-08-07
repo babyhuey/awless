@@ -15,8 +15,8 @@ type Fetcher interface {
 }
 
 type Cache interface {
-	Store(key string, val interface{})
-	Get(key string, funcs ...func() (interface{}, error)) (interface{}, error)
+	Store(key string, val any)
+	Get(key string, funcs ...func() (any, error)) (any, error)
 	Reset()
 }
 
@@ -24,10 +24,10 @@ type FetchResult struct {
 	ResourceType string
 	Err          error
 	Resources    []*graph.Resource
-	Objects      interface{}
+	Objects      any
 }
 
-type Func func(context.Context, Cache) ([]*graph.Resource, interface{}, error)
+type Func func(context.Context, Cache) ([]*graph.Resource, any, error)
 
 type Funcs map[string]Func
 
@@ -116,7 +116,7 @@ func (f *fetcher) FetchByType(ctx context.Context, resourceType string) (*graph.
 
 func (f *fetcher) fetchResource(ctx context.Context, resourceType string, results chan<- FetchResult) {
 	var err error
-	var objects interface{}
+	var objects any
 	resources := make([]*graph.Resource, 0)
 
 	fn, ok := f.fetchFuncs[resourceType]
@@ -150,10 +150,10 @@ func newCache() *cache {
 type keyCache struct {
 	once   sync.Once
 	err    error
-	result interface{}
+	result any
 }
 
-func (c *cache) Get(key string, funcs ...func() (interface{}, error)) (interface{}, error) {
+func (c *cache) Get(key string, funcs ...func() (any, error)) (any, error) {
 	c.mu.Lock()
 	cache, ok := c.cached[key]
 	if !ok {
@@ -171,7 +171,7 @@ func (c *cache) Get(key string, funcs ...func() (interface{}, error)) (interface
 	return cache.result, cache.err
 }
 
-func (c *cache) Store(key string, val interface{}) {
+func (c *cache) Store(key string, val any) {
 	c.mu.Lock()
 	c.cached[key] = &keyCache{result: val}
 	c.mu.Unlock()

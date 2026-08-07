@@ -18,7 +18,7 @@ type TemplateExecution struct {
 	*Template
 	Author, Source, Locale string
 	Profile, Path, Message string
-	Fillers                map[string]interface{}
+	Fillers                map[string]any
 }
 
 // Date extract the date from the ulid template identifier
@@ -53,8 +53,8 @@ func (t *TemplateExecution) SetMessage(s string) {
 // replaced. Template fillers are user-supplied values for template holes, so
 // `awless run tpl.aws password=SECRET` puts the secret here as well as in the
 // command line.
-func redactFillers(in map[string]interface{}) map[string]interface{} {
-	out := make(map[string]interface{}, len(in))
+func redactFillers(in map[string]any) map[string]any {
+	out := make(map[string]any, len(in))
 	for k, v := range in {
 		if ast.IsSensitiveParam(k) {
 			out[k] = ast.RedactedValue
@@ -182,15 +182,15 @@ func (t *TemplateExecution) Stats() *TemplateExecutionStats {
 }
 
 type toJSON struct {
-	ID       string                 `json:"id"`
-	Author   string                 `json:"author,omitempty"`
-	Source   string                 `json:"source"`
-	Locale   string                 `json:"locale"`
-	Profile  string                 `json:"profile,omitempty"`
-	Message  string                 `json:"message,omitempty"`
-	Path     string                 `json:"path,omitempty"`
-	Fillers  map[string]interface{} `json:"fillers"`
-	Commands []command              `json:"commands"`
+	ID       string         `json:"id"`
+	Author   string         `json:"author,omitempty"`
+	Source   string         `json:"source"`
+	Locale   string         `json:"locale"`
+	Profile  string         `json:"profile,omitempty"`
+	Message  string         `json:"message,omitempty"`
+	Path     string         `json:"path,omitempty"`
+	Fillers  map[string]any `json:"fillers"`
+	Commands []command      `json:"commands"`
 }
 
 type command struct {

@@ -45,7 +45,7 @@ func (cmd *CreateNatgateway) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("elasticip-id"), params.Key("subnet")))
 }
 
-func (cmd *CreateNatgateway) ExtractResult(i interface{}) string {
+func (cmd *CreateNatgateway) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateNatGatewayOutput).NatGateway.NatGatewayId)
 }
 
@@ -79,7 +79,7 @@ func (cmd *CheckNatgateway) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *CheckNatgateway) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckNatgateway) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeNatGatewaysInput{
 		NatGatewayIds: []string{awssdk.ToString(cmd.Id)},
 	}

@@ -184,7 +184,7 @@ type opt struct {
 	suggested []suggested
 }
 
-func Opt(i ...interface{}) Rule {
+func Opt(i ...any) Rule {
 	o := opt{}
 	for _, v := range i {
 		switch vv := v.(type) {

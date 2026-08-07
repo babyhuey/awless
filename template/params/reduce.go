@@ -2,10 +2,10 @@ package params
 
 type Reducer interface {
 	Keys() []string
-	Reduce(map[string]interface{}) (map[string]interface{}, error)
+	Reduce(map[string]any) (map[string]any, error)
 }
 
-type reduceFunc func(map[string]interface{}) (map[string]interface{}, error)
+type reduceFunc func(map[string]any) (map[string]any, error)
 
 func newReducer(fn reduceFunc, keys ...string) Reducer {
 	return &reducer{reduce: fn, keys: keys}
@@ -20,8 +20,8 @@ func (r *reducer) Keys() []string {
 	return r.keys
 }
 
-func (r *reducer) Reduce(all map[string]interface{}) (map[string]interface{}, error) {
-	in := make(map[string]interface{})
+func (r *reducer) Reduce(all map[string]any) (map[string]any, error) {
+	in := make(map[string]any)
 	for _, k := range r.keys {
 		if v, ok := all[k]; ok {
 			in[k] = v

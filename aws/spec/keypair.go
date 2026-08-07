@@ -47,7 +47,7 @@ func (cmd *CreateKeypair) ParamsSpec() params.Spec {
 	return params.NewSpec(
 		params.AllOf(params.Key("name"), params.Opt("encrypted")),
 		params.Validators{
-			"name": func(i interface{}, others map[string]interface{}) error {
+			"name": func(i any, others map[string]any) error {
 				keyDir := os.Getenv(keyDirEnv)
 				if keyDir == "" {
 					return fmt.Errorf("empty env var '%s'", keyDirEnv)
@@ -90,7 +90,7 @@ func (cmd *CreateKeypair) BeforeRun(renv env.Running) error {
 	return nil
 }
 
-func (cmd *CreateKeypair) ExtractResult(i interface{}) string {
+func (cmd *CreateKeypair) ExtractResult(i any) string {
 	return StringValue(i.(*ec2.ImportKeyPairOutput).KeyName)
 }
 

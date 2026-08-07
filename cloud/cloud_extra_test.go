@@ -264,14 +264,14 @@ type stubResource struct {
 	id, typ string
 }
 
-func (r *stubResource) Type() string                        { return r.typ }
-func (r *stubResource) Id() string                          { return r.id }
-func (r *stubResource) String() string                      { return r.id }
-func (r *stubResource) Format(string) string                { return r.id }
-func (r *stubResource) Properties() map[string]interface{}  { return nil }
-func (r *stubResource) Property(string) (interface{}, bool) { return nil, false }
-func (r *stubResource) Meta(string) (interface{}, bool)     { return nil, false }
-func (r *stubResource) Same(Resource) bool                  { return false }
+func (r *stubResource) Type() string                { return r.typ }
+func (r *stubResource) Id() string                  { return r.id }
+func (r *stubResource) String() string              { return r.id }
+func (r *stubResource) Format(string) string        { return r.id }
+func (r *stubResource) Properties() map[string]any  { return nil }
+func (r *stubResource) Property(string) (any, bool) { return nil, false }
+func (r *stubResource) Meta(string) (any, bool)     { return nil, false }
+func (r *stubResource) Same(Resource) bool          { return false }
 
 func TestAllServices(t *testing.T) {
 	// Save and restore the global registry

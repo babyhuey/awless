@@ -51,7 +51,7 @@ func (cmd *CreateMfadevice) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("name")))
 }
 
-func (cmd *CreateMfadevice) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CreateMfadevice) ManualRun(renv env.Running) (any, error) {
 	name := StringValue(cmd.Name)
 	input := &iam.CreateVirtualMFADeviceInput{
 		VirtualMFADeviceName: cmd.Name,
@@ -84,7 +84,7 @@ func (cmd *CreateMfadevice) ManualRun(renv env.Running) (interface{}, error) {
 	return output, nil
 }
 
-func (cmd *CreateMfadevice) ExtractResult(i interface{}) string {
+func (cmd *CreateMfadevice) ExtractResult(i any) string {
 	return StringValue(i.(*iam.CreateVirtualMFADeviceOutput).VirtualMFADevice.SerialNumber)
 }
 
@@ -122,7 +122,7 @@ func (cmd *AttachMfadevice) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *AttachMfadevice) AfterRun(renv env.Running, output interface{}) error {
+func (cmd *AttachMfadevice) AfterRun(renv env.Running, output any) error {
 	if !BoolValue(cmd.NoPrompt) {
 		if promptConfirm("\nDo you want to create a profile for this MFA device in %s?", awsConfigFilepath) {
 			roleArn, err := promptRole(cmd.api)

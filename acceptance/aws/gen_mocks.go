@@ -21,77 +21,74 @@ package awsat
 // SDK v2 does not have iface packages, so mocks must be manually defined
 // or use a different mocking strategy (e.g., httptest or interface wrappers).
 
-
-
 type rdsMock struct {
-  basicMock
+	basicMock
 }
 
 type lambdaMock struct {
-  basicMock
+	basicMock
 }
 
 type acmMock struct {
-  basicMock
+	basicMock
 }
 
 type elbv2Mock struct {
-  basicMock
+	basicMock
 }
 
 type applicationautoscalingMock struct {
-  basicMock
+	basicMock
 }
 
 type route53Mock struct {
-  basicMock
+	basicMock
 }
 
 type snsMock struct {
-  basicMock
+	basicMock
 }
 
 type s3Mock struct {
-  basicMock
+	basicMock
 }
 
 type ecrMock struct {
-  basicMock
+	basicMock
 }
 
 type cloudfrontMock struct {
-  basicMock
+	basicMock
 }
 
 type sqsMock struct {
-  basicMock
+	basicMock
 }
 
 type autoscalingMock struct {
-  basicMock
+	basicMock
 }
 
 type cloudformationMock struct {
-  basicMock
+	basicMock
 }
 
 type elbMock struct {
-  basicMock
+	basicMock
 }
 
 type iamMock struct {
-  basicMock
+	basicMock
 }
 
 type cloudwatchMock struct {
-  basicMock
+	basicMock
 }
 
 type ecsMock struct {
-  basicMock
+	basicMock
 }
 
 type ec2Mock struct {
-  basicMock
+	basicMock
 }
-

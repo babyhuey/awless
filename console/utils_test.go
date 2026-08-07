@@ -9,12 +9,12 @@ import (
 )
 
 func compareJSON(t *testing.T, actual, expected string) {
-	var got interface{}
+	var got any
 	if err := json.Unmarshal([]byte(actual), &got); err != nil {
 		t.Fatal(err)
 	}
 
-	var want interface{}
+	var want any
 	if err := json.Unmarshal([]byte(expected), &want); err != nil {
 		t.Fatal(err)
 	}

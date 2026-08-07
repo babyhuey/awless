@@ -55,7 +55,7 @@ func (cmd *CreateScalinggroup) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateScalinggroup) ExtractResult(i interface{}) string {
+func (cmd *CreateScalinggroup) ExtractResult(i any) string {
 	return StringValue(cmd.Name)
 }
 
@@ -111,7 +111,7 @@ func (cmd *CheckScalinggroup) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("count"), params.Key("name"), params.Key("timeout")))
 }
 
-func (sg *CheckScalinggroup) ManualRun(renv env.Running) (interface{}, error) {
+func (sg *CheckScalinggroup) ManualRun(renv env.Running) (any, error) {
 	input := &autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []string{awssdk.ToString(sg.Name)},
 	}

@@ -54,14 +54,14 @@ func (cmd *CreateRecord) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *CreateRecord) ManualRun(renv env.Running) (interface{}, error) { //nolint:staticcheck
+func (cmd *CreateRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
 	start := time.Now()
 	output, err := changeResourceRecordSets(cmd.api, String("CREATE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, cmd.Comment, cmd.Ttl)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
 
-func (cmd *CreateRecord) ExtractResult(i interface{}) string {
+func (cmd *CreateRecord) ExtractResult(i any) string {
 	return StringValue(i.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo.Id)
 }
 
@@ -83,14 +83,14 @@ func (cmd *UpdateRecord) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *UpdateRecord) ManualRun(renv env.Running) (interface{}, error) { //nolint:staticcheck
+func (cmd *UpdateRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
 	start := time.Now()
 	output, err := changeResourceRecordSets(cmd.api, String("UPSERT"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.Ttl)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
 
-func (cmd *UpdateRecord) ExtractResult(i interface{}) string {
+func (cmd *UpdateRecord) ExtractResult(i any) string {
 	return StringValue(i.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo.Id)
 }
 
@@ -115,7 +115,7 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 	)
 	builder.AddReducer(valueToValues, "value")
 	builder.AddReducer(
-		func(values map[string]interface{}) (map[string]interface{}, error) {
+		func(values map[string]any) (map[string]any, error) {
 			id, hasId := values["id"].(string)
 			if hasId {
 				delete(values, "id")
@@ -154,14 +154,14 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *DeleteRecord) ManualRun(renv env.Running) (interface{}, error) { //nolint:staticcheck
+func (cmd *DeleteRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
 	start := time.Now()
 	output, err := changeResourceRecordSets(cmd.api, String("DELETE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.Ttl)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
 
-func (cmd *DeleteRecord) ExtractResult(i interface{}) string {
+func (cmd *DeleteRecord) ExtractResult(i any) string {
 	return StringValue(i.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo.Id)
 }
 
@@ -206,9 +206,9 @@ func changeResourceRecordSets(api *route53.Client, action, zone, name, recordTyp
 	return api.ChangeResourceRecordSets(context.Background(), input)
 }
 
-func valueToValues(values map[string]interface{}) (map[string]interface{}, error) {
+func valueToValues(values map[string]any) (map[string]any, error) {
 	if value, hasValue := values["value"]; hasValue {
-		return map[string]interface{}{"values": value}, nil
+		return map[string]any{"values": value}, nil
 	} else {
 		return nil, nil
 	}

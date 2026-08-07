@@ -50,7 +50,7 @@ func (cmd *CreateCertificate) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateCertificate) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CreateCertificate) ManualRun(renv env.Running) (any, error) {
 	input := &acm.RequestCertificateInput{}
 	domains := awssdk.ToStringSlice(cmd.Domains)
 	if len(domains) == 0 {
@@ -106,7 +106,7 @@ func (cmd *CreateCertificate) ManualRun(renv env.Running) (interface{}, error) {
 	return output, nil
 }
 
-func (cmd *CreateCertificate) ExtractResult(i interface{}) string {
+func (cmd *CreateCertificate) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*acm.RequestCertificateOutput).CertificateArn)
 }
 
@@ -140,7 +140,7 @@ func (cmd *CheckCertificate) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *CheckCertificate) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckCertificate) ManualRun(renv env.Running) (any, error) {
 	input := &acm.DescribeCertificateInput{
 		CertificateArn: cmd.Arn,
 	}

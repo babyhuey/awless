@@ -38,7 +38,7 @@ func (cmd *CreateSubscription) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("endpoint"), params.Key("protocol"), params.Key("topic")))
 }
 
-func (cmd *CreateSubscription) ExtractResult(i interface{}) string {
+func (cmd *CreateSubscription) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*sns.SubscribeOutput).SubscriptionArn)
 }
 

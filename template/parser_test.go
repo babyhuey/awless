@@ -96,17 +96,17 @@ func TestParseVariousTemplatesCorrectly(t *testing.T) {
 func TestStringWithDigitValues(t *testing.T) {
 	tcases := []struct {
 		text      string
-		expParams map[string]interface{}
+		expParams map[string]any
 	}{
-		{"create keypair name=1test", map[string]interface{}{"name": "1test"}},
-		{"create keypair name=11test", map[string]interface{}{"name": "11test"}},
-		{"create keypair name=123test", map[string]interface{}{"name": "123test"}},
-		{"create keypair name=0test", map[string]interface{}{"name": "0test"}},
-		{"create keypair name=110", map[string]interface{}{"name": 110}},
-		{"create keypair name=1/test", map[string]interface{}{"name": "1/test"}},
-		{"create keypair name=123456789", map[string]interface{}{"name": 123456789}},
-		{"create keypair name=0.5", map[string]interface{}{"name": 0.5}},
-		{"create keypair name=0.5:0.6:+1", map[string]interface{}{"name": "0.5:0.6:+1"}},
+		{"create keypair name=1test", map[string]any{"name": "1test"}},
+		{"create keypair name=11test", map[string]any{"name": "11test"}},
+		{"create keypair name=123test", map[string]any{"name": "123test"}},
+		{"create keypair name=0test", map[string]any{"name": "0test"}},
+		{"create keypair name=110", map[string]any{"name": 110}},
+		{"create keypair name=1/test", map[string]any{"name": "1/test"}},
+		{"create keypair name=123456789", map[string]any{"name": 123456789}},
+		{"create keypair name=0.5", map[string]any{"name": 0.5}},
+		{"create keypair name=0.5:0.6:+1", map[string]any{"name": "0.5:0.6:+1"}},
 	}
 
 	for i, tcase := range tcases {
@@ -275,10 +275,10 @@ func TestWrapPegParseError(t *testing.T) {
 func TestParamsOnlyParsing(t *testing.T) {
 	tcases := []struct {
 		input string
-		exp   map[string]interface{}
+		exp   map[string]any
 	}{
-		{input: "type=t2.micro subnet=@my-subnet count=4", exp: map[string]interface{}{"type": "t2.micro", "subnet": ast.NewAliasNode("my-subnet"), "count": 4}},
-		{input: "subnet=[sub-1234,sub-2345]", exp: map[string]interface{}{"subnet": ast.NewListNode([]interface{}{"sub-1234", "sub-2345"})}},
+		{input: "type=t2.micro subnet=@my-subnet count=4", exp: map[string]any{"type": "t2.micro", "subnet": ast.NewAliasNode("my-subnet"), "count": 4}},
+		{input: "subnet=[sub-1234,sub-2345]", exp: map[string]any{"subnet": ast.NewListNode([]any{"sub-1234", "sub-2345"})}},
 	}
 	for i, tcase := range tcases {
 		params, err := ParseParams(tcase.input)
@@ -313,7 +313,7 @@ func TestTemplateParsing(t *testing.T) {
 					if err := isCommandNode(tpl.Statements[0].Node); err != nil {
 						t.Fatal(err)
 					}
-					return assertParams(tpl.Statements[0].Node, map[string]interface{}{"name": "a2zR_-+:;@~./<>"})
+					return assertParams(tpl.Statements[0].Node, map[string]any{"name": "a2zR_-+:;@~./<>"})
 				},
 			},
 			{
@@ -440,7 +440,7 @@ func TestTemplateParsing(t *testing.T) {
 		}{
 			{
 				input:    `create vpc`,
-				verifyFn: func(n ast.Node) error { return assertParams(n, make(map[string]interface{})) },
+				verifyFn: func(n ast.Node) error { return assertParams(n, make(map[string]any)) },
 			},
 			{
 				input:    `create vpc`,
@@ -453,19 +453,19 @@ func TestTemplateParsing(t *testing.T) {
 			{
 				input: `create vpc cidr=10.0.0.0/24 num=3 ip=127.0.0.1 name=bousin`,
 				verifyFn: func(n ast.Node) error {
-					return assertParams(n, map[string]interface{}{"cidr": "10.0.0.0/24", "num": 3, "ip": "127.0.0.1", "name": "bousin"})
+					return assertParams(n, map[string]any{"cidr": "10.0.0.0/24", "num": 3, "ip": "127.0.0.1", "name": "bousin"})
 				},
 			},
 			{
 				input: `create vpc cidr="10.0.0.0/24" num="3" ip="127.0.0.1" name="bousin"`,
 				verifyFn: func(n ast.Node) error {
-					return assertParams(n, map[string]interface{}{"cidr": "10.0.0.0/24", "num": "3", "ip": "127.0.0.1", "name": "bousin"})
+					return assertParams(n, map[string]any{"cidr": "10.0.0.0/24", "num": "3", "ip": "127.0.0.1", "name": "bousin"})
 				},
 			},
 			{
 				input: `create vpc cidr='10.0.0.0/24' num='3' ip='127.0.0.1' name='bousin'`,
 				verifyFn: func(n ast.Node) error {
-					return assertParams(n, map[string]interface{}{"cidr": "10.0.0.0/24", "num": "3", "ip": "127.0.0.1", "name": "bousin"})
+					return assertParams(n, map[string]any{"cidr": "10.0.0.0/24", "num": "3", "ip": "127.0.0.1", "name": "bousin"})
 				},
 			},
 			{
@@ -489,7 +489,7 @@ func TestTemplateParsing(t *testing.T) {
 			{
 				input: `create securitygroup port=20-80`,
 				verifyFn: func(n ast.Node) error {
-					if err := assertParams(n, map[string]interface{}{"port": "20-80"}); err != nil {
+					if err := assertParams(n, map[string]any{"port": "20-80"}); err != nil {
 						return err
 					}
 					return nil
@@ -498,7 +498,7 @@ func TestTemplateParsing(t *testing.T) {
 			{
 				input: `create securitygroup port="20-80"`,
 				verifyFn: func(n ast.Node) error {
-					if err := assertParams(n, map[string]interface{}{"port": "20-80"}); err != nil {
+					if err := assertParams(n, map[string]any{"port": "20-80"}); err != nil {
 						return err
 					}
 					return nil
@@ -507,7 +507,7 @@ func TestTemplateParsing(t *testing.T) {
 			{
 				input: `create securitygroup port='20-80'`,
 				verifyFn: func(n ast.Node) error {
-					if err := assertParams(n, map[string]interface{}{"port": "20-80"}); err != nil {
+					if err := assertParams(n, map[string]any{"port": "20-80"}); err != nil {
 						return err
 					}
 					return nil
@@ -516,25 +516,25 @@ func TestTemplateParsing(t *testing.T) {
 			{
 				input: `create vpc array=[test1,test2, 20 , my-array-elem4] ip=127.0.0.1`,
 				verifyFn: func(n ast.Node) error {
-					return assertCmdNodeParams(n, map[string]interface{}{"array": []interface{}{"test1", "test2", 20, "my-array-elem4"}, "ip": "127.0.0.1"})
+					return assertCmdNodeParams(n, map[string]any{"array": []any{"test1", "test2", 20, "my-array-elem4"}, "ip": "127.0.0.1"})
 				},
 			},
 			{
 				input: `create vpc array=["test1","test2", "20" , "my-array-elem4"] ip="127.0.0.1"`,
 				verifyFn: func(n ast.Node) error {
-					return assertCmdNodeParams(n, map[string]interface{}{"array": []interface{}{"test1", "test2", "20", "my-array-elem4"}, "ip": "127.0.0.1"})
+					return assertCmdNodeParams(n, map[string]any{"array": []any{"test1", "test2", "20", "my-array-elem4"}, "ip": "127.0.0.1"})
 				},
 			},
 			{
 				input: `create vpc array=['test1','test2', '20' , 'my-array-elem4'] ip='127.0.0.1'`,
 				verifyFn: func(n ast.Node) error {
-					return assertCmdNodeParams(n, map[string]interface{}{"array": []interface{}{"test1", "test2", "20", "my-array-elem4"}, "ip": "127.0.0.1"})
+					return assertCmdNodeParams(n, map[string]any{"array": []any{"test1", "test2", "20", "my-array-elem4"}, "ip": "127.0.0.1"})
 				},
 			},
 			{
 				input: `myinstance = create instance type={instance.type} cidr=10.0.0.0/25 subnet=@default-subnet vpc=$myvpc`,
 				verifyFn: func(n ast.Node) error {
-					if err := assertParams(n, map[string]interface{}{"cidr": "10.0.0.0/25"}); err != nil {
+					if err := assertParams(n, map[string]any{"cidr": "10.0.0.0/25"}); err != nil {
 						return err
 					}
 					if err := assertHoleKeys(n, map[string]string{"type": "instance.type"}); err != nil {
@@ -552,12 +552,12 @@ func TestTemplateParsing(t *testing.T) {
 			{
 				input: `create policy name=policyName effect=Allow action=[ec2:Describe*,autoscaling:Describe*,elasticloadbalancing:Describe*] resource=["arn:aws:iam::0123456789:mfa/${aws:username}", "arn:aws:iam::0123456789:user/${aws:username}"] conditions=["aws:MultiFactorAuthPresent==true", "aws:TokenIssueTime!=Null"]`,
 				verifyFn: func(n ast.Node) error {
-					if err := assertCmdNodeParams(n, map[string]interface{}{
+					if err := assertCmdNodeParams(n, map[string]any{
 						"name":       "policyName",
 						"effect":     "Allow",
-						"action":     []interface{}{"ec2:Describe*", "autoscaling:Describe*", "elasticloadbalancing:Describe*"},
-						"resource":   []interface{}{"arn:aws:iam::0123456789:mfa/${aws:username}", "arn:aws:iam::0123456789:user/${aws:username}"},
-						"conditions": []interface{}{"aws:MultiFactorAuthPresent==true", "aws:TokenIssueTime!=Null"}}); err != nil {
+						"action":     []any{"ec2:Describe*", "autoscaling:Describe*", "elasticloadbalancing:Describe*"},
+						"resource":   []any{"arn:aws:iam::0123456789:mfa/${aws:username}", "arn:aws:iam::0123456789:user/${aws:username}"},
+						"conditions": []any{"aws:MultiFactorAuthPresent==true", "aws:TokenIssueTime!=Null"}}); err != nil {
 						return err
 					}
 					if err := assertHoleKeys(n, map[string]string{}); err != nil {
@@ -590,12 +590,12 @@ func TestTemplateParsing(t *testing.T) {
 create subnet`,
 				verifyFn: func(s *Template) error {
 					if err := assertCommandNode(s.Statements[0].Node, "create", "vpc",
-						make(map[string]string), make(map[string]interface{}), make(map[string]string), make(map[string]string),
+						make(map[string]string), make(map[string]any), make(map[string]string), make(map[string]string),
 					); err != nil {
 						return err
 					}
 					if err := assertCommandNode(s.Statements[1].Node, "create", "subnet",
-						make(map[string]string), make(map[string]interface{}), make(map[string]string), make(map[string]string),
+						make(map[string]string), make(map[string]any), make(map[string]string), make(map[string]string),
 					); err != nil {
 						return err
 					}
@@ -614,12 +614,12 @@ create subnet
 `,
 				verifyFn: func(s *Template) error {
 					if err := assertCommandNode(s.Statements[0].Node, "create", "vpc",
-						make(map[string]string), make(map[string]interface{}), make(map[string]string), make(map[string]string),
+						make(map[string]string), make(map[string]any), make(map[string]string), make(map[string]string),
 					); err != nil {
 						return err
 					}
 					if err := assertCommandNode(s.Statements[1].Node, "create", "subnet",
-						make(map[string]string), make(map[string]interface{}), make(map[string]string), make(map[string]string),
+						make(map[string]string), make(map[string]any), make(map[string]string), make(map[string]string),
 					); err != nil {
 						return err
 					}
@@ -638,12 +638,12 @@ create subnet
 `,
 				verifyFn: func(s *Template) error {
 					if err := assertCommandNode(s.Statements[0].Node, "create", "vpc",
-						make(map[string]string), make(map[string]interface{}), make(map[string]string), make(map[string]string),
+						make(map[string]string), make(map[string]any), make(map[string]string), make(map[string]string),
 					); err != nil {
 						return err
 					}
 					if err := assertCommandNode(s.Statements[1].Node, "create", "subnet",
-						make(map[string]string), make(map[string]interface{}), make(map[string]string), make(map[string]string),
+						make(map[string]string), make(map[string]any), make(map[string]string), make(map[string]string),
 					); err != nil {
 						return err
 					}
@@ -660,7 +660,7 @@ create instance count=1 instance.type=t2.micro subnet=$mysubnet image=ami-9398d3
 				verifyFn: func(s *Template) error {
 					err := assertDeclarationNode(s.Statements[0].Node, "myvpc", "create", "vpc",
 						map[string]string{},
-						map[string]interface{}{"cidr": "10.0.0.0/24", "num": 3},
+						map[string]any{"cidr": "10.0.0.0/24", "num": 3},
 						map[string]string{},
 						map[string]string{},
 					)
@@ -670,7 +670,7 @@ create instance count=1 instance.type=t2.micro subnet=$mysubnet image=ami-9398d3
 
 					err = assertDeclarationNode(s.Statements[1].Node, "mysubnet", "delete", "subnet",
 						map[string]string{"vpc": "myvpc"},
-						map[string]interface{}{"cidr": "10.0.0.0/25"},
+						map[string]any{"cidr": "10.0.0.0/25"},
 						map[string]string{"name": "the_name"},
 						map[string]string{},
 					)
@@ -680,7 +680,7 @@ create instance count=1 instance.type=t2.micro subnet=$mysubnet image=ami-9398d3
 
 					err = assertCommandNode(s.Statements[2].Node, "create", "instance",
 						map[string]string{"subnet": "mysubnet"},
-						map[string]interface{}{"count": 1, "instance.type": "t2.micro", "ip": "127.0.0.1", "image": "ami-9398d3e0"},
+						map[string]any{"count": 1, "instance.type": "t2.micro", "ip": "127.0.0.1", "image": "ami-9398d3e0"},
 						map[string]string{},
 						map[string]string{},
 					)
@@ -703,7 +703,7 @@ mysecondvar = {var-hole}
 
 					err = assertDeclarationNode(s.Statements[1].Node, "mysubnet", "create", "subnet",
 						map[string]string{"vpc": "myvpc", "name": "myname"},
-						map[string]interface{}{"cidr": "10.0.0.0/25"},
+						map[string]any{"cidr": "10.0.0.0/25"},
 						map[string]string{},
 						map[string]string{},
 					)
@@ -742,7 +742,7 @@ mysecondvar = {var-hole}
 				input: `create s3object bucket=my-existing-bucket file=./todolist.txt`,
 				verifyFn: func(s *Template) error {
 					if err := assertCommandNode(s.Statements[0].Node, "create", "s3object",
-						map[string]string{}, map[string]interface{}{"bucket": "my-existing-bucket", "file": "./todolist.txt"}, map[string]string{}, map[string]string{},
+						map[string]string{}, map[string]any{"bucket": "my-existing-bucket", "file": "./todolist.txt"}, map[string]string{}, map[string]string{},
 					); err != nil {
 						return err
 					}
@@ -764,8 +764,8 @@ mysecondvar = {var-hole}
 	})
 }
 
-func assertParams(n ast.Node, expected map[string]interface{}) error {
-	compare := func(got, want map[string]interface{}) error {
+func assertParams(n ast.Node, expected map[string]any) error {
+	compare := func(got, want map[string]any) error {
 		if !reflect.DeepEqual(got, want) {
 			return fmt.Errorf("params: got %#v, want %#v", got, want)
 		}
@@ -794,7 +794,7 @@ func assertAliases(n ast.Node, expected map[string]string) error {
 	return compare(aliases, expected)
 }
 
-func assertCmdNodeParams(n ast.Node, expected map[string]interface{}) error {
+func assertCmdNodeParams(n ast.Node, expected map[string]any) error {
 	cmd := extractCmdNode(n)
 	if got, want := len(cmd.ParamNodes), len(expected); got != want {
 		return fmt.Errorf("got %d params (%#v), want %d params (%#v)", got, cmd.ParamNodes, want, expected)
@@ -804,12 +804,12 @@ func assertCmdNodeParams(n ast.Node, expected map[string]interface{}) error {
 		if !ok {
 			return fmt.Errorf("param '%s' missing in action params.", key)
 		}
-		var value interface{}
+		var value any
 		if i, ok := node.(ast.InterfaceNode); ok {
 			value = i.Value()
 		}
 		if l, ok := node.(ast.ListNode); ok {
-			var arr []interface{}
+			var arr []any
 			for _, e := range l.Elems() {
 				switch ev := e.(type) {
 				case ast.InterfaceNode:
@@ -863,7 +863,7 @@ func assertHoleKeys(n ast.Node, expected map[string]string) error {
 	return compare(holes, expected)
 }
 
-func assertVariableDeclarationNode(n ast.Node, expIdent string, value interface{}, expHole string) error {
+func assertVariableDeclarationNode(n ast.Node, expIdent string, value any, expHole string) error {
 	if err := isDeclarationNode(n); err != nil {
 		return err
 	}
@@ -891,7 +891,7 @@ func assertVariableDeclarationNode(n ast.Node, expIdent string, value interface{
 	return nil
 }
 
-func assertDeclarationNode(n ast.Node, expIdent, expAction, expEntity string, refs map[string]string, params map[string]interface{}, holes, aliases map[string]string) error {
+func assertDeclarationNode(n ast.Node, expIdent, expAction, expEntity string, refs map[string]string, params map[string]any, holes, aliases map[string]string) error {
 	if err := isDeclarationNode(n); err != nil {
 		return err
 	}
@@ -905,11 +905,11 @@ func assertDeclarationNode(n ast.Node, expIdent, expAction, expEntity string, re
 	return nil
 }
 
-func assertCommandNode(n ast.Node, expAction, expEntity string, refs map[string]string, params map[string]interface{}, holes, aliases map[string]string) error {
+func assertCommandNode(n ast.Node, expAction, expEntity string, refs map[string]string, params map[string]any, holes, aliases map[string]string) error {
 	return verifyCommandNode(n, expAction, expEntity, refs, params, holes, aliases)
 }
 
-func verifyCommandNode(n ast.Node, expAction, expEntity string, refs map[string]string, params map[string]interface{}, holes, aliases map[string]string) error {
+func verifyCommandNode(n ast.Node, expAction, expEntity string, refs map[string]string, params map[string]any, holes, aliases map[string]string) error {
 	if err := isCommandNode(n); err != nil {
 		return err
 	}
@@ -943,7 +943,7 @@ func verifyCommandNode(n ast.Node, expAction, expEntity string, refs map[string]
 }
 
 func extractCommandNode(n ast.Node) *ast.CommandNode {
-	msg := func(i interface{}) string {
+	msg := func(i any) string {
 		return fmt.Sprintf("extracting node: want CommandNode, got %T", i)
 	}
 	switch nn := n.(type) {
@@ -962,7 +962,7 @@ func extractCommandNode(n ast.Node) *ast.CommandNode {
 }
 
 func extractCmdNode(n ast.Node) *ast.CommandNode {
-	msg := func(i interface{}) string {
+	msg := func(i any) string {
 		return fmt.Sprintf("extracting node: want ActionNode, got %T", i)
 	}
 	switch nn := n.(type) {

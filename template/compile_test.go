@@ -12,7 +12,7 @@ import (
 )
 
 func TestDryRun(t *testing.T) {
-	env := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) interface{} {
+	env := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) any {
 		return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 	}).Build()
 
@@ -29,7 +29,7 @@ func TestDryRun(t *testing.T) {
 }
 
 func TestParamsProcessing(t *testing.T) {
-	env := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) interface{} {
+	env := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) any {
 		return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 	}).Build()
 
@@ -68,8 +68,8 @@ func TestWholeCompilation(t *testing.T) {
 	tcases := []struct {
 		tpl                  string
 		expect               string
-		expProcessedFillers  map[string]interface{}
-		expResolvedVariables map[string]interface{}
+		expProcessedFillers  map[string]any
+		expResolvedVariables map[string]any
 	}{
 		{
 			tpl: `subnetname = my-subnet
@@ -81,8 +81,8 @@ create instance subnet=$testsubnet image=ami-12345 count=$instancecount name='my
 			expect: `testsubnet = create subnet cidr=10.0.2.0/24 name=my-subnet vpc=vpc-1234
 update subnet id=$testsubnet public=true
 create instance count=42 image=ami-12345 name='my test instance' subnet=$testsubnet type=t2.micro`,
-			expProcessedFillers:  map[string]interface{}{"instance.type": "t2.micro", "test.cidr": "10.0.2.0/24", "instance.count": 42},
-			expResolvedVariables: map[string]interface{}{"subnetname": "my-subnet", "vpcref": "vpc-1234", "instancecount": 42},
+			expProcessedFillers:  map[string]any{"instance.type": "t2.micro", "test.cidr": "10.0.2.0/24", "instance.count": 42},
+			expResolvedVariables: map[string]any{"subnetname": "my-subnet", "vpcref": "vpc-1234", "instancecount": 42},
 		},
 		{
 			tpl: `
@@ -95,8 +95,8 @@ create loadbalancer subnets=[$sub1, $sub2, sub-3456,{backup-subnet}] name=mylb2
 sub1 = create subnet cidr=10.0.2.0/24 name=subnet1 vpc=vpc-1234
 sub2 = create subnet cidr=10.0.3.0/24 name=subnet2 vpc=vpc-1234
 create loadbalancer name=mylb2 subnets=[$sub1,$sub2,sub-3456,sub-0987]`,
-			expProcessedFillers:  map[string]interface{}{"test.cidr": "10.0.2.0/24", "backup-subnet": "sub-0987"},
-			expResolvedVariables: map[string]interface{}{},
+			expProcessedFillers:  map[string]any{"test.cidr": "10.0.2.0/24", "backup-subnet": "sub-0987"},
+			expResolvedVariables: map[string]any{},
 		},
 		{
 			tpl: `
@@ -109,8 +109,8 @@ lb1 = create loadbalancer subnets=[$sub1, $sub2, sub-3456,{backup-subnet}] name=
 sub1 = create subnet cidr=10.0.2.0/24 name=subnet1 vpc=vpc-1234
 sub2 = create subnet cidr=10.0.3.0/24 name=subnet2 vpc=vpc-1234
 lb1 = create loadbalancer name=mylb2 subnets=[$sub1,$sub2,sub-3456,sub-0987]`,
-			expProcessedFillers:  map[string]interface{}{"test.cidr": "10.0.2.0/24", "backup-subnet": "sub-0987"},
-			expResolvedVariables: map[string]interface{}{},
+			expProcessedFillers:  map[string]any{"test.cidr": "10.0.2.0/24", "backup-subnet": "sub-0987"},
+			expResolvedVariables: map[string]any{},
 		},
 		{
 			tpl: `
@@ -124,8 +124,8 @@ secondlb = create loadbalancer subnets=[$e,mysubnet-4,{mysubnet5.hole}] name=lb2
 `,
 			expect: `create loadbalancer name=lb1 subnets=[mysubnet-1,mysubnet-2,mysubnet-3,mysubnet-4]
 secondlb = create loadbalancer name=lb2 subnets=[mysubnet-1,mysubnet-4,mysubnet-5]`,
-			expProcessedFillers:  map[string]interface{}{"mysubnet2.hole": "mysubnet-2", "mysubnet3.hole": "mysubnet-3", "mysubnet5.hole": "mysubnet-5"},
-			expResolvedVariables: map[string]interface{}{"a": "mysubnet-1", "b": "mysubnet-1", "e": "mysubnet-1", "c": "mysubnet-2", "d": []interface{}{"mysubnet-1", "mysubnet-2", "mysubnet-3", "mysubnet-4"}},
+			expProcessedFillers:  map[string]any{"mysubnet2.hole": "mysubnet-2", "mysubnet3.hole": "mysubnet-3", "mysubnet5.hole": "mysubnet-5"},
+			expResolvedVariables: map[string]any{"a": "mysubnet-1", "b": "mysubnet-1", "e": "mysubnet-1", "c": "mysubnet-2", "d": []any{"mysubnet-1", "mysubnet-2", "mysubnet-3", "mysubnet-4"}},
 		},
 		{
 			tpl: `
@@ -136,8 +136,8 @@ create instance image=ami-1234 name=$name2 subnet=sub1234
 `,
 			expect: `create instance count=42 image=ami-1234 name=instance-myinstance-10 subnet=subnet-10 type=t2.micro
 create instance count=42 image=ami-1234 name=my-test-sub-2345 subnet=sub1234 type=t2.micro`,
-			expProcessedFillers:  map[string]interface{}{"instance.name": "myinstance", "version": 10, "instance.type": "t2.micro", "instance.count": 42, "hole": "@sub"},
-			expResolvedVariables: map[string]interface{}{"name": "instance-myinstance-10", "name2": "my-test-sub-2345"},
+			expProcessedFillers:  map[string]any{"instance.name": "myinstance", "version": 10, "instance.type": "t2.micro", "instance.count": 42, "hole": "@sub"},
+			expResolvedVariables: map[string]any{"name": "instance-myinstance-10", "name2": "my-test-sub-2345"},
 		},
 		{
 			tpl: `
@@ -148,25 +148,25 @@ create instance image=ami-1234 name=$name2 subnet=sub1234
 `,
 			expect: `create instance count=42 image=ami-1234 name='ins$\ta{nce}-myinstance10' subnet=subnet-10 type=t2.micro
 create instance count=42 image=ami-1234 name='sub-2345sub-2345text-with $Special {char-s' subnet=sub1234 type=t2.micro`,
-			expProcessedFillers:  map[string]interface{}{"instance.name": "myinstance", "version": 10, "instance.type": "t2.micro", "instance.count": 42, "hole": "@sub"},
-			expResolvedVariables: map[string]interface{}{"name": "ins$\\ta{nce}-myinstance10", "name2": "sub-2345sub-2345text-with $Special {char-s"},
+			expProcessedFillers:  map[string]any{"instance.name": "myinstance", "version": 10, "instance.type": "t2.micro", "instance.count": 42, "hole": "@sub"},
+			expResolvedVariables: map[string]any{"name": "ins$\\ta{nce}-myinstance10", "name2": "sub-2345sub-2345text-with $Special {char-s"},
 		},
 		{
 			tpl: `
 create loadbalancer name=mylb subnets={private.subnets}
 `,
 			expect:               `create loadbalancer name=mylb subnets=[sub-1234,sub-2345]`,
-			expProcessedFillers:  map[string]interface{}{"private.subnets": []interface{}{"sub-1234", "sub-2345"}},
-			expResolvedVariables: map[string]interface{}{},
+			expProcessedFillers:  map[string]any{"private.subnets": []any{"sub-1234", "sub-2345"}},
+			expResolvedVariables: map[string]any{},
 		},
 		{
 			tpl: `
 create loadbalancer name=mylb subnets=subnet-1, subnet-2
 `,
 			expect:               `create loadbalancer name=mylb subnets=[subnet-1,subnet-2]`,
-			expProcessedFillers:  map[string]interface{}{},
-			expResolvedVariables: map[string]interface{}{},
-		}, //retro-compatibility with old list style, without brackets
+			expProcessedFillers:  map[string]any{},
+			expResolvedVariables: map[string]any{},
+		},
 	}
 
 	for i, tcase := range tcases {
@@ -177,11 +177,11 @@ create loadbalancer name=mylb subnets=subnet-1, subnet-2
 				"sub":      "sub-2345",
 			}
 			return vals[v]
-		}).WithLookupCommandFunc(func(tokens ...string) interface{} {
+		}).WithLookupCommandFunc(func(tokens ...string) any {
 			return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 		}).Build()
 
-		cenv.Push(env.FILLERS, map[string]interface{}{
+		cenv.Push(env.FILLERS, map[string]any{
 			"instance.type":   "t2.micro",
 			"test.cidr":       "10.0.2.0/24",
 			"instance.count":  42,
@@ -193,7 +193,7 @@ create loadbalancer name=mylb subnets=subnet-1, subnet-2
 			"version":         10,
 			"instance.name":   "myinstance",
 			"hole":            ast.NewAliasNode("sub"),
-			"private.subnets": ast.NewListNode([]interface{}{"sub-1234", "sub-2345"}),
+			"private.subnets": ast.NewListNode([]any{"sub-1234", "sub-2345"}),
 		})
 
 		inTpl := template.MustParse(tcase.tpl)
@@ -222,31 +222,31 @@ func TestExternallyProvidedParams(t *testing.T) {
 		template            string
 		externalParams      string
 		expect              string
-		expProcessedFillers map[string]interface{}
+		expProcessedFillers map[string]any
 	}{
 		{
 			template:            `create instance count=1 image=ami-123 name=test subnet={hole.name} type=t2.micro`,
 			externalParams:      "hole.name=subnet-2345",
 			expect:              `create instance count=1 image=ami-123 name=test subnet=subnet-2345 type=t2.micro`,
-			expProcessedFillers: map[string]interface{}{"hole.name": "subnet-2345"},
+			expProcessedFillers: map[string]any{"hole.name": "subnet-2345"},
 		},
 		{
 			template:            `create instance count=1 image=ami-123 name=test subnet={hole.name} type={instance.type}`,
 			externalParams:      "instance.type=t2.nano hole.name=@subalias",
 			expect:              `create instance count=1 image=ami-123 name=test subnet=subnet-111 type=t2.nano`,
-			expProcessedFillers: map[string]interface{}{"hole.name": "@subalias", "instance.type": "t2.nano"},
+			expProcessedFillers: map[string]any{"hole.name": "@subalias", "instance.type": "t2.nano"},
 		},
 		{
 			template:            `create loadbalancer name=elbv2 subnets={my.subnets}`,
 			externalParams:      "my.subnets=[@sub1, @sub2]",
 			expect:              `create loadbalancer name=elbv2 subnets=[subnet-123,subnet-234]`,
-			expProcessedFillers: map[string]interface{}{"my.subnets": []interface{}{"@sub1", "@sub2"}},
+			expProcessedFillers: map[string]any{"my.subnets": []any{"@sub1", "@sub2"}},
 		},
 		{
 			template:            `create loadbalancer name={my.name} subnets={my.subnets}`,
 			externalParams:      "my.subnets=sub1, sub2 my.name=loadbalancername",
 			expect:              `create loadbalancer name=loadbalancername subnets=[sub1,sub2]`,
-			expProcessedFillers: map[string]interface{}{"my.name": "loadbalancername", "my.subnets": []interface{}{"sub1", "sub2"}},
+			expProcessedFillers: map[string]any{"my.name": "loadbalancername", "my.subnets": []any{"sub1", "sub2"}},
 		}, //retro-compatibility with old list style, without brackets
 	}
 	for i, tcase := range tcases {
@@ -254,7 +254,7 @@ func TestExternallyProvidedParams(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		cenv := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) interface{} {
+		cenv := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) any {
 			return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 		}).WithAliasFunc(func(p, v string) string {
 			vals := map[string]string{

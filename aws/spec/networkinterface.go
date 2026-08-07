@@ -52,7 +52,7 @@ func (cmd *CreateNetworkinterface) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CreateNetworkinterface) ExtractResult(i interface{}) string {
+func (cmd *CreateNetworkinterface) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateNetworkInterfaceOutput).NetworkInterface.NetworkInterfaceId)
 }
 
@@ -82,7 +82,7 @@ func (cmd *AttachNetworkinterface) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("device-index"), params.Key("id"), params.Key("instance")))
 }
 
-func (cmd *AttachNetworkinterface) ExtractResult(i interface{}) string {
+func (cmd *AttachNetworkinterface) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.AttachNetworkInterfaceOutput).AttachmentId)
 }
 
@@ -105,7 +105,7 @@ func (cmd *DetachNetworkinterface) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -148,7 +148,7 @@ func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]in
 	return nil, err
 }
 
-func (cmd *DetachNetworkinterface) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DetachNetworkinterface) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DetachNetworkInterfaceInput{}
 
 	if cmd.Attachment != nil {
@@ -196,7 +196,7 @@ func (cmd *CheckNetworkinterface) ParamsSpec() params.Spec {
 		})
 }
 
-func (cmd *CheckNetworkinterface) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckNetworkinterface) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeNetworkInterfacesInput{
 		NetworkInterfaceIds: []string{awssdk.ToString(cmd.Id)},
 	}

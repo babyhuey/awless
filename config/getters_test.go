@@ -32,7 +32,7 @@ func TestGetSyncEnabled(t *testing.T) {
 		Set("aws.iam.group.sync", "true")
 		Set("aws.iam.user.sync", "false")
 		Set("other.iam.user.sync", "false")
-		expect := map[string]interface{}{
+		expect := map[string]any{
 			"aws.region":            "eu-west-1",
 			"aws.ec2.sync":          true,
 			"aws.ec2.subnet.sync":   true,

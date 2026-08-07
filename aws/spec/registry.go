@@ -49,7 +49,7 @@ func (cmd *AuthenticateRegistry) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AtLeastOneOf(params.Key("accounts"), params.Key("no-confirm"), params.Key("no-docker-login")))
 }
 
-func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (any, error) {
 	input := &ecr.GetAuthorizationTokenInput{}
 	var err error
 

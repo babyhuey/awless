@@ -49,7 +49,7 @@ type funcBuilder struct {
 	relation                            int
 }
 
-type addParentFn func(*graph.Graph, tstore.RDFGraph, string, interface{}) error
+type addParentFn func(*graph.Graph, tstore.RDFGraph, string, any) error
 
 var addParentsFns = map[string][]addParentFn{
 	// Infra
@@ -173,7 +173,7 @@ func (fb funcBuilder) build() addParentFn {
 }
 
 func (fb funcBuilder) addRelationWithField() addParentFn {
-	return func(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+	return func(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 		val, err := valueAtPath(i, fb.fieldName)
 		if err != nil {
 			return err
@@ -207,7 +207,7 @@ func (fb funcBuilder) addRelationWithField() addParentFn {
 }
 
 func (fb funcBuilder) addRelationListWithStringField() addParentFn {
-	return func(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+	return func(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 		structField, err := verifyValidStructField(i, fb.stringListName)
 		if err != nil {
 			return err
@@ -248,7 +248,7 @@ func (fb funcBuilder) addRelationListWithStringField() addParentFn {
 }
 
 func (fb funcBuilder) addRelationListWithField() addParentFn {
-	return func(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+	return func(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 		structField, err := verifyValidStructField(i, fb.listName)
 		if err != nil {
 			return err
@@ -305,7 +305,7 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 	}
 }
 
-func verifyValidStructField(i interface{}, name string) (reflect.Value, error) {
+func verifyValidStructField(i any, name string) (reflect.Value, error) {
 	value := reflect.ValueOf(i)
 	if value.Kind() != reflect.Ptr {
 		return reflect.Value{}, fmt.Errorf("%T not a pointer", i)
@@ -337,7 +337,7 @@ func addRelation(g *graph.Graph, first, other *graph.Resource, relation int) err
 	return nil
 }
 
-func addRegionParent(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+func addRegionParent(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 	res, err := awsconv.InitResource(i)
 	if err != nil {
 		return err
@@ -346,7 +346,7 @@ func addRegionParent(g *graph.Graph, snap tstore.RDFGraph, region string, i inte
 	return nil
 }
 
-func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 	res, err := awsconv.InitResource(i)
 	if err != nil {
 		return err
@@ -383,7 +383,7 @@ func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 	return nil
 }
 
-func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 	user, ok := i.(*iamtypes.UserDetail)
 	if !ok {
 		return fmt.Errorf("aws fetch: not a user, but a %T", i)
@@ -411,7 +411,7 @@ func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string,
 	return nil
 }
 
-func fetchTargetsAndAddRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+func fetchTargetsAndAddRelations(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 	group, ok := i.(*elbv2types.TargetGroup)
 	if !ok {
 		return fmt.Errorf("add targets relation: not a target group, but a %T", i)
@@ -436,7 +436,7 @@ func fetchTargetsAndAddRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 	return nil
 }
 
-func addScalingGroupSubnets(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+func addScalingGroupSubnets(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 	group, ok := i.(*autoscalingtypes.AutoScalingGroup)
 	if !ok {
 		return fmt.Errorf("add autoscaling group relation: not a autoscaling group, but a %T", i)
@@ -460,7 +460,7 @@ func addScalingGroupSubnets(g *graph.Graph, snap tstore.RDFGraph, region string,
 
 // valueAtPath navigates a dot-separated field path through struct fields,
 // returning the value found. Replaces awsutil.ValuesAtPath from SDK v1.
-func valueAtPath(i interface{}, path string) (interface{}, error) {
+func valueAtPath(i any, path string) (any, error) {
 	parts := strings.Split(path, ".")
 	v := reflect.ValueOf(i)
 	for _, part := range parts {
@@ -481,7 +481,7 @@ func valueAtPath(i interface{}, path string) (interface{}, error) {
 	return v.Interface(), nil
 }
 
-func addAlarmMetric(g *graph.Graph, snap tstore.RDFGraph, region string, i interface{}) error {
+func addAlarmMetric(g *graph.Graph, snap tstore.RDFGraph, region string, i any) error {
 	alarm, ok := i.(*cloudwatchtypes.MetricAlarm)
 	if !ok {
 		return fmt.Errorf("add alarm metric relation: not a alarm, but a %T", i)

@@ -49,17 +49,17 @@ type DeclarationNode struct {
 
 type ExpressionNode interface {
 	Node
-	Result() interface{}
+	Result() any
 	Err() error
 }
 
 type Command interface {
 	ParamsSpec() params.Spec
-	Run(env.Running, map[string]interface{}) (interface{}, error)
+	Run(env.Running, map[string]any) (any, error)
 }
 
-func (c *CommandNode) Result() interface{} { return c.CmdResult }
-func (c *CommandNode) Err() error          { return c.CmdErr }
+func (c *CommandNode) Result() any { return c.CmdResult }
+func (c *CommandNode) Err() error  { return c.CmdErr }
 
 func (c *CommandNode) Keys() (keys []string) {
 	for k := range c.ParamNodes {
@@ -96,7 +96,7 @@ func (c *CommandNode) string(redact bool) string {
 		switch vv := v.(type) {
 		case string:
 			all = append(all, fmt.Sprintf("%s=%v", k, quoteStringIfNeeded(vv)))
-		case []interface{}:
+		case []any:
 			var a []string
 			for _, e := range vv {
 				switch ee := e.(type) {
@@ -136,8 +136,8 @@ func (c *CommandNode) clone() Node {
 	cmd := &CommandNode{
 		Command: c.Command,
 		Action:  c.Action, Entity: c.Entity,
-		ParamNodes: make(map[string]interface{}),
-		Refs:       make(map[string]interface{}),
+		ParamNodes: make(map[string]any),
+		Refs:       make(map[string]any),
 	}
 
 	for k, v := range c.ParamNodes {
@@ -149,7 +149,7 @@ func (c *CommandNode) clone() Node {
 	return cmd
 }
 
-func (c *CommandNode) ProcessRefs(refs map[string]interface{}) {
+func (c *CommandNode) ProcessRefs(refs map[string]any) {
 	for paramKey, param := range c.Refs {
 		if ref, ok := param.(RefNode); ok {
 			for k, v := range refs {
@@ -160,7 +160,7 @@ func (c *CommandNode) ProcessRefs(refs map[string]interface{}) {
 		}
 
 		if list, ok := param.(ListNode); ok {
-			var new []interface{}
+			var new []any
 			for _, e := range list.arr {
 				newElem := e
 				if ref, isRef := e.(RefNode); isRef {
@@ -177,8 +177,8 @@ func (c *CommandNode) ProcessRefs(refs map[string]interface{}) {
 	}
 }
 
-func (c *CommandNode) ToDriverParams() map[string]interface{} {
-	params := make(map[string]interface{})
+func (c *CommandNode) ToDriverParams() map[string]any {
+	params := make(map[string]any)
 	for k, v := range c.ParamNodes {
 		switch node := v.(type) {
 		case InterfaceNode:
@@ -191,9 +191,9 @@ func (c *CommandNode) ToDriverParams() map[string]interface{} {
 	return params
 }
 
-func (c *CommandNode) ToFillerParams() map[string]interface{} {
-	params := make(map[string]interface{})
-	fn := func(k string, v interface{}) interface{} {
+func (c *CommandNode) ToFillerParams() map[string]any {
+	params := make(map[string]any)
+	fn := func(k string, v any) any {
 		switch vv := v.(type) {
 		case InterfaceNode:
 			return vv.i
@@ -211,7 +211,7 @@ func (c *CommandNode) ToFillerParams() map[string]interface{} {
 		}
 		switch vv := v.(type) {
 		case ListNode:
-			var arr []interface{}
+			var arr []any
 			for _, a := range vv.arr {
 				arr = append(arr, fn(k, a))
 			}

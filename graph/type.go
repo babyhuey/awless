@@ -458,7 +458,7 @@ type PolicyStatement struct {
 	NotActions   compositeString     `json:"NotAction,omitempty"`
 	Resources    compositeString     `json:"Resource,omitempty"`
 	NotResources compositeString     `json:"NotResource,omitempty"`
-	Condition    interface{}         `json:",omitempty"`
+	Condition    any                 `json:",omitempty"`
 }
 
 type StatementPrincipal struct {

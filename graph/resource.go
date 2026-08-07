@@ -34,9 +34,9 @@ import (
 type Resource struct {
 	kind, id string
 
-	properties map[string]interface{}
+	properties map[string]any
 	relations  map[string][]*Resource
-	meta       map[string]interface{}
+	meta       map[string]any
 }
 
 const notFoundResourceType = "notfound"
@@ -45,8 +45,8 @@ func NotFoundResource(id string) *Resource {
 	return &Resource{
 		id:         id,
 		kind:       notFoundResourceType,
-		properties: make(map[string]interface{}),
-		meta:       make(map[string]interface{}),
+		properties: make(map[string]any),
+		meta:       make(map[string]any),
 		relations:  make(map[string][]*Resource),
 	}
 }
@@ -55,8 +55,8 @@ func InitResource(kind, id string) *Resource {
 	return &Resource{
 		id:         id,
 		kind:       kind,
-		properties: map[string]interface{}{properties.ID: id},
-		meta:       make(map[string]interface{}),
+		properties: map[string]any{properties.ID: id},
+		meta:       make(map[string]any),
 		relations:  make(map[string][]*Resource),
 	}
 }
@@ -120,21 +120,21 @@ func (res *Resource) Id() string {
 	return res.id
 }
 
-func (res *Resource) Properties() map[string]interface{} {
+func (res *Resource) Properties() map[string]any {
 	return res.properties
 }
 
-func (res *Resource) Property(k string) (interface{}, bool) {
+func (res *Resource) Property(k string) (any, bool) {
 	v, ok := res.properties[k]
 	return v, ok
 }
 
-func (res *Resource) Meta(k string) (interface{}, bool) {
+func (res *Resource) Meta(k string) (any, bool) {
 	v, ok := res.meta[k]
 	return v, ok
 }
 
-func (res *Resource) SetProperty(k string, v interface{}) {
+func (res *Resource) SetProperty(k string, v any) {
 	res.properties[k] = v
 }
 
@@ -271,7 +271,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 	return triples, nil
 }
 
-func marshalToRdfObject(i interface{}, definedBy, dataType string) (tstore.Object, error) {
+func marshalToRdfObject(i any, definedBy, dataType string) (tstore.Object, error) {
 	switch definedBy {
 	case rdf.RdfsLiteral:
 		return tstore.ObjectLiteral(i)
@@ -383,8 +383,8 @@ func (res Resources) Map(f func(*Resource) string) (out []string) {
 	return
 }
 
-func Subtract(one, other map[string]interface{}) map[string]interface{} {
-	result := make(map[string]interface{})
+func Subtract(one, other map[string]any) map[string]any {
+	result := make(map[string]any)
 
 	for propK, propV := range one {
 		var found bool

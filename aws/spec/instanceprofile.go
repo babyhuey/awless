@@ -73,7 +73,7 @@ func (cmd *AttachInstanceprofile) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]interface{}) (interface{}, error) {
+func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
@@ -97,7 +97,7 @@ func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]int
 	return fakeDryRunId("instanceprofile"), nil
 }
 
-func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 	instanceId := StringValue(cmd.Instance)
 	profileName := StringValue(cmd.Name)
 
@@ -166,7 +166,7 @@ func (cmd *DetachInstanceprofile) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("instance"), params.Key("name")))
 }
 
-func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 	instanceId := StringValue(cmd.Instance)
 	profileName := StringValue(cmd.Name)
 
@@ -207,7 +207,7 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (interface{}, erro
 	return lastId, nil
 }
 
-func (cmd *DetachInstanceprofile) ExtractResult(i interface{}) string {
+func (cmd *DetachInstanceprofile) ExtractResult(i any) string {
 	if i != nil {
 		return fmt.Sprint(i)
 	}

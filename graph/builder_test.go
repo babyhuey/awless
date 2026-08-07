@@ -2,11 +2,11 @@ package graph
 
 type rBuilder struct {
 	id, typ string
-	props   map[string]interface{}
+	props   map[string]any
 }
 
 func testResource(id, typ string) *rBuilder {
-	return &rBuilder{id: id, typ: typ, props: map[string]interface{}{"ID": id}}
+	return &rBuilder{id: id, typ: typ, props: map[string]any{"ID": id}}
 }
 
 func instResource(id string) *rBuilder {
@@ -25,11 +25,11 @@ func sGrpResource(id string) *rBuilder {
 	return testResource(id, "securitygroup")
 }
 
-func (b *rBuilder) prop(key string, value interface{}) *rBuilder {
+func (b *rBuilder) prop(key string, value any) *rBuilder {
 	b.props[key] = value
 	return b
 }
 
 func (b *rBuilder) build() *Resource {
-	return &Resource{id: b.id, kind: b.typ, properties: b.props, meta: make(map[string]interface{}), relations: make(map[string][]*Resource)}
+	return &Resource{id: b.id, kind: b.typ, properties: b.props, meta: make(map[string]any), relations: make(map[string][]*Resource)}
 }

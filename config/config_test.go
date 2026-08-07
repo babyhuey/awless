@@ -31,14 +31,14 @@ func TestDefaults(t *testing.T) {
 		if err := LoadConfig(); err != nil {
 			t.Fatal(err)
 		}
-		expect := map[string]interface{}{
+		expect := map[string]any{
 			"aws.region":   "eu-west-1",
 			"ec2.autosync": true,
 		}
 		if got, want := Config, expect; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
-		if got, want := Defaults, map[string]interface{}{"instance.type": "t2.micro"}; !reflect.DeepEqual(got, want) {
+		if got, want := Defaults, map[string]any{"instance.type": "t2.micro"}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
 	})
@@ -47,7 +47,7 @@ func TestDefaults(t *testing.T) {
 		if err := SetVolatile("aws.region", "us-west-1"); err != nil {
 			t.Fatal(err)
 		}
-		expect := map[string]interface{}{"aws.region": "us-west-1", "ec2.autosync": true}
+		expect := map[string]any{"aws.region": "us-west-1", "ec2.autosync": true}
 		if got, want := Config, expect; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
@@ -66,7 +66,7 @@ func TestDefaults(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		expect := map[string]interface{}{"aws.region": "us-west-1", "ec2.autosync": true}
+		expect := map[string]any{"aws.region": "us-west-1", "ec2.autosync": true}
 		if got, want := Config, expect; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
@@ -93,10 +93,10 @@ func TestDefaults(t *testing.T) {
 		if err := Set("instance.type", "t2.nano"); err != nil {
 			t.Fatal(err)
 		}
-		if got, want := Config, map[string]interface{}{"aws.region": "us-west-1", "ec2.autosync": true}; !reflect.DeepEqual(got, want) {
+		if got, want := Config, map[string]any{"aws.region": "us-west-1", "ec2.autosync": true}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
-		if got, want := Defaults, map[string]interface{}{"instance.type": "t2.nano"}; !reflect.DeepEqual(got, want) {
+		if got, want := Defaults, map[string]any{"instance.type": "t2.nano"}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
 		if err := Set("instance.image", "ami-165a0876"); err != nil {
@@ -108,7 +108,7 @@ func TestDefaults(t *testing.T) {
 		if err := Set("subnet.create", "true"); err != nil {
 			t.Fatal(err)
 		}
-		if got, want := Defaults, map[string]interface{}{"instance.type": "t2.nano", "instance.image": "ami-165a0876", "instance.count": 1, "subnet.create": true}; !reflect.DeepEqual(got, want) {
+		if got, want := Defaults, map[string]any{"instance.type": "t2.nano", "instance.image": "ami-165a0876", "instance.count": 1, "subnet.create": true}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
 	})
@@ -150,22 +150,22 @@ func TestDefaults(t *testing.T) {
 		}
 	})
 	t.Run("unset default and config", func(t *testing.T) {
-		if got, want := Config, map[string]interface{}{"aws.region": "us-west-1", "ec2.autosync": true}; !reflect.DeepEqual(got, want) {
+		if got, want := Config, map[string]any{"aws.region": "us-west-1", "ec2.autosync": true}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
-		if got, want := Defaults, map[string]interface{}{"instance.type": "t2.nano", "instance.image": "ami-165a0876", "instance.count": 1, "subnet.create": true}; !reflect.DeepEqual(got, want) {
+		if got, want := Defaults, map[string]any{"instance.type": "t2.nano", "instance.image": "ami-165a0876", "instance.count": 1, "subnet.create": true}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
 		Unset("ec2.autosync")
 		Unset("instance.image")
-		if got, want := Config, map[string]interface{}{"aws.region": "us-west-1"}; !reflect.DeepEqual(got, want) {
+		if got, want := Config, map[string]any{"aws.region": "us-west-1"}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
 		LoadConfig()
-		if got, want := Config, map[string]interface{}{"aws.region": "us-west-1"}; !reflect.DeepEqual(got, want) {
+		if got, want := Config, map[string]any{"aws.region": "us-west-1"}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
-		if got, want := Defaults, map[string]interface{}{"instance.type": "t2.nano", "instance.count": 1, "subnet.create": true}; !reflect.DeepEqual(got, want) {
+		if got, want := Defaults, map[string]any{"instance.type": "t2.nano", "instance.count": 1, "subnet.create": true}; !reflect.DeepEqual(got, want) {
 			t.Fatalf("got %#v, want %#v", got, want)
 		}
 	})

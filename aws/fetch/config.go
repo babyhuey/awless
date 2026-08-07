@@ -68,13 +68,13 @@ type AWSAPI struct {
 
 type Config struct {
 	Log   *logger.Logger
-	Extra map[string]interface{}
+	Extra map[string]any
 	APIs  *AWSAPI
 }
 
-func NewConfig(apis ...interface{}) *Config {
+func NewConfig(apis ...any) *Config {
 	c := &Config{
-		Extra: make(map[string]interface{}),
+		Extra: make(map[string]any),
 		Log:   logger.DiscardLogger,
 	}
 	assignAPIs(c, apis...)
@@ -93,7 +93,7 @@ func (c *Config) getBoolDefaultTrue(key string) bool {
 	return true
 }
 
-func assignAPIs(c *Config, apis ...interface{}) {
+func assignAPIs(c *Config, apis ...any) {
 	c.APIs = new(AWSAPI)
 	val := reflect.ValueOf(c.APIs).Elem()
 	stru := val.Type()

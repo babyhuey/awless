@@ -39,7 +39,7 @@ func (cmd *CreateSnapshot) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateSnapshot) ExtractResult(i interface{}) string {
+func (cmd *CreateSnapshot) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateSnapshotOutput).SnapshotId)
 }
 
@@ -72,6 +72,6 @@ func (cmd *CopySnapshot) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CopySnapshot) ExtractResult(i interface{}) string {
+func (cmd *CopySnapshot) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CopySnapshotOutput).SnapshotId)
 }

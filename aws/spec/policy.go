@@ -80,7 +80,7 @@ func (cmd *CreatePolicy) BeforeRun(renv env.Running) error {
 	return nil
 }
 
-func (cmd *CreatePolicy) ExtractResult(i interface{}) string {
+func (cmd *CreatePolicy) ExtractResult(i any) string {
 	return StringValue(i.(*iam.CreatePolicyOutput).Policy.Arn)
 }
 
@@ -226,7 +226,7 @@ func (cmd *AttachPolicy) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func transformAccessServiceToARN(values map[string]interface{}) (map[string]interface{}, error) {
+func transformAccessServiceToARN(values map[string]any) (map[string]any, error) {
 	service, hasService := values["service"].(string)
 	access, hasAccess := values["access"].(string)
 
@@ -235,13 +235,13 @@ func transformAccessServiceToARN(values map[string]interface{}) (map[string]inte
 		if err != nil {
 			return values, err
 		}
-		return map[string]interface{}{"arn": pol.Arn}, nil
+		return map[string]any{"arn": pol.Arn}, nil
 	} else {
 		return nil, nil
 	}
 }
 
-func (cmd *AttachPolicy) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *AttachPolicy) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 	switch {
 	case cmd.User != nil:
@@ -290,7 +290,7 @@ func (cmd *DetachPolicy) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *DetachPolicy) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *DetachPolicy) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 	switch {
 	case cmd.User != nil:
@@ -333,8 +333,8 @@ type policyStatement struct {
 }
 
 type principal struct {
-	AWS     interface{} `json:",omitempty"`
-	Service interface{} `json:",omitempty"`
+	AWS     any `json:",omitempty"`
+	Service any `json:",omitempty"`
 }
 
 type policyCondition struct {

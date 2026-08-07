@@ -25,11 +25,11 @@ import (
 
 func TestBuildIpPermissionsFromParams(t *testing.T) {
 	tcases := []struct {
-		params   map[string]interface{}
+		params   map[string]any
 		expected []ec2types.IpPermission
 	}{
 		{
-			params: map[string]interface{}{
+			params: map[string]any{
 				"protocol":  "tcp",
 				"cidr":      "192.168.1.10/24",
 				"portrange": 80,
@@ -44,7 +44,7 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 			},
 		},
 		{
-			params: map[string]interface{}{
+			params: map[string]any{
 				"protocol": "any",
 				"cidr":     "192.168.1.18/32",
 			},
@@ -58,7 +58,7 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 			},
 		},
 		{
-			params: map[string]interface{}{
+			params: map[string]any{
 				"protocol":  "udp",
 				"cidr":      "0.0.0.0/0",
 				"portrange": "22-23",
@@ -73,7 +73,7 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 			},
 		},
 		{
-			params: map[string]interface{}{
+			params: map[string]any{
 				"protocol":  "icmp",
 				"cidr":      "10.0.0.0/16",
 				"portrange": "any",
@@ -88,7 +88,7 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 			},
 		},
 		{
-			params: map[string]interface{}{
+			params: map[string]any{
 				"protocol":      "icmp",
 				"securitygroup": "sg-12345",
 				"portrange":     "any",
@@ -104,7 +104,7 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 		},
 
 		{
-			params: map[string]interface{}{
+			params: map[string]any{
 				"protocol":      "tcp",
 				"securitygroup": "sg-23456",
 				"portrange":     80,

@@ -47,7 +47,7 @@ func (cmd *CreateAppscalingpolicy) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *CreateAppscalingpolicy) ExtractResult(i interface{}) string {
+func (cmd *CreateAppscalingpolicy) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*applicationautoscaling.PutScalingPolicyOutput).PolicyARN)
 }
 

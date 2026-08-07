@@ -16,7 +16,7 @@ type ATBuilder struct {
 	template     string
 	cmdResult    *string
 	expectCalls  map[string]int
-	expectInput  map[string]interface{}
+	expectInput  map[string]any
 	ignoredInput map[string]struct{}
 	fillers      map[string]string
 	expectRevert string
@@ -27,7 +27,7 @@ type ATBuilder struct {
 func Template(template string) *ATBuilder {
 	return &ATBuilder{template: template,
 		expectCalls:  make(map[string]int),
-		expectInput:  make(map[string]interface{}),
+		expectInput:  make(map[string]any),
 		ignoredInput: make(map[string]struct{}),
 	}
 }
@@ -44,7 +44,7 @@ func (b *ATBuilder) ExpectCalls(expects ...string) *ATBuilder {
 	return b
 }
 
-func (b *ATBuilder) ExpectInput(call string, input interface{}) *ATBuilder {
+func (b *ATBuilder) ExpectInput(call string, input any) *ATBuilder {
 	b.expectInput[call] = input
 	return b
 }
@@ -91,7 +91,7 @@ func (b *ATBuilder) Run(t *testing.T, l ...*logger.Logger) {
 	}
 	awsspec.CommandFactory = NewAcceptanceFactory(b.mock, b.graph, l...)
 
-	cenv := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) interface{} {
+	cenv := template.NewEnv().WithLookupCommandFunc(func(tokens ...string) any {
 		return awsspec.CommandFactory.Build(strings.Join(tokens, ""))()
 	}).WithMissingHolesFunc(func(key string, paramPaths []string, isOptional bool) string {
 		return b.fillers[key]

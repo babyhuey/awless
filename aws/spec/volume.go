@@ -45,7 +45,7 @@ func (cmd *CreateVolume) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("availabilityzone"), params.Key("size")))
 }
 
-func (cmd *CreateVolume) ExtractResult(i interface{}) string {
+func (cmd *CreateVolume) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.CreateVolumeOutput).VolumeId)
 }
 
@@ -68,7 +68,7 @@ func (cmd *CheckVolume) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CheckVolume) ManualRun(renv env.Running) (interface{}, error) {
+func (cmd *CheckVolume) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeVolumesInput{VolumeIds: []string{awssdk.ToString(cmd.Id)}}
 
 	c := &checker{
@@ -126,7 +126,7 @@ type AttachVolume struct {
 func (cmd *AttachVolume) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("device"), params.Key("id"), params.Key("instance")))
 }
-func (cmd *AttachVolume) ExtractResult(i interface{}) string {
+func (cmd *AttachVolume) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.AttachVolumeOutput).VolumeId)
 }
 
@@ -147,6 +147,6 @@ func (cmd *DetachVolume) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *DetachVolume) ExtractResult(i interface{}) string {
+func (cmd *DetachVolume) ExtractResult(i any) string {
 	return awssdk.ToString(i.(*ec2.DetachVolumeOutput).VolumeId)
 }

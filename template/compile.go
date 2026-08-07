@@ -109,7 +109,7 @@ func failOnDeclarationWithNoResultPass(tpl *Template, cenv env.Compiling) (*Temp
 			return nil
 		}
 		type ER interface {
-			ExtractResult(interface{}) string
+			ExtractResult(any) string
 		}
 		if _, ok := cmdNode.Command.(ER); !ok {
 			return cmdErr(cmdNode, "command does not return a result, cannot assign to a variable")
@@ -171,7 +171,7 @@ func resolveParamsAndExtractRefsPass(tpl *Template, cenv env.Compiling) (*Templa
 				delete(node.ParamNodes, k)
 			case ast.ListNode:
 				var hasRef bool
-				var arr []interface{}
+				var arr []any
 				for _, elem := range paramNode.Elems() {
 					switch e := elem.(type) {
 					case ast.InterfaceNode:
@@ -206,7 +206,7 @@ func resolveParamsAndExtractRefsPass(tpl *Template, cenv env.Compiling) (*Templa
 func convertParamsPass(tpl *Template, cenv env.Compiling) (*Template, env.Compiling, error) {
 	convert := func(node *ast.CommandNode) error {
 		for _, reducer := range node.ParamsSpec().Reducers() {
-			params := make(map[string]interface{})
+			params := make(map[string]any)
 			for k, v := range node.ParamNodes {
 				params[k] = v
 			}
@@ -261,11 +261,11 @@ func inlineVariableValuePass(tpl *Template, cenv env.Compiling) (*Template, env.
 		if isDecl {
 			if right, isRightExpr := decl.Expr.(*ast.RightExpressionNode); isRightExpr {
 				if res := right.Result(); res != nil {
-					cenv.Push(env.RESOLVED_VARS, map[string]interface{}{decl.Ident: res})
+					cenv.Push(env.RESOLVED_VARS, map[string]any{decl.Ident: res})
 				}
 				ast.ProcessRefs(
 					&ast.AST{Statements: tpl.Statements[i+1:]},
-					map[string]interface{}{decl.Ident: right.Node()},
+					map[string]any{decl.Ident: right.Node()},
 				)
 				continue
 			}
@@ -313,7 +313,7 @@ func resolveMissingHolesPass(tpl *Template, cenv env.Compiling) (*Template, env.
 					return tpl, cenv, err
 				}
 			}
-			cenv.Push(env.FILLERS, map[string]interface{}{k: params[k]})
+			cenv.Push(env.FILLERS, map[string]any{k: params[k]})
 		}
 	}
 
@@ -401,7 +401,7 @@ func failOnUnresolvedAliasPass(tpl *Template, cenv env.Compiling) (*Template, en
 	return tpl, cenv, nil
 }
 
-func cmdErr(cmd *ast.CommandNode, i interface{}, a ...interface{}) error {
+func cmdErr(cmd *ast.CommandNode, i any, a ...any) error {
 	var prefix string
 	if cmd != nil {
 		prefix = fmt.Sprintf("%s %s: ", cmd.Action, cmd.Entity)
@@ -418,7 +418,7 @@ func cmdErr(cmd *ast.CommandNode, i interface{}, a ...interface{}) error {
 	if len(a) == 0 {
 		return errors.New(prefix + msg)
 	}
-	return fmt.Errorf("%s"+msg, append([]interface{}{prefix}, a...)...)
+	return fmt.Errorf("%s"+msg, append([]any{prefix}, a...)...)
 }
 
 func contains(arr []string, s string) bool {

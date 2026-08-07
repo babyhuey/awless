@@ -83,7 +83,7 @@ func Build{{ Title $service.Name }}FetchFuncs(conf *Config) fetch.Funcs {
 {{- range $index, $fetcher := $service.Fetchers }}
 	{{- if not $fetcher.ManualFetcher }}
 
-	funcs["{{ $fetcher.ResourceType }}"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, interface{}, error) {
+	funcs["{{ $fetcher.ResourceType }}"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []{{ $fetcher.AWSType }}
 

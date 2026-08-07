@@ -15,7 +15,7 @@ func TestValidation(t *testing.T) {
 		"two": params.MinLengthOf(2),
 	}
 
-	err := params.Validate(vals, map[string]interface{}{"one": "morethan3", "two": "o"})
+	err := params.Validate(vals, map[string]any{"one": "morethan3", "two": "o"})
 	if err == nil {
 		t.Fatal("expected error got none")
 	}
@@ -36,7 +36,7 @@ func TestValidationAllPass(t *testing.T) {
 		"one": params.MaxLengthOf(10),
 		"two": params.MinLengthOf(1),
 	}
-	err := params.Validate(vals, map[string]interface{}{"one": "short", "two": "ok"})
+	err := params.Validate(vals, map[string]any{"one": "short", "two": "ok"})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -46,7 +46,7 @@ func TestValidationNoMatchingKeys(t *testing.T) {
 	vals := params.Validators{
 		"one": params.MaxLengthOf(3),
 	}
-	err := params.Validate(vals, map[string]interface{}{"other": "value"})
+	err := params.Validate(vals, map[string]any{"other": "value"})
 	if err != nil {
 		t.Fatalf("expected no error when no keys match, got %v", err)
 	}
@@ -54,7 +54,7 @@ func TestValidationNoMatchingKeys(t *testing.T) {
 
 func TestValidationEmptyValidators(t *testing.T) {
 	vals := params.Validators{}
-	err := params.Validate(vals, map[string]interface{}{"any": "value"})
+	err := params.Validate(vals, map[string]any{"any": "value"})
 	if err != nil {
 		t.Fatalf("expected no error with empty validators, got %v", err)
 	}
@@ -317,7 +317,7 @@ func TestValidateWithMixedResults(t *testing.T) {
 	}
 
 	// All valid
-	err := params.Validate(vals, map[string]interface{}{
+	err := params.Validate(vals, map[string]any{
 		"name":  "my-resource",
 		"cidr":  "10.0.0.0/16",
 		"proto": "tcp",
@@ -327,7 +327,7 @@ func TestValidateWithMixedResults(t *testing.T) {
 	}
 
 	// One invalid
-	err = params.Validate(vals, map[string]interface{}{
+	err = params.Validate(vals, map[string]any{
 		"name":  "my-resource",
 		"cidr":  "invalid",
 		"proto": "tcp",

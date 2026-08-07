@@ -25,7 +25,7 @@ func (r *ById) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
 type ByTypeAndProperty struct {
 	Type  string
 	Key   string
-	Value interface{}
+	Value any
 }
 
 func (r *ByTypeAndProperty) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
@@ -65,7 +65,7 @@ func (r *ByTypeAndProperty) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
 
 type ByProperty struct {
 	Key   string
-	Value interface{}
+	Value any
 }
 
 func (r *ByProperty) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
