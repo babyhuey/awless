@@ -1,0 +1,68 @@
+version: 2
+
+project_name: awless
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      # Windows on arm64 has no meaningful audience for this CLI.
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      # The git tag is the single source of truth for a release version;
+      # config.Version's literal is only the fallback for plain `go build`.
+      - -X github.com/bootswithdefer/awless/config.Version=v{{ .Version }}
+      - -X github.com/bootswithdefer/awless/config.buildDate={{ .Date }}
+      - -X github.com/bootswithdefer/awless/config.buildSha={{ .FullCommit }}
+      - -X github.com/bootswithdefer/awless/config.buildOS={{ .Os }}
+      - -X github.com/bootswithdefer/awless/config.buildArch={{ .Arch }}
+      # Matches the value release.go used for tar.gz artifacts; config.BuildFor
+      # drives the upgrade instructions printed by the update check.
+      - -X github.com/bootswithdefer/awless/config.BuildFor=targz
+
+archives:
+  - formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - "^style:"
+      - "^build:"
+
+release:
+  github:
+    owner: bootswithdefer
+    name: awless
+  draft: false
+  prerelease: auto

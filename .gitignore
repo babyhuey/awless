@@ -10,3 +10,6 @@ awless
 # Compiled code generators (build with: cd gen/aws/generators && go run *.go)
 /generators
 gen/aws/generators/generators
+
+# GoReleaser build output
+/dist/

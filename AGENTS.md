@@ -31,6 +31,7 @@ make fmt-check     # fail if anything non-generated is unformatted
 make cover         # coverage profile + total
 make generate      # regenerate gen_*.go (see caveat below)
 make tools         # install pinned dev tools
+make release-snapshot  # build release artifacts locally (no publish)
 
 make check         # fast gate:  fmt-check vet lint test
 make verify        # full gate:  fmt-check vet lint test-race vuln  (mirrors CI)

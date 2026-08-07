@@ -13,6 +13,7 @@ GOBIN           := $(shell go env GOPATH)/bin
 # Must match the version installed by the lint job in CI.
 GOLANGCI_VERSION := v2.12.2
 GOLANGCI         := $(GOBIN)/golangci-lint
+GORELEASER       := $(GOBIN)/goreleaser
 GOVULNCHECK      := $(GOBIN)/govulncheck
 GOIMPORTS        := $(GOBIN)/goimports
 
@@ -126,6 +127,17 @@ $(GOVULNCHECK):
 
 $(GOIMPORTS):
 	go install golang.org/x/tools/cmd/goimports@latest
+
+.PHONY: release-check
+release-check: $(GORELEASER) ## Validate .goreleaser.yml
+	$(GORELEASER) check
+
+.PHONY: release-snapshot
+release-snapshot: $(GORELEASER) ## Build release artifacts locally without publishing
+	$(GORELEASER) release --snapshot --clean --skip=publish
+
+$(GORELEASER):
+	go install github.com/goreleaser/goreleaser/v2@latest
 
 .PHONY: pinact
 pinact: ## Re-pin GitHub Actions to commit SHAs (requires pinact)
