@@ -135,7 +135,8 @@ func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]in
 	}
 
 	_, err := cmd.api.DetachNetworkInterface(context.Background(), input)
-	if awsErr, ok := err.(smithy.APIError); ok {
+	var awsErr smithy.APIError
+	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			id := fakeDryRunId("networkinterface")
@@ -207,7 +208,8 @@ func (cmd *CheckNetworkinterface) ManualRun(renv env.Running) (interface{}, erro
 		fetchFunc: func() (string, error) {
 			output, err := cmd.api.DescribeNetworkInterfaces(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(smithy.APIError); ok {
+				var awserr smithy.APIError
+				if errors.As(err, &awserr) {
 					if awserr.ErrorCode() == "NetworkInterfaceNotFound" {
 						return notFoundState, nil
 					}

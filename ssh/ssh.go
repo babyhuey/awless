@@ -322,8 +322,8 @@ func checkHostKey(hostname string, remote net.Addr, key gossh.PublicKey) error {
 		return err
 	}
 	knownhostsErr := checkKnownHostFunc(hostname, remote, key)
-	keyError, ok := knownhostsErr.(*knownhosts.KeyError)
-	if !ok {
+	var keyError *knownhosts.KeyError
+	if !errors.As(knownhostsErr, &keyError) {
 		return knownhostsErr
 	}
 	if len(keyError.Want) == 0 {

@@ -62,13 +62,13 @@ func (ru *Runner) Run() error {
 
 	renv := NewRunEnv(cenv)
 	if _, err = tplExec.Template.DryRun(renv); err != nil {
-		switch t := err.(type) {
-		case *Errors:
+		var t *Errors
+		if errors.As(err, &t) {
 			errs, _ := t.Errors()
 			for _, e := range errs {
 				logger.Errorf("%s", e.Error())
 			}
-		default:
+		} else {
 			logger.Error(err)
 		}
 		return errors.New("Dry run failed")

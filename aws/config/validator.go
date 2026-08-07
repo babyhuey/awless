@@ -1,6 +1,7 @@
 package awsconfig
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -59,7 +60,7 @@ func StdinRegionSelector() string {
 
 	for !IsValidRegion(region) {
 		line, err := rl.Readline()
-		if err == readline.ErrInterrupt || err == io.EOF {
+		if errors.Is(err, readline.ErrInterrupt) || errors.Is(err, io.EOF) {
 			os.Exit(1)
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr, "error while selecting region: %s", err)

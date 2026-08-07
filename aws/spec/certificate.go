@@ -17,6 +17,7 @@ package awsspec
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"time"
 
@@ -151,7 +152,8 @@ func (cmd *CheckCertificate) ManualRun(renv env.Running) (interface{}, error) {
 		fetchFunc: func() (string, error) {
 			output, err := cmd.api.DescribeCertificate(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(smithy.APIError); ok {
+				var awserr smithy.APIError
+				if errors.As(err, &awserr) {
 					if awserr.ErrorCode() == "CertificateNotFound" {
 						return notFoundState, nil
 					}

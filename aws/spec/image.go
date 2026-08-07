@@ -17,6 +17,7 @@ package awsspec
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -129,7 +130,8 @@ func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]interface{}) 
 
 	start := time.Now()
 	_, err = cmd.api.ModifyImageAttribute(context.Background(), input)
-	if awsErr, ok := err.(smithy.APIError); ok {
+	var awsErr smithy.APIError
+	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			cmd.logger.ExtraVerbosef("dry run: ec2.ec2.ModifyImageAttribute call took %s", time.Since(start))
@@ -229,7 +231,8 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]interface{}) 
 	}
 
 	_, err := cmd.api.DeregisterImage(context.Background(), input)
-	if awsErr, ok := err.(smithy.APIError); ok {
+	var awsErr smithy.APIError
+	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			id := fakeDryRunId("image")

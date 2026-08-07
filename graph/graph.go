@@ -18,6 +18,7 @@ package graph
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -315,7 +316,7 @@ func (g *Graph) ListResourcesDependingOn(start *Resource) ([]*Resource, error) {
 		id := tri.Subject()
 		rT, err := resolveResourceType(snap, id)
 		if err != nil {
-			if err == errTypeNotFound {
+			if errors.Is(err, errTypeNotFound) {
 				resources = append(resources, NotFoundResource(id))
 				continue
 			}
@@ -342,7 +343,7 @@ func (g *Graph) ListResourcesAppliedOn(start *Resource) ([]*Resource, error) {
 		}
 		rT, err := resolveResourceType(snap, id)
 		if err != nil {
-			if err == errTypeNotFound {
+			if errors.Is(err, errTypeNotFound) {
 				resources = append(resources, NotFoundResource(id))
 				continue
 			}

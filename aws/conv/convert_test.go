@@ -17,6 +17,7 @@ limitations under the License.
 package awsconv
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"reflect"
@@ -801,7 +802,7 @@ func TestTransformFunctions(t *testing.T) {
 			{Key: awssdk.String("env"), Value: awssdk.String("prod")},
 		}
 		_, err := extractEFSTagFn("Name")(tags)
-		if err != ErrTagNotFound {
+		if !errors.Is(err, ErrTagNotFound) {
 			t.Errorf("expected ErrTagNotFound, got %v", err)
 		}
 	})
@@ -886,7 +887,7 @@ func TestTransformFunctions(t *testing.T) {
 			{Key: awssdk.String("env"), Value: awssdk.String("prod")},
 		}
 		_, err := extractTagFn("Name")(tags)
-		if err != ErrTagNotFound {
+		if !errors.Is(err, ErrTagNotFound) {
 			t.Errorf("expected ErrTagNotFound, got %v", err)
 		}
 	})

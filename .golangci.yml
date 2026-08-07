@@ -12,6 +12,7 @@ linters:
     # Added incrementally (ISSUES.md I9). errcheck (166 findings) and errorlint
     # (41) are still pending; see I9 for the ordering.
     - bodyclose
+    - errorlint
     - nilerr
   settings:
     govet:

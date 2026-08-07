@@ -1,6 +1,9 @@
 package fetch
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 // Not goroutine safe as for now
 type Error []error
@@ -8,14 +11,14 @@ type Error []error
 func WrapError(errs ...error) *Error {
 	fe := &Error{}
 	for _, e := range errs {
-		switch ee := e.(type) {
-		case *Error:
-			for _, eee := range *ee {
-				fe.Add(eee)
+		var nested *Error
+		if errors.As(e, &nested) {
+			for _, inner := range *nested {
+				fe.Add(inner)
 			}
-		default:
-			fe.Add(e)
+			continue
 		}
+		fe.Add(e)
 	}
 	return fe
 }

@@ -604,7 +604,7 @@ func userDataContentAsBase64(v interface{}, tplData interface{}) (string, error)
 	}
 
 	if readErr != nil {
-		return "", fmt.Errorf("got userdata from '%s' but cannot read content: %s", userdata, readErr)
+		return "", fmt.Errorf("got userdata from '%s' but cannot read content: %w", userdata, readErr)
 	}
 
 	if tpl, err := gotemplate.New("userdata").Parse(string(content)); err != nil {

@@ -128,7 +128,8 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]inter
 	case *ec2.RevokeSecurityGroupEgressInput:
 		_, err = cmd.api.RevokeSecurityGroupEgress(context.Background(), ii)
 	}
-	if awsErr, ok := err.(smithy.APIError); ok {
+	var awsErr smithy.APIError
+	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			cmd.logger.Verbose("dry run: update securitygroup ok")

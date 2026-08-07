@@ -236,7 +236,8 @@ func TestWrapPegParseError(t *testing.T) {
 		text := "create subnet\ncreate instance type= wrong=\ncreate vpc"
 		_, err := Parse(text)
 
-		perr, _ := err.(*parseError)
+		var perr *parseError
+		errors.As(err, &perr)
 
 		if got, want := perr.line, 2; got != want {
 			t.Fatalf("got %d, want %d", got, want)

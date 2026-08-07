@@ -272,7 +272,7 @@ func NewResource(source interface{}) (*graph.Resource, error) {
 				sourceField := nodeV.FieldByName(t.name)
 				if sourceField.IsValid() && !isNilValue(sourceField) {
 					val, err := t.transform(sourceField.Interface())
-					if err == ErrTagNotFound {
+					if errors.Is(err, ErrTagNotFound) {
 						return nil
 					}
 					if err != nil {

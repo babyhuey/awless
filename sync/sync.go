@@ -108,7 +108,7 @@ func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, err
 	servicesByName := make(map[string]cloud.Service)
 	for res := range resultc {
 		if res.err != nil {
-			allErrors = append(allErrors, fmt.Errorf("syncing %s: %s", res.service.Name(), res.err))
+			allErrors = append(allErrors, fmt.Errorf("syncing %s: %w", res.service.Name(), res.err))
 		} else {
 			s.logger.ExtraVerbosef("sync: fetched %s service took %s", res.service.Name(), time.Since(res.start))
 		}

@@ -187,13 +187,13 @@ func askHole(hole, promptSuffix string, autocomplete readline.AutoCompleter) (st
 
 	for {
 		line, err := l.Readline()
-		if err == readline.ErrInterrupt {
+		if errors.Is(err, readline.ErrInterrupt) {
 			if len(line) == 0 {
 				os.Exit(0)
 			} else {
 				continue
 			}
-		} else if err == io.EOF {
+		} else if errors.Is(err, io.EOF) {
 			break
 		}
 

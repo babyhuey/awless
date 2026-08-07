@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -179,7 +180,8 @@ func (cmd *CheckDistribution) ManualRun(renv env.Running) (interface{}, error) {
 		fetchFunc: func() (string, error) {
 			output, err := cmd.api.GetDistribution(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(smithy.APIError); ok {
+				var awserr smithy.APIError
+				if errors.As(err, &awserr) {
 					if awserr.ErrorCode() == "NoSuchDistribution" {
 						return notFoundState, nil
 					}

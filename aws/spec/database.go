@@ -17,6 +17,7 @@ package awsspec
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -146,7 +147,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err 
 	if replica := cmd.ReadReplicaIdentifier; replica != nil {
 		input := &rds.CreateDBInstanceReadReplicaInput{}
 		if ierr := structInjector(cmd, input, renv.Context()); ierr != nil {
-			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceReadReplicaInput: %s", ierr)
+			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceReadReplicaInput: %w", ierr)
 		}
 		start := time.Now()
 		output, err = cmd.api.CreateDBInstanceReadReplica(context.Background(), input)
@@ -154,7 +155,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output interface{}, err 
 	} else {
 		input := &rds.CreateDBInstanceInput{}
 		if ierr := structInjector(cmd, input, renv.Context()); ierr != nil {
-			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceInput: %s", ierr)
+			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceInput: %w", ierr)
 		}
 		start := time.Now()
 		output, err = cmd.api.CreateDBInstance(context.Background(), input)
@@ -228,7 +229,8 @@ func (cmd *CheckDatabase) ManualRun(renv env.Running) (interface{}, error) {
 		fetchFunc: func() (string, error) {
 			output, err := cmd.api.DescribeDBInstances(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(smithy.APIError); ok {
+				var awserr smithy.APIError
+				if errors.As(err, &awserr) {
 					if awserr.ErrorCode() == "DatabaseNotFound" {
 						return notFoundState, nil
 					}

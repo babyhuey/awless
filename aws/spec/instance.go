@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -241,7 +242,8 @@ func (cmd *CheckInstance) ManualRun(renv env.Running) (interface{}, error) {
 		fetchFunc: func() (string, error) {
 			output, err := cmd.api.DescribeInstances(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(smithy.APIError); ok {
+				var awserr smithy.APIError
+				if errors.As(err, &awserr) {
 					if awserr.ErrorCode() == "InstanceNotFound" {
 						return notFoundState, nil
 					}

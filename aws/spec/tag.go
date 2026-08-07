@@ -16,6 +16,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -62,7 +63,8 @@ func (cmd *CreateTag) dryRun(renv env.Running, params map[string]interface{}) (i
 
 	start := time.Now()
 	_, err := cmd.api.CreateTags(context.Background(), input)
-	if awsErr, ok := err.(smithy.APIError); ok {
+	var awsErr smithy.APIError
+	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			cmd.logger.ExtraVerbosef("dry run: ec2.CreateTags call took %s", time.Since(start))
@@ -127,7 +129,8 @@ func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]interface{}) (i
 
 	start := time.Now()
 	_, err := cmd.api.DeleteTags(context.Background(), input)
-	if awsErr, ok := err.(smithy.APIError); ok {
+	var awsErr smithy.APIError
+	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			cmd.logger.ExtraVerbosef("dry run: ec2.DeleteTags call took %s", time.Since(start))

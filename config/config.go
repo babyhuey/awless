@@ -84,12 +84,12 @@ func LoadConfig() error {
 	err := database.Execute(func(db *database.DB) (dberr error) {
 		Config, dberr = db.GetConfigs(configDatabaseKey)
 		if dberr != nil {
-			return fmt.Errorf("config: load config: %s", dberr)
+			return fmt.Errorf("config: load config: %w", dberr)
 		}
 
 		Defaults, dberr = db.GetConfigs(defaultsDatabaseKey)
 		if dberr != nil {
-			return fmt.Errorf("config: load defaults: %s", dberr)
+			return fmt.Errorf("config: load defaults: %w", dberr)
 		}
 		return
 	})

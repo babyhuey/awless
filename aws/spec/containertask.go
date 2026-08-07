@@ -244,7 +244,8 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (interface{}, error)
 	taskdefOutput, err := cmd.api.DescribeTaskDefinition(context.Background(), &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: cmd.Name,
 	})
-	if awserr, ok := err.(smithy.APIError); err != nil && ok {
+	var awserr smithy.APIError
+	if err != nil && errors.As(err, &awserr) {
 		if awserr.ErrorCode() == "ClientException" && strings.Contains(strings.ToLower(awserr.ErrorMessage()), "unable to describe task definition") {
 			cmd.logger.Verbosef("service %s does not exist: creating service", taskDefinitionName)
 			taskDefinitionInput = &ecs.RegisterTaskDefinitionInput{

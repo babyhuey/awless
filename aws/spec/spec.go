@@ -229,7 +229,8 @@ func BoolValue(v *bool) bool {
 }
 
 func decorateAWSError(err error) error {
-	if aerr, ok := err.(smithy.APIError); ok {
+	var aerr smithy.APIError
+	if errors.As(err, &aerr) {
 		return fmt.Errorf("%s: %s", aerr.ErrorCode(), aerr.ErrorMessage())
 	}
 	return err

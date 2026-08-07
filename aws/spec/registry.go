@@ -18,6 +18,7 @@ package awsspec
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -96,7 +97,8 @@ func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (interface{}, error
 			dockerCmd := exec.Command("docker", torun[1:]...)
 			out, err := dockerCmd.Output()
 			if err != nil {
-				if e, ok := err.(*exec.ExitError); ok {
+				var e *exec.ExitError
+				if errors.As(err, &e) {
 					return nil, fmt.Errorf("error running docker command: %s", e.Stderr)
 				}
 				return nil, fmt.Errorf("error running docker command: %w", err)

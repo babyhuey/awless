@@ -70,8 +70,8 @@ func AllOf(rules ...Rule) Rule {
 func (n allOf) Run(input []string) (err error) {
 	for _, r := range n.rules {
 		err = r.Run(input)
-		if err != optErr && err != nil {
-			return fmt.Errorf("%s: expecting %s", err, n.String())
+		if !errors.Is(err, optErr) && err != nil {
+			return fmt.Errorf("%w: expecting %s", err, n.String())
 		}
 	}
 	return nil
@@ -151,7 +151,7 @@ func (n atLeastOneOf) Run(input []string) error {
 	}
 	var pass int
 	for _, r := range n.rules {
-		if err := r.Run(input); err == nil || err == optErr {
+		if err := r.Run(input); err == nil || errors.Is(err, optErr) {
 			pass++
 		}
 	}

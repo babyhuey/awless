@@ -17,6 +17,7 @@ limitations under the License.
 package repo
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -100,7 +101,7 @@ func (r *gitRepo) List() ([]*Rev, error) {
 	for {
 		commit, err := iter.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			panic(fmt.Sprintf("error listing repo revisions: %s", err))
@@ -156,7 +157,7 @@ func (r *gitRepo) LoadRev(version string) (*Rev, error) {
 
 func unmarshalIntoGraph(g *graph.Graph, commit *object.Commit, filename string) error {
 	f, err := commit.File(filename)
-	if err != nil && err != object.ErrFileNotFound {
+	if err != nil && !errors.Is(err, object.ErrFileNotFound) {
 		return err
 	} else if err == nil {
 		contents, err := f.Contents()

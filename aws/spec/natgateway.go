@@ -17,6 +17,7 @@ package awsspec
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -90,7 +91,8 @@ func (cmd *CheckNatgateway) ManualRun(renv env.Running) (interface{}, error) {
 		fetchFunc: func() (string, error) {
 			output, err := cmd.api.DescribeNatGateways(context.Background(), input)
 			if err != nil {
-				if awserr, ok := err.(smithy.APIError); ok {
+				var awserr smithy.APIError
+				if errors.As(err, &awserr) {
 					if awserr.ErrorCode() == "NatGatewayNotFound" {
 						return notFoundState, nil
 					}
