@@ -118,9 +118,11 @@ func processCmdNode(renv env.Running, n *ast.CommandNode) bool {
 
 func prefixError(err error, prefix string) error {
 	if err == nil {
-		return err
+		return nil
 	}
-	return fmt.Errorf("%s: %s", prefix, err.Error())
+	// %w, not err.Error(): this helper sits in front of many template errors, so
+	// stringifying here would break the chain for all of them.
+	return fmt.Errorf("%s: %w", prefix, err)
 }
 
 func (s *Template) Validate(rules ...Validator) (all []error) {

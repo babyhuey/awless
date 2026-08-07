@@ -131,7 +131,9 @@ func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 			if !hasUser && hasId {
 				r, err := cmd.graph.FindOne(cloud.NewQuery(cloud.AccessKey).Match(match.Property(properties.ID, id)))
 				if err != nil || r == nil {
-					return values, nil
+					// Best effort: resolving the key's user is a convenience, so a
+					// lookup failure must not fail the command.
+					return values, nil //nolint:nilerr
 				}
 				if keyUser, ok := r.Property(properties.Username); ok {
 					values["user"] = keyUser

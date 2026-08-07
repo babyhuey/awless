@@ -9,6 +9,10 @@ linters:
     - staticcheck
     - unconvert
     - unused
+    # Added incrementally (ISSUES.md I9). errcheck (166 findings) and errorlint
+    # (41) are still pending; see I9 for the ordering.
+    - bodyclose
+    - nilerr
   settings:
     govet:
       enable-all: true

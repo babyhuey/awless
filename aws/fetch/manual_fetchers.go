@@ -296,7 +296,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 
 		clusterNames, err := getClusterArns(ctx, cache, conf.APIs.Ecs)
 		if err != nil {
-			return resources, objects, nil
+			return resources, objects, err
 		}
 
 		for _, clusterArns := range sliceOfSlice(clusterNames, 100) {

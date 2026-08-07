@@ -474,7 +474,7 @@ func (c *compositeString) UnmarshalJSON(data []byte) (err error) {
 	var str string
 	if err = json.Unmarshal(data, &str); err == nil {
 		*c = []string{str}
-		return
+		return //nolint:nilerr // err is nil here: the string form parsed successfully
 	}
 
 	var slice []string
@@ -492,7 +492,7 @@ func (c *compositeStatement) UnmarshalJSON(data []byte) (err error) {
 	var statement *PolicyStatement
 	if err = json.Unmarshal(data, &statement); err == nil {
 		*c = []*PolicyStatement{statement}
-		return
+		return //nolint:nilerr // err is nil here: the single-statement form parsed
 	}
 
 	var slice []*PolicyStatement
