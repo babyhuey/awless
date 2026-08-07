@@ -136,7 +136,10 @@ func initCloudServicesHook(cmd *cobra.Command, args []string) error {
 		}
 		if !noSyncGlobalFlag {
 			logger.Infof("Syncing new region '%s'... (disable with --no-sync global flag)", region)
-			if _, err := sync.NewSyncer(logger.DefaultLogger).Sync(RootContext(), services...); err != nil {
+			syncer, err := sync.NewSyncer(logger.DefaultLogger)
+			if err != nil {
+				logger.Warningf("cannot sync new region '%s': %s", region, err)
+			} else if _, err := syncer.Sync(RootContext(), services...); err != nil {
 				logger.Warningf("syncing new region '%s': %s", region, err)
 			}
 		}
@@ -158,7 +161,11 @@ func initSyncerHook(cmd *cobra.Command, args []string) error {
 	if noSyncGlobalFlag {
 		sync.DefaultSyncer = sync.NoOpSyncer()
 	} else {
-		sync.DefaultSyncer = sync.NewSyncer(logger.DefaultLogger)
+		syncer, err := sync.NewSyncer(logger.DefaultLogger)
+		if err != nil {
+			return fmt.Errorf("initializing syncer: %w", err)
+		}
+		sync.DefaultSyncer = syncer
 	}
 	return nil
 }

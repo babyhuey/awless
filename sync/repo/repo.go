@@ -106,7 +106,7 @@ func (r *gitRepo) List() ([]*Rev, error) {
 			if errors.Is(err, io.EOF) {
 				break
 			}
-			panic(fmt.Sprintf("error listing repo revisions: %s", err))
+			return all, fmt.Errorf("listing repo revisions: %w", err)
 		}
 
 		all = append(all, &Rev{Id: commit.Hash.String(), Date: commit.Committer.When})

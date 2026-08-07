@@ -56,10 +56,14 @@ type syncer struct {
 	logger *logger.Logger
 }
 
-func NewSyncer(l ...*logger.Logger) Syncer {
+// NewSyncer builds a Syncer backed by the local git repo in ~/.awless.
+//
+// It returns an error rather than panicking: repo.New fails on a real runtime
+// condition — an unwritable or unreadable ~/.awless — not a programmer error.
+func NewSyncer(l ...*logger.Logger) (Syncer, error) {
 	repo, err := repo.New()
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("creating syncer: %w", err)
 	}
 
 	s := &syncer{Repo: repo}
@@ -70,7 +74,8 @@ func NewSyncer(l ...*logger.Logger) Syncer {
 		s.logger = logger.DiscardLogger
 	}
 
-	return s
+	return s, nil
+
 }
 
 func (s *syncer) Sync(ctx context.Context, services ...cloud.Service) (map[string]cloud.GraphAPI, error) {

@@ -17,7 +17,7 @@ Two ELF binaries are committed to the repository. They bloat clone size and are 
 
 ---
 
-### B2: Upgrade check points to upstream wallix/awless
+### B2: Upgrade check points to upstream wallix/awless — **FIXED**
 
 **Severity:** Low  
 **File:** `config/upgrade.go:56`
@@ -28,7 +28,7 @@ The `notifyIfUpgrade` function fetches version info and prints upgrade instructi
 
 ---
 
-### B3: `math/rand` used without seeding (pre-Go 1.20 pattern)
+### B3: `math/rand` used without seeding — **WON'T FIX** (both sites are non-security and Go auto-seeds since 1.20; documented in place)
 
 **Severity:** Low  
 **Files:** `aws/spec/spec.go:6`, `graph/rdf.go:5`
@@ -226,7 +226,7 @@ If non-loopback binding is ever wanted, require an explicit opt-in flag and warn
 
 ---
 
-### B10: `panic()` in library code paths
+### B10: `panic()` in library code paths — **FIXED** (MustMarshal kept by design; MarshalTo is the error-returning alternative)
 
 **Severity:** Low  
 **Files:** `sync/sync.go:61`, `sync/repo/repo.go:106`, `graph/graph.go:387`
@@ -299,7 +299,7 @@ References Go 1.9–1.11 and `goveralls`. Completely superseded by `.github/work
 
 ---
 
-### D4: 101 uses of `context.Background()` in non-test code
+### D4: `context.Background()` throughout — **FIXED**
 
 **Severity:** Medium  
 **Files:** `aws/spec/gen_runs.go` (generated), `aws/fetch/manual_fetchers.go`, `aws/tailers/`, `sync/sync.go`
@@ -395,7 +395,7 @@ go mod tidy && git diff go.mod go.sum
 
 ---
 
-### D6b: Classic ELB (v1) support maintained alongside ELBv2
+### D6b: Classic ELB (v1) support maintained alongside ELBv2 — **WON'T FIX** (still used by older accounts; flagged only so the cost is deliberate)
 
 **Severity:** Low  
 **Files:** `aws/spec/classicloadbalancer.go`, `aws/fetch/config.go`, `gen/aws/fetchers_definitions.go`
@@ -430,7 +430,7 @@ The only test coverage for AWS API interactions is via the broken acceptance fra
 
 ---
 
-### D9: Skipped tests
+### D9: Skipped tests — **DOCUMENTED** (both skips now state their reason; TestDocForEachCommand needs 127 CLI examples written)
 
 **Severity:** Low  
 **Files:**
@@ -516,7 +516,7 @@ Extend EKS, DynamoDB, Secrets Manager, API Gateway v2, SSM, EFS, CloudTrail, and
 
 ---
 
-### I4: Implement proper signal handling for graceful shutdown
+### I4: Implement proper signal handling — **FIXED**
 
 **Severity:** Low  
 **File:** `main.go`, `commands/root.go`
@@ -539,7 +539,7 @@ The generators use raw `text/template` with string concatenation and manual file
 
 ---
 
-### I6: Add Dependabot auto-merge for patch updates
+### I6: Add Dependabot auto-merge for patch updates — **FIXED**
 
 **Severity:** Low  
 **File:** `.github/dependabot.yml`

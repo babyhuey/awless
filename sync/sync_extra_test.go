@@ -49,7 +49,7 @@ func TestNewSyncerCreation(t *testing.T) {
 	os.Setenv("__AWLESS_HOME", tmpDir)
 	defer os.Unsetenv("__AWLESS_HOME")
 
-	s := NewSyncer()
+	s := mustSyncer(t)
 	if s == nil {
 		t.Fatal("expected non-nil syncer")
 	}

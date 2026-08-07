@@ -36,7 +36,7 @@ func TestSyncTripleFiles(t *testing.T) {
 
 	os.Setenv("__AWLESS_HOME", tmpDir)
 
-	if _, err := NewSyncer().Sync(context.Background(), srv1, srv2); err != nil {
+	if _, err := mustSyncer(t).Sync(context.Background(), srv1, srv2); err != nil {
 		t.Fatal(err)
 	}
 
@@ -75,4 +75,14 @@ func (s *mockService) Fetch(context.Context) (cloud.GraphAPI, error) { return s.
 func (s *mockService) IsSyncDisabled() bool                          { return false }
 func (s *mockService) FetchByType(context.Context, string) (cloud.GraphAPI, error) {
 	return nil, nil
+}
+
+// mustSyncer builds a Syncer for tests, failing rather than returning an error.
+func mustSyncer(t *testing.T) Syncer {
+	t.Helper()
+	s, err := NewSyncer()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s
 }
