@@ -16,8 +16,16 @@ limitations under the License.
 
 package main
 
-import "github.com/wallix/awless/commands"
+import (
+	"os"
+
+	"github.com/wallix/awless/commands"
+)
 
 func main() {
-	commands.RootCmd.Execute()
+	// cobra already prints the error to stderr (SilenceErrors is not set on
+	// RootCmd), so only the exit status needs handling here.
+	if err := commands.RootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
