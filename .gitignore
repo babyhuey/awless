@@ -6,3 +6,7 @@ awless
 *.zip
 .idea
 .codegraph/
+
+# Compiled code generators (build with: cd gen/aws/generators && go run *.go)
+/generators
+gen/aws/generators/generators
