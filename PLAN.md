@@ -136,7 +136,7 @@ Add `.codegraph/` to `.gitignore` in both repos, folded into the Phase 1A housek
 
 ---
 
-## Phase 1 — Unblock CI and tooling
+## Phase 1 — Unblock CI and tooling — **DONE**
 
 Highest value per unit effort. Nothing here depends on anything else, so all three tracks run in parallel.
 
@@ -167,7 +167,7 @@ The fork and clone were deleted, so there is nothing to build, test, or lint. Al
 
 ---
 
-## Phase 2 — Security and correctness
+## Phase 2 — Security and correctness — **DONE**
 
 Real defects. Ordered by user impact, and grouped where fixes share code.
 
@@ -206,7 +206,7 @@ Real defects. Ordered by user impact, and grouped where fixes share code.
 
 ---
 
-## Phase 3 — Dependency modernization
+## Phase 3 — Dependency modernization — **DONE** (3C partially: I6 needs a repo setting)
 
 Depends on Phase 1 (CI must be green to trust these changes) and Phase 0.1 (module path decision).
 
@@ -245,7 +245,7 @@ Independent of 3A, parallelizable. Ordered by effort-to-value:
 
 ---
 
-## Phase 4 — Retire the scheduler
+## Phase 4 — Retire the scheduler — **DONE**
 
 Decision recorded in Phase 0.2: **retire**. This phase is a deletion task, not a port. The scheduler's own backlog is gone along with the repo; nothing below depends on it.
 
@@ -339,3 +339,33 @@ Phase 5   modernization ..... %w → linters → any → context → release too
 - **`triplestore`'s `(*triple).key()` format is a wire contract.** Changing it invalidates every binary-encoded graph already cached in users' `~/.awless`. Treat as a breaking change requiring a migration path.
 - **`triplestore` has no upstream backlog.** Upstream `master` is identical to the commit `awless` pins (`compare` reports `ahead_by: 0`), so the fork starts exactly at what is in use. There is nothing to catch up on — only the absence of a maintainer.
 - **Test before and after each phase.** `awless` builds green today; that is the baseline to protect.
+
+---
+
+## Status — 2026-08-06
+
+Phases 1–4 complete. Phase 5 outstanding.
+
+| Phase | State |
+|---|---|
+| 0 Decisions | all resolved |
+| 1 Unblock CI | done — B5, I17, B1, D3, I18; triplestore D1, I1, D6, D7 |
+| 2 Correctness | done — B6, B9, B7, B8/I13 (partial), I12, B11; triplestore B1 |
+| 3 Dependencies | done — triplestore tagged v0.1.0 and adopted, module renamed, D6/D6a, I10, B4 |
+| 4 Retire scheduler | done — v1.1.0, last wallix dependency gone |
+| 5 Modernization | not started |
+
+**Deviations from this plan, all recorded in the relevant commits:**
+
+- `triplestore` was tagged **v0.1.0**, not `v1.0.0`. Its `B2`, `B3` and `D5` are pending
+  breaking API changes, so 1.0.0 would promise stability that does not hold yet.
+- `boltdb` → `bbolt` was pulled forward from Phase 3B into Phase 2, because boltdb
+  crashes under the race detector (`checkptr`) and therefore blocked `I12`.
+- `B8`/`I13` are **partially** done. The issue claimed 5 fan-out sites; `manual_fetchers.go`
+  had never been audited and holds 5 more.
+- Generated files were rewritten in place during the module rename rather than regenerated,
+  because the generators produce non-compiling output. Escalated as `I15`.
+- Phase 4 removed **two** `isSchedulingMode()` call sites; this plan listed one.
+
+**Still needs input:** `I6` (Dependabot auto-merge) requires `allow_auto_merge` on the
+repository, currently `false`. Everything else in Phase 5 is unblocked.
