@@ -16,26 +16,32 @@ Guide for AI agents working in this repository.
 
 ## Build & Test
 
+Use the Makefile rather than raw commands — it pins tool versions to match CI.
+`make help` lists everything.
+
 ```sh
-# Build
-go build -o awless .
+make build         # build the awless binary
+make test          # go test ./...
+make test-race     # go test -race ./...
+make lint          # golangci-lint (pinned v2.12.2, installs on demand)
+make vet           # go vet ./...
+make vuln          # govulncheck ./...
+make fmt           # gofmt -s + goimports -local github.com/bootswithdefer/awless
+make fmt-check     # fail if anything non-generated is unformatted
+make cover         # coverage profile + total
+make generate      # regenerate gen_*.go (see caveat below)
+make tools         # install pinned dev tools
 
-# Run tests
-go test ./...
-
-# Lint (requires golangci-lint)
-golangci-lint run ./...
-
-# Format
-gofmt -w -s .
-goimports -w -local github.com/bootswithdefer/awless .
-
-# Code generation (regenerates gen_*.go files)
-cd gen/aws/generators && go run *.go
-
-# Full check
-make check
+make check         # fast gate:  fmt-check vet lint test
+make verify        # full gate:  fmt-check vet lint test-race vuln  (mirrors CI)
 ```
+
+`make verify` is the gate to run before committing; it is what CI enforces.
+
+**Caveat on `make generate`:** the generators currently emit a `gen_mocks_test.go`
+with an unused import, so their output does not compile, and the committed
+generated files differ from generator output by ~2400 lines. See ISSUES.md I15
+before relying on it.
 
 ## Directory Structure
 
