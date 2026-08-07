@@ -41,6 +41,23 @@ jobs:
           chart: true
           amend: true
 
+  race:
+    name: Race Detector
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # Restored after being dropped in 6830d3d0. Its absence is why the
+      # goroutine leaks and unbounded fan-out in the fetchers (B8/I13) went
+      # unnoticed. Kept as a separate job so a race failure is distinguishable
+      # from an ordinary test failure, and so it does not slow the main job.
+      - name: Test with race detector
+        run: go test -race -count=1 ./...
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
