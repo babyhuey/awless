@@ -163,38 +163,33 @@ Note `git log` shows a prior "sort panic" fix (`71665081`), so this class of cra
 
 ---
 
-### B8: Goroutine leak on first error in fan-out helpers — **PARTIALLY FIXED**
+### B8: Goroutine leak on first error in fan-out helpers — **FIXED**
 
 **Severity:** Medium  
-**Fixed:** `aws/fetch/s3_helpers.go` (forEachBucketParallel, getBucketsPerRegion), `aws/fetch/ecs_helpers.go` (getAllTasks), `aws/conv/convert.go`, `inspect/inspectors/pricer.go`  
-**Remaining:** `aws/fetch/manual_fetchers.go`
+**Files:** `aws/fetch/s3_helpers.go`, `aws/fetch/ecs_helpers.go`, `aws/fetch/manual_fetchers.go`, `aws/conv/convert.go`, `inspect/inspectors/pricer.go`
 
 The pattern spawned one goroutine per item writing to an **unbuffered** error
-channel, while the consumer returned on the first error — leaving every other
-failing goroutine blocked on send forever, so `wg.Wait()` never completed and
-the channel was never closed.
+channel while the consumer returned on the first error, leaving every other
+failing goroutine blocked on send forever, so `wg.Wait()` never completed.
 
-Five sites were migrated to `errgroup` with `SetLimit` (see commit
-`bdee93f8`), which fixes the leak and bounds concurrency together.
+All 10 per-item fan-out sites are now `errgroup` with `SetLimit`, which fixes the
+leak and bounds concurrency together.
 
-**Remaining work — 5 per-item fan-outs in `manual_fetchers.go`:**
+Three sites had defects beyond the leak:
 
-| Line | Fans out over |
-|---|---|
-| 180 | ECS task definition ARNs |
-| 341 | ELBv2 load balancers |
-| 611 | IAM users |
-| 759 | (URL fetches) |
-| 884 | Route53 hosted zones |
+- `ecs_helpers.go getAllTasks` called `tasksWG.Add` from inside a worker while
+  another goroutine could already be in `tasksWG.Wait()`, which is undefined
+  behavior, and sent a result after sending an error.
+- `manual_fetchers.go` IAM users registered `defer wg.Done()` **after** an early
+  return, so a failing `InitResource` left the counter high and `wg.Wait()`
+  deadlocked. It also wrote a shared `hasError` flag from several goroutines
+  without synchronization.
+- `aws/conv/convert.go` continued to send a result after sending an error.
 
-Note the original estimate of "5 sites" undercounted: `manual_fetchers.go` was
-not audited when this issue was written. The other ~15 `go func` occurrences in
-that file are single-producer streaming goroutines feeding `resourcesC`, a
-different and lower-severity pattern — they should be reviewed but are not the
-same leak.
-
-**Fix:** same treatment — `errgroup` with `SetLimit(maxParallelAWSCalls)`, the
-constant already added in `aws/fetch/limits.go`.
+The remaining argument-less `go func()` calls in `manual_fetchers.go` are
+fixed-count producer goroutines (two or three per fetch), not per-item fan-outs,
+so they do not scale with account size. They are a different and much lower-risk
+pattern.
 
 ---
 
@@ -816,23 +811,22 @@ This is the worst combination: a codebase with heavy goroutine fan-out (20+ `go 
 
 ---
 
-### I13: Unbounded concurrency in fan-out fetchers — **PARTIALLY FIXED**
+### I13: Unbounded concurrency in fan-out fetchers — **FIXED**
 
 **Severity:** Medium  
-**Fixed / Remaining:** same split as `B8` above — both were fixed by the same change.
+**Files:** same as `B8`; both were fixed by the same change.
 
-Unbounded fan-out meant an account with thousands of buckets, clusters or IAM
-users issued that many simultaneous AWS API calls, reliably causing throttling
-(`RequestLimitExceeded`, `Throttling`) and unpredictable memory use.
+Unbounded fan-out meant an account with thousands of buckets, clusters, IAM
+users, queues or hosted zones issued that many simultaneous AWS API calls,
+reliably causing throttling (`RequestLimitExceeded`) and unpredictable memory
+use.
 
-Bounded via `errgroup.SetLimit` at the five sites listed in `B8`.
-`aws/fetch/limits.go` defines `maxParallelAWSCalls = 20`;
-`inspect/inspectors/pricer.go` uses a local limit of 10 for the pricing
-endpoint.
+Bounded via `errgroup.SetLimit`. `aws/fetch/limits.go` defines
+`maxParallelAWSCalls = 20`; `inspect/inspectors/pricer.go` uses a local limit of
+10 for the pricing endpoint.
 
-**Remaining:** the 5 `manual_fetchers.go` sites in `B8`. Consider also making
-the limit configurable via `awless config` if 20 proves wrong for very large
-accounts.
+**Possible follow-up:** make the limit configurable through `awless config` if 20
+proves wrong for very large accounts.
 
 ---
 

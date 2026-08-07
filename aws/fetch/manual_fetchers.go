@@ -32,6 +32,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	sqstypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
+	"golang.org/x/sync/errgroup"
 
 	awsconv "github.com/bootswithdefer/awless/aws/conv"
 	"github.com/bootswithdefer/awless/cloud"
@@ -161,8 +162,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			err error
 		}
 
-		var wg sync.WaitGroup
-		resc := make(chan resStruct)
+		var arns []string
 
 		fetchDefinitionsInput := &ecs.ListTaskDefinitionsInput{}
 		if givenFamilyPrefix, hasFilter := getUserFiltersFromContext(ctx)["name"]; hasFilter {
@@ -175,24 +175,36 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			if err != nil {
 				return resources, objects, err
 			}
-			for _, arn := range out.TaskDefinitionArns {
-				wg.Add(1)
-				go func(taskDefArn string) {
-					defer wg.Done()
-					tasksOut, err := conf.APIs.Ecs.DescribeTaskDefinition(ctx, &ecs.DescribeTaskDefinitionInput{TaskDefinition: &taskDefArn})
-					if err != nil {
-						resc <- resStruct{err: err}
-						return
-					}
-					resc <- resStruct{res: tasksOut.TaskDefinition}
-				}(arn)
-			}
+			arns = append(arns, out.TaskDefinitionArns...)
 		}
 
-		go func() {
-			wg.Wait()
-			close(resc)
-		}()
+		// Bounded: one goroutine per task definition ARN with no limit meant an
+		// account with many definitions issued that many simultaneous
+		// DescribeTaskDefinition calls. Results are collected rather than
+		// streamed so the consumer below is unchanged; it already drains every
+		// result and accumulates errors instead of returning on the first.
+		var (
+			mu        sync.Mutex
+			collected []resStruct
+		)
+		descG := new(errgroup.Group)
+		descG.SetLimit(maxParallelAWSCalls)
+
+		for _, arn := range arns {
+			taskDefArn := arn
+			descG.Go(func() error {
+				tasksOut, err := conf.APIs.Ecs.DescribeTaskDefinition(ctx, &ecs.DescribeTaskDefinitionInput{TaskDefinition: &taskDefArn})
+				mu.Lock()
+				defer mu.Unlock()
+				if err != nil {
+					collected = append(collected, resStruct{err: err})
+					return nil
+				}
+				collected = append(collected, resStruct{res: tasksOut.TaskDefinition})
+				return nil
+			})
+		}
+		_ = descG.Wait() // per-item errors are carried in collected, as before
 
 		var tasks []ecstypes.Task
 		if val, e := cache.Get("getAllTasks", func() (any, error) {
@@ -206,7 +218,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		var errs []string
 		var err error
 
-		for res := range resc {
+		for _, res := range collected {
 			if res.err != nil {
 				errs = appendIfNotInSlice(errs, res.err.Error())
 				continue
@@ -326,9 +338,10 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		errc := make(chan error)
-		resultc := make(chan elbv2types.Listener)
-		var wg sync.WaitGroup
+		// Bounded and leak-free: previously one goroutine per load balancer wrote
+		// to unbuffered channels while the consumer returned on the first error,
+		// leaving the rest blocked on send forever.
+		var lbs []elbv2types.LoadBalancer
 
 		lbPaginator := elbv2.NewDescribeLoadBalancersPaginator(conf.APIs.Elbv2, &elbv2.DescribeLoadBalancersInput{})
 		for lbPaginator.HasMorePages() {
@@ -336,48 +349,41 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			if err != nil {
 				return resources, objects, err
 			}
-			for _, lb := range out.LoadBalancers {
-				wg.Add(1)
-				go func(lb elbv2types.LoadBalancer) {
-					defer wg.Done()
-					listenerPaginator := elbv2.NewDescribeListenersPaginator(conf.APIs.Elbv2, &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
-					for listenerPaginator.HasMorePages() {
-						lout, lerr := listenerPaginator.NextPage(ctx)
-						if lerr != nil {
-							errc <- lerr
-							return
-						}
-						for _, listen := range lout.Listeners {
-							resultc <- listen
-						}
+			lbs = append(lbs, out.LoadBalancers...)
+		}
+
+		var mu sync.Mutex
+		g := new(errgroup.Group)
+		g.SetLimit(maxParallelAWSCalls)
+
+		for _, lb := range lbs {
+			lb := lb
+			g.Go(func() error {
+				listenerPaginator := elbv2.NewDescribeListenersPaginator(conf.APIs.Elbv2, &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
+				for listenerPaginator.HasMorePages() {
+					lout, err := listenerPaginator.NextPage(ctx)
+					if err != nil {
+						return err
 					}
-				}(lb)
-			}
+					for _, listen := range lout.Listeners {
+						res, err := awsconv.NewResource(listen)
+						if err != nil {
+							return err
+						}
+						mu.Lock()
+						objects = append(objects, listen)
+						resources = append(resources, res)
+						mu.Unlock()
+					}
+				}
+				return nil
+			})
 		}
 
-		go func() {
-			wg.Wait()
-			close(resultc)
-		}()
-
-		for {
-			select {
-			case err := <-errc:
-				if err != nil {
-					return resources, objects, err
-				}
-			case listener, ok := <-resultc:
-				if !ok {
-					return resources, objects, nil
-				}
-				objects = append(objects, listener)
-				res, err := awsconv.NewResource(listener)
-				if err != nil {
-					return resources, objects, err
-				}
-				resources = append(resources, res)
-			}
+		if err := g.Wait(); err != nil {
+			return resources, objects, err
 		}
+		return resources, objects, nil
 	}
 }
 
@@ -593,81 +599,64 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		var wg sync.WaitGroup
-		resourcesC := make(chan *graph.Resource)
-		objectsC := make(chan iamtypes.AccessKeyMetadata)
-		errC := make(chan error)
-		var hasError bool
+		// Previously this had three defects beyond the unbounded fan-out: the
+		// `defer wg.Done()` was registered *after* an early return, so a failing
+		// InitResource left the counter high and wg.Wait() blocked forever;
+		// `hasError` was written from several goroutines without
+		// synchronization; and the consumer returned on the first error, leaving
+		// the remaining senders blocked on unbuffered channels.
+		var (
+			mu  sync.Mutex
+			g   = new(errgroup.Group)
+			all []iamtypes.User
+		)
+		g.SetLimit(maxParallelAWSCalls)
 
 		usersPaginator := iam.NewListUsersPaginator(conf.APIs.Iam, &iam.ListUsersInput{})
-		for usersPaginator.HasMorePages() && !hasError {
+		for usersPaginator.HasMorePages() {
 			outUsers, err := usersPaginator.NextPage(ctx)
 			if err != nil {
 				return resources, objects, err
 			}
+			all = append(all, outUsers.Users...)
+		}
 
-			for _, user := range outUsers.Users {
-				wg.Add(1)
-				go func(u iamtypes.User) {
-					userRes, err := awsconv.InitResource(u)
+		for _, user := range all {
+			u := user
+			g.Go(func() error {
+				userRes, err := awsconv.InitResource(u)
+				if err != nil {
+					return err
+				}
+
+				akPaginator := iam.NewListAccessKeysPaginator(conf.APIs.Iam, &iam.ListAccessKeysInput{UserName: u.UserName})
+				for akPaginator.HasMorePages() {
+					out, err := akPaginator.NextPage(ctx)
 					if err != nil {
-						hasError = true
-						errC <- err
-						return
+						return err
 					}
-					defer wg.Done()
-
-					akPaginator := iam.NewListAccessKeysPaginator(conf.APIs.Iam, &iam.ListAccessKeysInput{UserName: u.UserName})
-					for akPaginator.HasMorePages() {
-						out, err := akPaginator.NextPage(ctx)
+					for _, output := range out.AccessKeyMetadata {
+						res, err := awsconv.NewResource(output)
 						if err != nil {
-							hasError = true
-							errC <- err
-							return
+							return err
 						}
-						for _, output := range out.AccessKeyMetadata {
-							objectsC <- output
-							res, e := awsconv.NewResource(output)
-							if e != nil {
-								errC <- e
-								hasError = true
-								return
-							}
-							res.AddRelation(rdf.ChildrenOfRel, userRes)
-							resourcesC <- res
-						}
+						res.AddRelation(rdf.ChildrenOfRel, userRes)
+
+						mu.Lock()
+						objects = append(objects, output)
+						resources = append(resources, res)
+						mu.Unlock()
 					}
-				}(user)
-			}
+				}
+				return nil
+			})
 		}
 
-		go func() {
-			wg.Wait()
-			close(errC)
-			close(objectsC)
-			close(resourcesC)
-		}()
-
-		for {
-			select {
-			case e := <-errC:
-				if e != nil {
-					return resources, objects, e
-				}
-			case r, ok := <-resourcesC:
-				if !ok {
-					return resources, objects, nil
-				}
-				if r != nil {
-					resources = append(resources, r)
-				}
-			case o, ok := <-objectsC:
-				if !ok {
-					return resources, objects, nil
-				}
-				objects = append(objects, o)
-			}
+		// Partial results are still returned alongside an error, as before.
+		if err := g.Wait(); err != nil {
+			return resources, objects, err
 		}
+		return resources, objects, nil
 	}
 }
 func addManualStorageFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
@@ -749,40 +738,43 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return nil, objects, err
 		}
 
-		errC := make(chan error)
-		objectsC := make(chan string)
-		resourcesC := make(chan *graph.Resource)
-		var wg sync.WaitGroup
+		// Bounded and leak-free: previously one goroutine per queue wrote to
+		// unbuffered channels while the consumer returned on the first error,
+		// leaving the rest blocked on send forever.
+		var mu sync.Mutex
+		g := new(errgroup.Group)
+		g.SetLimit(maxParallelAWSCalls)
 
 		for _, output := range out.QueueUrls {
-			wg.Add(1)
-			go func(url string) {
-				defer wg.Done()
-				objectsC <- url
+			url := output
+			g.Go(func() error {
+				mu.Lock()
+				objects = append(objects, url)
+				mu.Unlock()
 				res := graph.InitResource(cloud.Queue, url)
 				res.Properties()[properties.ID] = url
 				attrs, err := conf.APIs.Sqs.GetQueueAttributes(ctx, &sqs.GetQueueAttributesInput{AttributeNames: []sqstypes.QueueAttributeName{sqstypes.QueueAttributeNameAll}, QueueUrl: &url})
 				if err != nil {
 					var apiErr smithy.APIError
 					if errors.As(err, &apiErr) && (apiErr.ErrorCode() == "AWS.SimpleQueueService.NonExistentQueue" || apiErr.ErrorCode() == "AWS.SimpleQueueService.QueueDeletedRecently") {
-						return
+						// Queue vanished between List and Get; not an error.
+						return nil
 					}
-					errC <- err
-					return
+					return err
 				}
 				for k, v := range attrs.Attributes {
 					switch k {
 					case "ApproximateNumberOfMessages":
 						count, err := strconv.Atoi(v)
 						if err != nil {
-							errC <- err
+							return err
 						}
 						res.Properties()[properties.ApproximateMessageCount] = count
 					case "CreatedTimestamp":
 						if v != "" {
 							timestamp, err := strconv.ParseInt(v, 10, 64)
 							if err != nil {
-								errC <- err
+								return err
 							}
 							res.Properties()[properties.Created] = time.Unix(timestamp, 0)
 						}
@@ -790,7 +782,7 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 						if v != "" {
 							timestamp, err := strconv.ParseInt(v, 10, 64)
 							if err != nil {
-								errC <- err
+								return err
 							}
 							res.Properties()[properties.Modified] = time.Unix(timestamp, 0)
 						}
@@ -799,43 +791,23 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 					case "DelaySeconds":
 						delay, err := strconv.Atoi(v)
 						if err != nil {
-							errC <- err
+							return err
 						}
 						res.Properties()[properties.Delay] = delay
 					}
 
 				}
-				resourcesC <- res
-			}(output)
-
+				mu.Lock()
+				resources = append(resources, res)
+				mu.Unlock()
+				return nil
+			})
 		}
 
-		go func() {
-			wg.Wait()
-			close(errC)
-			close(objectsC)
-			close(resourcesC)
-		}()
-
-		for {
-			select {
-			case err := <-errC:
-				if err != nil {
-					return resources, objects, err
-				}
-			case o, ok := <-objectsC:
-				if !ok {
-					return resources, objects, nil
-				}
-				objects = append(objects, o)
-			case r, ok := <-resourcesC:
-				if !ok {
-					return resources, objects, nil
-				}
-				resources = append(resources, r)
-
-			}
+		if err := g.Wait(); err != nil {
+			return resources, objects, err
 		}
+		return resources, objects, nil
 	}
 }
 func addManualDnsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
@@ -850,98 +822,72 @@ func addManualDnsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 
 		zoneName, hasZoneFilter := getUserFiltersFromContext(ctx)["zone"]
 
-		errC := make(chan error)
-		zoneC := make(chan route53types.HostedZone)
-		objectsC := make(chan route53types.ResourceRecordSet)
-		resourcesC := make(chan *graph.Resource)
+		// Two bounded phases replacing a three-stage channel pipeline. The old
+		// version leaked: one goroutine per hosted zone wrote to unbuffered
+		// channels while the consumer returned on the first error, leaving the
+		// rest blocked on send forever.
+		var zones []route53types.HostedZone
 
-		go func() {
-			paginator := route53.NewListHostedZonesPaginator(conf.APIs.Route53, &route53.ListHostedZonesInput{})
-			for paginator.HasMorePages() {
-				out, err := paginator.NextPage(ctx)
-				if err != nil {
-					errC <- err
-					break
-				}
-				for _, output := range out.HostedZones {
-					if hasZoneFilter {
-						if strings.Contains(strings.ToLower(awssdk.ToString(output.Name)), strings.ToLower(zoneName)) {
-							zoneC <- output
-						}
-					} else {
-						zoneC <- output
-					}
-				}
+		paginator := route53.NewListHostedZonesPaginator(conf.APIs.Route53, &route53.ListHostedZonesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
 			}
-			close(zoneC)
-		}()
-
-		go func() {
-			var wg sync.WaitGroup
-
-			for zone := range zoneC {
-				wg.Add(1)
-				go func(z route53types.HostedZone) {
-					defer wg.Done()
-					input := &route53.ListResourceRecordSetsInput{HostedZoneId: z.Id}
-					for {
-						out, err := conf.APIs.Route53.ListResourceRecordSets(ctx, input)
-						if err != nil {
-							errC <- err
-							return
-						}
-						for _, output := range out.ResourceRecordSets {
-							objectsC <- output
-							res, err := awsconv.NewResource(output)
-							if err != nil {
-								errC <- err
-								return
-							}
-							res.Properties()[properties.Zone] = awssdk.ToString(z.Name)
-
-							parent, err := awsconv.InitResource(z)
-							if err != nil {
-								errC <- err
-								return
-							}
-							res.AddRelation(rdf.ChildrenOfRel, parent)
-							resourcesC <- res
-						}
-						if !out.IsTruncated {
-							break
-						}
-						input.StartRecordName = out.NextRecordName
-						input.StartRecordType = out.NextRecordType
-						input.StartRecordIdentifier = out.NextRecordIdentifier
-					}
-				}(zone)
-			}
-
-			go func() {
-				wg.Wait()
-				close(objectsC)
-				close(resourcesC)
-			}()
-		}()
-
-		for {
-			select {
-			case err := <-errC:
-				if err != nil {
-					return resources, objects, err
+			for _, output := range out.HostedZones {
+				if hasZoneFilter && !strings.Contains(strings.ToLower(awssdk.ToString(output.Name)), strings.ToLower(zoneName)) {
+					continue
 				}
-			case o, ok := <-objectsC:
-				if !ok {
-					return resources, objects, nil
-				}
-				objects = append(objects, o)
-			case r, ok := <-resourcesC:
-				if !ok {
-					return resources, objects, nil
-				}
-				resources = append(resources, r)
+				zones = append(zones, output)
 			}
 		}
+
+		var mu sync.Mutex
+		g := new(errgroup.Group)
+		g.SetLimit(maxParallelAWSCalls)
+
+		for _, zone := range zones {
+			z := zone
+			g.Go(func() error {
+				parent, err := awsconv.InitResource(z)
+				if err != nil {
+					return err
+				}
+
+				input := &route53.ListResourceRecordSetsInput{HostedZoneId: z.Id}
+				for {
+					out, err := conf.APIs.Route53.ListResourceRecordSets(ctx, input)
+					if err != nil {
+						return err
+					}
+					for _, output := range out.ResourceRecordSets {
+						res, err := awsconv.NewResource(output)
+						if err != nil {
+							return err
+						}
+						res.Properties()[properties.Zone] = awssdk.ToString(z.Name)
+						res.AddRelation(rdf.ChildrenOfRel, parent)
+
+						mu.Lock()
+						objects = append(objects, output)
+						resources = append(resources, res)
+						mu.Unlock()
+					}
+					if !out.IsTruncated {
+						break
+					}
+					input.StartRecordName = out.NextRecordName
+					input.StartRecordType = out.NextRecordType
+					input.StartRecordIdentifier = out.NextRecordIdentifier
+				}
+				return nil
+			})
+		}
+
+		if err := g.Wait(); err != nil {
+			return resources, objects, err
+		}
+		return resources, objects, nil
 	}
 }
 func addManualLambdaFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
