@@ -35,7 +35,7 @@ func generateTestMocks() {
 	}
 
 	templ, err := template.New("mocks").Funcs(template.FuncMap{
-		"Title":            strings.Title,
+		"Title":            capitalize,
 		"ToUpper":          strings.ToUpper,
 		"Join":             strings.Join,
 		"SdkModulePath":    aws.SdkModulePath,

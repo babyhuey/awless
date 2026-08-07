@@ -39,7 +39,7 @@ func generateAcceptanceMocks() {
 	templ, err := template.New("mocks").Funcs(
 		template.FuncMap{
 			"Join":  strings.Join,
-			"Title": strings.Title,
+			"Title": capitalize,
 		},
 	).Parse(atMocksTemplate)
 	if err != nil {
@@ -65,7 +65,7 @@ func generateAcceptanceFactory() {
 
 	templ, err := template.New("acceptanceFactory").Funcs(
 		template.FuncMap{
-			"Title": strings.Title,
+			"Title": capitalize,
 		},
 	).Parse(atMocksCmdBuilders)
 	if err != nil {

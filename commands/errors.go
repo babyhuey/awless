@@ -19,6 +19,7 @@ package commands
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -28,4 +29,17 @@ func exitOn(err error) {
 		fmt.Fprintln(os.Stderr, color.RedString("[error]  "), err)
 		os.Exit(1)
 	}
+}
+
+// capitalize upper-cases the first character of s.
+//
+// Replaces strings.Title, deprecated in Go 1.18 because it applies Unicode word
+// boundaries and title-cases every word. Every input here is a single ASCII
+// token — an AWS API name, resource type, template action, or policy effect —
+// so this is both correct and narrower than the deprecated behavior.
+func capitalize(s string) string {
+	if s == "" {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }

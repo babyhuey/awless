@@ -344,7 +344,7 @@ type policyCondition struct {
 }
 
 func buildStatementFromParams(effect *string, resource, action, condition []*string) (*policyStatement, error) {
-	stat := &policyStatement{Effect: strings.Title(StringValue(effect))}
+	stat := &policyStatement{Effect: capitalize(StringValue(effect))}
 	if resource != nil {
 		res := castStringSlice(resource)
 		if len(res) == 1 && res[0] == "all" {

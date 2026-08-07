@@ -79,7 +79,7 @@ func (b *Builder) buildQuery() (cloud.Query, error) {
 	for _, f := range b.filters {
 		splits := strings.SplitN(f, "=", 2)
 		if len(splits) == 2 {
-			name, val := strings.TrimSpace(strings.Title(splits[0])), strings.TrimSpace(splits[1])
+			name, val := strings.TrimSpace(capitalize(splits[0])), strings.TrimSpace(splits[1])
 			key := ColumnDefinitions(b.columnDefinitions).resolveKey(name)
 
 			if key != "" {
@@ -249,7 +249,7 @@ func WithColumns(properties []string) optsFn {
 				}
 			}
 			if !found {
-				columns = append(columns, StringColumnDefinition{Prop: strings.Title(p)})
+				columns = append(columns, StringColumnDefinition{Prop: capitalize(p)})
 			}
 		}
 		b.columnDefinitions = columns

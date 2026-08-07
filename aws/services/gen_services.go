@@ -80,12 +80,13 @@ import (
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 	sts "github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/smithy-go"
+	tstore "github.com/bootswithdefer/triplestore"
+
 	awsfetch "github.com/bootswithdefer/awless/aws/fetch"
 	"github.com/bootswithdefer/awless/cloud"
 	"github.com/bootswithdefer/awless/fetch"
 	"github.com/bootswithdefer/awless/graph"
 	"github.com/bootswithdefer/awless/logger"
-	tstore "github.com/bootswithdefer/triplestore"
 )
 
 const accessDenied = "Access Denied"

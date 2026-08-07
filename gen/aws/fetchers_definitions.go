@@ -43,7 +43,7 @@ func ApiToInterface(api string) string {
 	case "cloudwatchlogs":
 		return "CloudWatchLogsAPI"
 	case "route53", "lambda":
-		return strings.Title(api) + "API"
+		return capitalize(api) + "API"
 	default:
 		return strings.ToUpper(api) + "API"
 	}
@@ -262,4 +262,17 @@ var FetchersDefs = []fetchersDef{
 			{Api: "cloudwatchlogs", ResourceType: cloud.LogGroup, AWSType: "cloudwatchlogstypes.LogGroup", ApiMethod: "DescribeLogGroups", Input: "cloudwatchlogs.DescribeLogGroupsInput{}", Output: "cloudwatchlogs.DescribeLogGroupsOutput", OutputsExtractor: "LogGroups", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
+}
+
+// capitalize upper-cases the first character of s.
+//
+// Replaces strings.Title, deprecated in Go 1.18 because it applies Unicode word
+// boundaries and title-cases every word. Every input here is a single ASCII
+// token — an AWS API name, resource type, template action, or policy effect —
+// so this is both correct and narrower than the deprecated behavior.
+func capitalize(s string) string {
+	if s == "" {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }

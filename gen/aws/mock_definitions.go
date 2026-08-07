@@ -178,7 +178,7 @@ var mocksDefs = []*mockDef{
 
 func Mocks() []*mockDef {
 	for _, def := range mocksDefs {
-		def.Name = "mock" + strings.Title(def.Api)
+		def.Name = "mock" + capitalize(def.Api)
 		for _, f := range def.Funcs {
 			if f.MockField == "" {
 				f.MockField = nameFromAwsType(f.AWSType)

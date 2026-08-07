@@ -19,6 +19,7 @@ package awsat
 
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"
+
 	awsspec "github.com/bootswithdefer/awless/aws/spec"
 	"github.com/bootswithdefer/awless/cloud"
 	"github.com/bootswithdefer/awless/logger"

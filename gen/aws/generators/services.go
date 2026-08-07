@@ -35,7 +35,7 @@ func generateServicesFuncs() {
 	}
 
 	templ, err := template.New("funcs").Funcs(template.FuncMap{
-		"Title":            strings.Title,
+		"Title":            capitalize,
 		"ToUpper":          strings.ToUpper,
 		"Join":             strings.Join,
 		"SdkModulePath":    aws.SdkModulePath,

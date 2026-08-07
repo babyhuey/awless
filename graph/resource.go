@@ -371,7 +371,7 @@ func (r *Resource) unmarshalMeta(gph tstore.RDFGraph) error {
 }
 
 func namespacedResourceType(typ string) string {
-	return fmt.Sprintf("%s:%s", rdf.CloudOwlNS, strings.Title(typ))
+	return fmt.Sprintf("%s:%s", rdf.CloudOwlNS, capitalize(typ))
 }
 
 type Resources []*Resource
@@ -435,4 +435,17 @@ func trimNS(s string) string {
 		return s
 	}
 	return spl[len(spl)-1]
+}
+
+// capitalize upper-cases the first character of s.
+//
+// Replaces strings.Title, deprecated in Go 1.18 because it applies Unicode word
+// boundaries and title-cases every word. Every input here is a single ASCII
+// token — an AWS API name, resource type, template action, or policy effect —
+// so this is both correct and narrower than the deprecated behavior.
+func capitalize(s string) string {
+	if s == "" {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }

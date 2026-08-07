@@ -18,6 +18,7 @@ package console
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -86,4 +87,17 @@ func divideValue(from, by uint64) string {
 		return fmt.Sprintf("~%d", res)
 	}
 	return fmt.Sprint(res)
+}
+
+// capitalize upper-cases the first character of s.
+//
+// Replaces strings.Title, deprecated in Go 1.18 because it applies Unicode word
+// boundaries and title-cases every word. Every input here is a single ASCII
+// token — an AWS API name, resource type, template action, or policy effect —
+// so this is both correct and narrower than the deprecated behavior.
+func capitalize(s string) string {
+	if s == "" {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }
