@@ -72,7 +72,7 @@ func writeTemplateToFile(templ *template.Template, data interface{}, dir, filena
 		log.Fatal(err)
 	}
 	path := filepath.Join(dir, filename)
-	if err := os.WriteFile(path, buff.Bytes(), 0666); err != nil {
+	if err := os.WriteFile(path, buff.Bytes(), 0644); err != nil {
 		log.Fatal(err)
 	}
 
