@@ -527,15 +527,28 @@ No `SIGINT`/`SIGTERM` handling. If a long-running AWS operation (e.g., `create i
 
 ---
 
-### I5: Modernize the code generation pipeline
+### I5: Modernize the code generation pipeline — **FIXED**
 
 **Severity:** Low  
-**Files:** `gen/aws/generators/*.go`
+**Files:** `gen/aws/generators/main.go`, `.github/workflows/ci.yml`
 
-The generators use raw `text/template` with string concatenation and manual file writing. Modern Go would use `go generate` directives more idiomatically, and the templates could benefit from:
-- Better error messages on template failures
-- Validation that generated output compiles before overwriting
-- A `--check` mode that verifies generated files are up-to-date (useful in CI)
+All three asks are done, across this change and `I15`:
+
+- **Better error messages.** Template failures and write failures now name the
+  target file. A bare `log.Fatal(err)` gave no indication which of the ten
+  generated files failed.
+- **Validation that output compiles before overwriting.** `writeTemplateToFile`
+  parses the rendered bytes and aborts on a syntax error, so a bad template no
+  longer destroys the previous good file. Verified by deliberately breaking a
+  template: generation fails and the existing file is left intact. Syntax only —
+  type errors still surface at build time.
+- **A `--check` mode for CI.** Implemented as the `codegen` job rather than a
+  generator flag: it regenerates and fails on any diff. That required `I15` first,
+  since output had to compile, be formatted and be deterministic before a drift
+  check could mean anything.
+
+Also from `I15`: the generators run `goimports` on their own output, and map
+iteration is sorted so runs are byte-identical.
 
 ---
 

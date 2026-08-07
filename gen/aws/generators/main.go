@@ -27,6 +27,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"go/parser"
+	"go/token"
 	"log"
 	"os"
 	"os/exec"
@@ -74,13 +76,24 @@ func main() {
 }
 
 func writeTemplateToFile(templ *template.Template, data any, dir, filename string) {
+	path := filepath.Join(dir, filename)
+
 	var buff bytes.Buffer
 	if err := templ.Execute(&buff, data); err != nil {
-		log.Fatal(err)
+		// Name the target file: a bare template error gives no clue which of the
+		// ten generated files failed.
+		log.Fatalf("executing template for %s: %s", relativePathToRoot(path), err)
 	}
-	path := filepath.Join(dir, filename)
+
+	// Parse before overwriting. A template change that produces invalid Go used to
+	// land on disk and only fail at the next build, by which point the previous
+	// good copy was gone.
+	if err := validateGoSyntax(path, buff.Bytes()); err != nil {
+		log.Fatalf("generated output for %s is not valid Go: %s", relativePathToRoot(path), err)
+	}
+
 	if err := os.WriteFile(path, buff.Bytes(), 0644); err != nil {
-		log.Fatal(err)
+		log.Fatalf("writing %s: %s", relativePathToRoot(path), err)
 	}
 
 	// Templates emit an import for every AWS API in the definitions, whether or
@@ -96,6 +109,14 @@ func writeTemplateToFile(templ *template.Template, data any, dir, filename strin
 	}
 
 	log.Printf("generated %s", relativePathToRoot(path))
+}
+
+// validateGoSyntax parses src, so a template producing invalid Go fails before
+// the previous good file is overwritten. It checks syntax only; type errors still
+// surface at build time.
+func validateGoSyntax(path string, src []byte) error {
+	_, err := parser.ParseFile(token.NewFileSet(), path, src, parser.SkipObjectResolution)
+	return err
 }
 
 // runGoimports formats a generated file and prunes its unused imports.
