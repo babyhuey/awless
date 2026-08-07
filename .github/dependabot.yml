@@ -4,7 +4,28 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      # 30+ AWS SDK v2 service modules release constantly and almost always move
+      # together. Without grouping they generate more PRs than everything else
+      # combined.
+      - name: aws-sdk-go-v2
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2*"
+          - "github.com/aws/smithy-go"
+      - name: golang-x
+        patterns:
+          - "golang.org/x/*"
+      - name: minor-and-patch
+        update-types:
+          - "minor"
+          - "patch"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      - name: github-actions
+        patterns:
+          - "*"
