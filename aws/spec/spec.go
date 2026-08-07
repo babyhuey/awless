@@ -66,6 +66,11 @@ func implementsInputPostProcessor(i any) (InputPostProcessor, bool) {
 	return v, ok
 }
 
+// fakeDryRunId builds a plausible-looking AWS id for dry-run output.
+//
+// math/rand is deliberate: this value is only ever displayed, never used as a
+// credential, token or key, so it does not need crypto/rand. Go auto-seeds the
+// global source as of 1.20, so no explicit seeding is required either.
 func fakeDryRunId(entity string) string {
 	suffix := rand.Intn(1e6)
 	switch entity {

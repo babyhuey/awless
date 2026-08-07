@@ -136,7 +136,7 @@ func TestJSONDisplays(t *testing.T) {
 	})
 
 	t.Run("Multi resource", func(t *testing.T) {
-		t.Skip("Comparison fail: until we can order what is inside each resource")
+		t.Skip("resource property ordering is not deterministic; see ISSUES.md D9")
 
 		displayer, _ := BuildOptions(
 			WithFormat("json"),

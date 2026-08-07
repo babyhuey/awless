@@ -723,8 +723,8 @@ func TestNotifyIfUpgradeGoGet(t *testing.T) {
 	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(buff.String(), "go get -u") {
-		t.Fatalf("expected go get message, got %s", buff.String())
+	if !strings.Contains(buff.String(), "go install") {
+		t.Fatalf("expected go install message, got %s", buff.String())
 	}
 }
 

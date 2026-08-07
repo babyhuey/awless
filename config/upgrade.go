@@ -81,9 +81,14 @@ func notifyIfUpgrade(url string, messaging io.Writer) error {
 				if runtime.GOOS == "windows" {
 					ext = "zip"
 				}
-				install = fmt.Sprintf("Run `wget -O awless-%s.%s https://github.com/bootswithdefer/awless/releases/download/%s/awless-%s-%s.%s`", latest.Version, ext, latest.Version, runtime.GOOS, runtime.GOARCH, ext)
+				// Matches GoReleaser's archive name template:
+				// {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+				// The tag keeps its leading v; the version inside the file name
+				// does not.
+				install = fmt.Sprintf("Run `wget https://github.com/bootswithdefer/awless/releases/download/%s/awless_%s_%s_%s.%s`",
+					latest.Version, strings.TrimPrefix(latest.Version, "v"), runtime.GOOS, runtime.GOARCH, ext)
 			default:
-				install = "Run `go get -u github.com/bootswithdefer/awless`"
+				install = "Run `go install github.com/bootswithdefer/awless@latest`"
 			}
 			fmt.Fprintf(messaging, "New version %s available. Checkout the latest features at https://github.com/bootswithdefer/awless/blob/master/CHANGELOG.md\n%s\n", latest.Version, install)
 		}

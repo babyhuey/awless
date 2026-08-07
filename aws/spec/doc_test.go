@@ -8,7 +8,12 @@ import (
 )
 
 func TestDocForEachCommand(t *testing.T) {
-	t.Skip()
+	// Skipped: 127 of the generated commands have no CLI example in
+	// aws/doc/clidoc.go. That is missing documentation rather than a defect, and
+	// writing the examples is content work tracked as ISSUES.md D9. Unskip once
+	// they exist; the assertion itself is correct.
+	t.Skip("127 commands still lack CLI examples; see ISSUES.md D9")
+
 	for name, def := range AWSTemplatesDefinitions {
 		if doc := awsdoc.AwlessExamplesDoc(def.Action, def.Entity); len(doc) == 0 {
 			t.Errorf("missing awless CLI examples for template '%s'", name)

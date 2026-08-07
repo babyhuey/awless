@@ -37,7 +37,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.8
 	github.com/aws/smithy-go v1.24.2
 	github.com/boombuler/barcode v1.1.0
-	github.com/bootswithdefer/triplestore v0.1.0
+	github.com/bootswithdefer/triplestore v1.0.0
 	github.com/chzyer/readline v1.5.1
 	github.com/fatih/color v1.18.0
 	github.com/go-git/go-git/v5 v5.19.2
