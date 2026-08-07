@@ -19,7 +19,7 @@ package main
 import (
 	"os"
 
-	"github.com/wallix/awless/commands"
+	"github.com/bootswithdefer/awless/commands"
 )
 
 func main() {

@@ -25,8 +25,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/oklog/ulid/v2"
 
-	"github.com/wallix/awless/template/env"
-	"github.com/wallix/awless/template/internal/ast"
+	"github.com/bootswithdefer/awless/template/env"
+	"github.com/bootswithdefer/awless/template/internal/ast"
 )
 
 type Template struct {

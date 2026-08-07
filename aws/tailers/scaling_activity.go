@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
 
-	awsservices "github.com/wallix/awless/aws/services"
+	awsservices "github.com/bootswithdefer/awless/aws/services"
 )
 
 type scalingActivitiesTailer struct {

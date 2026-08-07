@@ -24,11 +24,11 @@ import (
 	"strings"
 	"unicode"
 
-	tstore "github.com/wallix/triplestore"
+	tstore "github.com/bootswithdefer/triplestore"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/cloud/properties"
-	"github.com/wallix/awless/cloud/rdf"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/properties"
+	"github.com/bootswithdefer/awless/cloud/rdf"
 )
 
 type Resource struct {

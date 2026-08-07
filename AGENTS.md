@@ -4,14 +4,14 @@ Guide for AI agents working in this repository.
 
 ## Project Overview
 
-`awless` is a CLI tool for managing AWS resources. It provides a template DSL for infrastructure creation/revert, local graph-based resource sync, smart SSH, and human-friendly output. This is a modernized fork of [wallix/awless](https://github.com/wallix/awless) maintained at [babyhuey/awless](https://github.com/babyhuey/awless).
+`awless` is a CLI tool for managing AWS resources. It provides a template DSL for infrastructure creation/revert, local graph-based resource sync, smart SSH, and human-friendly output. This is a modernized fork of [wallix/awless](https://github.com/wallix/awless) maintained at [bootswithdefer/awless](https://github.com/bootswithdefer/awless).
 
 - **Language:** Go 1.26
-- **Module path:** `github.com/wallix/awless`
+- **Module path:** `github.com/bootswithdefer/awless`
 - **AWS SDK:** v2 (`github.com/aws/aws-sdk-go-v2`)
 - **CLI framework:** `github.com/spf13/cobra`
-- **Graph storage:** `github.com/wallix/triplestore` (RDF triples)
-- **Local DB:** BoltDB (`github.com/boltdb/bolt`)
+- **Graph storage:** `github.com/bootswithdefer/triplestore` (RDF triples)
+- **Local DB:** bbolt (`go.etcd.io/bbolt`)
 - **Version:** v1.0.0 (set in `config/version.go`)
 
 ## Build & Test
@@ -28,7 +28,7 @@ golangci-lint run ./...
 
 # Format
 gofmt -w -s .
-goimports -w -local github.com/wallix/awless .
+goimports -w -local github.com/bootswithdefer/awless .
 
 # Code generation (regenerates gen_*.go files)
 cd gen/aws/generators && go run *.go
@@ -133,7 +133,7 @@ attach securitygroup id={instance.SecurityGroups} instance=$instance_id
 
 ## Conventions
 
-- **Imports:** Group stdlib, then third-party, then `github.com/wallix/awless` (enforced by goimports with `-local`)
+- **Imports:** Group stdlib, then third-party, then `github.com/bootswithdefer/awless` (enforced by goimports with `-local`)
 - **Error handling:** Wrap with context; use `fmt.Errorf` or `decorateAWSError()` for AWS errors
 - **Pointer helpers:** Use `String()`, `StringValue()`, `Int64()`, `Bool()` from `aws/spec/spec.go`
 - **Resource types:** Constants defined in `cloud/cloud.go` (e.g., `cloud.Instance`, `cloud.Vpc`)

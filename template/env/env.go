@@ -1,7 +1,7 @@
 package env
 
 import (
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 const (

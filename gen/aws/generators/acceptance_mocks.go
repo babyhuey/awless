@@ -96,9 +96,9 @@ package awsat
 
 import (
   "github.com/aws/aws-sdk-go-v2/aws"
-  "github.com/wallix/awless/cloud"
-  awsspec "github.com/wallix/awless/aws/spec"
-  "github.com/wallix/awless/logger"
+  "github.com/bootswithdefer/awless/cloud"
+  awsspec "github.com/bootswithdefer/awless/aws/spec"
+  "github.com/bootswithdefer/awless/logger"
 )
 
 type AcceptanceFactory struct {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"math/rand"
 
-	tstore "github.com/wallix/triplestore"
+	tstore "github.com/bootswithdefer/triplestore"
 
-	"github.com/wallix/awless/cloud/rdf"
+	"github.com/bootswithdefer/awless/cloud/rdf"
 )
 
 func getPropertyValue(gph tstore.RDFGraph, propObj tstore.Object, prop string) (interface{}, error) {

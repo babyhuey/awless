@@ -14,7 +14,7 @@ import (
 	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	"github.com/fatih/color"
 
-	awsservices "github.com/wallix/awless/aws/services"
+	awsservices "github.com/bootswithdefer/awless/aws/services"
 )
 
 const (

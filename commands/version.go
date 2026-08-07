@@ -23,7 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wallix/awless/config"
+	"github.com/bootswithdefer/awless/config"
 )
 
 func init() {

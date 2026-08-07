@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/wallix/awless/template"
+	"github.com/bootswithdefer/awless/template"
 )
 
 func newTestTemplateExecution(id string, cmdLine string) *template.TemplateExecution {

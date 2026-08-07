@@ -60,9 +60,9 @@ import (
   cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
   cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
   cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
-  "github.com/wallix/awless/fetch"
-  "github.com/wallix/awless/graph"
-  awsconv "github.com/wallix/awless/aws/conv"
+  "github.com/bootswithdefer/awless/fetch"
+  "github.com/bootswithdefer/awless/graph"
+  awsconv "github.com/bootswithdefer/awless/aws/conv"
 )
 func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)

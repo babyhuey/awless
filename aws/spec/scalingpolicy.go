@@ -19,9 +19,9 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/template/params"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/template/params"
 )
 
 type CreateScalingpolicy struct {

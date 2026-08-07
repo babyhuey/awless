@@ -27,7 +27,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 // stsCacheDuration is the duration for which STS credentials are cached.

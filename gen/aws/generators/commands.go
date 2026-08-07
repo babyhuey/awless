@@ -27,7 +27,7 @@ import (
 
 	"sort"
 
-	"github.com/wallix/awless/gen/aws"
+	"github.com/bootswithdefer/awless/gen/aws"
 )
 
 func loadCommandStructs() map[string]cmdData {
@@ -252,9 +252,9 @@ import (
 	{{ $api }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}"
 	{{- end }}
 	"github.com/aws/smithy-go"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/template/env"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/template/env"
 )
 
 {{ range $cmdName, $tag := . }}
@@ -404,8 +404,8 @@ package awsspec
 
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 type Factory interface {

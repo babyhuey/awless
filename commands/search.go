@@ -24,9 +24,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	awsspec "github.com/wallix/awless/aws/spec"
-	"github.com/wallix/awless/config"
-	"github.com/wallix/awless/logger"
+	awsspec "github.com/bootswithdefer/awless/aws/spec"
+	"github.com/bootswithdefer/awless/config"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 var (

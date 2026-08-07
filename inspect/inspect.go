@@ -19,8 +19,8 @@ package inspect
 import (
 	"io"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/inspect/inspectors"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/inspect/inspectors"
 )
 
 var InspectorsRegister map[string]Inspector

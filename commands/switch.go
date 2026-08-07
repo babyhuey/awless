@@ -22,8 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	awsconfig "github.com/wallix/awless/aws/config"
-	"github.com/wallix/awless/config"
+	awsconfig "github.com/bootswithdefer/awless/aws/config"
+	"github.com/bootswithdefer/awless/config"
 )
 
 func init() {

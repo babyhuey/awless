@@ -22,8 +22,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wallix/awless/template/env"
-	"github.com/wallix/awless/template/params"
+	"github.com/bootswithdefer/awless/template/env"
+	"github.com/bootswithdefer/awless/template/params"
 )
 
 func TestCloneAST(t *testing.T) {

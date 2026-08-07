@@ -28,7 +28,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/wallix/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud"
 )
 
 var pricesURL = "http://ec2-price.com"

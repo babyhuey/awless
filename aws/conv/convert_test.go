@@ -37,7 +37,7 @@ import (
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
 
-	"github.com/wallix/awless/graph"
+	"github.com/bootswithdefer/awless/graph"
 )
 
 func TestTransformFunctions(t *testing.T) {

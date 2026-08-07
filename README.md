@@ -30,7 +30,7 @@ For more read our [FAQ](#faq) below (how `awless` compares to other tools, etc.)
 Requires Go 1.21+:
 
 ```sh
-go install github.com/wallix/awless@latest
+go install github.com/bootswithdefer/awless@latest
 ```
 
 Or clone and build:

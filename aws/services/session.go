@@ -27,8 +27,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 
-	awsconfig "github.com/wallix/awless/aws/config"
-	"github.com/wallix/awless/logger"
+	awsconfig "github.com/bootswithdefer/awless/aws/config"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 func ResolveRegionFromEnv() (region string) {

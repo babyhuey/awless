@@ -29,8 +29,8 @@ import (
 	"github.com/aws/smithy-go"
 	"github.com/spf13/cobra"
 
-	awsservices "github.com/wallix/awless/aws/services"
-	"github.com/wallix/awless/logger"
+	awsservices "github.com/bootswithdefer/awless/aws/services"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 var onlyMyIPFlag, onlyMyNameFlag, onlyMyTypeFlag, onlyMyIDFlag, onlyMyAccountFlag, onlyMyResourcePathFlag bool
@@ -70,7 +70,7 @@ var whoamiCmd = &cobra.Command{
 		if me.IsRoot() {
 			logger.Warning("You are currently root")
 			logger.Warning("Best practices suggest to create a new user and affecting it roles of access")
-			logger.Warning("awless official templates might help https://github.com/wallix/awless-templates\n")
+			logger.Warning("awless official templates might help https://github.com/bootswithdefer/awless-templates\n")
 		}
 
 		switch {

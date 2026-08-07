@@ -45,9 +45,9 @@ import (
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
 	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/smithy-go"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/template/env"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/template/env"
 )
 
 func NewAttachAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachAlarm {

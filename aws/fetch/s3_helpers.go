@@ -11,10 +11,10 @@ import (
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"golang.org/x/sync/errgroup"
 
-	awsconv "github.com/wallix/awless/aws/conv"
-	"github.com/wallix/awless/cloud/rdf"
-	"github.com/wallix/awless/fetch"
-	"github.com/wallix/awless/graph"
+	awsconv "github.com/bootswithdefer/awless/aws/conv"
+	"github.com/bootswithdefer/awless/cloud/rdf"
+	"github.com/bootswithdefer/awless/fetch"
+	"github.com/bootswithdefer/awless/graph"
 )
 
 func forEachBucketParallel(ctx context.Context, cache fetch.Cache, api *s3.Client, f func(b s3types.Bucket) error) error {

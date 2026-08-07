@@ -20,7 +20,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/wallix/awless/gen/aws"
+	"github.com/bootswithdefer/awless/gen/aws"
 )
 
 func generateFetcherFuncs() {
@@ -69,9 +69,9 @@ import (
   {{ $api }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}/types"
   {{- end }}
   {{- end }}
-  "github.com/wallix/awless/fetch"
-  "github.com/wallix/awless/graph"
-  awsconv "github.com/wallix/awless/aws/conv"
+  "github.com/bootswithdefer/awless/fetch"
+  "github.com/bootswithdefer/awless/graph"
+  awsconv "github.com/bootswithdefer/awless/aws/conv"
 )
 
 {{- range $index, $service := . }}

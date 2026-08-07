@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
-	"github.com/wallix/awless/fetch"
+	"github.com/bootswithdefer/awless/fetch"
 )
 
 type AccountAuthorizationDetails struct {

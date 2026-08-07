@@ -22,8 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wallix/awless/database"
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/database"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 var (

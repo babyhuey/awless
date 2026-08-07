@@ -17,9 +17,9 @@ limitations under the License.
 package graph
 
 import (
-	tstore "github.com/wallix/triplestore"
+	tstore "github.com/bootswithdefer/triplestore"
 
-	"github.com/wallix/awless/cloud/rdf"
+	"github.com/bootswithdefer/awless/cloud/rdf"
 )
 
 type Visitor interface {

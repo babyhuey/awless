@@ -30,11 +30,11 @@ import (
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
-	tstore "github.com/wallix/triplestore"
+	tstore "github.com/bootswithdefer/triplestore"
 
-	awsconv "github.com/wallix/awless/aws/conv"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/graph"
+	awsconv "github.com/bootswithdefer/awless/aws/conv"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/graph"
 )
 
 const (

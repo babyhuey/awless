@@ -23,14 +23,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/template/env"
-	"github.com/wallix/awless/template/params"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/template/env"
+	"github.com/bootswithdefer/awless/template/params"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"go.yaml.in/yaml/v3"
 
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 type CreateStack struct {
@@ -68,7 +68,7 @@ func (cmd *CreateStack) ExtractResult(i interface{}) string {
 }
 
 // Add StackFile support via BeforeRun hook
-// https://github.com/wallix/awless/issues/145
+// https://github.com/bootswithdefer/awless/issues/145
 // http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-cfn-artifacts.html
 func (cmd *CreateStack) BeforeRun(renv env.Running) (err error) {
 	cmd.Parameters, cmd.Tags, cmd.PolicyBody, err = processStackFile(cmd.StackFile, cmd.PolicyFile, cmd.Parameters, cmd.Tags)
@@ -108,7 +108,7 @@ func (cmd *UpdateStack) ExtractResult(i interface{}) string {
 }
 
 // Add StackFile support via BeforeRun hook
-// https://github.com/wallix/awless/issues/145
+// https://github.com/bootswithdefer/awless/issues/145
 // http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-cfn-artifacts.html
 func (cmd *UpdateStack) BeforeRun(renv env.Running) (err error) {
 	cmd.Parameters, cmd.Tags, cmd.PolicyBody, err = processStackFile(cmd.StackFile, cmd.PolicyFile, cmd.Parameters, cmd.Tags)

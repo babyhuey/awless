@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 func TestSSHConfigStringWithProxy(t *testing.T) {

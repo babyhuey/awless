@@ -11,16 +11,16 @@ import (
 	"path/filepath"
 	"time"
 
+	tstore "github.com/bootswithdefer/triplestore"
 	"github.com/gorilla/mux"
-	tstore "github.com/wallix/triplestore"
 
-	awsservices "github.com/wallix/awless/aws/services"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/cloud/properties"
-	"github.com/wallix/awless/cloud/rdf"
-	"github.com/wallix/awless/graph"
-	"github.com/wallix/awless/sync"
-	"github.com/wallix/awless/sync/repo"
+	awsservices "github.com/bootswithdefer/awless/aws/services"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/properties"
+	"github.com/bootswithdefer/awless/cloud/rdf"
+	"github.com/bootswithdefer/awless/graph"
+	"github.com/bootswithdefer/awless/sync"
+	"github.com/bootswithdefer/awless/sync/repo"
 )
 
 type server struct {

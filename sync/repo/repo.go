@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wallix/awless/graph"
+	"github.com/bootswithdefer/awless/graph"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"

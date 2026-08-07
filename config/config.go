@@ -8,9 +8,9 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	awsconfig "github.com/wallix/awless/aws/config"
-	awsspec "github.com/wallix/awless/aws/spec"
-	"github.com/wallix/awless/database"
+	awsconfig "github.com/bootswithdefer/awless/aws/config"
+	awsspec "github.com/bootswithdefer/awless/aws/spec"
+	"github.com/bootswithdefer/awless/database"
 )
 
 var (

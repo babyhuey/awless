@@ -21,14 +21,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/template/env"
-	"github.com/wallix/awless/template/params"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/template/env"
+	"github.com/bootswithdefer/awless/template/params"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 type CreateS3object struct {

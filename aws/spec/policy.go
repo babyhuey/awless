@@ -28,9 +28,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/template/env"
-	"github.com/wallix/awless/template/params"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/template/env"
+	"github.com/bootswithdefer/awless/template/params"
 
 	"context"
 
@@ -38,7 +38,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 type CreatePolicy struct {

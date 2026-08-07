@@ -715,7 +715,7 @@ func TestNotifyIfUpgradeBrew(t *testing.T) {
 
 	BuildFor = "brew"
 	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"URL":"https://github.com/wallix/awless/releases/latest","Version":"1000.0.0"}`))
+		w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
 	}))
 	defer tserver.Close()
 
@@ -734,7 +734,7 @@ func TestNotifyIfUpgradeGoGet(t *testing.T) {
 
 	BuildFor = "" // default, not brew or zip
 	tserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"URL":"https://github.com/wallix/awless/releases/latest","Version":"1000.0.0"}`))
+		w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
 	}))
 	defer tserver.Close()
 

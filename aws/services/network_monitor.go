@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/wallix/awless/console"
+	"github.com/bootswithdefer/awless/console"
 )
 
 var DefaultNetworkMonitor = &NetworkMonitor{requests: make(map[string]*req)}

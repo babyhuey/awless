@@ -14,7 +14,7 @@ lint:
 
 fmt:
 	@echo Formatting code
-	@goimports -w -local github.com/wallix/awless .
+	@goimports -w -local github.com/bootswithdefer/awless .
 	@gofmt -w -s .
 
 generate:

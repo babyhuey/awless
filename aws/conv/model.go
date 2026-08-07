@@ -19,8 +19,8 @@ package awsconv
 import (
 	"reflect"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/cloud/properties"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/properties"
 )
 
 var awsResourcesDef = map[string]map[string]*propertyTransform{

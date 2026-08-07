@@ -20,7 +20,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/wallix/awless/gen/aws"
+	"github.com/bootswithdefer/awless/gen/aws"
 )
 
 func generateServicesFuncs() {
@@ -86,12 +86,12 @@ import (
   {{- end }}
   {{- end }}
   "github.com/aws/smithy-go"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/graph"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/fetch"
-	awsfetch "github.com/wallix/awless/aws/fetch"
-	tstore "github.com/wallix/triplestore"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/graph"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/fetch"
+	awsfetch "github.com/bootswithdefer/awless/aws/fetch"
+	tstore "github.com/bootswithdefer/triplestore"
 )
 
 const accessDenied = "Access Denied"

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wallix/awless/graph"
+	"github.com/bootswithdefer/awless/graph"
 )
 
 func TestNew(t *testing.T) {

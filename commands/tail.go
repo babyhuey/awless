@@ -23,7 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	awstailers "github.com/wallix/awless/aws/tailers"
+	awstailers "github.com/bootswithdefer/awless/aws/tailers"
 )
 
 var tailFollowFrequencyFlag time.Duration

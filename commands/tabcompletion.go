@@ -7,10 +7,10 @@ import (
 
 	"github.com/chzyer/readline"
 
-	awsservices "github.com/wallix/awless/aws/services"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/graph"
-	"github.com/wallix/awless/template"
+	awsservices "github.com/bootswithdefer/awless/aws/services"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/graph"
+	"github.com/bootswithdefer/awless/template"
 )
 
 func enumCompletionFunc(enum []string) readline.AutoCompleter {

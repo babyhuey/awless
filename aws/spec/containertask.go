@@ -22,16 +22,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/template/env"
-	"github.com/wallix/awless/template/params"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/template/env"
+	"github.com/bootswithdefer/awless/template/params"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/aws/smithy-go"
 
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 type StartContainertask struct {

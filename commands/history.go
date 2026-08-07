@@ -20,15 +20,15 @@ import (
 	"fmt"
 	"os"
 
-	awsservices "github.com/wallix/awless/aws/services"
+	awsservices "github.com/bootswithdefer/awless/aws/services"
 
 	"github.com/spf13/cobra"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/config"
-	"github.com/wallix/awless/console"
-	"github.com/wallix/awless/graph"
-	"github.com/wallix/awless/sync"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/config"
+	"github.com/bootswithdefer/awless/console"
+	"github.com/bootswithdefer/awless/graph"
+	"github.com/bootswithdefer/awless/sync"
 )
 
 var (

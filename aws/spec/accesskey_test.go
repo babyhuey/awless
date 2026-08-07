@@ -23,7 +23,7 @@ import (
 	"strings"
 	"testing"
 
-	awsconfig "github.com/wallix/awless/aws/config"
+	awsconfig "github.com/bootswithdefer/awless/aws/config"
 )
 
 func TestCredentialsPrompter(t *testing.T) {

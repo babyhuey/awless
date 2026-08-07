@@ -33,9 +33,9 @@ import (
 	"github.com/olekukonko/tablewriter/pkg/twwidth"
 	"github.com/olekukonko/tablewriter/tw"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/cloud/match"
-	"github.com/wallix/awless/graph"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/match"
+	"github.com/bootswithdefer/awless/graph"
 )
 
 var (

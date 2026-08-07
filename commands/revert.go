@@ -24,10 +24,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wallix/awless/config"
-	"github.com/wallix/awless/database"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/template"
+	"github.com/bootswithdefer/awless/config"
+	"github.com/bootswithdefer/awless/database"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/template"
 )
 
 func init() {

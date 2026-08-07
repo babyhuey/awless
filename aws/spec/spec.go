@@ -10,13 +10,13 @@ import (
 
 	"github.com/aws/smithy-go"
 
-	"github.com/wallix/awless/template/env"
-	"github.com/wallix/awless/template/params"
+	"github.com/bootswithdefer/awless/template/env"
+	"github.com/bootswithdefer/awless/template/params"
 
 	"github.com/fatih/color"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/logger"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/logger"
 )
 
 const (

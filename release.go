@@ -125,7 +125,7 @@ func buildAndZip(osname, arch string) error {
 		buildFor = "zip"
 	}
 
-	buildInfo := fmt.Sprintf("-X github.com/wallix/awless/config.buildDate=%s -X github.com/wallix/awless/config.buildSha=%s -X github.com/wallix/awless/config.buildOS=%s -X github.com/wallix/awless/config.buildArch=%s -X github.com/wallix/awless/config.BuildFor=%s",
+	buildInfo := fmt.Sprintf("-X github.com/bootswithdefer/awless/config.buildDate=%s -X github.com/bootswithdefer/awless/config.buildSha=%s -X github.com/bootswithdefer/awless/config.buildOS=%s -X github.com/bootswithdefer/awless/config.buildArch=%s -X github.com/bootswithdefer/awless/config.BuildFor=%s",
 		time.Now().Format(time.RFC3339),
 		strings.TrimSpace(sha),
 		osname,

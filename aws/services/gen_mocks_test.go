@@ -55,7 +55,7 @@ import (
   ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
   ecs "github.com/aws/aws-sdk-go-v2/service/ecs"
   ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
-  "github.com/wallix/awless/cloud"
+  "github.com/bootswithdefer/awless/cloud"
 )
 
 

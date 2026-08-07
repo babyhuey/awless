@@ -31,14 +31,14 @@ func TestUpgradeMessaging(t *testing.T) {
 		if ua := r.Header.Get("User-Agent"); !strings.HasPrefix(ua, "awless-client-"+Version) {
 			t.Fatalf("unexpected user-agent: %s", ua)
 		}
-		w.Write([]byte(`{"URL":"https://github.com/wallix/awless/releases/latest","Version":"1000.0.0"}`))
+		w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
 	}))
 	var buff bytes.Buffer
 	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
 		t.Fatal(err)
 	}
 
-	exp := fmt.Sprintf("New version 1000.0.0 available. Checkout the latest features at https://github.com/wallix/awless/blob/master/CHANGELOG.md\nRun `wget -O awless-1000.0.0.tar.gz https://github.com/wallix/awless/releases/download/1000.0.0/awless-%s-%s.tar.gz`\n", runtime.GOOS, runtime.GOARCH)
+	exp := fmt.Sprintf("New version 1000.0.0 available. Checkout the latest features at https://github.com/bootswithdefer/awless/blob/master/CHANGELOG.md\nRun `wget -O awless-1000.0.0.tar.gz https://github.com/bootswithdefer/awless/releases/download/1000.0.0/awless-%s-%s.tar.gz`\n", runtime.GOOS, runtime.GOARCH)
 	if got, want := buff.String(), exp; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}

@@ -20,7 +20,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/wallix/awless/template"
+	"github.com/bootswithdefer/awless/template"
 
 	bolt "go.etcd.io/bbolt"
 )

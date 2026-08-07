@@ -23,9 +23,9 @@ import (
 
 	"github.com/fatih/color"
 
-	p "github.com/wallix/awless/cloud/properties"
-	"github.com/wallix/awless/graph"
-	"github.com/wallix/awless/graph/resourcetest"
+	p "github.com/bootswithdefer/awless/cloud/properties"
+	"github.com/bootswithdefer/awless/graph"
+	"github.com/bootswithdefer/awless/graph/resourcetest"
 )
 
 func init() {

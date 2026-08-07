@@ -23,7 +23,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/olekukonko/tablewriter/tw"
 
-	"github.com/wallix/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud"
 )
 
 type tableResourceDisplayer struct {

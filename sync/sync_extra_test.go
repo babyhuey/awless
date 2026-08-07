@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/wallix/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud"
 )
 
 func TestNoOpSyncer(t *testing.T) {

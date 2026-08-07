@@ -1,8 +1,8 @@
 package awsdoc
 
 import (
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/cloud/properties"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/properties"
 )
 
 var (

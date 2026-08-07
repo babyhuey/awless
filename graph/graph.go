@@ -22,10 +22,10 @@ import (
 	"io"
 	"os"
 
-	tstore "github.com/wallix/triplestore"
+	tstore "github.com/bootswithdefer/triplestore"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/cloud/rdf"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/rdf"
 )
 
 type Graph struct {

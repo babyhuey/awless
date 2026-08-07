@@ -103,6 +103,8 @@ github.com/aws/smithy-go v1.24.2 h1:FzA3bu/nt/vDvmnkg+R8Xl46gmzEDam6mZ1hzmwXFng=
 github.com/aws/smithy-go v1.24.2/go.mod h1:YE2RhdIuDbA5E5bTdciG9KrW3+TiEONeUWCqxX9i1Fc=
 github.com/boombuler/barcode v1.1.0 h1:ChaYjBR63fr4LFyGn8E8nt7dBSt3MiU3zMOZqFvVkHo=
 github.com/boombuler/barcode v1.1.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
+github.com/bootswithdefer/triplestore v0.1.0 h1:kj+aZwb2SUcgztdTrxS6Z6y48dbaUC+dfH82mZWU+Ag=
+github.com/bootswithdefer/triplestore v0.1.0/go.mod h1:l/G78llBDKzmNst+OIvK6cvyiJN+RsINBacB+mqoBPw=
 github.com/chzyer/logex v1.2.1 h1:XHDu3E6q+gdHgsdTPH6ImJMIp436vR6MPtH8gP05QzM=
 github.com/chzyer/logex v1.2.1/go.mod h1:JLbx6lG2kDbNRFnfkgvh4eRJRPX1QCoOIWomwysCBrQ=
 github.com/chzyer/readline v1.5.1 h1:upd/6fQk4src78LMRzh5vItIt361/o4uq553V8B5sGI=
@@ -205,8 +207,6 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/wallix/awless-scheduler v0.0.6 h1:0j0myT4RsRfgmc3K9BZjVLRBvdIFNYQF8QqQIGE98HQ=
 github.com/wallix/awless-scheduler v0.0.6/go.mod h1:oummDtrcZjMI7mwAaOJ9ObZLZ69eQlAWCUY4H+Y/SAU=
-github.com/wallix/triplestore v0.0.0-20180213143850-4099dd913851 h1:wkoRryfeVJs3/GdZr4hwHuaOHqkAljPRh7coa0mmhy8=
-github.com/wallix/triplestore v0.0.0-20180213143850-4099dd913851/go.mod h1:0mjZIZg2WYnhGU4dFdrZgnRcBshZzS97uz9Wq3Cgf7w=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 go.etcd.io/bbolt v1.5.0 h1:S7GAl7Fxv12yohbwFfIbQCGDWbQbtDGPET4P/bD4lxU=

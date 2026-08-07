@@ -8,9 +8,9 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/wallix/awless/console"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/template"
+	"github.com/bootswithdefer/awless/console"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/template"
 )
 
 type logPrinter interface {

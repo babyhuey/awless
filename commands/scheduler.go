@@ -25,7 +25,8 @@ import (
 
 	"github.com/wallix/awless-scheduler/client"
 	"github.com/wallix/awless-scheduler/model"
-	"github.com/wallix/awless/config"
+
+	"github.com/bootswithdefer/awless/config"
 )
 
 var (

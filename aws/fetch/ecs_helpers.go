@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
-	"github.com/wallix/awless/fetch"
+	"github.com/bootswithdefer/awless/fetch"
 )
 
 func getClusterArns(ctx context.Context, cache fetch.Cache, api *ecs.Client) ([]string, error) {

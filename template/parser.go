@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wallix/awless/template/internal/ast"
+	"github.com/bootswithdefer/awless/template/internal/ast"
 )
 
 func Parse(text string) (tmpl *Template, err error) {

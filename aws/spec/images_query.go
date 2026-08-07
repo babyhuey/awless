@@ -13,7 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
-	awsdoc "github.com/wallix/awless/aws/doc"
+	awsdoc "github.com/bootswithdefer/awless/aws/doc"
 )
 
 // Image resolving allows to find AWS AMIs identifiers specifying what you want instead

@@ -20,7 +20,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/wallix/awless/gen/aws"
+	"github.com/bootswithdefer/awless/gen/aws"
 )
 
 func generateTestMocks() {
@@ -80,7 +80,7 @@ import (
   {{ $mock.Api }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $mock.Api }}/types"
   {{- end }}
   {{- end }}
-  "github.com/wallix/awless/cloud"
+  "github.com/bootswithdefer/awless/cloud"
 )
 
 {{ range $, $mock := . }}

@@ -25,10 +25,10 @@ import (
 
 	"runtime"
 
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/graph"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/sync/repo"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/graph"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/sync/repo"
 )
 
 const fileExt = ".nt"
@@ -155,7 +155,7 @@ func (s *syncer) Sync(services ...cloud.Service) (map[string]cloud.GraphAPI, err
 		closeFile()
 	}
 
-	if runtime.GOOS != "windows" { // https://github.com/wallix/awless/issues/119
+	if runtime.GOOS != "windows" { // https://github.com/bootswithdefer/awless/issues/119
 		if err := s.Commit(filepaths...); err != nil {
 			allErrors = append(allErrors, fmt.Errorf("committing %s: %s", strings.Join(filepaths, ", "), err))
 		}

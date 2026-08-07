@@ -19,7 +19,7 @@ package aws
 import (
 	"strings"
 
-	"github.com/wallix/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud"
 )
 
 func ApiToInterface(api string) string {

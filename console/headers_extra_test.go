@@ -9,7 +9,7 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/wallix/awless/graph"
+	"github.com/bootswithdefer/awless/graph"
 )
 
 func TestColoredValueColumnDefinitionFormat(t *testing.T) {

@@ -27,14 +27,14 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	awsconfig "github.com/wallix/awless/aws/config"
-	"github.com/wallix/awless/cloud"
-	"github.com/wallix/awless/cloud/properties"
-	"github.com/wallix/awless/cloud/rdf"
-	"github.com/wallix/awless/config"
-	"github.com/wallix/awless/console"
-	"github.com/wallix/awless/logger"
-	"github.com/wallix/awless/sync"
+	awsconfig "github.com/bootswithdefer/awless/aws/config"
+	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/properties"
+	"github.com/bootswithdefer/awless/cloud/rdf"
+	"github.com/bootswithdefer/awless/config"
+	"github.com/bootswithdefer/awless/console"
+	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/sync"
 )
 
 var (

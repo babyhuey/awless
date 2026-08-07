@@ -9,7 +9,7 @@ import (
 
 	"github.com/oklog/ulid/v2"
 
-	"github.com/wallix/awless/template/internal/ast"
+	"github.com/bootswithdefer/awless/template/internal/ast"
 )
 
 // Allow template executions serialization with context for JSON storage

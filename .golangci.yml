@@ -56,7 +56,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/wallix/awless
+        - github.com/bootswithdefer/awless
   exclusions:
     generated: lax
     paths:
