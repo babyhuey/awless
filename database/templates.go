@@ -22,7 +22,7 @@ import (
 
 	"github.com/wallix/awless/template"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 const TEMPLATES_BUCKET = "templates"

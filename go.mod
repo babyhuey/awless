@@ -36,7 +36,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.68.2
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.8
 	github.com/aws/smithy-go v1.24.2
-	github.com/boltdb/bolt v1.3.1
 	github.com/boombuler/barcode v1.1.0
 	github.com/chzyer/readline v1.5.1
 	github.com/fatih/color v1.18.0
@@ -47,6 +46,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/wallix/awless-scheduler v0.0.6
 	github.com/wallix/triplestore v0.0.0-20180213143850-4099dd913851
+	go.etcd.io/bbolt v1.5.0
 	golang.org/x/crypto v0.48.0
 	golang.org/x/sync v0.22.0
 	golang.org/x/term v0.40.0
@@ -83,11 +83,11 @@ require (
 	github.com/olekukonko/errors v1.1.0 // indirect
 	github.com/olekukonko/ll v0.1.4-0.20260115111900-9e59c2286df0 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/spf13/pflag v1.0.9 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )

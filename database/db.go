@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (
