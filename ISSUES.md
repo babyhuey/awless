@@ -6,7 +6,7 @@ Known bugs, technical debt, and improvement opportunities in this repository.
 
 ## Bugs
 
-### B1: Compiled binaries committed to git
+### B1: Compiled binaries committed to git — **FIXED**
 
 **Severity:** Medium  
 **Files:** `./generators` (6.1MB), `gen/aws/generators/generators` (5.3MB)
@@ -39,7 +39,7 @@ Uses `math/rand` for dry-run ID generation and graph operations. Since Go 1.20, 
 
 ---
 
-### B4: CI actions pinned to tags instead of commit SHAs
+### B4: CI actions pinned to tags instead of commit SHAs — **FIXED**
 
 **Severity:** Low  
 **File:** `.github/workflows/ci.yml`
@@ -50,7 +50,7 @@ Actions are referenced by mutable tags (`actions/checkout@v4`, `actions/setup-go
 
 ---
 
-### B5: golangci-lint config incompatible with v2 — CI lint job is broken
+### B5: golangci-lint config incompatible with v2 — **FIXED**
 
 **Severity:** High  
 **Files:** `.golangci.yml`, `.github/workflows/ci.yml`
@@ -122,7 +122,7 @@ issues:
 
 ---
 
-### B6: Secrets persisted in plaintext to the local template log
+### B6: Secrets persisted in plaintext to the local template log — **FIXED**
 
 **Severity:** High  
 **Files:** `template/marshal.go:69`, `template/marshal.go:61`, `database/templates.go:41`
@@ -142,7 +142,7 @@ The DB file itself is mode `0600` (`database/db.go:69`), so this is not world-re
 
 ---
 
-### B7: `awless list --sort` panics on mixed-type columns
+### B7: `awless list --sort` panics on mixed-type columns — **FIXED**
 
 **Severity:** Medium  
 **File:** `console/displayer.go:975`, `console/displayer.go:1001`
@@ -193,7 +193,7 @@ pattern.
 
 ---
 
-### B9: Web UI binds to all interfaces with no timeouts or auth
+### B9: Web UI binds to all interfaces with no timeouts or auth — **FIXED**
 
 **Severity:** Medium  
 **Files:** `web/web.go:46`, `commands/web.go:35`
@@ -239,7 +239,7 @@ If non-loopback binding is ever wanted, require an explicit opt-in flag and warn
 
 ---
 
-### B11: Generated source written world-writable (`0666`)
+### B11: Generated source written world-writable (`0666`) — **FIXED**
 
 **Severity:** Low  
 **File:** `gen/aws/generators/main.go:75`
@@ -267,7 +267,7 @@ All 30 factory functions contain `// TODO: SDK v2 mocking needs rework`. The acc
 
 ---
 
-### D2: `strings.Title` deprecated since Go 1.18
+### D2: `strings.Title` deprecated since Go 1.18 — **FIXED**
 
 **Severity:** Medium  
 **Files:**
@@ -288,7 +288,7 @@ All 30 factory functions contain `// TODO: SDK v2 mocking needs rework`. The acc
 
 ---
 
-### D3: Stale `.travis.yml`
+### D3: Stale `.travis.yml` — **FIXED**
 
 **Severity:** Low  
 **File:** `.travis.yml`
@@ -321,7 +321,7 @@ The 8 newly-added services only support fetching/listing. They have no create/up
 
 ---
 
-### D6: Deprecated / abandoned dependencies
+### D6: Deprecated / abandoned dependencies — **FIXED**
 
 **Severity:** Medium  
 **File:** `go.mod`
@@ -362,7 +362,7 @@ Verified against upstream repositories. No module declares a formal `Deprecated:
 
 ---
 
-### D6a: `go-git` v4 drags in 26 stale transitive dependencies
+### D6a: `go-git` v4 drags in 26 stale transitive dependencies — **FIXED**
 
 **Severity:** Medium  
 **File:** `go.mod` (indirect block)
@@ -408,7 +408,7 @@ This is not broken and not urgent — Classic ELBs still exist in older VPC acco
 
 ---
 
-### D7: `release.go` references upstream wallix/awless paths
+### D7: `release.go` references upstream wallix/awless paths — **FIXED** (release.go deleted, I11)
 
 **Severity:** Low  
 **File:** `release.go:105`
@@ -475,7 +475,7 @@ Note `ST1003` on exported names cannot be fixed without breaking the public API 
 
 ---
 
-### I1: Add `arm64` to release builds
+### I1: Add `arm64` to release builds — **FIXED** (GoReleaser, I11)
 
 **Severity:** Low  
 **File:** `release.go`
@@ -486,7 +486,7 @@ The `builds` map only includes `amd64` and `386`. The CI workflow already cross-
 
 ---
 
-### I2: Add golangci-lint to CI via official action
+### I2: Add golangci-lint to CI via official action — **WON'T FIX**: pinned `go install` of an exact version (v2.12.2) is equivalent and keeps CI and local in sync; see B5
 
 **Severity:** Low  
 **File:** `.github/workflows/ci.yml`
@@ -561,7 +561,7 @@ Key untested areas:
 
 ---
 
-### I8: Go language modernization
+### I8: Go language modernization — **FIXED**
 
 **Severity:** Medium  
 **Scope:** Project-wide
@@ -601,7 +601,7 @@ The codebase was originally written for Go 1.9 and while it compiles on Go 1.26,
 
 ---
 
-### I9: Expand golangci-lint configuration
+### I9: Expand golangci-lint configuration — **FIXED**
 
 **Severity:** Medium  
 **File:** `.golangci.yml`
@@ -632,7 +632,7 @@ The current config enables only 10 linters. Several high-value linters are missi
 
 ---
 
-### I10: Add govulncheck to CI
+### I10: Add govulncheck to CI — **FIXED**
 
 **Severity:** High  
 **File:** `.github/workflows/ci.yml`
@@ -672,7 +672,7 @@ No vulnerability scanning exists. The project has 60+ dependencies including sec
 
 ---
 
-### I11: Replace `release.go` with GoReleaser
+### I11: Replace `release.go` with GoReleaser — **FIXED**
 
 **Severity:** Medium  
 **File:** `release.go`
@@ -785,7 +785,7 @@ jobs:
 
 ---
 
-### I12: Restore `-race` in CI
+### I12: Restore `-race` in CI — **FIXED**
 
 **Severity:** Medium  
 **File:** `.github/workflows/ci.yml`
@@ -937,7 +937,7 @@ It also makes the affected code paths untestable, which is part of why `commands
 
 ---
 
-### I17: `main.go` discards the error from `Execute()`
+### I17: `main.go` discards the error from `Execute()` — **FIXED**
 
 **Severity:** Low  
 **File:** `main.go:22`
