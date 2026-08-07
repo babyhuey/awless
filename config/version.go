@@ -43,22 +43,22 @@ type BuildInfo struct {
 
 func (b BuildInfo) String() string {
 	var buff bytes.Buffer
-	buff.WriteString(fmt.Sprintf("version=%s", b.Version))
+	fmt.Fprintf(&buff, "version=%s", b.Version)
 
 	if b.Sha != "" {
-		buff.WriteString(fmt.Sprintf(", commit=%s", b.Sha))
+		fmt.Fprintf(&buff, ", commit=%s", b.Sha)
 	}
 	if b.Date != "" {
-		buff.WriteString(fmt.Sprintf(", build-date=%s", b.Date))
+		fmt.Fprintf(&buff, ", build-date=%s", b.Date)
 	}
 	if b.Arch != "" {
-		buff.WriteString(fmt.Sprintf(", build-arch=%s", b.Arch))
+		fmt.Fprintf(&buff, ", build-arch=%s", b.Arch)
 	}
 	if b.OS != "" {
-		buff.WriteString(fmt.Sprintf(", build-os=%s", b.OS))
+		fmt.Fprintf(&buff, ", build-os=%s", b.OS)
 	}
 	if b.For != "" {
-		buff.WriteString(fmt.Sprintf(", build-for=%s", b.For))
+		fmt.Fprintf(&buff, ", build-for=%s", b.For)
 	}
 	return buff.String()
 }

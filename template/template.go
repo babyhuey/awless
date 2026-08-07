@@ -95,7 +95,7 @@ func (s *Template) Run(renv env.Running) (*Template, error) {
 
 func processCmdNode(renv env.Running, n *ast.CommandNode) bool {
 	if renv.IsDryRun() {
-		n.CmdResult, n.CmdErr = n.Command.Run(renv, n.ToDriverParams())
+		n.CmdResult, n.CmdErr = n.Run(renv, n.ToDriverParams())
 		n.CmdErr = prefixError(n.CmdErr, fmt.Sprintf("dry run: %s %s", n.Action, n.Entity))
 	} else {
 		n.CmdResult, n.CmdErr = n.Run(renv, n.ToDriverParams())
@@ -134,8 +134,8 @@ func (s *Template) Validate(rules ...Validator) (all []error) {
 	return
 }
 
-func (t *Template) HasErrors() bool {
-	for _, cmd := range t.CommandNodesIterator() {
+func (s *Template) HasErrors() bool {
+	for _, cmd := range s.CommandNodesIterator() {
 		if cmd.CmdErr != nil {
 			return true
 		}
@@ -143,9 +143,9 @@ func (t *Template) HasErrors() bool {
 	return false
 }
 
-func (t *Template) UniqueDefinitions(apis map[string]string) (res []string) {
+func (s *Template) UniqueDefinitions(apis map[string]string) (res []string) {
 	unique := make(map[string]struct{})
-	for _, cmd := range t.CommandNodesIterator() {
+	for _, cmd := range s.CommandNodesIterator() {
 		key := fmt.Sprintf("%s%s", cmd.Action, cmd.Entity)
 		if api, found := apis[key]; found {
 			unique[api] = struct{}{}

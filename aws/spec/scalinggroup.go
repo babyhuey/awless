@@ -110,20 +110,20 @@ func (cmd *CheckScalinggroup) ParamsSpec() params.Spec {
 	return params.NewSpec(params.AllOf(params.Key("count"), params.Key("name"), params.Key("timeout")))
 }
 
-func (sg *CheckScalinggroup) ManualRun(renv env.Running) (any, error) {
+func (cmd *CheckScalinggroup) ManualRun(renv env.Running) (any, error) {
 	input := &autoscaling.DescribeAutoScalingGroupsInput{
-		AutoScalingGroupNames: []string{awssdk.ToString(sg.Name)},
+		AutoScalingGroupNames: []string{awssdk.ToString(cmd.Name)},
 	}
 
-	sgName := StringValue(sg.Name)
+	sgName := StringValue(cmd.Name)
 
 	c := &checker{
 		description: fmt.Sprintf("scalinggroup '%s'", sgName),
-		timeout:     time.Duration(Int64AsIntValue(sg.Timeout)) * time.Second,
+		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		checkName:   "count",
 		fetchFunc: func() (string, error) {
-			output, err := sg.api.DescribeAutoScalingGroups(renv.RequestContext(), input)
+			output, err := cmd.api.DescribeAutoScalingGroups(renv.RequestContext(), input)
 			if err != nil {
 				return "", err
 			}
@@ -134,8 +134,8 @@ func (sg *CheckScalinggroup) ManualRun(renv env.Running) (any, error) {
 			}
 			return "", fmt.Errorf("scalinggroup %s not found", sgName)
 		},
-		expect: fmt.Sprint(Int64AsIntValue(sg.Count)),
-		logger: sg.logger,
+		expect: fmt.Sprint(Int64AsIntValue(cmd.Count)),
+		logger: cmd.logger,
 	}
 	return nil, c.check()
 }

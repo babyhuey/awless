@@ -64,7 +64,7 @@ var revertCmd = &cobra.Command{
 			logger.Warningf("This template was originally run with profile %s", prof)
 		}
 
-		reverted, err := loaded.Template.Revert()
+		reverted, err := loaded.Revert()
 		exitOn(err)
 
 		tplExec := &template.TemplateExecution{

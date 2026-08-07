@@ -249,7 +249,7 @@ func promptRole(api *iam.Client) (string, error) {
 	_, _ = fmt.Scanln(&roleArn)
 	roleArn = strings.TrimSpace(roleArn)
 	if roleArn == "" {
-		return roleArn, errors.New("Role cannot be empty")
+		return roleArn, errors.New("role cannot be empty")
 	}
 	return roleArn, nil
 }

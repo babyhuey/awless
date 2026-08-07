@@ -89,7 +89,7 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 				// Redacted: Message is persisted to the local template log, and
 				// a one-liner message embeds the full command line, which may
 				// carry a secret (e.g. `create loginprofile password=...`).
-				tplExec.SetMessage(fmt.Sprintf("Run %s", tplExec.Template.StringRedacted()))
+				tplExec.SetMessage(fmt.Sprintf("Run %s", tplExec.StringRedacted()))
 			} else if path := tplExec.Path; path != "" {
 				stats := tplExec.Stats()
 				if stats.KOCount > 0 {
@@ -108,7 +108,7 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 
 		if template.IsRevertible(tplExec.Template) {
 			fmt.Println()
-			logger.Infof("Revert this template with `awless revert %s`", tplExec.Template.ID)
+			logger.Infof("Revert this template with `awless revert %s`", tplExec.ID)
 		}
 
 		runSyncFor(tplExec)

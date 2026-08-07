@@ -26,7 +26,7 @@ func exampleDoc(key string) string {
 	if ok {
 		var buf bytes.Buffer
 		for i, ex := range examples {
-			buf.WriteString(fmt.Sprintf("  %s", ex))
+			fmt.Fprintf(&buf, "  %s", ex)
 			if i != len(examples)-1 {
 				buf.WriteByte('\n')
 			}

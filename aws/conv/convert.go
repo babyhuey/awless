@@ -222,7 +222,7 @@ func InitResource(source any) (*graph.Resource, error) {
 	case cloudwatchlogstypes.LogGroup:
 		res = graph.InitResource(cloud.LogGroup, awssdk.ToString(ss.LogGroupName))
 	default:
-		return nil, fmt.Errorf("Unknown type of resource %T", source)
+		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}
 	return res, nil
 }
@@ -237,18 +237,18 @@ func NewResource(source any) (*graph.Resource, error) {
 
 	value := reflect.ValueOf(source)
 	if !value.IsValid() {
-		return nil, fmt.Errorf("can not fetch cloud resource. %v is not valid.", value)
+		return nil, fmt.Errorf("can not fetch cloud resource. %v is not valid", value)
 	}
 	var nodeV reflect.Value
-	if value.Kind() == reflect.Ptr {
+	if value.Kind() == reflect.Pointer {
 		if value.IsNil() {
-			return nil, fmt.Errorf("can not fetch cloud resource. %v is a nil pointer.", value)
+			return nil, fmt.Errorf("can not fetch cloud resource. %v is a nil pointer", value)
 		}
 		nodeV = value.Elem()
 	} else if value.Kind() == reflect.Struct {
 		nodeV = value
 	} else {
-		return nil, fmt.Errorf("can not fetch cloud resource. %v is not a valid struct or pointer.", value)
+		return nil, fmt.Errorf("can not fetch cloud resource. %v is not a valid struct or pointer", value)
 	}
 
 	// Bounded and leak-free. The previous version wrote to unbuffered resultc
@@ -316,7 +316,7 @@ type fetchFn func(i any) (any, error)
 
 var extractValueFn = func(i any) (any, error) {
 	iv := reflect.ValueOf(i)
-	if iv.Kind() == reflect.Ptr {
+	if iv.Kind() == reflect.Pointer {
 		if iv.IsNil() {
 			return nil, nil
 		}
@@ -508,7 +508,7 @@ var extractFieldFn = func(field string) transformFn {
 	return func(i any) (any, error) {
 		value := reflect.ValueOf(i)
 		var struc reflect.Value
-		if value.Kind() == reflect.Ptr {
+		if value.Kind() == reflect.Pointer {
 			struc = value.Elem()
 			if struc.Kind() != reflect.Struct {
 				return nil, fmt.Errorf("extract field '%s': not a struct pointer but a %T", field, i)
@@ -865,7 +865,7 @@ func notEmptyStr(str *string) bool {
 
 func isNilValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
+	case reflect.Pointer, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
 		return v.IsNil()
 	default:
 		return false
@@ -875,7 +875,7 @@ func isNilValue(v reflect.Value) bool {
 func HashFields(fields ...any) string {
 	var buf bytes.Buffer
 	for _, field := range fields {
-		buf.WriteString(fmt.Sprint(field))
+		fmt.Fprint(&buf, field)
 	}
 	h := adler32.New()
 	_, _ = buf.WriteTo(h)

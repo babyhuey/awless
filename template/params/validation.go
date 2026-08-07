@@ -16,7 +16,7 @@ func Validate(all Validators, paramValues map[string]any) error {
 		if val, ok := paramValues[key]; ok {
 			if err := vFn(val, paramValues); err != nil {
 				hasErr = true
-				msg.WriteString(fmt.Sprintf("\n\t\t- param '%s': %s", key, err))
+				fmt.Fprintf(msg, "\n\t\t- param '%s': %s", key, err)
 			}
 		}
 	}

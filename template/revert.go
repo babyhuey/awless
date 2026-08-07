@@ -8,10 +8,10 @@ import (
 	"github.com/bootswithdefer/awless/template/internal/ast"
 )
 
-func (temp *Template) Revert() (*Template, error) {
-	tpl, _, err := Compile(temp, new(noopCompileEnv), PreRevertCompileMode)
+func (s *Template) Revert() (*Template, error) {
+	tpl, _, err := Compile(s, new(noopCompileEnv), PreRevertCompileMode)
 	if err != nil {
-		return temp, err
+		return s, err
 	}
 
 	var lines []string

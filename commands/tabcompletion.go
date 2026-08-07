@@ -237,7 +237,7 @@ func keyCorrespondsToProperty(holekey, prop string) bool {
 	if holekey == prop {
 		return true
 	}
-	if strings.Replace(holekey, "-", "", -1) == prop {
+	if strings.ReplaceAll(holekey, "-", "") == prop {
 		return true
 	}
 	return false

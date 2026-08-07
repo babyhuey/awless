@@ -378,7 +378,7 @@ func (c *policyConditions) MarshalJSON() ([]byte, error) {
 	var buff bytes.Buffer
 	buff.WriteRune('{')
 	for i, cond := range *c {
-		buff.WriteString(fmt.Sprintf("\"%s\":{\"%s\":\"%s\"}", cond.Type, cond.Key, cond.Value))
+		fmt.Fprintf(&buff, "\"%s\":{\"%s\":\"%s\"}", cond.Type, cond.Key, cond.Value)
 		if i < len(*c)-1 {
 			buff.WriteRune(',')
 		}

@@ -89,7 +89,7 @@ func (b *Builder) buildQuery() (cloud.Query, error) {
 				for _, h := range b.columnDefinitions {
 					allowed = append(allowed, h.propKey())
 				}
-				return cloud.Query{}, fmt.Errorf("Invalid filter key '%s'. Expecting any of: %s. (Note: filter keys/values are case insensitive)", name, strings.Join(allowed, ", "))
+				return cloud.Query{}, fmt.Errorf("invalid filter key '%s'. Expecting any of: %s. (Note: filter keys/values are case insensitive)", name, strings.Join(allowed, ", "))
 			}
 		}
 	}
@@ -393,7 +393,7 @@ func (d *csvDisplayer) Print(w io.Writer) error {
 		}
 	}
 
-	d.sorter.sort(values)
+	d.sort(values)
 
 	var buff bytes.Buffer
 
@@ -411,7 +411,7 @@ func (d *csvDisplayer) Print(w io.Writer) error {
 		for j, h := range d.columnDefinitions {
 			val := h.format(values[i][j])
 			if strings.ContainsAny(val, ",\n\"") {
-				val = strings.Replace(val, "\"", "\"\"", -1) // Replace " in val by "" (cf https://tools.ietf.org/html/rfc4180)
+				val = strings.ReplaceAll(val, "\"", "\"\"") // Replace " in val by "" (cf https://tools.ietf.org/html/rfc4180)
 				val = "\"" + val + "\""
 			}
 			props = append(props, val)
@@ -449,7 +449,7 @@ func (d *tsvDisplayer) Print(w io.Writer) error {
 		}
 	}
 
-	d.sorter.sort(values)
+	d.sort(values)
 
 	var head []string
 	for _, h := range d.columnDefinitions {
@@ -522,10 +522,10 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 		}
 	}
 
-	d.sorter.sort(values)
+	d.sort(values)
 	markColumnAsc := -1
-	if len(d.sorter.columns()) > 0 {
-		markColumnAsc = d.sorter.columns()[0]
+	if len(d.columns()) > 0 {
+		markColumnAsc = d.columns()[0]
 	}
 
 	columnsToDisplay := d.columnDefinitions
@@ -536,7 +536,7 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 		for j, h := range d.columnDefinitions {
 			var symbol string
 			if markColumnAsc == j {
-				symbol = d.sorter.symbol()
+				symbol = d.symbol()
 			}
 			colW := colWidth(j, values, h, symbol) + 3 // +3 (tables margin + border)
 			if currentWidth+colW > d.maxwidth {
@@ -563,7 +563,7 @@ func (d *tableDisplayer) Print(w io.Writer) error {
 		for i, h := range columnsToDisplay {
 			var symbol string
 			if markColumnAsc == i {
-				symbol = d.sorter.symbol()
+				symbol = d.symbol()
 			}
 			displayHeaders = append(displayHeaders, h.title(symbol))
 		}
@@ -636,7 +636,7 @@ func (d *porcelainDisplayer) Print(w io.Writer) error {
 		}
 	}
 
-	d.sorter.sort(values)
+	d.sort(values)
 
 	var lines []string
 
@@ -1023,7 +1023,7 @@ func resolveSortIndexes(headers []ColumnDefinition, sortingBy ...string) ([]int,
 	for _, t := range sortBy {
 		id, ok := normalized[strings.ToLower(t)]
 		if !ok && strings.ToLower(t) != "id" {
-			return ids, fmt.Errorf("Invalid column name '%s'", t)
+			return ids, fmt.Errorf("invalid column name '%s'", t)
 		}
 		ids = append(ids, id)
 	}

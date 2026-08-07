@@ -59,7 +59,7 @@ func (ru *Runner) Run() error {
 
 	tplExec.Fillers = cenv.Get(env.PROCESSED_FILLERS)
 
-	errs := tplExec.Template.Validate(ru.Validators...)
+	errs := tplExec.Validate(ru.Validators...)
 	if len(errs) > 0 {
 		for _, err := range errs {
 			logger.Warning(err)
@@ -77,7 +77,7 @@ func (ru *Runner) Run() error {
 	// Cancellation reaches every AWS call made by the commands through here; see
 	// env.Running.RequestContext.
 	renv.SetRequestContext(ru.Context())
-	if _, err = tplExec.Template.DryRun(renv); err != nil {
+	if _, err = tplExec.DryRun(renv); err != nil {
 		var t *Errors
 		if errors.As(err, &t) {
 			errs, _ := t.Errors()
@@ -87,7 +87,7 @@ func (ru *Runner) Run() error {
 		} else {
 			logger.Error(err)
 		}
-		return errors.New("Dry run failed")
+		return errors.New("dry run failed")
 	}
 
 	ok, err := ru.BeforeRun(tplExec)
@@ -96,7 +96,7 @@ func (ru *Runner) Run() error {
 	}
 
 	if ok {
-		tplExec.Template, err = tplExec.Template.Run(renv)
+		tplExec.Template, err = tplExec.Run(renv)
 		if err != nil {
 			logger.Errorf("Running template error: %s", err)
 		}

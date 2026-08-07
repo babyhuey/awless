@@ -154,7 +154,7 @@ func (h KeyValuesColumnDefinition) format(i any) string {
 	}
 	var b bytes.Buffer
 	for i, kv := range ii {
-		b.WriteString(fmt.Sprintf("%s:%s", color.CyanString(kv.KeyName), kv.Value))
+		fmt.Fprintf(&b, "%s:%s", color.CyanString(kv.KeyName), kv.Value)
 		if i < len(ii)-1 {
 			b.WriteString(" ")
 		}
@@ -233,11 +233,11 @@ func (h FirewallRulesColumnDefinition) format(i any) string {
 		case r.Protocol == "any":
 			w.WriteString(r.Protocol)
 		case r.PortRange.Any:
-			w.WriteString(fmt.Sprintf("%s:any", r.Protocol))
+			fmt.Fprintf(&w, "%s:any", r.Protocol)
 		case r.PortRange.FromPort == r.PortRange.ToPort:
-			w.WriteString(fmt.Sprintf("%s:%d", r.Protocol, r.PortRange.FromPort))
+			fmt.Fprintf(&w, "%s:%d", r.Protocol, r.PortRange.FromPort)
 		default:
-			w.WriteString(fmt.Sprintf("%s:%d-%d", r.Protocol, r.PortRange.FromPort, r.PortRange.ToPort))
+			fmt.Fprintf(&w, "%s:%d-%d", r.Protocol, r.PortRange.FromPort, r.PortRange.ToPort)
 		}
 
 		w.WriteString(") ")

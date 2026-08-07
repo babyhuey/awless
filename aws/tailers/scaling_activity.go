@@ -99,7 +99,10 @@ func (t *scalingActivitiesTailer) displayNewEvents(infra *awsservices.Infra, w i
 			if t.lastEventTime.Before(evt.stamp) {
 				t.lastEventTime = evt.stamp
 			}
-			if evt.stamp == lastEventTime || evt.stamp.Before(lastEventTime) {
+			// == on time.Time compares the wall clock, the monotonic reading and the
+			// location, so two values representing the same instant can compare
+			// unequal. Equal() compares the instant.
+			if evt.stamp.Equal(lastEventTime) || evt.stamp.Before(lastEventTime) {
 				eventFound = true
 				break
 			}

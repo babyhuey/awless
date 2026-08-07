@@ -101,7 +101,7 @@ const semverLen = 3
 
 type semver [semverLen]int
 
-var SemverInvalidFormatErr = errors.New("semver invalid format")
+var ErrSemverInvalidFormat = errors.New("semver invalid format")
 
 func IsSemverUpgrade(current, latest string) bool {
 	i, err := CompareSemver(current, latest)
@@ -123,14 +123,14 @@ func CompareSemver(current, latest string) (int, error) {
 	lFields := strings.FieldsFunc(latest, dot)
 
 	if len(cFields) != semverLen || len(lFields) != semverLen {
-		return 0, SemverInvalidFormatErr
+		return 0, ErrSemverInvalidFormat
 	}
 
 	currents := new(semver)
 	for i, f := range cFields {
 		num, err := strconv.Atoi(f)
 		if err != nil {
-			return 0, SemverInvalidFormatErr
+			return 0, ErrSemverInvalidFormat
 		}
 		currents[i] = num
 	}
@@ -139,7 +139,7 @@ func CompareSemver(current, latest string) (int, error) {
 	for i, f := range lFields {
 		num, err := strconv.Atoi(f)
 		if err != nil {
-			return 0, SemverInvalidFormatErr
+			return 0, ErrSemverInvalidFormat
 		}
 		latests[i] = num
 	}

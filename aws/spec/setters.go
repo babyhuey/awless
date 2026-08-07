@@ -367,7 +367,7 @@ func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...an
 			elemToSet = reflect.New(sliceField.Type().Elem().Elem())
 			sliceField.Set(reflect.Append(sliceField, elemToSet))
 		}
-		if sliceField.Type().Elem().Kind() != reflect.Ptr {
+		if sliceField.Type().Elem().Kind() != reflect.Pointer {
 			err = fmt.Errorf("set field awsslicestruct: field %s is not a slice of struct pointer, but a %s", matches[0], sliceField.Kind())
 			return
 		}
@@ -631,7 +631,7 @@ func structSetter(s any, params map[string]any) error {
 		var fieldType string
 		if v, ok := params[tplName]; ok {
 			kind := field.Type.Kind()
-			if kind == reflect.Ptr {
+			if kind == reflect.Pointer {
 				switch field.Type.Elem().Kind() {
 				case reflect.String:
 					fieldType = awsstr
@@ -644,7 +644,7 @@ func structSetter(s any, params map[string]any) error {
 				default:
 					return fmt.Errorf("unknown type %s for parameter %s in struct setter", tplName, field.Type.String())
 				}
-			} else if kind == reflect.Slice && field.Type.Elem().Kind() == reflect.Ptr {
+			} else if kind == reflect.Slice && field.Type.Elem().Kind() == reflect.Pointer {
 				switch field.Type.Elem().Elem().Kind() {
 				case reflect.String:
 					fieldType = awsstringslice
@@ -708,7 +708,7 @@ func setValueAtPath(i any, path string, v any) {
 	}
 	parts := strings.Split(path, ".")
 	val := reflect.ValueOf(i)
-	for val.Kind() == reflect.Ptr {
+	for val.Kind() == reflect.Pointer {
 		if val.IsNil() {
 			return
 		}
@@ -725,15 +725,15 @@ func setValueAtPath(i any, path string, v any) {
 		}
 		if idx == len(parts)-1 {
 			rv := reflect.ValueOf(v)
-			if field.Kind() == reflect.Ptr {
-				if rv.Kind() == reflect.Ptr {
+			if field.Kind() == reflect.Pointer {
+				if rv.Kind() == reflect.Pointer {
 					field.Set(rv.Convert(field.Type()))
 				} else {
 					ptr := reflect.New(field.Type().Elem())
 					ptr.Elem().Set(rv.Convert(field.Type().Elem()))
 					field.Set(ptr)
 				}
-			} else if rv.Kind() == reflect.Ptr && !rv.IsNil() {
+			} else if rv.Kind() == reflect.Pointer && !rv.IsNil() {
 				field.Set(rv.Elem().Convert(field.Type()))
 			} else if rv.Type().AssignableTo(field.Type()) {
 				field.Set(rv)
@@ -743,7 +743,7 @@ func setValueAtPath(i any, path string, v any) {
 				field.Set(rv)
 			}
 		} else {
-			if field.Kind() == reflect.Ptr {
+			if field.Kind() == reflect.Pointer {
 				if field.IsNil() {
 					field.Set(reflect.New(field.Type().Elem()))
 				}

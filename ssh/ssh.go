@@ -49,7 +49,7 @@ func InitClient(keyname string, keyFolders ...string) (*Client, error) {
 	}
 
 	if len(auths) == 0 {
-		return nil, fmt.Errorf("No key provided and no SSH_AUTH_SOCK env variable set, unable to resolve auth")
+		return nil, fmt.Errorf("no key provided and no SSH_AUTH_SOCK env variable set, unable to resolve auth")
 	}
 
 	return &Client{
@@ -139,7 +139,7 @@ func (c *Client) NewClientWithProxy(destinationHost string, destinationPort int,
 func (c *Client) CloseAll() error {
 	if c != nil {
 		if c.Client != nil {
-			return c.Client.Close()
+			return c.Close()
 		}
 		if c.Proxy != nil {
 			return c.Proxy.Close()
@@ -336,7 +336,7 @@ func checkHostKey(hostname string, remote net.Addr, key gossh.PublicKey) error {
 			_, err = f.WriteString(knownhosts.Line([]string{hostname}, key) + "\n")
 			return err
 		} else {
-			return errors.New("Host public key verification failed.")
+			return errors.New("host public key verification failed")
 		}
 	}
 

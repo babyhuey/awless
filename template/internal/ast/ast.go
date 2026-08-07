@@ -223,7 +223,7 @@ func (c *CommandNode) ToFillerParams() map[string]any {
 
 func (s *Statement) Clone() *Statement {
 	newStat := &Statement{}
-	newStat.Node = s.Node.clone()
+	newStat.Node = s.clone()
 
 	return newStat
 }

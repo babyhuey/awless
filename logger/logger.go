@@ -178,7 +178,7 @@ func prepend(s any, v ...any) []any {
 }
 
 func formatMultiLineErrMsg(msg string) []string {
-	notabs := strings.Replace(msg, "\t", "", -1)
+	notabs := strings.ReplaceAll(msg, "\t", "")
 	var indented []string
 	for _, line := range strings.Split(notabs, "\n") {
 		indented = append(indented, fmt.Sprintf("          %s", line))

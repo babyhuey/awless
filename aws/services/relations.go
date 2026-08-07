@@ -267,7 +267,7 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 			listValue := structField.Index(i)
 			var listStruc reflect.Value
 			switch listValue.Kind() {
-			case reflect.Ptr:
+			case reflect.Pointer:
 				listStruc = listValue.Elem()
 			case reflect.Struct:
 				listStruc = listValue
@@ -307,7 +307,7 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 
 func verifyValidStructField(i any, name string) (reflect.Value, error) {
 	value := reflect.ValueOf(i)
-	if value.Kind() != reflect.Ptr {
+	if value.Kind() != reflect.Pointer {
 		return reflect.Value{}, fmt.Errorf("%T not a pointer", i)
 	}
 	struc := value.Elem()
@@ -350,7 +350,7 @@ func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 		return err
 	}
 	value := reflect.ValueOf(i)
-	if value.Kind() != reflect.Ptr {
+	if value.Kind() != reflect.Pointer {
 		return fmt.Errorf("add parent to %s: unknown type %T", res.Id(), i)
 	}
 	struc := value.Elem()
@@ -466,7 +466,7 @@ func valueAtPath(i any, path string) (any, error) {
 	parts := strings.Split(path, ".")
 	v := reflect.ValueOf(i)
 	for _, part := range parts {
-		for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+		for v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
 			if v.IsNil() {
 				return nil, nil
 			}

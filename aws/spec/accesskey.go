@@ -147,7 +147,7 @@ func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 				}
 				switch len(keys.AccessKeyMetadata) {
 				case 0:
-					return values, fmt.Errorf("no access key found for %s:", user)
+					return values, fmt.Errorf("no access key found for %s", user)
 				case 1:
 					values["id"] = StringValue(keys.AccessKeyMetadata[0].AccessKeyId)
 				default:

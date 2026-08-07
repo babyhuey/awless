@@ -97,7 +97,7 @@ func (cmd *CreateCertificate) ManualRun(renv env.Running) (any, error) {
 	if len(domainsToValidate) > 0 {
 		var helpMsg bytes.Buffer
 		for domain, validationDomain := range domainsToValidate {
-			helpMsg.WriteString(fmt.Sprintf("\n\t-> %s: {admin/administrator/hostmaster/postmaster/webmaster}@%s", domain, validationDomain))
+			fmt.Fprintf(&helpMsg, "\n\t-> %s: {admin/administrator/hostmaster/postmaster/webmaster}@%s", domain, validationDomain)
 		}
 		cmd.logger.Warningf("validate your certificates by following the instructions sent by email to %s", helpMsg.String())
 	}

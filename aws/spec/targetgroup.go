@@ -83,27 +83,27 @@ func (cmd *UpdateTargetgroup) ParamsSpec() params.Spec {
 	))
 }
 
-func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
-	tgArn := StringValue(tg.Id)
+func (cmd *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
+	tgArn := StringValue(cmd.Id)
 
 	attrsInput := &elbv2.ModifyTargetGroupAttributesInput{}
 	var areTargetAttrsModified bool
 
-	if v := tg.Stickiness; v != nil {
+	if v := cmd.Stickiness; v != nil {
 		attrsInput.Attributes = append(attrsInput.Attributes, elbv2types.TargetGroupAttribute{
 			Key:   String("stickiness.enabled"),
 			Value: v,
 		})
 		areTargetAttrsModified = true
 	}
-	if v := tg.Stickinessduration; v != nil {
+	if v := cmd.Stickinessduration; v != nil {
 		attrsInput.Attributes = append(attrsInput.Attributes, elbv2types.TargetGroupAttribute{
 			Key:   String("stickiness.lb_cookie.duration_seconds"),
 			Value: v,
 		})
 		areTargetAttrsModified = true
 	}
-	if v := tg.Deregistrationdelay; v != nil {
+	if v := cmd.Deregistrationdelay; v != nil {
 		attrsInput.Attributes = append(attrsInput.Attributes, elbv2types.TargetGroupAttribute{
 			Key:   String("deregistration_delay.timeout_seconds"),
 			Value: v,
@@ -118,57 +118,57 @@ func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
 			return nil, err
 		}
 		start := time.Now()
-		if _, err = tg.api.ModifyTargetGroupAttributes(renv.RequestContext(), attrsInput); err != nil {
+		if _, err = cmd.api.ModifyTargetGroupAttributes(renv.RequestContext(), attrsInput); err != nil {
 			return nil, err
 		}
-		tg.logger.ExtraVerbosef("elbv2.ModifyTargetGroupAttributes call took %s", time.Since(start))
+		cmd.logger.ExtraVerbosef("elbv2.ModifyTargetGroupAttributes call took %s", time.Since(start))
 	}
 
 	input := &elbv2.ModifyTargetGroupInput{}
 	var isTargetGroupModified bool
 
-	if v := tg.Healthcheckinterval; v != nil {
+	if v := cmd.Healthcheckinterval; v != nil {
 		if err = setFieldWithType(v, input, "HealthCheckIntervalSeconds", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
-	if v := tg.Healthcheckpath; v != nil {
+	if v := cmd.Healthcheckpath; v != nil {
 		if err = setFieldWithType(v, input, "HealthCheckPath", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
-	if v := tg.Healthcheckport; v != nil {
+	if v := cmd.Healthcheckport; v != nil {
 		if err = setFieldWithType(v, input, "HealthCheckPort", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 	}
-	if v := tg.Healthcheckprotocol; v != nil {
+	if v := cmd.Healthcheckprotocol; v != nil {
 		if err = setFieldWithType(v, input, "HealthCheckProtocol", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
-	if v := tg.Healthchecktimeout; v != nil {
+	if v := cmd.Healthchecktimeout; v != nil {
 		if err = setFieldWithType(v, input, "HealthCheckTimeoutSeconds", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
-	if v := tg.Healthythreshold; v != nil {
+	if v := cmd.Healthythreshold; v != nil {
 		if err = setFieldWithType(v, input, "HealthyThresholdCount", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
-	if v := tg.Unhealthythreshold; v != nil {
+	if v := cmd.Unhealthythreshold; v != nil {
 		if err = setFieldWithType(v, input, "UnhealthyThresholdCount", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
-	if v := tg.Matcher; v != nil {
+	if v := cmd.Matcher; v != nil {
 		if err = setFieldWithType(v, input, "Matcher.HttpCode", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
@@ -180,8 +180,8 @@ func (tg *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
 			return nil, err
 		}
 		start := time.Now()
-		output, err := tg.api.ModifyTargetGroup(renv.RequestContext(), input)
-		tg.logger.ExtraVerbosef("elbv2.ModifyTargetGroup call took %s", time.Since(start))
+		output, err := cmd.api.ModifyTargetGroup(renv.RequestContext(), input)
+		cmd.logger.ExtraVerbosef("elbv2.ModifyTargetGroup call took %s", time.Since(start))
 		return output, err
 	}
 	return nil, nil

@@ -359,13 +359,13 @@ func (res *Resource) unmarshalFullRdf(gph tstore.RDFGraph) error {
 	return nil
 }
 
-func (r *Resource) unmarshalMeta(gph tstore.RDFGraph) error {
-	for _, t := range gph.WithSubjPred(r.Id(), MetaPredicate) {
+func (res *Resource) unmarshalMeta(gph tstore.RDFGraph) error {
+	for _, t := range gph.WithSubjPred(res.Id(), MetaPredicate) {
 		text, err := tstore.ParseString(t.Object())
 		if err != nil {
 			return err
 		}
-		r.meta["diff"] = text
+		res.meta["diff"] = text
 	}
 	return nil
 }

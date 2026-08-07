@@ -126,7 +126,7 @@ func (pe *parseError) Error() string {
 	}
 
 	var buff bytes.Buffer
-	buff.WriteString(fmt.Sprintf("error parsing template at line %d (char %d):\n", pe.line, pe.start))
+	fmt.Fprintf(&buff, "error parsing template at line %d (char %d):\n", pe.line, pe.start)
 
 	for i, l := range pe.lines {
 		buff.WriteByte('\t')

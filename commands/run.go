@@ -347,7 +347,7 @@ func runSyncFor(tplExec *template.TemplateExecution) {
 		return
 	}
 
-	apis := tplExec.Template.UniqueDefinitions(awsspec.APIPerTemplateDefName)
+	apis := tplExec.UniqueDefinitions(awsspec.APIPerTemplateDefName)
 
 	services := awsservices.GetCloudServicesForAPIs(apis...)
 
@@ -485,7 +485,7 @@ func getTemplateText(path string) (content []byte, expanded string, err error) {
 	if ok {
 		comp, _ := config.CompareSemver(requiredVersion, config.Version)
 		if comp > 0 {
-			return content, expanded, fmt.Errorf("This template has metadata indicating to be parsed with at least awless version %s. Your current version is %s", requiredVersion, config.Version)
+			return content, expanded, fmt.Errorf("this template has metadata indicating to be parsed with at least awless version %s. Your current version is %s", requiredVersion, config.Version)
 		}
 	}
 

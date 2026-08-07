@@ -179,7 +179,7 @@ func readStackFile(p string) (sf *stackFile, err error) {
 			return nil, fmt.Errorf("\n%w", err)
 		}
 	default:
-		return nil, fmt.Errorf("Unknown StackFile format %q. Should be \".json\", \".yml\" or \".yaml\"", path.Ext(p))
+		return nil, fmt.Errorf("unknown StackFile format %q. Should be \".json\", \".yml\" or \".yaml\"", path.Ext(p))
 	}
 	return sf, err
 }

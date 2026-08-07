@@ -28,13 +28,13 @@ type and struct {
 	matchers []cloud.Matcher
 }
 
-func (m and) Match(r cloud.Resource) bool {
-	for _, match := range m.matchers {
+func (p and) Match(r cloud.Resource) bool {
+	for _, match := range p.matchers {
 		if !match.Match(r) {
 			return false
 		}
 	}
-	return len(m.matchers) > 0
+	return len(p.matchers) > 0
 }
 
 func And(matchers ...cloud.Matcher) cloud.Matcher {
@@ -45,8 +45,8 @@ type or struct {
 	matchers []cloud.Matcher
 }
 
-func (m or) Match(r cloud.Resource) bool {
-	for _, match := range m.matchers {
+func (p or) Match(r cloud.Resource) bool {
+	for _, match := range p.matchers {
 		if match.Match(r) {
 			return true
 		}
@@ -66,17 +66,17 @@ type propertyMatcher struct {
 	contains      bool
 }
 
-func (m propertyMatcher) Match(r cloud.Resource) bool {
-	v, found := r.Property(m.name)
+func (p propertyMatcher) Match(r cloud.Resource) bool {
+	v, found := r.Property(p.name)
 	if !found {
 		return false
 	}
-	expectVal := m.value
-	if m.matchOnString {
+	expectVal := p.value
+	if p.matchOnString {
 		v = fmt.Sprint(v)
-		expectVal = fmt.Sprint(m.value)
+		expectVal = fmt.Sprint(p.value)
 	}
-	if m.ignoreCase {
+	if p.ignoreCase {
 		if vv, vIsStr := v.(string); vIsStr {
 			v = strings.ToLower(vv)
 		}
@@ -84,7 +84,7 @@ func (m propertyMatcher) Match(r cloud.Resource) bool {
 			expectVal = strings.ToLower(expect)
 		}
 	}
-	if m.contains {
+	if p.contains {
 		vv, vIsStr := v.(string)
 		expect, expectIsStr := expectVal.(string)
 		if vIsStr && expectIsStr {
@@ -117,13 +117,13 @@ type tagMatcher struct {
 	tagRegexp *regexp.Regexp
 }
 
-func (m tagMatcher) Match(r cloud.Resource) bool {
+func (p tagMatcher) Match(r cloud.Resource) bool {
 	tags, ok := r.Properties()["Tags"].([]string)
 	if !ok {
 		return false
 	}
 	for _, t := range tags {
-		if m.tagRegexp.MatchString(t) {
+		if p.tagRegexp.MatchString(t) {
 			return true
 		}
 	}
@@ -132,7 +132,7 @@ func (m tagMatcher) Match(r cloud.Resource) bool {
 
 func Tag(key, val string) tagMatcher {
 	tagQuoteRegexp := "^" + regexp.QuoteMeta(key+"="+val) + "$"
-	tagWildcardRegexp := regexp.MustCompile(strings.Replace(tagQuoteRegexp, "\\*", ".*", -1))
+	tagWildcardRegexp := regexp.MustCompile(strings.ReplaceAll(tagQuoteRegexp, "\\*", ".*"))
 
 	return tagMatcher{tagRegexp: tagWildcardRegexp}
 }
@@ -141,7 +141,7 @@ type tagKeyMatcher struct {
 	key string
 }
 
-func (m tagKeyMatcher) Match(r cloud.Resource) bool {
+func (p tagKeyMatcher) Match(r cloud.Resource) bool {
 	tags, ok := r.Properties()["Tags"].([]string)
 	if !ok {
 		return false
@@ -149,7 +149,7 @@ func (m tagKeyMatcher) Match(r cloud.Resource) bool {
 	for _, t := range tags {
 		splits := strings.Split(t, "=")
 		if len(splits) > 0 {
-			if splits[0] == m.key {
+			if splits[0] == p.key {
 				return true
 			}
 		}
@@ -165,7 +165,7 @@ type tagValueMatcher struct {
 	value string
 }
 
-func (m tagValueMatcher) Match(r cloud.Resource) bool {
+func (p tagValueMatcher) Match(r cloud.Resource) bool {
 	tags, ok := r.Properties()["Tags"].([]string)
 	if !ok {
 		return false
@@ -173,7 +173,7 @@ func (m tagValueMatcher) Match(r cloud.Resource) bool {
 	for _, t := range tags {
 		splits := strings.Split(t, "=")
 		if len(splits) > 1 {
-			if splits[1] == m.value {
+			if splits[1] == p.value {
 				return true
 			}
 		}

@@ -70,7 +70,7 @@ func AllOf(rules ...Rule) Rule {
 func (n allOf) Run(input []string) (err error) {
 	for _, r := range n.rules {
 		err = r.Run(input)
-		if !errors.Is(err, optErr) && err != nil {
+		if !errors.Is(err, errOpt) && err != nil {
 			return fmt.Errorf("%w: expecting %s", err, n.String())
 		}
 	}
@@ -151,7 +151,7 @@ func (n atLeastOneOf) Run(input []string) error {
 	}
 	var pass int
 	for _, r := range n.rules {
-		if err := r.Run(input); err == nil || errors.Is(err, optErr) {
+		if err := r.Run(input); err == nil || errors.Is(err, errOpt) {
 			pass++
 		}
 	}
@@ -206,14 +206,14 @@ func Suggested(s ...string) (sugs []suggested) {
 	return
 }
 
-var optErr = errors.New("opt err")
+var errOpt = errors.New("opt err")
 
 func (n opt) Visit(fn func(r Rule)) {
 	fn(n)
 }
 
 func (n opt) Run(input []string) error {
-	return optErr
+	return errOpt
 }
 
 func (n opt) Missing(input []string) (miss []string) {

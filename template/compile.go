@@ -253,7 +253,7 @@ func checkInvalidReferenceDeclarationsPass(tpl *Template, cenv env.Compiling) (*
 }
 
 func inlineVariableValuePass(tpl *Template, cenv env.Compiling) (*Template, env.Compiling, error) {
-	newTpl := &Template{ID: tpl.ID, AST: tpl.AST.Clone()}
+	newTpl := &Template{ID: tpl.ID, AST: tpl.Clone()}
 	newTpl.Statements = []*ast.Statement{}
 
 	for i, st := range tpl.Statements {
@@ -353,9 +353,9 @@ func resolveAliasPass(tpl *Template, cenv env.Compiling) (*Template, env.Compili
 	case 0:
 		break
 	case 1:
-		return tpl, cenv, fmt.Errorf("cannot resolve alias \"%s\". Not found in locally synced data.", emptyResolv[0])
+		return tpl, cenv, fmt.Errorf("cannot resolve alias \"%s\". Not found in locally synced data", emptyResolv[0])
 	default:
-		return tpl, cenv, fmt.Errorf("cannot resolve aliases: %q. Not found in locally synced data.", emptyResolv)
+		return tpl, cenv, fmt.Errorf("cannot resolve aliases: %q. Not found in locally synced data", emptyResolv)
 
 	}
 

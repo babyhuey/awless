@@ -65,7 +65,7 @@ var showCmd = &cobra.Command{
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("REFERENCE required. See examples.")
+			return errors.New("REFERENCE required. See examples")
 		}
 
 		ref := args[0]
@@ -124,7 +124,7 @@ var showCmd = &cobra.Command{
 func showResourceValuesOnlyFor(resource cloud.Resource, propKeys []string) {
 	var normalized []string
 	for _, p := range propKeys {
-		normalized = append(normalized, strings.ToLower(strings.Replace(p, " ", "", -1)))
+		normalized = append(normalized, strings.ToLower(strings.ReplaceAll(p, " ", "")))
 	}
 
 	valuesForKeys := map[string]string{}
@@ -250,9 +250,9 @@ func findResourceInLocalGraphs(ref string) (cloud.Resource, cloud.GraphAPI) {
 		logger.Infof("%d resources found with name '%s' in region '%s' for profile '%s'. Show a specific resource with:", len(resources), deprefix(ref), config.GetAWSRegion(), config.GetAWSProfile())
 		for _, res := range resources {
 			var buf bytes.Buffer
-			buf.WriteString(fmt.Sprintf("\t`awless show %s` to show the %s", res.Id(), res.Type()))
+			fmt.Fprintf(&buf, "\t`awless show %s` to show the %s", res.Id(), res.Type())
 			if state, ok := res.Properties()[properties.State].(string); ok {
-				buf.WriteString(fmt.Sprintf(" (state: '%s')", state))
+				fmt.Fprintf(&buf, " (state: '%s')", state)
 			}
 			logger.Infof("%s", buf.String())
 		}
@@ -318,7 +318,7 @@ func decorateWithSuggestion(err error, ref string) error {
 		}
 		for _, parent := range parents {
 			if parent.Type() == cloud.Region {
-				buf.WriteString(fmt.Sprintf("\n\tfound previously synced under region '%s' as %s. Show it with `awless show %s -r %s --local`", parent.Id(), res, res.Id(), parent.Id()))
+				fmt.Fprintf(buf, "\n\tfound previously synced under region '%s' as %s. Show it with `awless show %s -r %s --local`", parent.Id(), res, res.Id(), parent.Id())
 			}
 		}
 

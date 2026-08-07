@@ -130,7 +130,7 @@ func (f *fetcher) fetchResource(ctx context.Context, resourceType string, result
 		err = fmt.Errorf("no fetch func defined for resource type '%s'", resourceType)
 	}
 
-	f.cache.Store(fmt.Sprintf("%s_objects", resourceType), objects)
+	f.Store(fmt.Sprintf("%s_objects", resourceType), objects)
 
 	results <- FetchResult{
 		ResourceType: resourceType,

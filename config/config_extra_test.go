@@ -485,8 +485,8 @@ func TestCompareSemverErrors(t *testing.T) {
 	}
 	for _, tc := range tcases {
 		_, err := CompareSemver(tc.a, tc.b)
-		if !errors.Is(err, SemverInvalidFormatErr) {
-			t.Fatalf("CompareSemver(%q, %q): expected SemverInvalidFormatErr, got %v", tc.a, tc.b, err)
+		if !errors.Is(err, ErrSemverInvalidFormat) {
+			t.Fatalf("CompareSemver(%q, %q): expected ErrSemverInvalidFormat, got %v", tc.a, tc.b, err)
 		}
 	}
 }

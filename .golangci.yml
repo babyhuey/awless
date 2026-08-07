@@ -21,10 +21,7 @@ linters:
         - fieldalignment
         - shadow
         # 'inline' is a recently added analyzer that enable-all picks up. It is
-        # not part of stock `go vet`, which CI runs separately and passes.
-        # 16 findings, all reflect.Ptr -> reflect.Pointer. Tracked as ISSUES.md
-        # I19; re-enable once that lands.
-        - inline
+        - inline # noisy suggestions to inline constants; go vet does not run it
     misspell:
       locale: US
     staticcheck:
@@ -35,8 +32,13 @@ linters:
         # v1 enabled gosimple + staticcheck but NOT stylecheck, so ST* and QF*
         # checks never ran here. Excluded to keep this a behavior-preserving
         # migration: enabling them adds 255 findings. Tracked as ISSUES.md I19.
-        - -ST*
-        - -QF*
+        # ST1003 remains excluded: 175 findings, and the ALL_CAPS ones are
+        # exported identifiers in template/env, so renaming them would break the
+        # public API for a purely cosmetic gain. Tracked in ISSUES.md I19.
+        - -ST1003
+        # QF1002: one site, aws/fetch/manual_fetchers.go, switching on a sum of
+        # four counters. A tagged switch there reads worse than the boolean form.
+        - -QF1002
   exclusions:
     generated: lax
     presets:

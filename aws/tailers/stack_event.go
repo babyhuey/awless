@@ -95,7 +95,7 @@ func (t *stackEventTailer) Tail(w io.Writer) error {
 	}
 
 	if !isDeploying {
-		return fmt.Errorf("Stack %s not being deployed at the moment", t.stackName)
+		return fmt.Errorf("stack %s not being deployed at the moment", t.stackName)
 	}
 
 	ticker := time.NewTicker(t.pollingFrequency)
@@ -114,10 +114,10 @@ func (t *stackEventTailer) Tail(w io.Writer) error {
 				color.Red("Canceling update of stack %q", t.stackName)
 				err := t.cancelStackUpdate(cfn)
 				if err != nil {
-					return fmt.Errorf("Couldn't cancel stack update.\nError: %w\nStack update could be running, please check manually", err)
+					return fmt.Errorf("couldn't cancel stack update.\nError: %w\nStack update could be running, please check manually", err)
 				}
 			} else {
-				return fmt.Errorf("Timeout (%s) reached. Exiting...", t.timeout.String())
+				return fmt.Errorf("timeout (%s) reached. Exiting", t.timeout.String())
 			}
 		case <-ticker.C:
 			if err := t.displayRelevantEvents(cfn, tab); err != nil {
@@ -210,7 +210,7 @@ func (t *stackEventTailer) isStackBeingDeployed(cfn *awsservices.Cloudformation)
 	}
 
 	if len(stacks.Stacks) == 0 {
-		return false, fmt.Errorf("Stack not found")
+		return false, fmt.Errorf("stack not found")
 	}
 
 	return strings.HasSuffix(string(stacks.Stacks[0].StackStatus), StackEventInProgress), nil
@@ -300,9 +300,9 @@ func coloredResourceStatus(str string) string {
 
 }
 
-func (e stackEvents) printReverse(w io.Writer, f filters) error {
-	for i := len(e) - 1; i >= 0; i-- {
-		_, _ = w.Write(e[i].filter(f))
+func (t stackEvents) printReverse(w io.Writer, f filters) error {
+	for i := len(t) - 1; i >= 0; i-- {
+		_, _ = w.Write(t[i].filter(f))
 	}
 
 	return nil
@@ -335,21 +335,21 @@ func (f filters) header() []byte {
 	return []byte(color.New(color.Bold).Sprintf("%s", buf.String()) + "\n")
 }
 
-func (e *stackEvent) filter(filters []string) (out []byte) {
+func (t *stackEvent) filter(filters []string) (out []byte) {
 	var buf bytes.Buffer
 
 	for i, f := range filters {
 		switch {
-		case f == StackEventLogicalID && e.LogicalResourceId != nil:
-			buf.WriteString(*e.LogicalResourceId)
-		case f == StackEventTimestamp && e.Timestamp != nil:
-			buf.WriteString(e.Timestamp.Format(time.RFC3339))
-		case f == StackEventStatus && e.ResourceStatus != "":
-			buf.WriteString(coloredResourceStatus(string(e.ResourceStatus)))
-		case f == StackEventStatusReason && e.ResourceStatusReason != nil:
-			buf.WriteString(*e.ResourceStatusReason)
-		case f == StackEventType && e.ResourceType != nil:
-			buf.WriteString(*e.ResourceType)
+		case f == StackEventLogicalID && t.LogicalResourceId != nil:
+			buf.WriteString(*t.LogicalResourceId)
+		case f == StackEventTimestamp && t.Timestamp != nil:
+			buf.WriteString(t.Timestamp.Format(time.RFC3339))
+		case f == StackEventStatus && t.ResourceStatus != "":
+			buf.WriteString(coloredResourceStatus(string(t.ResourceStatus)))
+		case f == StackEventStatusReason && t.ResourceStatusReason != nil:
+			buf.WriteString(*t.ResourceStatusReason)
+		case f == StackEventType && t.ResourceType != nil:
+			buf.WriteString(*t.ResourceType)
 		}
 
 		if i != len(filters)-1 {
@@ -365,25 +365,25 @@ func (e *stackEvent) filter(filters []string) (out []byte) {
 
 const cfnStackResourceType = "AWS::CloudFormation::Stack"
 
-func (s *stackEvent) isDeploymentStart() bool {
-	return (s.ResourceType != nil && *s.ResourceType == cfnStackResourceType) &&
-		(s.ResourceStatus == cloudformationtypes.ResourceStatusCreateInProgress ||
-			s.ResourceStatus == cloudformationtypes.ResourceStatusDeleteInProgress ||
-			s.ResourceStatus == cloudformationtypes.ResourceStatusUpdateInProgress)
+func (t *stackEvent) isDeploymentStart() bool {
+	return (t.ResourceType != nil && *t.ResourceType == cfnStackResourceType) &&
+		(t.ResourceStatus == cloudformationtypes.ResourceStatusCreateInProgress ||
+			t.ResourceStatus == cloudformationtypes.ResourceStatusDeleteInProgress ||
+			t.ResourceStatus == cloudformationtypes.ResourceStatusUpdateInProgress)
 }
 
-func (s *stackEvent) isDeploymentFinished() bool {
-	return (s.ResourceType != nil && *s.ResourceType == cfnStackResourceType) &&
-		(strings.HasSuffix(string(s.ResourceStatus), StackEventComplete) ||
-			strings.HasSuffix(string(s.ResourceStatus), StackEventFailed))
+func (t *stackEvent) isDeploymentFinished() bool {
+	return (t.ResourceType != nil && *t.ResourceType == cfnStackResourceType) &&
+		(strings.HasSuffix(string(t.ResourceStatus), StackEventComplete) ||
+			strings.HasSuffix(string(t.ResourceStatus), StackEventFailed))
 }
 
-func (s *stackEvent) isFailed() bool {
-	return strings.HasSuffix(string(s.ResourceStatus), StackEventFailed) || s.ResourceStatus == cloudformationtypes.ResourceStatusUpdateRollbackInProgress
+func (t *stackEvent) isFailed() bool {
+	return strings.HasSuffix(string(t.ResourceStatus), StackEventFailed) || t.ResourceStatus == cloudformationtypes.ResourceStatusUpdateRollbackInProgress
 }
 
-func (s *stackEventTailer) cancelStackUpdate(cfn *awsservices.Cloudformation) error {
-	inp := &cloudformation.CancelUpdateStackInput{StackName: &s.stackName}
+func (t *stackEventTailer) cancelStackUpdate(cfn *awsservices.Cloudformation) error {
+	inp := &cloudformation.CancelUpdateStackInput{StackName: &t.stackName}
 	_, err := cfn.CloudformationClient.CancelUpdateStack(context.Background(), inp)
 	return err
 }

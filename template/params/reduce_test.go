@@ -238,7 +238,7 @@ func TestOptRun(t *testing.T) {
 	o := Opt("a")
 	err := o.Run([]string{"a"})
 	if err == nil {
-		t.Fatal("Opt.Run should always return optErr")
+		t.Fatal("Opt.Run should always return errOpt")
 	}
 }
 
