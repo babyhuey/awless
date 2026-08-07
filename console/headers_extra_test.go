@@ -2,6 +2,7 @@ package console
 
 import (
 	"bytes"
+	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -478,22 +479,39 @@ func TestValueLowerOrEqualTimeAndSlices(t *testing.T) {
 	}
 }
 
-func TestValueLowerOrEqualPanicsOnUnknownType(t *testing.T) {
+// Previously asserted a panic for types with no explicit case. Display code
+// must not crash the CLI, so the contract is now a deterministic fallback to
+// comparing rendered values. Same inputs as before.
+func TestValueLowerOrEqualHandlesUnknownType(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
-			t.Fatal("expected panic for unknown type")
+		if r := recover(); r != nil {
+			t.Fatalf("unknown type must not panic, got: %v", r)
 		}
 	}()
-	valueLowerOrEqual(complex(1, 2), complex(3, 4))
+	a, b := complex(1, 2), complex(3, 4)
+	if !valueLowerOrEqual(a, b) {
+		t.Errorf("expected fmt.Sprint fallback ordering %q <= %q", fmt.Sprint(a), fmt.Sprint(b))
+	}
+	if valueLowerOrEqual(b, a) {
+		t.Error("fallback ordering must be antisymmetric for distinct values")
+	}
 }
 
-func TestValueLowerOrEqualPanicsOnMismatchedTypes(t *testing.T) {
+// Previously asserted a panic for mismatched types. A single column can hold
+// different types across resources, so this must sort rather than crash.
+func TestValueLowerOrEqualHandlesMismatchedTypes(t *testing.T) {
 	defer func() {
-		if r := recover(); r == nil {
-			t.Fatal("expected panic for mismatched types")
+		if r := recover(); r != nil {
+			t.Fatalf("mismatched types must not panic, got: %v", r)
 		}
 	}()
-	valueLowerOrEqual(1, "string")
+	// "1" <= "string" under string comparison.
+	if !valueLowerOrEqual(1, "string") {
+		t.Error(`expected valueLowerOrEqual(1, "string") to be true via fallback`)
+	}
+	if valueLowerOrEqual("string", 1) {
+		t.Error("fallback ordering must be antisymmetric for distinct values")
+	}
 }
 
 func TestTSVDisplay(t *testing.T) {

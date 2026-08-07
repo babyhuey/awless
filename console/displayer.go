@@ -957,6 +957,14 @@ func (d *defaultSorter) symbol() string {
 	return " ▲"
 }
 
+// valueLowerOrEqual orders two resource property values for display sorting.
+//
+// Resource properties are interface{} sourced from heterogeneous AWS responses,
+// so a single column can hold different types across resources (and types this
+// function has no case for). It therefore never panics: unknown or mismatched
+// types fall back to comparing their rendered form, which yields a stable if
+// arbitrary order. Panicking here would crash the CLI mid-render, and a sort
+// panic of this class has already been fixed once (commit 71665081).
 func valueLowerOrEqual(a, b interface{}) bool {
 	if a == nil && b == nil {
 		return true
@@ -972,7 +980,7 @@ func valueLowerOrEqual(a, b interface{}) bool {
 		return false
 	}
 	if reflect.TypeOf(a) != reflect.TypeOf(b) {
-		panic(fmt.Sprintf("can not compare values of type %T and %T", a, b))
+		return fmt.Sprint(a) <= fmt.Sprint(b)
 	}
 	switch a.(type) {
 	case int:
@@ -995,10 +1003,8 @@ func valueLowerOrEqual(a, b interface{}) bool {
 		aa := a.(bool)
 		bb := b.(bool)
 		return !aa || bb
-	case []string, []int:
-		return fmt.Sprint(a) <= fmt.Sprint(b)
 	default:
-		panic(fmt.Sprintf("can not compare values of type %T", a))
+		return fmt.Sprint(a) <= fmt.Sprint(b)
 	}
 }
 
