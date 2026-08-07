@@ -27,7 +27,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/mitchellh/ioprogress"
 
 	"github.com/wallix/awless/logger"
 )
@@ -134,7 +133,7 @@ func (cmd *DeleteS3object) ParamsSpec() params.Spec {
 
 type ProgressReadSeeker struct {
 	file   *os.File
-	reader *ioprogress.Reader
+	reader *progressReader
 }
 
 func NewProgressReader(f *os.File) (*ProgressReadSeeker, error) {
@@ -148,13 +147,13 @@ func NewProgressReader(f *os.File) (*ProgressReadSeeker, error) {
 		// once in memory and a second time for the HTTP upload
 		// here we only display for the actual HTTP upload
 		if progress > total {
-			return ioprogress.DrawTextFormatBytes(progress/2, total)
+			return drawTextFormatBytes(progress/2, total)
 		}
 		return ""
 	}
 
-	reader := &ioprogress.Reader{
-		DrawFunc: ioprogress.DrawTerminalf(os.Stdout, draw),
+	reader := &progressReader{
+		DrawFunc: drawTerminalf(os.Stdout, draw),
 		Reader:   f,
 		Size:     finfo.Size(),
 	}

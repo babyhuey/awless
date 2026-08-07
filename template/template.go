@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/oklog/ulid"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/wallix/awless/template/env"
 	"github.com/wallix/awless/template/internal/ast"

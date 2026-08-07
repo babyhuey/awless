@@ -28,7 +28,7 @@ import (
 	"github.com/wallix/awless/template/params"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/wallix/awless/logger"
 )
