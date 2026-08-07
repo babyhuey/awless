@@ -26,6 +26,8 @@ import (
 	"sync"
 	"text/tabwriter"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/wallix/awless/cloud"
 )
 
@@ -35,6 +37,8 @@ type Pricer struct {
 	total float64
 	count map[string]int
 }
+
+const maxParallelPriceFetches = 10
 
 func (p *Pricer) Name() string {
 	return "pricer"
@@ -62,37 +66,30 @@ func (p *Pricer) Inspect(g cloud.GraphAPI) error {
 
 	fmt.Printf("Fetching prices at %s for region %s\n\n", pricesURL, region)
 
-	type result struct {
-		typ   string
-		price float64
-	}
-
-	var wg sync.WaitGroup
-	resultC := make(chan result)
+	// Bounded: one goroutine per instance type with no limit meant unbounded
+	// simultaneous HTTP calls to the pricing endpoint.
+	var mu sync.Mutex
+	eg := new(errgroup.Group)
+	eg.SetLimit(maxParallelPriceFetches)
 
 	for ty := range pricePerType {
-		wg.Add(1)
-		go func(t string) {
-			defer wg.Done()
+		t := ty
+		eg.Go(func() error {
 			price, err := fetchPrice(t, region)
 			if err != nil {
+				// Preserved: a price fetch failure is reported and skipped
+				// rather than failing the whole inspection.
 				fmt.Printf("fetching price for '%s': %s\n", t, err)
-				return
+				return nil
 			}
-
-			resultC <- result{typ: t, price: price}
-		}(ty)
+			mu.Lock()
+			pricePerType[t] = price
+			mu.Unlock()
+			return nil
+		})
 	}
 
-	go func() {
-		wg.Wait()
-		close(resultC)
-	}()
-
-	for r := range resultC {
-		pricePerType[r.typ] = r.price
-	}
-
+	_ = eg.Wait() // the closures never return an error; failures are logged above
 	for typ, count := range p.count {
 		p.total = p.total + (float64(count) * pricePerType[typ])
 	}

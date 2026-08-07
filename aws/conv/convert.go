@@ -29,6 +29,8 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/errgroup"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
 	apigatewayv2types "github.com/aws/aws-sdk-go-v2/service/apigatewayv2/types"
@@ -249,63 +251,57 @@ func NewResource(source interface{}) (*graph.Resource, error) {
 		return nil, fmt.Errorf("can not fetch cloud resource. %v is not a valid struct or pointer.", value)
 	}
 
-	type keyValResult struct {
-		key string
-		val interface{}
-	}
+	// Bounded and leak-free. The previous version wrote to unbuffered resultc
+	// and errc channels while the consumer returned on the first error, leaving
+	// remaining goroutines blocked on send forever. It also continued to send a
+	// result after sending an error, rather than stopping.
+	var mu sync.Mutex
+	g := new(errgroup.Group)
+	g.SetLimit(maxParallelPropertyTransforms)
 
-	resultc := make(chan keyValResult)
-	errc := make(chan error)
-
-	var wg sync.WaitGroup
 	for prop, trans := range awsResourcesDef[res.Type()] {
-		wg.Add(1)
-		go func(p string, t *propertyTransform) {
-			defer wg.Done()
+		p, t := prop, trans
+		g.Go(func() error {
+			setProp := func(val interface{}) {
+				mu.Lock()
+				res.Properties()[p] = val
+				mu.Unlock()
+			}
+
 			if t.transform != nil {
 				sourceField := nodeV.FieldByName(t.name)
 				if sourceField.IsValid() && !isNilValue(sourceField) {
 					val, err := t.transform(sourceField.Interface())
 					if err == ErrTagNotFound {
-						return
+						return nil
 					}
 					if err != nil {
-						errc <- fmt.Errorf("type [%s]: prop '%v': %s", res.Type(), p, err)
+						return fmt.Errorf("type [%s]: prop '%v': %s", res.Type(), p, err)
 					}
-					resultc <- keyValResult{p, val}
+					setProp(val)
 				}
 			}
 			if t.fetch != nil {
 				val, err := t.fetch(source)
 				if err != nil {
-					errc <- fmt.Errorf("type [%s]: prop '%v': %s", res.Type(), p, err)
+					return fmt.Errorf("type [%s]: prop '%v': %s", res.Type(), p, err)
 				}
-				resultc <- keyValResult{p, val}
+				setProp(val)
 			}
-		}(prop, trans)
+			return nil
+		})
 	}
 
-	go func() {
-		wg.Wait()
-		close(errc)
-		close(resultc)
-	}()
-
-	for {
-		select {
-		case e := <-errc:
-			if e != nil {
-				return res, e
-			}
-		case keyVal, ok := <-resultc:
-			if !ok {
-				return res, nil
-			}
-			res.Properties()[keyVal.key] = keyVal.val
-		}
+	if err := g.Wait(); err != nil {
+		return res, err
 	}
 
+	return res, nil
 }
+
+// maxParallelPropertyTransforms bounds the per-property fan-out when
+// converting one AWS API object into a graph resource.
+const maxParallelPropertyTransforms = 10
 
 var ErrTagNotFound = errors.New("aws tag key not found")
 

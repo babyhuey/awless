@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"golang.org/x/sync/errgroup"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
@@ -47,86 +49,75 @@ func getAllTasks(ctx context.Context, cache fetch.Cache, api *ecs.Client) (res [
 		return res, cerr
 	}
 
-	type listTasksOutput struct {
-		err     error
-		output  *ecs.ListTasksOutput
+	// Two bounded phases rather than a streaming pipeline.
+	//
+	// The previous implementation had three defects: it called tasksWG.Add from
+	// inside a worker while another goroutine could already be in
+	// tasksWG.Wait() (undefined behavior), its consumer returned on the first
+	// error leaving senders blocked on unbuffered channels forever, and it
+	// spawned two goroutines per cluster plus one per page with no limit.
+	//
+	// Phase 1 lists task ARNs, phase 2 describes them. Batches are kept
+	// per-page because DescribeTasks accepts at most 100 tasks per call.
+	type taskBatch struct {
 		cluster string
+		arns    []string
 	}
-	tasksNamesc := make(chan listTasksOutput)
-	var wg sync.WaitGroup
+
+	var (
+		mu      sync.Mutex
+		batches []taskBatch
+	)
+
+	listG := new(errgroup.Group)
+	listG.SetLimit(maxParallelAWSCalls)
 
 	for _, cluster := range clusterArns {
-		wg.Add(1)
-		go func(cl string) {
-			defer wg.Done()
-			paginator := ecs.NewListTasksPaginator(api, &ecs.ListTasksInput{Cluster: &cl, DesiredStatus: ecstypes.DesiredStatusRunning})
-			for paginator.HasMorePages() {
-				out, er := paginator.NextPage(ctx)
-				if er != nil {
-					tasksNamesc <- listTasksOutput{err: er}
-					return
+		for _, status := range []ecstypes.DesiredStatus{ecstypes.DesiredStatusRunning, ecstypes.DesiredStatusStopped} {
+			cl, st := cluster, status
+			listG.Go(func() error {
+				paginator := ecs.NewListTasksPaginator(api, &ecs.ListTasksInput{Cluster: &cl, DesiredStatus: st})
+				for paginator.HasMorePages() {
+					out, er := paginator.NextPage(ctx)
+					if er != nil {
+						return er
+					}
+					if len(out.TaskArns) == 0 {
+						continue
+					}
+					mu.Lock()
+					batches = append(batches, taskBatch{cluster: cl, arns: out.TaskArns})
+					mu.Unlock()
 				}
-				tasksNamesc <- listTasksOutput{output: out, cluster: cl}
-			}
-		}(cluster)
-
-		wg.Add(1)
-		go func(cl string) {
-			defer wg.Done()
-			paginator := ecs.NewListTasksPaginator(api, &ecs.ListTasksInput{Cluster: &cl, DesiredStatus: ecstypes.DesiredStatusStopped})
-			for paginator.HasMorePages() {
-				out, er := paginator.NextPage(ctx)
-				if er != nil {
-					tasksNamesc <- listTasksOutput{err: er}
-					return
-				}
-				tasksNamesc <- listTasksOutput{output: out, cluster: cl}
-			}
-		}(cluster)
-	}
-
-	type describeTasksOutput struct {
-		err    error
-		output *ecs.DescribeTasksOutput
-	}
-
-	tasksc := make(chan describeTasksOutput)
-	var tasksWG sync.WaitGroup
-
-	tasksWG.Add(1)
-	go func() {
-		defer tasksWG.Done()
-		for r := range tasksNamesc {
-			if r.err != nil {
-				tasksc <- describeTasksOutput{err: r.err}
-				return
-			}
-			if len(r.output.TaskArns) == 0 {
-				continue
-			}
-
-			tasksWG.Add(1)
-			go func(taskArns []string, cluster string) {
-				defer tasksWG.Done()
-				tasksOut, er := api.DescribeTasks(ctx, &ecs.DescribeTasksInput{Cluster: &cluster, Tasks: taskArns})
-				tasksc <- describeTasksOutput{err: er, output: tasksOut}
-			}(r.output.TaskArns, r.cluster)
+				return nil
+			})
 		}
-	}()
-
-	go func() {
-		wg.Wait()
-		close(tasksNamesc)
-		tasksWG.Wait()
-		close(tasksc)
-	}()
-
-	for r := range tasksc {
-		if err = r.err; err != nil {
-			return
-		}
-		res = append(res, r.output.Tasks...)
 	}
 
-	return
+	if err = listG.Wait(); err != nil {
+		return res, err
+	}
+
+	describeG := new(errgroup.Group)
+	describeG.SetLimit(maxParallelAWSCalls)
+
+	for _, batch := range batches {
+		b := batch
+		describeG.Go(func() error {
+			out, er := api.DescribeTasks(ctx, &ecs.DescribeTasksInput{Cluster: &b.cluster, Tasks: b.arns})
+			if er != nil {
+				return er
+			}
+			mu.Lock()
+			res = append(res, out.Tasks...)
+			mu.Unlock()
+			return nil
+		})
+	}
+
+	if err = describeG.Wait(); err != nil {
+		return res, err
+	}
+
+	return res, nil
 }

@@ -13,9 +13,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.64.2
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.71.7
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.60.2
+	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.55.7
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.55.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.64.0
-	github.com/aws/aws-sdk-go-v2/service/cloudtrail v1.55.7
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.56.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.294.0
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.55.4
@@ -48,6 +48,7 @@ require (
 	github.com/wallix/awless-scheduler v0.0.6
 	github.com/wallix/triplestore v0.0.0-20180213143850-4099dd913851
 	golang.org/x/crypto v0.48.0
+	golang.org/x/sync v0.22.0
 	golang.org/x/term v0.40.0
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.4.0

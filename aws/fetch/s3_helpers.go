@@ -9,6 +9,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"golang.org/x/sync/errgroup"
 
 	awsconv "github.com/wallix/awless/aws/conv"
 	"github.com/wallix/awless/cloud/rdf"
@@ -27,30 +28,19 @@ func forEachBucketParallel(ctx context.Context, cache fetch.Cache, api *s3.Clien
 		buckets = v
 	}
 
-	errc := make(chan error)
-	var wg sync.WaitGroup
+	// Bounded: one goroutine per bucket previously meant thousands of
+	// simultaneous AWS calls on large accounts, causing throttling. errgroup
+	// also removes the leak the old unbuffered error channel had, where
+	// returning on the first error left the remaining senders blocked forever.
+	g := new(errgroup.Group)
+	g.SetLimit(maxParallelAWSCalls)
 
 	for _, output := range buckets {
-		wg.Add(1)
-		go func(b s3types.Bucket) {
-			defer wg.Done()
-			if err := f(b); err != nil {
-				errc <- err
-			}
-		}(output)
-	}
-	go func() {
-		wg.Wait()
-		close(errc)
-	}()
-
-	for err := range errc {
-		if err != nil {
-			return err
-		}
+		b := output
+		g.Go(func() error { return f(b) })
 	}
 
-	return nil
+	return g.Wait()
 }
 
 func fetchObjectsForBucket(ctx context.Context, api *s3.Client, bucket s3types.Bucket, resourcesC chan<- *graph.Resource) error {
@@ -138,52 +128,42 @@ func getBucketsPerRegion(ctx context.Context, api *s3.Client) ([]s3types.Bucket,
 		buckets = out.Buckets
 	}
 
-	bucketc := make(chan s3types.Bucket)
-	errc := make(chan error)
+	// Bounded, and leak-free: the previous version used unbuffered bucketc and
+	// errc channels with a consumer that returned on the first error, leaving
+	// every other in-flight goroutine blocked on send forever.
+	region, _ := ctx.Value("region").(string)
 
-	var wg sync.WaitGroup
+	var (
+		mu              sync.Mutex
+		bucketsInRegion []s3types.Bucket
+	)
+
+	g := new(errgroup.Group)
+	g.SetLimit(maxParallelAWSCalls)
 
 	for _, bucket := range buckets {
-		wg.Add(1)
-		go func(b s3types.Bucket) {
-			defer wg.Done()
+		b := bucket
+		g.Go(func() error {
 			loc, err := api.GetBucketLocation(ctx, &s3.GetBucketLocationInput{Bucket: b.Name})
 			if err != nil {
-				errc <- err
-				return
+				return err
 			}
 
-			region, _ := ctx.Value("region").(string)
 			locConstraint := string(loc.LocationConstraint)
-			switch locConstraint {
-			case "":
-				if region == "us-east-1" {
-					bucketc <- b
-				}
-			case region:
-				bucketc <- b
+			// An empty location constraint means us-east-1.
+			inRegion := locConstraint == region || (locConstraint == "" && region == "us-east-1")
+			if inRegion {
+				mu.Lock()
+				bucketsInRegion = append(bucketsInRegion, b)
+				mu.Unlock()
 			}
-		}(bucket)
+			return nil
+		})
 	}
-	go func() {
-		wg.Wait()
-		close(bucketc)
-	}()
 
-	var bucketsInRegion []s3types.Bucket
-	for {
-		select {
-		case err := <-errc:
-			if err != nil {
-				return bucketsInRegion, err
-			}
-		case b, ok := <-bucketc:
-			if !ok {
-				return bucketsInRegion, nil
-			}
-			bucketsInRegion = append(bucketsInRegion, b)
-		}
-	}
+	// Partial results are returned alongside an error, as before.
+	err = g.Wait()
+	return bucketsInRegion, err
 }
 
 func fetchAndExtractGrantsFn(ctx context.Context, api *s3.Client, bucketName string) ([]*graph.Grant, error) {
