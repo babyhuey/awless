@@ -900,20 +900,33 @@ hand-edit `gen_*.go`" rule in `AGENTS.md`.
 
 ---
 
-### I16: Replace `os.Exit` calls in command paths
+### I16: `os.Exit` in command paths — **PARTIALLY FIXED**, remainder deliberate
 
 **Severity:** Low  
-**Files:** `commands/errors.go:29`, `commands/runner.go:89`, `commands/show.go:77,260`, `commands/list.go:119,123`, `commands/revert.go:60`, `commands/run.go:199`, `template/runner.go:93`, `aws/config/validator.go:63`
+**Files:** `commands/run.go`, `aws/config/validator.go`, plus 8 other `os.Exit` sites
 
-Nine `os.Exit` calls sit inside command implementations. `os.Exit` skips all deferred functions, which means:
+The concern was that `os.Exit` skips deferred functions, losing cleanup. Audited
+every `os.Exit` against the defers in scope, and exactly two sites actually
+skipped one — both a `readline` instance, so the terminal was left in raw mode
+after Ctrl-C:
 
-- BoltDB is not closed cleanly (`database/db.go:44` uses `defer db.Close()`)
-- Open file handles and SSH sessions are not released
-- Template execution logs may not be flushed
+- `commands/run.go` the template-hole prompt
+- `aws/config/validator.go` the region selector
 
-It also makes the affected code paths untestable, which is part of why `commands/` has almost no test coverage (see I7).
+Both now close explicitly before exiting.
 
-**Fix:** Return errors up to `main.go` and exit once from there. `cobra` supports `RunE` for exactly this. This pairs with I4 (signal handling), since both require a single well-defined exit path.
+**Deliberately not done: removing `os.Exit` entirely.** That means converting
+`exitOn` to return an error, which touches **88 call sites** and requires every
+cobra `Run` to become `RunE`. The original justification does not survive
+scrutiny:
+
+- `database.Execute` opens and closes the DB within a single call
+  (`defer db.Close()` is function-scoped), so no long-lived handle is leaked.
+- The other defers in scope at an `os.Exit` are the two readline cases above.
+
+So the refactor's remaining benefit is testability of `commands/`, which is
+better pursued as part of `I7` where it can be justified by coverage rather than
+done speculatively.
 
 ---
 

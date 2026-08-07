@@ -61,6 +61,9 @@ func StdinRegionSelector() string {
 	for !IsValidRegion(region) {
 		line, err := rl.Readline()
 		if errors.Is(err, readline.ErrInterrupt) || errors.Is(err, io.EOF) {
+			// os.Exit skips the deferred rl.Close(), leaving the terminal in raw
+			// mode, so close explicitly first.
+			_ = rl.Close()
 			os.Exit(1)
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr, "error while selecting region: %s", err)

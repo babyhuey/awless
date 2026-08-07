@@ -189,10 +189,13 @@ func askHole(hole, promptSuffix string, autocomplete readline.AutoCompleter) (st
 		line, err := l.Readline()
 		if errors.Is(err, readline.ErrInterrupt) {
 			if len(line) == 0 {
+				// Ctrl-C at an empty prompt aborts awless. os.Exit skips the
+				// deferred l.Close(), which would leave the terminal in raw mode,
+				// so close explicitly first.
+				_ = l.Close()
 				os.Exit(0)
-			} else {
-				continue
 			}
+			continue
 		} else if errors.Is(err, io.EOF) {
 			break
 		}
