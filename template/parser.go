@@ -96,6 +96,14 @@ func parseStatement(text string) (ast.Node, error) {
 		return nil, err
 	}
 
+	// Input that parses successfully but yields no statement — an empty string,
+	// or a comment-only line — used to panic here with an index out of range.
+	// This is reachable from TemplateExecution.UnmarshalJSON, which re-parses
+	// persisted command lines, so a log entry like that crashed `awless log`.
+	if len(templ.Statements) == 0 {
+		return nil, fmt.Errorf("parse statement: no statement found in %q", text)
+	}
+
 	return templ.Statements[0].Node, nil
 }
 

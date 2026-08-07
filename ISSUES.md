@@ -830,7 +830,7 @@ proves wrong for very large accounts.
 
 ---
 
-### I14: Migrate fuzzers to native Go fuzzing
+### I14: Migrate fuzzers to native Go fuzzing — **FIXED** (found a real panic; see commit)
 
 **Severity:** Low  
 **Files:** `template/fuzz/parsing/main.go:9`, `template/fuzz/parameters/main.go:12`

@@ -86,6 +86,30 @@ jobs:
             exit 1
           fi
 
+  fuzz:
+    name: Fuzz (smoke)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
+      # Short runs only: enough to catch an obvious regression on every push
+      # without turning CI into a fuzzing farm. The seed corpus and any
+      # discovered crashers in template/testdata/fuzz are exercised by the
+      # normal `test` job on every run.
+      #
+      # The template parser is the target because it consumes untrusted input:
+      # `awless run` takes a local path or an HTTP URL, and the local log is
+      # re-parsed on read.
+      - name: Fuzz template parsing
+        run: go test ./template/ -run=XXX -fuzz='^FuzzParse$' -fuzztime=60s
+
+      - name: Fuzz statement parsing
+        run: go test ./template/ -run=XXX -fuzz='^FuzzParseStatement$' -fuzztime=60s
+
   vuln:
     name: Vulnerability Check
     runs-on: ubuntu-latest

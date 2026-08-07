@@ -50,6 +50,11 @@ test: ## Run tests
 test-race: ## Run tests with the race detector
 	go test -race -count=1 ./...
 
+.PHONY: fuzz
+fuzz: ## Run each fuzz target briefly (FUZZTIME=30s to override)
+	go test ./template/ -run=XXX -fuzz='^FuzzParse$$' -fuzztime=$(or $(FUZZTIME),30s)
+	go test ./template/ -run=XXX -fuzz='^FuzzParseStatement$$' -fuzztime=$(or $(FUZZTIME),30s)
+
 .PHONY: cover
 cover: ## Run tests with coverage and print the total
 	go test -count=1 -coverprofile=coverage.out ./...
