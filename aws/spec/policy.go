@@ -319,9 +319,11 @@ func (cmd *DetachPolicy) ManualRun(renv env.Running) (any, error) {
 	}
 }
 
+// Marshaled into an IAM policy document, where these key names are required by AWS
+// rather than chosen here. Tagged explicitly so a field rename cannot change them.
 type policyBody struct {
-	Version   string
-	Statement []*policyStatement
+	Version   string             `json:"Version"`
+	Statement []*policyStatement `json:"Statement"`
 }
 
 type policyStatement struct {

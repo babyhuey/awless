@@ -9,6 +9,7 @@ import (
 )
 
 func compareJSON(t *testing.T, actual, expected string) {
+	t.Helper()
 	var got any
 	if err := json.Unmarshal([]byte(actual), &got); err != nil {
 		t.Fatal(err)

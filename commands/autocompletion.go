@@ -242,7 +242,7 @@ __awless_convert_bash_to_zsh() {
 	-e "s/\\\$(type${RWORD}/\$(__awless_type/g" \
 	<<'BASH_COMPLETION_EOF'
 `
-	_, _ = out.Write([]byte(zshInitialization))
+	_, _ = out.WriteString(zshInitialization)
 
 	buf := new(bytes.Buffer)
 	// Writes to an in-memory buffer, so this cannot meaningfully fail.
@@ -254,6 +254,6 @@ BASH_COMPLETION_EOF
 }
 __awless_bash_source <(__awless_convert_bash_to_zsh)
 `
-	_, _ = out.Write([]byte(zshTail))
+	_, _ = out.WriteString(zshTail)
 	return nil
 }

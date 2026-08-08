@@ -20,7 +20,10 @@ linters:
     - exhaustive     # a switch over an enum missing cases
     - fatcontext     # a context created inside a loop
     - intrange       # for i := range n instead of a three-clause loop
+    - mirror         # the []byte variant where a string one avoids an allocation
+    - musttag        # structs crossing a serialization boundary need explicit tags
     - predeclared    # shadowing a predeclared identifier
+    - thelper        # test helpers should call t.Helper()
     # dupword is deliberately absent. All three findings were false positives: a
     # repeated word inside an embedded zsh script, a "very:very:very" test fixture,
     # and a template literal that legitimately reads "none none". Configuring

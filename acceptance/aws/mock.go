@@ -24,6 +24,9 @@ func (m *basicMock) Calls() map[string]int {
 	return m.calls
 }
 
+// only affects which line a failure is attributed to, and this never fails.
+//
+//nolint:thelper // Stores the *testing.T rather than asserting on it; t.Helper()
 func (m *basicMock) SetTesting(t *testing.T) {
 	m.t = t
 }

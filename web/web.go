@@ -258,46 +258,46 @@ const showResourceTpl = `<!DOCTYPE html>
 		<meta charset="UTF-8">
 	</head>
 	<body>
-	<h2>{{.Type}}: {{.Id}}</h2>
+	<h2>{{.Type}}: {{.ID}}</h2>
 	<ul>
 	{{range $name, $val := .Properties}}
 	  <li><b>{{$name}}:</b> {{$val}}</li>
         {{end}}
         </ul>
 
-	{{if (len .Parents) gt 0}}
+	{{if gt (len .Parents) 0}}
 	<h4>Parents:</h4>
 	<ul>
 	{{range .Parents}}
-	  <li>{{.Type}} <a href="/resources/{{ urlquery .Id}}">{{.Id}}</a></li>
+	  <li>{{.Type}} <a href="/resources/{{ urlquery .ID}}">{{.ID}}</a></li>
 	{{end}}
 	</ul>
 	{{end}}
 
-	{{if (len .Children) gt 0}}
+	{{if gt (len .Children) 0}}
 	<h4>Children:</h4>
 	<ul>
 	{{range .Children}}
-	  <li>{{.Type}} <a href="/resources/{{ urlquery .Id}}">{{.Id}}</a></li>
+	  <li>{{.Type}} <a href="/resources/{{ urlquery .ID}}">{{.ID}}</a></li>
 	{{end}}
 	</ul>
 	{{end}}
 
 
-	{{if (len .DependsOn) gt 0}}
+	{{if gt (len .DependsOn) 0}}
 	<h4>Depends on:</h4>
 	<ul>
 	{{range .DependsOn}}
-	  <li>{{.Type}} <a href="/resources/{{ urlquery .Id}}">{{.Id}}</a></li>
+	  <li>{{.Type}} <a href="/resources/{{ urlquery .ID}}">{{.ID}}</a></li>
 	{{end}}
 	</ul>
 	{{end}}
 
-	{{if (len .AppliesOn) gt 0}}
+	{{if gt (len .AppliesOn) 0}}
 	<h4>Applies on:</h4>
 	<ul>
 	{{range .AppliesOn}}
-	  <li>{{.Type}} <a href="/resources/{{ urlquery .Id}}">{{.Id}}</a></li>
+	  <li>{{.Type}} <a href="/resources/{{ urlquery .ID}}">{{.ID}}</a></li>
 	{{end}}
 	</ul>
 	{{end}}
@@ -317,7 +317,7 @@ const resourcesTpl = `<!DOCTYPE html>
 		         {{ $name := index .Properties "Name" }}
 			 <li>
 			  {{if $name}} {{if (ne (print $name) "")}}<b>Name:</b> {{$name}}, {{end}}{{end}}
-			  <b>ID: </b><a href="/resources/{{ urlquery .Id}}">{{.Id}}</a>
+			  <b>ID: </b><a href="/resources/{{ urlquery .ID}}">{{.ID}}</a>
 			 </li>
 		  {{end}}
 		</ul>

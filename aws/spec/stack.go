@@ -115,10 +115,12 @@ func (cmd *UpdateStack) BeforeRun(renv env.Running) (err error) {
 	return
 }
 
+// Read from a user-supplied stack file in either YAML or JSON, so both sets of tags
+// are needed; without the json ones the keys came from the field names by accident.
 type stackFile struct {
-	Parameters  map[string]string `yaml:"Parameters"`
-	Tags        map[string]string `yaml:"Tags"`
-	StackPolicy map[string]any    `yaml:"StackPolicy"`
+	Parameters  map[string]string `yaml:"Parameters" json:"Parameters"`
+	Tags        map[string]string `yaml:"Tags" json:"Tags"`
+	StackPolicy map[string]any    `yaml:"StackPolicy" json:"StackPolicy"`
 }
 
 func processStackFile(stackFilePath, policyFile *string, parameters, tags []*string) (newParams, newTags []*string, policyData *string, err error) {

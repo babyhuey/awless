@@ -34,9 +34,10 @@ import (
 // In AWS SDK v2, the default assumed role session duration is 15 minutes.
 var stsCacheDuration = 15 * time.Minute
 
+// Serialized to the credentials cache file, so the field name is the on-disk key.
 type cachedCredential struct {
 	aws.Credentials
-	Expiration time.Time
+	Expiration time.Time `json:"Expiration"`
 }
 
 func (c *cachedCredential) isExpired() bool {

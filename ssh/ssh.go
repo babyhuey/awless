@@ -398,7 +398,7 @@ func workaroundExeCVEThroughScript(args []string) error {
 	}
 
 	script := fmt.Sprintf("#! /bin/bash\n%s", strings.Join(args, " "))
-	if _, err := tmpExec.Write([]byte(script)); err != nil {
+	if _, err := tmpExec.WriteString(script); err != nil {
 		return err
 	}
 	if err := tmpExec.Close(); err != nil {

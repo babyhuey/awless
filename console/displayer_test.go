@@ -19,6 +19,7 @@ package console
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -658,14 +659,14 @@ func TestPipeOutputNotTruncated(t *testing.T) {
 	// With maxwidth=0, output should NOT contain "Columns truncated"
 	if contains := "Columns truncated"; len(output) > 0 {
 		for _, line := range []string{contains} {
-			if bytes.Contains([]byte(output), []byte(line)) {
+			if strings.Contains(output, line) {
 				t.Fatalf("pipe output should not truncate columns, but got:\n%s", output)
 			}
 		}
 	}
 	// All column headers should be present (not truncated)
 	for _, col := range []string{"ID", "Name", "State", "Type", "Public IP"} {
-		if !bytes.Contains([]byte(output), []byte(col)) {
+		if !strings.Contains(output, col) {
 			t.Fatalf("pipe output missing column %q:\n%s", col, output)
 		}
 	}

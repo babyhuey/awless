@@ -69,8 +69,10 @@ func notifyIfUpgrade(ctx context.Context, url string, messaging io.Writer) error
 	}
 	defer resp.Body.Close()
 
+	// Decoded from the release endpoint, so these are its key names.
 	latest := struct {
-		Version, URL string
+		Version string `json:"Version"`
+		URL     string `json:"URL"`
 	}{}
 
 	dec := json.NewDecoder(resp.Body)

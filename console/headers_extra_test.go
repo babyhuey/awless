@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -550,7 +551,7 @@ func TestTSVDisplay(t *testing.T) {
 		t.Fatal("expected non-empty TSV output")
 	}
 	// TSV should have tab-separated header
-	if !bytes.Contains([]byte(output), []byte("ID\tName")) {
+	if !strings.Contains(output, "ID\tName") {
 		t.Fatalf("expected tab-separated headers, got: %q", output)
 	}
 }

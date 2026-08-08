@@ -490,9 +490,12 @@ const (
 	fileExt           = ".aws"
 )
 
+// Unmarshaled from the remote templates manifest, so these are wire names.
 type templateMetadata struct {
-	Title, Name, MinimalVersion string
-	Tags                        []string
+	Title          string   `json:"Title"`
+	Name           string   `json:"Name"`
+	MinimalVersion string   `json:"MinimalVersion"`
+	Tags           []string `json:"Tags"`
 }
 
 func getTemplateText(path string) (content []byte, expanded string, err error) {

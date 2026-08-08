@@ -78,17 +78,20 @@ func (r *ImageResolverCache) Get(key string) ([]*AwsImage, bool) {
 
 const ImageQuerySpec = "owner:distro:variant:arch:virtualization:store"
 
+// AwsImage is rendered by `awless search images --format json`, so its field names
+// are a wire contract. The json tags are explicit for that reason: the ID field was
+// briefly renamed from Id without one, which silently changed the output key.
 type AwsImage struct {
-	ID                 string
-	Owner              string
-	Location           string
-	Type               string
-	Architecture       string
-	VirtualizationType string
-	Name               string
-	Created            time.Time
-	Hypervisor         string
-	Store              string
+	ID                 string    `json:"Id"`
+	Owner              string    `json:"Owner"`
+	Location           string    `json:"Location"`
+	Type               string    `json:"Type"`
+	Architecture       string    `json:"Architecture"`
+	VirtualizationType string    `json:"VirtualizationType"`
+	Name               string    `json:"Name"`
+	Created            time.Time `json:"Created"`
+	Hypervisor         string    `json:"Hypervisor"`
+	Store              string    `json:"Store"`
 }
 
 type ImageQuery struct {
