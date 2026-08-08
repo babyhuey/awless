@@ -701,6 +701,49 @@ func contains(arr []string, e string) bool {
 
 // setValueAtPath sets a value at a dot-separated field path in a struct.
 // Replaces awsutil.SetValueAtPath from SDK v1.
+// convertSlice adapts a slice value to a destination slice type whose elements
+// differ only by indirection — []*string to []string and the reverse.
+//
+// SDK v1 modeled string lists as []*string and v2 models them as []string. The
+// param setters still build []*string, so without this every field declared
+// awsstringslice panicked in reflect.Set: 35 fields across create tag, create
+// alarm, create database, create loadbalancer and others.
+//
+// Handled here rather than by changing the setters so that a field genuinely
+// modeled as []*T keeps working.
+func convertSlice(rv reflect.Value, dest reflect.Type) (reflect.Value, bool) {
+	if rv.Kind() != reflect.Slice || dest.Kind() != reflect.Slice {
+		return reflect.Value{}, false
+	}
+
+	srcElem, destElem := rv.Type().Elem(), dest.Elem()
+	deref := srcElem.Kind() == reflect.Pointer && srcElem.Elem().ConvertibleTo(destElem)
+	ref := destElem.Kind() == reflect.Pointer && srcElem.ConvertibleTo(destElem.Elem())
+	if !deref && !ref {
+		return reflect.Value{}, false
+	}
+
+	out := reflect.MakeSlice(dest, 0, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		e := rv.Index(i)
+		switch {
+		case deref:
+			if e.IsNil() {
+				// A nil element has no value to carry over; the zero value is the
+				// only sane choice for a non-pointer destination.
+				out = reflect.Append(out, reflect.Zero(destElem))
+				continue
+			}
+			out = reflect.Append(out, e.Elem().Convert(destElem))
+		case ref:
+			ptr := reflect.New(destElem.Elem())
+			ptr.Elem().Set(e.Convert(destElem.Elem()))
+			out = reflect.Append(out, ptr)
+		}
+	}
+	return out, true
+}
+
 func setValueAtPath(i any, path string, v any) {
 	path = strings.TrimPrefix(path, ".")
 	if path == "" {
@@ -739,6 +782,8 @@ func setValueAtPath(i any, path string, v any) {
 				field.Set(rv)
 			} else if rv.Type().ConvertibleTo(field.Type()) {
 				field.Set(rv.Convert(field.Type()))
+			} else if converted, ok := convertSlice(rv, field.Type()); ok {
+				field.Set(converted)
 			} else {
 				field.Set(rv)
 			}
