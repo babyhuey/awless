@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	awsservices "github.com/bootswithdefer/awless/aws/services"
@@ -79,8 +78,9 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 			}
 			return true, nil
 		}
-		os.Exit(1)
-		return false, nil
+		// The user declined at the confirmation prompt. Nothing to explain, but the
+		// exit status must still say the template did not run.
+		return false, ErrReported
 	}
 
 	runner.AfterRun = func(tplExec *template.TemplateExecution) error {

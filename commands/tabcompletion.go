@@ -10,6 +10,7 @@ import (
 	awsservices "github.com/bootswithdefer/awless/aws/services"
 	"github.com/bootswithdefer/awless/cloud"
 	"github.com/bootswithdefer/awless/graph"
+	"github.com/bootswithdefer/awless/logger"
 	"github.com/bootswithdefer/awless/template"
 )
 
@@ -25,6 +26,9 @@ func enumCompletionFunc(enum []string) readline.AutoCompleter {
 }
 
 func typedParamCompletionFunc(g cloud.GraphAPI, resourceType, propName string) readline.AutoCompleter {
+	if g == nil {
+		return readline.NewPrefixCompleter()
+	}
 	var items []readline.PrefixCompleterInterface
 	resources, _ := g.Find(cloud.NewQuery(resourceType))
 	for _, res := range resources {
@@ -43,6 +47,11 @@ func typedParamCompletionFunc(g cloud.GraphAPI, resourceType, propName string) r
 	return readline.NewPrefixCompleter(items...)
 }
 func holeAutoCompletion(g cloud.GraphAPI, paramPaths []string) readline.AutoCompleter {
+	if g == nil {
+		// The local graphs could not be read; offer no suggestions rather than
+		// dereferencing nil.
+		return readline.NewPrefixCompleter()
+	}
 	type typesProp struct {
 		types []string
 		prop  string
@@ -64,7 +73,12 @@ func holeAutoCompletion(g cloud.GraphAPI, paramPaths []string) readline.AutoComp
 	var possibleSuggests []string
 	for _, entityProp := range entities {
 		resources, err := g.Find(cloud.NewQuery(entityProp.types...))
-		exitOn(err)
+		if err != nil {
+			// Autocompletion is a convenience: a failed lookup should cost the user
+			// suggestions for this entity, not abort the command they are typing.
+			logger.Verbosef("autocompletion: %s", err)
+			continue
+		}
 		if len(resources) == 0 {
 			continue
 		}

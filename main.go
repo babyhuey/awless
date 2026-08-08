@@ -18,9 +18,13 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/fatih/color"
 
 	"github.com/bootswithdefer/awless/commands"
 )
@@ -38,9 +42,19 @@ func main() {
 
 	commands.SetRootContext(ctx)
 
-	// cobra already prints the error to stderr (SilenceErrors is not set on
-	// RootCmd), so only the exit status needs handling here.
+	// The single exit point. Commands return errors rather than calling os.Exit, so
+	// deferred cleanup always runs, and reporting happens in exactly one place —
+	// RootCmd sets SilenceErrors so cobra does not also print.
 	if err := commands.RootCmd.ExecuteContext(ctx); err != nil {
+		if errors.Is(err, commands.ErrExitZero) {
+			// The command already told the user what they needed; that is success.
+			return
+		}
+		if !errors.Is(err, commands.ErrReported) {
+			// ErrReported means the reason was already printed, usually with a
+			// suggested command; printing again would only repeat it.
+			fmt.Fprintln(os.Stderr, color.RedString("[error] "), err)
+		}
 		os.Exit(1)
 	}
 }

@@ -74,6 +74,10 @@ func init() {
 }
 
 var RootCmd = &cobra.Command{
+	// Errors are printed by main rather than cobra, so that the ErrExitZero
+	// sentinel — a success that carries no message — is not reported as a failure.
+	SilenceErrors: true,
+
 	Use:   "awless COMMAND",
 	Short: "Manage  and explore your cloud",
 	Long: `awless is a powerful CLI to explore, sync and manage your cloud infrastructure.

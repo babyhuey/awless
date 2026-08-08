@@ -105,8 +105,11 @@ func (ru *Runner) Run() error {
 		}
 	}
 
-	if tplExec.Stats().KOCount > 0 {
-		os.Exit(1)
+	if ko := tplExec.Stats().KOCount; ko > 0 {
+		// Each failure was already reported as it happened, so this only needs to
+		// make the exit status reflect them. Returned rather than exited so the
+		// caller's deferred work — persisting the template log — still runs.
+		return fmt.Errorf("%d command(s) failed", ko)
 	}
 
 	return nil

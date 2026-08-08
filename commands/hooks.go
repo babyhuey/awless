@@ -33,13 +33,19 @@ import (
 	"github.com/bootswithdefer/awless/sync"
 )
 
-func applyHooks(funcs ...func(*cobra.Command, []string) error) func(*cobra.Command, []string) {
-	return func(cmd *cobra.Command, args []string) {
+// applyHooks chains hook funcs into one, stopping at the first error.
+//
+// Returns an error-returning func so it can be used with cobra's PersistentPreRunE
+// rather than PersistentPreRun; the void form had to call os.Exit on failure, which
+// bypassed cobra's error handling and the single exit path in main.
+func applyHooks(funcs ...func(*cobra.Command, []string) error) func(*cobra.Command, []string) error {
+	return func(cmd *cobra.Command, args []string) error {
 		for _, fn := range funcs {
 			if err := fn(cmd, args); err != nil {
-				exitOn(err)
+				return err
 			}
 		}
+		return nil
 	}
 }
 

@@ -42,11 +42,11 @@ func init() {
 }
 
 var historyCmd = &cobra.Command{
-	Use:               "history",
-	Hidden:            true,
-	Short:             "(in progress) Show a infra resource history & changes using your locally sync snapshots",
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	Use:                "history",
+	Hidden:             true,
+	Short:              "(in progress) Show a infra resource history & changes using your locally sync snapshots",
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		region := config.GetAWSRegion()
@@ -56,30 +56,40 @@ var historyCmd = &cobra.Command{
 		var diffs []*sync.Diff
 
 		all, err := sync.DefaultSyncer.List()
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		for i := 1; i < len(all); i++ {
 			from, err := sync.DefaultSyncer.LoadRev(all[i-1].ID)
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 
 			to, err := sync.DefaultSyncer.LoadRev(all[i].ID)
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 
 			d, err := sync.BuildDiff(from, to, root.ID())
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 
 			diffs = append(diffs, d)
 		}
 
 		for _, diff := range diffs {
-			displayRevisionDiff(diff, awsservices.InfraService.Name(), root, verboseGlobalFlag)
+			if err := displayRevisionDiff(diff, awsservices.InfraService.Name(), root, verboseGlobalFlag); err != nil {
+				return err
+			}
 		}
 
 		return nil
 	},
 }
 
-func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resource, verbose bool) {
+func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resource, verbose bool) error {
 	fromRevision := "repository creation"
 	if diff.From.ID != "" {
 		fromRevision = diff.From.ID[:7] + " on " + diff.From.Date.Format("Monday January 2, 15:04")
@@ -98,8 +108,12 @@ func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resou
 				console.WithFormat("table"),
 				console.WithRootNode(root),
 			).SetSource(graphdiff).Build()
-			exitOn(err)
-			exitOn(displayer.Print(os.Stdout))
+			if err != nil {
+				return err
+			}
+			if err := displayer.Print(os.Stdout); err != nil {
+				return err
+			}
 			fmt.Println()
 		} else if verbose {
 			fmt.Println("▶", cloudService, "properties, from", fromRevision,
@@ -114,8 +128,12 @@ func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resou
 				console.WithFormat("tree"),
 				console.WithRootNode(root),
 			).SetSource(graphdiff).Build()
-			exitOn(err)
-			exitOn(displayer.Print(os.Stdout))
+			if err != nil {
+				return err
+			}
+			if err := displayer.Print(os.Stdout); err != nil {
+				return err
+			}
 			fmt.Println()
 		} else if verbose {
 			fmt.Println("▶", cloudService, "resources, from", fromRevision,
@@ -123,4 +141,5 @@ func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resou
 			fmt.Println("No resource changes.")
 		}
 	}
+	return nil
 }

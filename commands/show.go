@@ -60,8 +60,8 @@ var showCmd = &cobra.Command{
   awless show /aws/lambda/my-func   # show a log group by name
   awless show my-cluster            # show an EKS cluster
   awless show my-table              # show a DynamoDB table`,
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
@@ -74,21 +74,31 @@ var showCmd = &cobra.Command{
 		if _, err := awsconfig.ParseRegion(ref); err == nil && ref != config.GetAWSRegion() {
 			logger.Errorf("Cannot show region '%s' as you are in region '%s'", ref, config.GetAWSRegion())
 			logger.Infof("Use `awless show %s -r %s`", ref, ref)
-			os.Exit(1)
+			return ErrReported
 		}
 
 		var resource cloud.Resource
 		var gph cloud.GraphAPI
+		var err error
 
-		resource, gph = findResourceInLocalGraphs(ref)
+		resource, gph, err = findResourceInLocalGraphs(ref)
+		if err != nil {
+			return err
+		}
 
 		if resource == nil && localGlobalFlag {
-			exitOn(decorateWithSuggestion(notFound, ref))
+			if err := decorateWithSuggestion(notFound, ref); err != nil {
+				return err
+			}
 		} else if resource == nil {
 			runFullSync()
 
-			if resource, gph = findResourceInLocalGraphs(ref); resource == nil {
-				exitOn(decorateWithSuggestion(notFound, ref))
+			if resource, gph, err = findResourceInLocalGraphs(ref); err != nil {
+				return err
+			} else if resource == nil {
+				if err := decorateWithSuggestion(notFound, ref); err != nil {
+					return err
+				}
 			}
 		}
 
@@ -98,7 +108,9 @@ var showCmd = &cobra.Command{
 				services = append(services, cloud.AllServices()...)
 			} else {
 				srv, err := cloud.GetServiceForType(resource.Type())
-				exitOn(err)
+				if err != nil {
+					return err
+				}
 				services = append(services, srv)
 			}
 
@@ -106,14 +118,19 @@ var showCmd = &cobra.Command{
 			if _, err := sync.DefaultSyncer.Sync(RootContext(), services...); err != nil {
 				logger.Verbose(err)
 			}
-			resource, gph = findResourceInLocalGraphs(ref)
+			resource, gph, err = findResourceInLocalGraphs(ref)
+			if err != nil {
+				return err
+			}
 		}
 
 		if resource != nil {
 			if len(showPropertiesValuesOnlyFlag) > 0 {
-				showResourceValuesOnlyFor(resource, showPropertiesValuesOnlyFlag)
-			} else {
-				showResource(resource, gph)
+				if err := showResourceValuesOnlyFor(resource, showPropertiesValuesOnlyFlag); err != nil {
+					return err
+				}
+			} else if err := showResource(resource, gph); err != nil {
+				return err
 			}
 		}
 
@@ -121,7 +138,7 @@ var showCmd = &cobra.Command{
 	},
 }
 
-func showResourceValuesOnlyFor(resource cloud.Resource, propKeys []string) {
+func showResourceValuesOnlyFor(resource cloud.Resource, propKeys []string) error {
 	var normalized []string
 	for _, p := range propKeys {
 		normalized = append(normalized, strings.ToLower(strings.ReplaceAll(p, " ", "")))
@@ -152,22 +169,29 @@ func showResourceValuesOnlyFor(resource cloud.Resource, propKeys []string) {
 	if len(values) > 0 {
 		fmt.Println(strings.Join(values, ","))
 	} else {
-		exitOn(fmt.Errorf("no values for %q", propKeys))
+		return fmt.Errorf("no values for %q", propKeys)
 	}
+	return nil
 }
 
-func showResource(resource cloud.Resource, gph cloud.GraphAPI) {
+func showResource(resource cloud.Resource, gph cloud.GraphAPI) error {
 	displayer, err := console.BuildOptions(
 		console.WithColumnDefinitions(console.DefaultsColumnDefinitions[resource.Type()]),
 		console.WithFormat(listingFormat),
 		console.WithMaxWidth(console.GetTerminalWidth()),
 	).SetSource(resource).Build()
-	exitOn(err)
+	if err != nil {
+		return err
+	}
 
-	exitOn(displayer.Print(os.Stdout))
+	if err := displayer.Print(os.Stdout); err != nil {
+		return err
+	}
 
 	parents, err := gph.ResourceRelations(resource, rdf.ParentOf, true)
-	exitOn(err)
+	if err != nil {
+		return err
+	}
 
 	var parentsW bytes.Buffer
 	var count int
@@ -199,7 +223,9 @@ func showResource(resource cloud.Resource, gph cloud.GraphAPI) {
 		return nil
 	}
 	err = gph.VisitRelations(resource, rdf.ChildrenOfRel, true, printWithTabs)
-	exitOn(err)
+	if err != nil {
+		return err
+	}
 
 	if len(parents) > 0 || hasChildren {
 		fmt.Println(renderCyanBoldFn("\nLineage:"))
@@ -208,16 +234,23 @@ func showResource(resource cloud.Resource, gph cloud.GraphAPI) {
 	}
 
 	appliedOn, err := gph.ResourceRelations(resource, rdf.ApplyOn, false)
-	exitOn(err)
+	if err != nil {
+		return err
+	}
 	printResourceList(renderCyanBoldFn("Applied on"), appliedOn)
 
 	dependingOn, err := gph.ResourceRelations(resource, rdf.DependingOnRel, false)
-	exitOn(err)
+	if err != nil {
+		return err
+	}
 	printResourceList(renderCyanBoldFn("Depending on"), dependingOn)
 
 	siblings, err := gph.ResourceSiblings(resource)
-	exitOn(err)
+	if err != nil {
+		return err
+	}
 	printResourceList(renderCyanBoldFn("Siblings"), siblings, "display all with flag --siblings")
+	return nil
 }
 
 func runFullSync() {
@@ -239,13 +272,16 @@ func runFullSync() {
 	}
 }
 
-func findResourceInLocalGraphs(ref string) (cloud.Resource, cloud.GraphAPI) {
-	g, resources, _ := resolveResourceFromRefInCurrentRegion(ref)
+func findResourceInLocalGraphs(ref string) (cloud.Resource, cloud.GraphAPI, error) {
+	g, resources, _, err := resolveResourceFromRefInCurrentRegion(ref)
+	if err != nil {
+		return nil, nil, err
+	}
 	switch len(resources) {
 	case 0:
-		return nil, nil
+		return nil, nil, nil
 	case 1:
-		return resources[0], g
+		return resources[0], g, nil
 	default:
 		logger.Infof("%d resources found with name '%s' in region '%s' for profile '%s'. Show a specific resource with:", len(resources), deprefix(ref), config.GetAWSRegion(), config.GetAWSProfile())
 		for _, res := range resources {
@@ -257,51 +293,63 @@ func findResourceInLocalGraphs(ref string) (cloud.Resource, cloud.GraphAPI) {
 			logger.Infof("%s", buf.String())
 		}
 
-		os.Exit(0)
+		// The user has been shown each candidate and the command to run; ending here
+		// is success, not failure.
+		return nil, nil, ErrExitZero
 	}
-
-	return nil, nil
 }
 
-func resolveResourceFromRefInCurrentRegion(ref string) (cloud.GraphAPI, []cloud.Resource, string) {
+func resolveResourceFromRefInCurrentRegion(ref string) (cloud.GraphAPI, []cloud.Resource, string, error) {
 	g, err := sync.LoadLocalGraphs(config.GetAWSProfile(), config.GetAWSRegion())
-	exitOn(err)
+	if err != nil {
+		return nil, nil, "", err
+	}
 	return resolveResourceFromRef(g, ref)
 }
 
-func resolveResourceFromRefInAllLocalRegion(ref string) (cloud.GraphAPI, []cloud.Resource, string) {
+func resolveResourceFromRefInAllLocalRegion(ref string) (cloud.GraphAPI, []cloud.Resource, string, error) {
 	g, err := sync.LoadAllLocalGraphs(config.GetAWSProfile())
-	exitOn(err)
+	if err != nil {
+		return nil, nil, "", err
+	}
 	return resolveResourceFromRef(g, ref)
 }
 
-func resolveResourceFromRef(g cloud.GraphAPI, ref string) (cloud.GraphAPI, []cloud.Resource, string) {
+func resolveResourceFromRef(g cloud.GraphAPI, ref string) (cloud.GraphAPI, []cloud.Resource, string, error) {
 	name := deprefix(ref)
 
 	if strings.HasPrefix(ref, "@") {
 		logger.Verbosef("prefixed with @: forcing research by name '%s'", name)
 		rs, err := g.FindWithProperties(map[string]any{properties.Name: name})
-		exitOn(err)
-		return g, rs, properties.Name
+		if err != nil {
+			return nil, nil, "", err
+		}
+		return g, rs, properties.Name, nil
 	}
 	rs, err := g.FindWithProperties(map[string]any{properties.ID: name})
-	exitOn(err)
+	if err != nil {
+		return nil, nil, "", err
+	}
 
 	if len(rs) > 0 {
-		return g, rs, properties.ID
+		return g, rs, properties.ID, nil
 	}
 
 	rs, err = g.FindWithProperties(map[string]any{properties.Arn: name})
-	exitOn(err)
+	if err != nil {
+		return nil, nil, "", err
+	}
 
 	if len(rs) > 0 {
-		return g, rs, properties.Arn
+		return g, rs, properties.Arn, nil
 	}
 
 	rs, err = g.FindWithProperties(map[string]any{properties.Name: name})
-	exitOn(err)
+	if err != nil {
+		return nil, nil, "", err
+	}
 
-	return g, rs, properties.Name
+	return g, rs, properties.Name, nil
 }
 
 func deprefix(s string) string {
@@ -310,7 +358,12 @@ func deprefix(s string) string {
 
 func decorateWithSuggestion(err error, ref string) error {
 	buf := bytes.NewBufferString(fmt.Sprintf("%s in region '%s' for profile '%s'", err.Error(), config.GetAWSRegion(), config.GetAWSProfile()))
-	g, resources, _ := resolveResourceFromRefInAllLocalRegion(ref)
+	g, resources, _, resolveErr := resolveResourceFromRefInAllLocalRegion(ref)
+	if resolveErr != nil {
+		// The suggestion is a nicety layered on the original error; failing to build
+		// it must not replace what the caller was actually reporting.
+		return err
+	}
 	for _, res := range resources {
 		parents, err := g.ResourceRelations(res, rdf.ParentOf, true)
 		if err != nil {

@@ -38,27 +38,32 @@ var switchCmd = &cobra.Command{
   awless switch mfa                 # now using profile mfa (with mfa a valid profile in ~/.aws/{config,credentials})
   awless switch default us-west-1   # now using region us-west-1 and the default profile
   awless sw eu-west-3 admin         # now using profile admin in region eu-west-3`,
-	PersistentPreRun: applyHooks(initAwlessEnvHook, initLoggerHook),
-	PersistentPostRun: applyHooks(
+	PersistentPreRunE: applyHooks(initAwlessEnvHook, initLoggerHook),
+	PersistentPostRunE: applyHooks(
 		includeHookIf(&config.TriggerSyncOnConfigUpdate, initCloudServicesHook),
 		notifyOnRegionOrProfilePrecedenceHook,
 	),
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 || len(args) > 2 {
 			fmt.Fprintf(os.Stdout, "currently in region '%s' with profile '%s' (switch -h for help and examples)\n", config.GetAWSRegion(), config.GetAWSProfile())
-			return
+			return nil
 		}
 		for _, arg := range args {
 			if awsconfig.IsValidRegion(arg) {
-				exitOn(config.Set(config.RegionConfigKey, arg))
+				if err := config.Set(config.RegionConfigKey, arg); err != nil {
+					return err
+				}
 				continue
 			}
 			if awsconfig.IsValidProfile(arg) {
-				exitOn(config.Set(config.ProfileConfigKey, arg))
+				if err := config.Set(config.ProfileConfigKey, arg); err != nil {
+					return err
+				}
 				continue
 			}
-			exitOn(fmt.Errorf("could not find profile: '%s' in $HOME/.aws/{credentials,config}", arg))
+			return fmt.Errorf("could not find profile: '%s' in $HOME/.aws/{credentials,config}", arg)
 		}
+		return nil
 	},
 }

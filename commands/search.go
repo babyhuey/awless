@@ -49,11 +49,11 @@ var searchCmd = &cobra.Command{
 }
 
 var awsImagesCmd = &cobra.Command{
-	Use:               "images",
-	PersistentPreRun:  applyHooks(initAwlessEnvHook, initLoggerHook, initCloudServicesHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(networkMonitorHook),
-	Short:             fmt.Sprintf("Resolve from current region the official community AMIs according to an awless specific bare distro query format, ordering by latest first. Supported owners: %s", strings.Join(awsspec.SupportedAMIOwners, ", ")),
-	Long:              fmt.Sprintf("Resolve from current region the official community AMIs according to an awless specific bare distro query format, ordering by latest first.\n\nQuery string specification is the following column separated format:\n\n\t\t%s\n\nEverything optional expect for the 'owner'. Supported owners: %s", awsspec.ImageQuerySpec, strings.Join(awsspec.SupportedAMIOwners, ", ")),
+	Use:                "images",
+	PersistentPreRunE:  applyHooks(initAwlessEnvHook, initLoggerHook, initCloudServicesHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(networkMonitorHook),
+	Short:              fmt.Sprintf("Resolve from current region the official community AMIs according to an awless specific bare distro query format, ordering by latest first. Supported owners: %s", strings.Join(awsspec.SupportedAMIOwners, ", ")),
+	Long:               fmt.Sprintf("Resolve from current region the official community AMIs according to an awless specific bare distro query format, ordering by latest first.\n\nQuery string specification is the following column separated format:\n\n\t\t%s\n\nEverything optional expect for the 'owner'. Supported owners: %s", awsspec.ImageQuerySpec, strings.Join(awsspec.SupportedAMIOwners, ", ")),
 	Example: `  awless search images redhat:rhel:7.2
   awless search images debian::jessie
   awless search images canonical --latest-id
@@ -61,19 +61,23 @@ var awsImagesCmd = &cobra.Command{
   awless search images amazonlinux:amzn2
   awless search images amazonlinux:::::instance-store`,
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			exitOn(fmt.Errorf("expecting image query string. Expecting: %s (with everything optional expect for the owner)", awsspec.ImageQuerySpec))
+			return fmt.Errorf("expecting image query string. Expecting: %s (with everything optional expect for the owner)", awsspec.ImageQuerySpec)
 		}
 
 		resolver := awsspec.EC2ImageResolver()
 
 		query, err := awsspec.ParseImageQuery(args[0])
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		logger.Infof("launching search for image in '%s' region. Query: '%s'", config.GetAWSRegion(), query)
 		imgs, _, err := resolver.Resolve(query)
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		var ids []string
 		for _, img := range imgs {
@@ -84,7 +88,7 @@ var awsImagesCmd = &cobra.Command{
 			for _, id := range ids {
 				fmt.Println(id)
 			}
-			return
+			return nil
 		}
 
 		if showLatestIDOnly || showIDOnlyFlag {
@@ -94,12 +98,15 @@ var awsImagesCmd = &cobra.Command{
 					break
 				}
 			}
-			return
+			return nil
 		}
 
 		b, err := json.MarshalIndent(imgs, "", " ")
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		fmt.Fprintln(os.Stdout, string(b))
+		return nil
 	},
 }

@@ -47,10 +47,10 @@ func init() {
 }
 
 var logCmd = &cobra.Command{
-	Use:               "log [REVERTID]",
-	Short:             "Show all awless template actions against your cloud infrastructure",
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade),
+	Use:                "log [REVERTID]",
+	Short:              "Show all awless template actions against your cloud infrastructure",
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade),
 
 	RunE: func(c *cobra.Command, args []string) error {
 		var all []*database.LoadedTemplate
@@ -58,36 +58,44 @@ var logCmd = &cobra.Command{
 		printer := getPrinter(args)
 
 		if len(args) > 0 {
-			exitOn(database.Execute(func(db *database.DB) error {
+			if err := database.Execute(func(db *database.DB) error {
 				single, err := db.GetLoadedTemplate(args[0])
 				if err != nil {
 					return err
 				}
 				all = append(all, single)
 				return nil
-			}))
+			}); err != nil {
+				return err
+			}
 			print(all, printer)
 			return nil
 		}
 
 		if deleteAllLogsFlag {
-			exitOn(database.Execute(func(db *database.DB) error {
+			if err := database.Execute(func(db *database.DB) error {
 				return db.DeleteTemplates()
-			}))
+			}); err != nil {
+				return err
+			}
 			return nil
 		}
 
 		if tid := deleteFromIDLogsFlag; tid != "" {
-			exitOn(database.Execute(func(db *database.DB) error {
+			if err := database.Execute(func(db *database.DB) error {
 				return db.DeleteTemplate(tid)
-			}))
+			}); err != nil {
+				return err
+			}
 			return nil
 		}
 
-		exitOn(database.Execute(func(db *database.DB) (dberr error) {
+		if err := database.Execute(func(db *database.DB) (dberr error) {
 			all, dberr = db.ListTemplates()
 			return
-		}))
+		}); err != nil {
+			return err
+		}
 
 		print(all, printer)
 		return nil

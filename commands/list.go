@@ -97,9 +97,9 @@ var listCmd = &cobra.Command{
   awless list ssmparameters
   awless list filesystems
   awless list apigateways`,
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
-	Short:             "List resources: sorting, filtering via tag/properties, output formatting, etc...",
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	Short:              "List resources: sorting, filtering via tag/properties, output formatting, etc...",
 }
 
 var listSpecificResourceCmd = func(resType string) *cobra.Command {
@@ -107,7 +107,7 @@ var listSpecificResourceCmd = func(resType string) *cobra.Command {
 		Use:   cloud.PluralizeResource(resType),
 		Short: fmt.Sprintf("[%s] List %s %s", awsservices.ServicePerResourceType[resType], strings.ToUpper(awsservices.APIPerResourceType[resType]), cloud.PluralizeResource(resType)),
 
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				var plural string
 				if len(args) > 1 {
@@ -116,11 +116,11 @@ var listSpecificResourceCmd = func(resType string) *cobra.Command {
 				logger.Errorf("invalid parameter%s '%s'", plural, strings.Join(args, " "))
 				if strings.Contains(args[0], "=") {
 					if !promptConfirmDefaultYes("Did you mean `awless list %s --filter %s`? ", cloud.PluralizeResource(resType), strings.Join(args, " ")) {
-						os.Exit(1)
+						return ErrReported
 					}
 					listingFiltersFlag = append(listingFiltersFlag, args...)
 				} else {
-					os.Exit(1)
+					return ErrReported
 				}
 			}
 			var g cloud.GraphAPI
@@ -129,17 +129,21 @@ var listSpecificResourceCmd = func(resType string) *cobra.Command {
 				if srvName, ok := awsservices.ServicePerResourceType[resType]; ok {
 					g = sync.LoadLocalGraphForService(srvName, config.GetAWSProfile(), config.GetAWSRegion())
 				} else {
-					exitOn(fmt.Errorf("cannot find service for resource type %s", resType))
+					return fmt.Errorf("cannot find service for resource type %s", resType)
 				}
 			} else {
 				srv, err := cloud.GetServiceForType(resType)
-				exitOn(err)
+				if err != nil {
+					return err
+				}
 				fetchContext := context.WithValue(RootContext(), contextKey("force"), true)
 				g, err = srv.FetchByType(context.WithValue(fetchContext, contextKey("filters"), listingFiltersFlag), resType)
-				exitOn(err)
+				if err != nil {
+					return err
+				}
 			}
 
-			printResources(g, resType)
+			return printResources(g, resType)
 		},
 	}
 }
@@ -150,20 +154,25 @@ var listAllResourceInServiceCmd = func(srvName string) *cobra.Command {
 		Short:  fmt.Sprintf("List all %s resources", srvName),
 		Hidden: true,
 
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			g := sync.LoadLocalGraphForService(srvName, config.GetAWSProfile(), config.GetAWSRegion())
 			displayer, err := console.BuildOptions(
 				console.WithFormat(listingFormat),
 				console.WithMaxWidth(console.GetTerminalWidth()),
 				console.WithIDsOnly(listOnlyIDs),
 			).SetSource(g).Build()
-			exitOn(err)
-			exitOn(displayer.Print(os.Stdout))
+			if err != nil {
+				return err
+			}
+			if err := displayer.Print(os.Stdout); err != nil {
+				return err
+			}
+			return nil
 		},
 	}
 }
 
-func printResources(g cloud.GraphAPI, resType string) {
+func printResources(g cloud.GraphAPI, resType string) error {
 	displayer, err := console.BuildOptions(
 		console.WithRdfType(resType),
 		console.WithColumns(listingColumnsFlag),
@@ -178,7 +187,9 @@ func printResources(g cloud.GraphAPI, resType string) {
 		console.WithReverseSort(reverseFlag),
 		console.WithNoHeaders(noHeadersFlag),
 	).SetSource(g).Build()
-	exitOn(err)
+	if err != nil {
+		return err
+	}
 
-	exitOn(displayer.Print(os.Stdout))
+	return displayer.Print(os.Stdout)
 }

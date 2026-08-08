@@ -42,7 +42,7 @@ var configCmd = &cobra.Command{
 	PersistentPreRunE:  initAwlessEnvHook,
 	PersistentPostRunE: notifyOnRegionOrProfilePrecedenceHook,
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if keysOnly {
 			for k := range config.Config {
 				fmt.Println(k)
@@ -53,6 +53,7 @@ var configCmd = &cobra.Command{
 		} else {
 			fmt.Println(config.DisplayConfig())
 		}
+		return nil
 	},
 }
 
@@ -76,10 +77,10 @@ var configGetCmd = &cobra.Command{
 }
 
 var configSetCmd = &cobra.Command{
-	Use:               "set KEY [VALUE]",
-	Short:             "Set or update a configuration value",
-	PersistentPreRun:  applyHooks(initAwlessEnvHook),
-	PersistentPostRun: applyHooks(includeHookIf(&config.TriggerSyncOnConfigUpdate, initCloudServicesHook)),
+	Use:                "set KEY [VALUE]",
+	Short:              "Set or update a configuration value",
+	PersistentPreRunE:  applyHooks(initAwlessEnvHook),
+	PersistentPostRunE: applyHooks(includeHookIf(&config.TriggerSyncOnConfigUpdate, initCloudServicesHook)),
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
@@ -89,9 +90,13 @@ var configSetCmd = &cobra.Command{
 		case 0:
 			return fmt.Errorf("not enough parameters")
 		case 1:
-			exitOn(config.InteractiveSet(strings.TrimSpace(args[0])))
+			if err := config.InteractiveSet(strings.TrimSpace(args[0])); err != nil {
+				return err
+			}
 		default:
-			exitOn(config.Set(strings.TrimSpace(args[0]), strings.TrimSpace(args[1])))
+			if err := config.Set(strings.TrimSpace(args[0]), strings.TrimSpace(args[1])); err != nil {
+				return err
+			}
 		}
 
 		return nil
@@ -111,7 +116,9 @@ var configUnsetCmd = &cobra.Command{
 			fmt.Println("this parameter has not been set")
 		} else {
 
-			exitOn(config.Unset(args[0]))
+			if err := config.Unset(args[0]); err != nil {
+				return err
+			}
 		}
 		return nil
 	},

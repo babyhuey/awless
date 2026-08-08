@@ -58,19 +58,22 @@ func init() {
 }
 
 var tailCmd = &cobra.Command{
-	Use:               "tail",
-	Hidden:            true,
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, networkMonitorHook),
-	Short:             "Tail cloud events",
+	Use:                "tail",
+	Hidden:             true,
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, networkMonitorHook),
+	Short:              "Tail cloud events",
 }
 
 var scalingActivitiesCmd = &cobra.Command{
 	Use:   "scaling-activities",
 	Short: "Watch scaling-activities",
 
-	Run: func(cmd *cobra.Command, args []string) {
-		exitOn(awstailers.NewScalingActivitiesTailer(tailNumberEventsFlag, tailEnableFollowFlag, tailFollowFrequencyFlag).Tail(os.Stdout))
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := awstailers.NewScalingActivitiesTailer(tailNumberEventsFlag, tailEnableFollowFlag, tailFollowFrequencyFlag).Tail(os.Stdout); err != nil {
+			return err
+		}
+		return nil
 	},
 }
 
@@ -78,11 +81,14 @@ var stackEventsCmd = &cobra.Command{
 	Use:   "stack-events",
 	Short: "Watch stack-events",
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			exitOn(fmt.Errorf("expecting stack-name string"))
+			return fmt.Errorf("expecting stack-name string")
 		}
 
-		exitOn(awstailers.NewCloudformationEventsTailer(args[0], tailNumberEventsFlag, tailEnableFollowFlag, tailFollowFrequencyFlag, stackEventsFilters, stackEventsTailTimeout, cancelStackUpdateAfterTimeout).Tail(os.Stdout))
+		if err := awstailers.NewCloudformationEventsTailer(args[0], tailNumberEventsFlag, tailEnableFollowFlag, tailFollowFrequencyFlag, stackEventsFilters, stackEventsTailTimeout, cancelStackUpdateAfterTimeout).Tail(os.Stdout); err != nil {
+			return err
+		}
+		return nil
 	},
 }

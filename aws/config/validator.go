@@ -61,8 +61,13 @@ func StdinRegionSelector() string {
 	for !IsValidRegion(region) {
 		line, err := rl.Readline()
 		if errors.Is(err, readline.ErrInterrupt) || errors.Is(err, io.EOF) {
-			// os.Exit skips the deferred rl.Close(), leaving the terminal in raw
-			// mode, so close explicitly first.
+			// Ctrl-C or EOF while choosing a region aborts awless.
+			//
+			// One of two os.Exit calls left outside main. It cannot return an error
+			// instead: this is registered as a stdinParamProviderFn in
+			// config.configDefinitions, whose signature is func() string, so there is
+			// no error to return. Closing explicitly first because os.Exit skips the
+			// deferred rl.Close(), which would leave the terminal in raw mode.
 			_ = rl.Close()
 			os.Exit(1)
 		} else if err != nil {

@@ -79,15 +79,17 @@ func init() {
 const maxMsgLen = 140
 
 var runCmd = &cobra.Command{
-	Use:               "run PATH",
-	Short:             "Run a template given a filepath or URL",
-	Example:           "  awless run ~/templates/my-infra.aws\n  awless run https://raw.githubusercontent.com/wallix/awless-templates/master/create_vpc.aws\n  awless run repo:create_vpc",
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	Use:                "run PATH",
+	Short:              "Run a template given a filepath or URL",
+	Example:            "  awless run ~/templates/my-infra.aws\n  awless run https://raw.githubusercontent.com/wallix/awless-templates/master/create_vpc.aws\n  awless run repo:create_vpc",
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if listRemoteTemplatesFlag {
-			exitOn(listRemoteTemplates())
+			if err := listRemoteTemplates(); err != nil {
+				return err
+			}
 			return nil
 		}
 		if len(args) < 1 {
@@ -95,19 +97,25 @@ var runCmd = &cobra.Command{
 		}
 
 		if len(runLogMessage) > maxMsgLen {
-			exitOn(fmt.Errorf("message to be persisted should not exceed %d characters", maxMsgLen))
+			return fmt.Errorf("message to be persisted should not exceed %d characters", maxMsgLen)
 		}
 
 		content, fullPath, err := getTemplateText(args[0])
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		logger.Verbosef("Loaded template text:\n\n%s\n", removeComments(content))
 
 		templ, err := template.Parse(string(content))
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		extraParams, err := template.ParseParams(strings.Join(args[1:], " "))
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		tplExec := &template.TemplateExecution{
 			Template: templ,
@@ -115,7 +123,9 @@ var runCmd = &cobra.Command{
 			Message:  strings.TrimSpace(runLogMessage),
 		}
 
-		exitOn(NewRunnerRequiredParamsOnly(tplExec.Template, tplExec.Message, tplExec.Path, config.Defaults, extraParams).Run())
+		if err := NewRunnerRequiredParamsOnly(tplExec.Template, tplExec.Message, tplExec.Path, config.Defaults, extraParams).Run(); err != nil {
+			return err
+		}
 
 		return nil
 	},
@@ -148,9 +158,9 @@ func missingHolesStdinFunc() func(string, []string, bool) string {
 			fmt.Fprintln(os.Stderr, strings.Join(docs, "; ")+":")
 		}
 
-		autocomplete := holeAutoCompletion(allGraphsOnce.mustLoad(), paramPaths)
+		autocomplete := holeAutoCompletion(allGraphsOnce.load(), paramPaths)
 		if typedParam != nil {
-			autocomplete = typedParamCompletionFunc(allGraphsOnce.mustLoad(), typedParam.ResourceType, typedParam.PropertyName)
+			autocomplete = typedParamCompletionFunc(allGraphsOnce.load(), typedParam.ResourceType, typedParam.PropertyName)
 		}
 
 		if len(enums) > 0 {
@@ -181,7 +191,7 @@ func askHole(hole, promptSuffix string, autocomplete readline.AutoCompleter) (st
 		EOFPrompt:       "exit",
 	})
 	if err != nil {
-		exitOn(err)
+		return "", err
 	}
 	defer l.Close()
 
@@ -189,9 +199,14 @@ func askHole(hole, promptSuffix string, autocomplete readline.AutoCompleter) (st
 		line, err := l.Readline()
 		if errors.Is(err, readline.ErrInterrupt) {
 			if len(line) == 0 {
-				// Ctrl-C at an empty prompt aborts awless. os.Exit skips the
-				// deferred l.Close(), which would leave the terminal in raw mode,
-				// so close explicitly first.
+				// Ctrl-C at an empty prompt aborts awless.
+				//
+				// One of two os.Exit calls left outside main. It cannot return an
+				// error instead: the only caller is a template env MissingHolesFunc,
+				// whose signature is func(string, []string, bool) string, and that
+				// caller retries on any error — so a sentinel would loop forever.
+				// Closing explicitly first because os.Exit skips the deferred
+				// l.Close(), which would leave the terminal in raw mode.
 				_ = l.Close()
 				os.Exit(0)
 			}
@@ -215,11 +230,19 @@ type onceLoader struct {
 	once stdsync.Once
 }
 
-func (l *onceLoader) mustLoad() cloud.GraphAPI {
+// load returns the local graphs, or nil if they could not be read.
+//
+// Only autocompletion uses this, so a failure costs the user suggestions rather
+// than the command: it previously called exitOn, aborting a prompt the user was
+// part-way through typing. The completion helpers tolerate a nil graph.
+func (l *onceLoader) load() cloud.GraphAPI {
 	l.once.Do(func() {
 		l.g, l.err = sync.LoadLocalGraphs(config.GetAWSProfile(), config.GetAWSRegion())
 	})
-	exitOn(l.err)
+	if l.err != nil {
+		logger.Verbosef("autocompletion: cannot load local graphs: %s", l.err)
+		return nil
+	}
 	return l.g
 }
 
@@ -227,12 +250,12 @@ var allGraphsOnce = &onceLoader{}
 
 func createDriverCommands(action string, entities []string) *cobra.Command {
 	actionCmd := &cobra.Command{
-		Use:               fmt.Sprintf("%s ENTITY [param=value ...]", action),
-		Short:             oneLinerShortDesc(action, entities),
-		Long:              fmt.Sprintf("Allow to %s: %v", action, strings.Join(entities, ", ")),
-		Annotations:       map[string]string{"one-liner": "true"},
-		PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
-		PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+		Use:                fmt.Sprintf("%s ENTITY [param=value ...]", action),
+		Short:              oneLinerShortDesc(action, entities),
+		Long:               fmt.Sprintf("Allow to %s: %v", action, strings.Join(entities, ", ")),
+		Annotations:        map[string]string{"one-liner": "true"},
+		PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
+		PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return fmt.Errorf("missing ENTITY")
@@ -240,7 +263,10 @@ func createDriverCommands(action string, entities []string) *cobra.Command {
 
 			invalidEntityErr := fmt.Errorf("invalid entity '%s'", args[0])
 
-			_, resources, matchingProperty := resolveResourceFromRefInCurrentRegion(args[0])
+			_, resources, matchingProperty, err := resolveResourceFromRefInCurrentRegion(args[0])
+			if err != nil {
+				return err
+			}
 			if len(resources) != 1 {
 				return invalidEntityErr
 			}
@@ -250,13 +276,17 @@ func createDriverCommands(action string, entities []string) *cobra.Command {
 				return invalidEntityErr
 			}
 			templ, err := suggestFixParsingError(templDef, args, matchingProperty, invalidEntityErr)
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 
 			tplExec := &template.TemplateExecution{
 				Template: templ,
 			}
 
-			exitOn(NewRunner(tplExec.Template, tplExec.Message, tplExec.Path).Run())
+			if err := NewRunner(tplExec.Template, tplExec.Message, tplExec.Path).Run(); err != nil {
+				return err
+			}
 			return nil
 		},
 	}
@@ -264,7 +294,11 @@ func createDriverCommands(action string, entities []string) *cobra.Command {
 	for _, entity := range entities {
 		templDef, ok := awsspec.AWSLookupDefinitions(fmt.Sprintf("%s%s", action, entity))
 		if !ok {
-			exitOn(errors.New("command unsupported on inline mode"))
+			// Reached only if a command is registered without a matching template
+			// definition, which is an internal inconsistency rather than anything a
+			// user can cause. Panics at registration time, as regexp.MustCompile
+			// does, because there is no caller to return an error to.
+			panic(fmt.Sprintf("no template definition for %s %s", action, entity))
 		}
 		run := func(def awsspec.Definition) func(cmd *cobra.Command, args []string) error {
 			return func(cmd *cobra.Command, args []string) error {
@@ -272,19 +306,28 @@ func createDriverCommands(action string, entities []string) *cobra.Command {
 
 				templ, err := template.Parse(text)
 				if err != nil {
-					_, resources, matchingProperty := resolveResourceFromRefInCurrentRegion(args[0])
+					_, resources, matchingProperty, resolveErr := resolveResourceFromRefInCurrentRegion(args[0])
+					if resolveErr != nil {
+						return resolveErr
+					}
 					if len(resources) != 1 {
-						exitOn(err)
+						// Nothing to suggest without a single match, so report the
+						// original parse failure.
+						return err
 					}
 					templ, err = suggestFixParsingError(def, args, matchingProperty, err)
-					exitOn(err)
+					if err != nil {
+						return err
+					}
 				}
 
 				tplExec := &template.TemplateExecution{
 					Template: templ,
 				}
 
-				exitOn(NewRunner(tplExec.Template, tplExec.Message, tplExec.Path, config.Defaults).Run())
+				if err := NewRunner(tplExec.Template, tplExec.Message, tplExec.Path, config.Defaults).Run(); err != nil {
+					return err
+				}
 				return nil
 			}
 		}
@@ -317,14 +360,14 @@ func createDriverCommands(action string, entities []string) *cobra.Command {
 			validArgs = append(validArgs, param+"=")
 		}
 		currentCmd := &cobra.Command{
-			Use:               fmt.Sprintf("%s [param=value ...]", templDef.Entity),
-			PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
-			PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
-			Short:             awsdoc.AwlessCommandDefinitionsDoc(action, templDef.Entity, fmt.Sprintf("%s a %s%s", capitalize(action), apiStr, templDef.Entity)),
-			Long:              fmt.Sprintf("PARAMS:\n%s\nPARAMS PATTERNS:\n  %s\n\nSEE ALSO:\n%s", paramsStr.String(), templDef.Params, availableActionsForEntity(templDef.Entity)),
-			Example:           awsdoc.AwlessExamplesDoc(action, templDef.Entity),
-			RunE:              run(templDef),
-			ValidArgs:         validArgs,
+			Use:                fmt.Sprintf("%s [param=value ...]", templDef.Entity),
+			PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
+			PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+			Short:              awsdoc.AwlessCommandDefinitionsDoc(action, templDef.Entity, fmt.Sprintf("%s a %s%s", capitalize(action), apiStr, templDef.Entity)),
+			Long:               fmt.Sprintf("PARAMS:\n%s\nPARAMS PATTERNS:\n  %s\n\nSEE ALSO:\n%s", paramsStr.String(), templDef.Params, availableActionsForEntity(templDef.Entity)),
+			Example:            awsdoc.AwlessExamplesDoc(action, templDef.Entity),
+			RunE:               run(templDef),
+			ValidArgs:          validArgs,
 		}
 		currentCmd.SetUsageTemplate(customCommandUsageTemplate)
 		currentCmd.SetHelpTemplate(`{{with .Short}}{{. | trimTrailingWhitespaces}}

@@ -964,35 +964,50 @@ hand-edit `gen_*.go`" rule in `AGENTS.md`.
 
 ---
 
-### I16: `os.Exit` in command paths — **PARTIALLY FIXED**, remainder deliberate
+### I16: `os.Exit` in command paths — **FIXED**
 
-**Severity:** Low  
-**Files:** `commands/run.go`, `aws/config/validator.go`, plus 8 other `os.Exit` sites
+**Severity:** Medium  
+**Files:** `commands/`, `main.go`, `template/runner.go`, `aws/config/validator.go`
 
-The concern was that `os.Exit` skips deferred functions, losing cleanup. Audited
-every `os.Exit` against the defers in scope, and exactly two sites actually
-skipped one — both a `readline` instance, so the terminal was left in raw mode
-after Ctrl-C:
+All 87 `exitOn` calls are gone and `exitOn` itself is deleted. Commands return
+errors, and `main` is the single exit point, so deferred cleanup always runs.
 
-- `commands/run.go` the template-hole prompt
-- `aws/config/validator.go` the region selector
+What it took:
 
-Both now close explicitly before exiting.
+- **9 `Run:` commands became `RunE:`**, since a void handler has nowhere to return
+  an error.
+- **`applyHooks` returns an error** and callers moved to `PersistentPreRunE` /
+  `PersistentPostRunE`. The void form had to call `os.Exit` on hook failure, which
+  bypassed cobra entirely.
+- **Helpers gained error returns**, including `showResource`,
+  `showResourceValuesOnlyFor`, `findResourceInLocalGraphs`, the three
+  `resolveResourceFromRef*` variants, `printResources`, `displayRevisionDiff` and
+  `fetchConnectionInfo`.
+- **`RootCmd` sets `SilenceErrors`** and `main` does the printing, so reporting
+  happens in exactly one place.
+- **Two sentinels** carry outcomes that are not plain failures: `ErrExitZero` for
+  "already told the user, this is success" (the multi-match branch of
+  `findResourceInLocalGraphs`, which had called `os.Exit(0)`), and `ErrReported` for
+  "reason already printed, exit non-zero without repeating it".
+- **`mustLoad` became `load`**, returning nil on failure. Only autocompletion uses
+  it, so a failed graph load now costs suggestions rather than aborting a prompt the
+  user is part-way through typing. The completion helpers gained nil guards.
+- **`template/runner.go`** returns an error for failed commands instead of exiting,
+  so the caller's deferred template-log persistence runs.
 
-**Deliberately not done: removing `os.Exit` entirely.** That means converting
-`exitOn` to return an error, which touches **88 call sites** and requires every
-cobra `Run` to become `RunE`. The original justification does not survive
-scrutiny:
+**Two `os.Exit` calls remain outside `main`, and cannot be removed.** Both are
+readline interrupt paths whose enclosing signature has no error to return:
 
-- `database.Execute` opens and closes the DB within a single call
-  (`defer db.Close()` is function-scoped), so no long-lived handle is leaked.
-- The other defers in scope at an `os.Exit` are the two readline cases above.
+| Site | Why |
+|---|---|
+| `commands/run.go` Ctrl-C at an empty prompt | The caller is a template env `MissingHolesFunc`, `func(string, []string, bool) string`, and it retries on any error — a sentinel would loop forever. |
+| `aws/config/validator.go` Ctrl-C while selecting a region | Registered as a `stdinParamProviderFn`, `func() string`. |
 
-So the refactor's remaining benefit is testability of `commands/`, which is
-better pursued as part of `I7` where it can be justified by coverage rather than
-done speculatively.
+Both close readline explicitly first, since `os.Exit` skips the deferred close and
+would leave the terminal in raw mode. Both now record the reason in place.
 
----
+Verified that exit codes are unchanged from before the refactor for `list`, `show`,
+`config get` and an unknown command, and that errors print exactly once.
 
 ### I17: `main.go` discards the error from `Execute()` — **FIXED**
 

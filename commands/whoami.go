@@ -47,25 +47,27 @@ func init() {
 }
 
 var whoamiCmd = &cobra.Command{
-	Use:               "whoami",
-	Aliases:           []string{"who"},
-	PersistentPreRun:  applyHooks(initAwlessEnvHook, initLoggerHook, initCloudServicesHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
-	Short:             "Show your account, attached (i.e. managed) and inlined policies",
+	Use:                "whoami",
+	Aliases:            []string{"who"},
+	PersistentPreRunE:  applyHooks(initAwlessEnvHook, initLoggerHook, initCloudServicesHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	Short:              "Show your account, attached (i.e. managed) and inlined policies",
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if onlyMyIPFlag {
 			fmt.Println(getMyIP())
-			return
+			return nil
 		}
 
 		if localGlobalFlag {
 			logger.Warning("`--local` flag prevent the command from fetching remote information")
-			return
+			return nil
 		}
 
 		me, err := awsservices.AccessService.(*awsservices.Access).GetIdentity()
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		if me.IsRoot() {
 			logger.Warning("You are currently root")
@@ -76,24 +78,24 @@ var whoamiCmd = &cobra.Command{
 		switch {
 		case onlyMyAccountFlag:
 			fmt.Println(me.Account)
-			return
+			return nil
 		case onlyMyIDFlag:
 			fmt.Println(me.UserID)
-			return
+			return nil
 		case onlyMyNameFlag:
 			fmt.Println(me.Resource)
-			return
+			return nil
 		case onlyMyTypeFlag:
 			fmt.Println(me.ResourceType)
-			return
+			return nil
 		case onlyMyResourcePathFlag:
 			fmt.Println(me.ResourcePath)
-			return
+			return nil
 		}
 
 		if !me.IsUserType() {
 			fmt.Printf("ResourceType: %s, Resource: %s, Id: %s, Account: %s\n", me.ResourceType, me.Resource, me.UserID, me.Account)
-			return
+			return nil
 		}
 
 		fmt.Printf("Username: %s, Id: %s, Account: %s\n", me.Resource, me.UserID, me.Account)
@@ -106,7 +108,7 @@ var whoamiCmd = &cobra.Command{
 			} else {
 				logger.Error(err)
 			}
-			return
+			return nil
 		}
 
 		if attached := policies.Attached; len(attached) > 0 {
@@ -130,6 +132,7 @@ var whoamiCmd = &cobra.Command{
 				fmt.Printf("\nPolicies from group '%s': %s\n", g, strings.Join(pol, ", "))
 			}
 		}
+		return nil
 	},
 }
 

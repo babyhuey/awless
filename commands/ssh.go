@@ -84,8 +84,8 @@ var sshCmd = &cobra.Command{
   awless ssh private-redis --through my-proxy --through-port 23              # specifying proxy port
   awless ssh 172.31.77.151 --port 2222 --through my-proxy --through-port 23  # specifying target & proxy port`,
 
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
@@ -100,15 +100,21 @@ var sshCmd = &cobra.Command{
 		} else {
 			connectionCtx, err = initInstanceConnectionContext(args[0], keyPathFlag)
 		}
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		firsHopClient, err := ssh.InitClient(connectionCtx.keypath, config.KeysDir, filepath.Join(os.Getenv("HOME"), ".ssh"))
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		if err != nil && strings.Contains(err.Error(), "cannot find SSH key") && keyPathFlag == "" {
 			logger.Info("you may want to specify a key filepath with `-i /path/to/key.pem`")
 		}
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		firsHopClient.SetLogger(logger.DefaultLogger)
 		firsHopClient.SetStrictHostKeyChecking(!disableStrictHostKeyCheckingFlag)
@@ -123,10 +129,10 @@ var sshCmd = &cobra.Command{
 			if priv := connectionCtx.privip; priv != "" {
 				firsHopClient.IP = connectionCtx.privip
 			} else {
-				exitOn(fmt.Errorf(
+				return fmt.Errorf(
 					"no private IP resolved for instance %s (state '%s')",
 					connectionCtx.instance.ID(), connectionCtx.state,
-				))
+				)
 			}
 		} else {
 			if pub := connectionCtx.ip; pub != "" {
@@ -134,7 +140,7 @@ var sshCmd = &cobra.Command{
 			} else if priv := connectionCtx.privip; priv != "" {
 				firsHopClient.IP = connectionCtx.privip
 			} else {
-				exitOn(fmt.Errorf("no public/private IP resolved for instance %s (state '%s')", connectionCtx.instance.ID(), connectionCtx.state))
+				return fmt.Errorf("no public/private IP resolved for instance %s (state '%s')", connectionCtx.instance.ID(), connectionCtx.state)
 			}
 		}
 
@@ -146,7 +152,9 @@ var sshCmd = &cobra.Command{
 
 		if isConnectionRefusedErr(err) {
 			logger.Warning("cannot connect to this instance, maybe the system is still booting?")
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 			return nil
 		}
 
@@ -154,20 +162,26 @@ var sshCmd = &cobra.Command{
 			if e := connectionCtx.checkInstanceAccessible(); e != nil {
 				logger.Error(e.Error())
 			}
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 		}
 
 		targetClient := firsHopClient
 
 		if proxyInstanceThroughFlag != "" {
 			destInstanceCtx, err := initInstanceConnectionContext(args[0], keyPathFlag)
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 			if destInstanceCtx.user != "" {
 				targetClient, err = firsHopClient.NewClientWithProxy(destInstanceCtx.privip, sshPortFlag, destInstanceCtx.user)
 			} else {
 				targetClient, err = firsHopClient.NewClientWithProxy(destInstanceCtx.privip, sshPortFlag, defaultAMIUsers...)
 			}
-			exitOn(err)
+			if err != nil {
+				return err
+			}
 		}
 
 		if printSSHConfigFlag {
@@ -184,7 +198,9 @@ var sshCmd = &cobra.Command{
 			return nil
 		}
 
-		exitOn(targetClient.Connect())
+		if err := targetClient.Connect(); err != nil {
+			return err
+		}
 		return nil
 	},
 }
@@ -212,16 +228,22 @@ func initInstanceConnectionContext(userhost, keypath string) (*instanceConnectio
 		ctx.instanceName = userhost
 	}
 
-	ctx.fetchConnectionInfo()
+	if err := ctx.fetchConnectionInfo(); err != nil {
+		return nil, err
+	}
 
 	instanceMatchers := match.Or(match.Property(properties.Name, ctx.instanceName), match.Property(properties.PublicIP, ctx.instanceName), match.Property(properties.PrivateIP, ctx.instanceName))
 	resources, err := ctx.resourcesGraph.Find(cloud.NewQuery(cloud.Instance).Match(instanceMatchers))
-	exitOn(err)
+	if err != nil {
+		return nil, err
+	}
 	switch len(resources) {
 	case 0:
 		// No instance with that name, use the id
 		ctx.instance, err = findResource(ctx.resourcesGraph, ctx.instanceName, cloud.Instance)
-		exitOn(err)
+		if err != nil {
+			return nil, err
+		}
 	case 1:
 		ctx.instance = resources[0]
 	default:
@@ -232,7 +254,9 @@ func initInstanceConnectionContext(userhost, keypath string) (*instanceConnectio
 
 		var running []cloud.Resource
 		running, err = ctx.resourcesGraph.Find(cloud.NewQuery(cloud.Instance).Match(match.And(instanceMatchers, match.Property(properties.State, "running"))))
-		exitOn(err)
+		if err != nil {
+			return nil, err
+		}
 
 		switch len(running) {
 		case 0:
@@ -270,7 +294,7 @@ func initInstanceConnectionContext(userhost, keypath string) (*instanceConnectio
 	return ctx, nil
 }
 
-func (ctx *instanceConnectionContext) fetchConnectionInfo() {
+func (ctx *instanceConnectionContext) fetchConnectionInfo() error {
 	var resourcesGraph, sgroupsGraph cloud.GraphAPI
 	var myip net.IP
 	var wg sync.WaitGroup
@@ -307,15 +331,16 @@ func (ctx *instanceConnectionContext) fetchConnectionInfo() {
 	}()
 	for err := range errc {
 		if err != nil {
-			exitOn(err)
+			return err
 		}
 	}
 	if err := resourcesGraph.Merge(sgroupsGraph); err != nil {
-		exitOn(fmt.Errorf("merging security group graph: %w", err))
+		return fmt.Errorf("merging security group graph: %w", err)
 	}
 
 	ctx.resourcesGraph = resourcesGraph
 	ctx.myip = myip
+	return nil
 }
 
 func (ctx *instanceConnectionContext) checkInstanceAccessible() (err error) {

@@ -41,12 +41,12 @@ func init() {
 }
 
 var inspectCmd = &cobra.Command{
-	Use:               "inspect",
-	Short:             "Analyze your infrastructure through inspectors",
-	Long:              fmt.Sprintf("Basic proof of concept inspectors to analyze your infrastructure: %s", allInspectors()),
-	Example:           "  awless inspect -i bucket_sizer\n  awless inspect -i pricer\n  awless inspect -i port_scanner",
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	Use:                "inspect",
+	Short:              "Analyze your infrastructure through inspectors",
+	Long:               fmt.Sprintf("Basic proof of concept inspectors to analyze your infrastructure: %s", allInspectors()),
+	Example:            "  awless inspect -i bucket_sizer\n  awless inspect -i pricer\n  awless inspect -i port_scanner",
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 
 	RunE: func(c *cobra.Command, args []string) error {
 		inspector, ok := inspect.InspectorsRegister[inspectorFlag]
@@ -67,9 +67,13 @@ var inspectCmd = &cobra.Command{
 		}
 
 		g, err := sync.LoadLocalGraphs(config.GetAWSProfile(), config.GetAWSRegion())
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
-		exitOn(inspector.Inspect(g))
+		if err := inspector.Inspect(g); err != nil {
+			return err
+		}
 
 		inspector.Print(os.Stdout)
 

@@ -17,19 +17,9 @@ limitations under the License.
 package commands
 
 import (
-	"fmt"
-	"os"
+	"errors"
 	"strings"
-
-	"github.com/fatih/color"
 )
-
-func exitOn(err error) {
-	if err != nil {
-		fmt.Fprintln(os.Stderr, color.RedString("[error]  "), err)
-		os.Exit(1)
-	}
-}
 
 // capitalize upper-cases the first character of s.
 //
@@ -43,3 +33,19 @@ func capitalize(s string) string {
 	}
 	return strings.ToUpper(s[:1]) + s[1:]
 }
+
+// ErrExitZero reports that a command has already told the user everything they
+// need and should end successfully without printing an error.
+//
+// Exists so those paths can return through cobra like any other outcome instead of
+// calling os.Exit(0) mid-call, which skipped deferred cleanup and bypassed the
+// single exit point in main.
+var ErrExitZero = errors.New("awless: nothing further to report")
+
+// ErrReported marks a failure whose explanation has already been printed, usually
+// through logger.Errorf together with a suggested command.
+//
+// Returning it exits non-zero without printing a second message, which is what
+// these paths used os.Exit(1) for. Keeping them as errors means deferred cleanup
+// runs and there is still only one exit point.
+var ErrReported = errors.New("awless: command failed")

@@ -20,8 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"os"
-
 	"github.com/spf13/cobra"
 
 	"github.com/bootswithdefer/awless/config"
@@ -35,11 +33,11 @@ func init() {
 }
 
 var revertCmd = &cobra.Command{
-	Use:               "revert REVERTID",
-	Short:             "Revert a template from a revert ID (see `awless log`). If deployment has changed there is no guarantee that it is still revertible.",
-	Example:           "  awless revert 01BA7RV6ES86PZYCM3H28WM6KZ",
-	PersistentPreRun:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
-	PersistentPostRun: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
+	Use:                "revert REVERTID",
+	Short:              "Revert a template from a revert ID (see `awless log`). If deployment has changed there is no guarantee that it is still revertible.",
+	Example:            "  awless revert 01BA7RV6ES86PZYCM3H28WM6KZ",
+	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, initSyncerHook, firstInstallDoneHook),
+	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 
 	RunE: func(c *cobra.Command, args []string) error {
 		if len(args) < 1 {
@@ -49,15 +47,17 @@ var revertCmd = &cobra.Command{
 		revertID := args[0]
 
 		var loaded *template.TemplateExecution
-		exitOn(database.Execute(func(db *database.DB) (terr error) {
+		if err := database.Execute(func(db *database.DB) (terr error) {
 			loaded, terr = db.GetTemplate(revertID)
 			return
-		}))
+		}); err != nil {
+			return err
+		}
 
 		if loc := loaded.Locale; loc != "" && loc != config.GetAWSRegion() {
 			logger.Errorf("This template was originally run in region %s", loc)
 			logger.Infof("Revert with `awless revert %s -r %s -p %s`", revertID, loc, loaded.Profile)
-			os.Exit(1)
+			return ErrReported
 		}
 
 		if prof := loaded.Profile; prof != config.GetAWSProfile() {
@@ -65,7 +65,9 @@ var revertCmd = &cobra.Command{
 		}
 
 		reverted, err := loaded.Revert()
-		exitOn(err)
+		if err != nil {
+			return err
+		}
 
 		tplExec := &template.TemplateExecution{
 			Template: reverted,
@@ -75,7 +77,9 @@ var revertCmd = &cobra.Command{
 		}
 		tplExec.SetMessage(fmt.Sprintf("Revert %s: %s", loaded.ID, loaded.Message))
 
-		exitOn(NewRunnerRequiredParamsOnly(tplExec.Template, tplExec.Message, tplExec.Path).Run())
+		if err := NewRunnerRequiredParamsOnly(tplExec.Template, tplExec.Message, tplExec.Path).Run(); err != nil {
+			return err
+		}
 
 		return nil
 	},

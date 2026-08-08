@@ -54,17 +54,20 @@ func webListenAddr(port string, listenAll bool) string {
 }
 
 var webCmd = &cobra.Command{
-	Use:              "web",
-	Hidden:           true,
-	Short:            "[Experimental] Browse your locally synced data through the web",
-	PersistentPreRun: applyHooks(initLoggerHook, initAwlessEnvHook),
+	Use:               "web",
+	Hidden:            true,
+	Short:             "[Experimental] Browse your locally synced data through the web",
+	PersistentPreRunE: applyHooks(initLoggerHook, initAwlessEnvHook),
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if webListenAllFlag {
 			logger.Warning("web UI listening on all interfaces with no authentication; anyone who can reach this port can browse your synced AWS inventory")
 		}
 
 		server := web.New(webListenAddr(webPortFlag, webListenAllFlag), config.GetAWSProfile())
-		exitOn(server.Start())
+		if err := server.Start(); err != nil {
+			return err
+		}
+		return nil
 	},
 }
