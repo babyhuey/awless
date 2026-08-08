@@ -187,6 +187,11 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 
 	var lastID string
 	for _, ass := range assocs {
+		// An association without a profile is not one we can match on, and
+		// dereferencing it panicked.
+		if ass.IamInstanceProfile == nil {
+			continue
+		}
 		if strings.Contains(StringValue(ass.IamInstanceProfile.Arn), profileName) {
 			input := &ec2.DisassociateIamInstanceProfileInput{
 				AssociationId: ass.AssociationId,
@@ -198,8 +203,11 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 				return nil, err
 			}
 			cmd.logger.ExtraVerbosef("ec2.DisassociateIamInstanceProfile call took %s", time.Since(start))
-			id := StringValue(output.IamInstanceProfileAssociation.IamInstanceProfile.Id)
-			lastID = id
+			// AWS normally echoes the association back, but an empty response must not
+			// take the process down after the detach has already happened.
+			if a := output.IamInstanceProfileAssociation; a != nil && a.IamInstanceProfile != nil {
+				lastID = StringValue(a.IamInstanceProfile.Id)
+			}
 		}
 	}
 

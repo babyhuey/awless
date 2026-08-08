@@ -800,6 +800,20 @@ func convertSlice(rv reflect.Value, dest reflect.Type) (reflect.Value, bool) {
 	return out, true
 }
 
+// parseIndexedSegment splits a path segment such as "Items[0]" into its field name and
+// element index.
+func parseIndexedSegment(part string) (name string, index int, indexed bool) {
+	open := strings.IndexByte(part, '[')
+	if open < 0 || !strings.HasSuffix(part, "]") {
+		return part, 0, false
+	}
+	n, err := strconv.Atoi(part[open+1 : len(part)-1])
+	if err != nil {
+		return part, 0, false
+	}
+	return part[:open], n, true
+}
+
 func setValueAtPath(i any, path string, v any) {
 	path = strings.TrimPrefix(path, ".")
 	if path == "" {
@@ -818,10 +832,40 @@ func setValueAtPath(i any, path string, v any) {
 		if val.Kind() != reflect.Struct {
 			return
 		}
-		field := val.FieldByName(part)
+
+		// A segment may name an element of a slice, as in Origins.Items[0].DomainName.
+		// Splitting only on "." left "Items[0]" to be looked up as a field name, which
+		// never matched, so the whole assignment was dropped in silence.
+		name, elemIdx, indexed := parseIndexedSegment(part)
+
+		field := val.FieldByName(name)
 		if !field.IsValid() || !field.CanSet() {
 			return
 		}
+
+		if indexed {
+			if field.Kind() != reflect.Slice {
+				return
+			}
+			for field.Len() <= elemIdx {
+				field.Set(reflect.Append(field, reflect.New(field.Type().Elem()).Elem()))
+			}
+			elem := field.Index(elemIdx)
+			if idx == len(parts)-1 {
+				return // a path cannot end at a slice element
+			}
+			// Recurse into the element, which Index makes addressable.
+			target := elem
+			if elem.Kind() != reflect.Pointer {
+				target = elem.Addr()
+			} else if elem.IsNil() {
+				elem.Set(reflect.New(elem.Type().Elem()))
+				target = elem
+			}
+			setValueAtPath(target.Interface(), strings.Join(parts[idx+1:], "."), v)
+			return
+		}
+
 		if idx == len(parts)-1 {
 			rv := reflect.ValueOf(v)
 			if field.Kind() == reflect.Pointer {

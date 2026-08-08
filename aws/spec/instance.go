@@ -38,7 +38,7 @@ type CreateInstance struct {
 	graph             cloud.GraphAPI
 	api               *ec2.Client
 	Image             *string   `awsName:"ImageId" awsType:"awsstr" templateName:"image"`
-	Count             *int64    `awsName:"MaxCount,MinCount" awsType:"awsin64" templateName:"count"`
+	Count             *int64    `awsName:"MaxCount,MinCount" awsType:"awsint64" templateName:"count"`
 	Type              *string   `awsName:"InstanceType" awsType:"awsstr" templateName:"type"`
 	Name              *string   `templateName:"name"`
 	Subnet            *string   `awsName:"SubnetId" awsType:"awsstr" templateName:"subnet"`
