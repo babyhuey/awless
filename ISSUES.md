@@ -563,20 +563,35 @@ Dependabot is configured but there's no auto-merge setup. Given the high number 
 
 ---
 
-### I7: Test coverage improvement targets
+### I7: Test coverage improvement targets — **PARTIALLY FIXED**
 
 **Severity:** Medium  
-**Current state:** ~22.4% coverage (83 test files, 180 source files)
+**Files:** `Makefile`, `.github/workflows/ci.yml`, `acceptance/aws/`, `aws/spec/setters_slice_test.go`
 
-Key untested areas:
-- `commands/` — only `tabcompletion_test.go` and `run_test.go` exist; no tests for `ssh.go`, `show.go`, `list.go`, `sync.go`
-- `aws/fetch/manual_fetchers.go` (38KB) — zero test coverage
-- `aws/services/` — only lookup and relation tests; no service-level tests
-- `ssh/` — basic tests exist but no integration-style tests
+Two things were wrong here, one of them a measurement error.
 
-**Fix:** Prioritize `commands/` tests (testable with mock services) and `aws/conv/` edge cases.
+**The number was understated.** `go test -coverprofile` only attributes coverage
+to the package under test, so every statement the acceptance and integration tests
+drive in other packages was counted as uncovered. Adding `-coverpkg=./...` to the
+`cover` targets and the CI test job moved the reported total from 23.2% to **30.0%**
+with no new tests — the difference was always covered, just not credited.
 
----
+**Real gaps closed:**
+
+- `acceptance/aws` went from zero tests to 13, covering a spread of EC2, IAM, S3,
+  SNS and SQS commands through the full pipeline (see `D1`/`D8`). These drive a
+  large amount of `aws/spec`, which was the single least-covered significant
+  package at 6.7%.
+- `aws/spec/setters_slice_test.go` unit-tests the setter dispatch directly,
+  including the `[]*string` → `[]string` conversion whose absence was a live
+  runtime bug.
+
+**Still open, and why:** the remaining zero-coverage functions are dominated by
+I/O — `console/terminal.go` (terminal size, raw mode, signal propagation),
+`config/init.go` and the stdin selectors in `aws/config/validator.go`, and
+`config/upgrade.go`'s HTTP check. Covering these needs terminal and network
+seams that do not exist yet, which is a refactor rather than a test-writing task.
+`commands/` at 21% is the largest remaining opportunity.
 
 ### I8: Go language modernization — **FIXED**
 

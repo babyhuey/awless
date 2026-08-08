@@ -57,7 +57,7 @@ fuzz: ## Run each fuzz target briefly (FUZZTIME=30s to override)
 
 .PHONY: cover
 cover: ## Run tests with coverage and print the total
-	go test -count=1 -coverprofile=coverage.out ./...
+	go test -count=1 -coverpkg=./... -coverprofile=coverage.out ./...
 	@go tool cover -func=coverage.out | tail -1
 
 .PHONY: cover-html
