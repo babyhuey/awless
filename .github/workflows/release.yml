@@ -25,14 +25,24 @@ jobs:
         with:
           go-version-file: go.mod
 
+      # GoReleaser takes a path to the key, not its contents, so the secret is written
+      # to a file first. Kept out of the workspace so no archive glob can pick it up,
+      # and mode 600 because ssh refuses a world-readable key.
+      - name: Write the Homebrew tap deploy key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.HOMEBREW_TAP_SSH_KEY }}" > ~/.ssh/homebrew_tap
+          chmod 600 ~/.ssh/homebrew_tap
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+
       - uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
         with:
           version: '~> v2'
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Publishing the Homebrew cask means committing to bootswithdefer/homebrew-tap,
-          # which GITHUB_TOKEN cannot do — it is scoped to this repository. This must be a
-          # PAT with contents:write on the tap repo. If the secret is absent GoReleaser
-          # fails the cask step, so the release itself still publishes.
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          # The cask is committed to bootswithdefer/homebrew-tap over SSH with a deploy
+          # key scoped to that repository. GITHUB_TOKEN cannot reach another repository,
+          # and a PAT with `repo` scope would grant write access to every repository the
+          # owner has, which is far more than this needs.
+          HOMEBREW_TAP_SSH_KEY_PATH: /home/runner/.ssh/homebrew_tap

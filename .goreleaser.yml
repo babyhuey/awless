@@ -78,10 +78,13 @@ homebrew_casks:
       owner: bootswithdefer
       name: homebrew-tap
       branch: main
-      # The workflow's default GITHUB_TOKEN is scoped to this repository and cannot
-      # push to the tap, so a PAT with contents:write on the tap is required. Set it
-      # as the HOMEBREW_TAP_TOKEN secret.
-      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+      # Pushed over SSH with a deploy key rather than with a token. The workflow's
+      # GITHUB_TOKEN is scoped to this repository and cannot write to the tap, and a
+      # personal access token with `repo` scope would grant write access to every
+      # repository the owner has. A deploy key is limited to the tap alone.
+      git:
+        url: "git@github.com:bootswithdefer/homebrew-tap.git"
+        private_key: "{{ .Env.HOMEBREW_TAP_SSH_KEY_PATH }}"
     directory: Casks
     binaries:
       - awless
