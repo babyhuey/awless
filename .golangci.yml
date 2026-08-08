@@ -14,6 +14,19 @@ linters:
     - errcheck
     - errorlint
     - nilerr
+    # Report nothing today, so they cost nothing and guard against regressions.
+    - asasalint       # []any passed to a variadic func
+    - contextcheck    # a function should inherit its caller's context
+    - durationcheck   # multiplying two durations
+    - iotamixing      # iota mixed with explicit values in one const block
+    - makezero        # slice made with a length then appended to
+    - nilnesserr      # returns an error that is always nil
+    - nolintlint      # a //nolint must be specific and explained
+    - reassign        # assigning to another package's variable
+    - recvcheck       # mixed pointer and value receivers on one type
+    - sqlclosecheck   # unclosed sql.Rows / sql.Stmt
+    - usestdlibvars   # stdlib constants instead of literals
+    - wastedassign    # a value assigned and never used
   settings:
     govet:
       enable-all: true

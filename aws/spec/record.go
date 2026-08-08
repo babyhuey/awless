@@ -54,7 +54,7 @@ func (cmd *CreateRecord) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *CreateRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
+func (cmd *CreateRecord) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 	output, err := changeResourceRecordSets(cmd.api, String("CREATE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, cmd.Comment, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
@@ -83,7 +83,7 @@ func (cmd *UpdateRecord) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *UpdateRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
+func (cmd *UpdateRecord) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 	output, err := changeResourceRecordSets(cmd.api, String("UPSERT"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
@@ -154,7 +154,7 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 	return builder.Done()
 }
 
-func (cmd *DeleteRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
+func (cmd *DeleteRecord) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 	output, err := changeResourceRecordSets(cmd.api, String("DELETE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
