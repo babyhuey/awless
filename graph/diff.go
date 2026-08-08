@@ -86,7 +86,7 @@ func (d *hierarchicDiffer) Run(root string, from *Graph, to *Graph) (*Diff, erro
 	fromSnap := from.store.Snapshot()
 	toSnap := to.store.Snapshot()
 
-	maxCount := max(uint32(fromSnap.Count()), uint32(toSnap.Count()))
+	maxCount := maxInt(uint32(fromSnap.Count()), uint32(toSnap.Count()))
 	processing := make(chan string, maxCount)
 
 	if maxCount < 1 {
@@ -147,8 +147,8 @@ func compareChildTriplesOf(onPredicate, root string, fromGraph tstore.RDFGraph, 
 func intersectTriples(a, b []tstore.Triple) []tstore.Triple {
 	var inter []tstore.Triple
 
-	for i := 0; i < len(a); i++ {
-		for j := 0; j < len(b); j++ {
+	for i := range a {
+		for j := range b {
 			if a[i].Equal(b[j]) {
 				inter = append(inter, a[i])
 			}
@@ -161,9 +161,9 @@ func intersectTriples(a, b []tstore.Triple) []tstore.Triple {
 func subtractTriples(a, b []tstore.Triple) []tstore.Triple {
 	var sub []tstore.Triple
 
-	for i := 0; i < len(a); i++ {
+	for i := range a {
 		var found bool
-		for j := 0; j < len(b); j++ {
+		for j := range b {
 			if a[i].Equal(b[j]) {
 				found = true
 			}
@@ -176,7 +176,7 @@ func subtractTriples(a, b []tstore.Triple) []tstore.Triple {
 	return sub
 }
 
-func max(a, b uint32) uint32 {
+func maxInt(a, b uint32) uint32 {
 	if a < b {
 		return b
 	}

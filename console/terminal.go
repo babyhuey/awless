@@ -104,7 +104,7 @@ func InteractiveTerminal(client *ssh.Client) error {
 	return session.Wait()
 }
 
-func propagateSignals(signalc chan os.Signal, session *ssh.Session, stdin io.WriteCloser) {
+func propagateSignals(signalc chan os.Signal, _ *ssh.Session, stdin io.WriteCloser) {
 	for s := range signalc {
 		switch s {
 		case os.Interrupt:

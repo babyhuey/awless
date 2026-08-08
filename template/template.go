@@ -43,14 +43,14 @@ func (s *Template) DryRun(renv env.Running) (tpl *Template, err error) {
 		return
 	}
 
-	errs := &Errors{}
+	errs := &RunError{}
 	for _, cmd := range tpl.CommandNodesIterator() {
 		if cmderr := cmd.Err(); cmderr != nil {
 			errs.add(cmderr)
 		}
 	}
 
-	if _, any := errs.Errors(); any {
+	if _, hasErrs := errs.Errors(); hasErrs {
 		err = errs
 	}
 
@@ -237,19 +237,19 @@ func extractExpressionNode(st *ast.Statement) ast.ExpressionNode {
 	return nil
 }
 
-type Errors struct {
+type RunError struct {
 	errs []error
 }
 
-func (d *Errors) Errors() ([]error, bool) {
+func (d *RunError) Errors() ([]error, bool) {
 	return d.errs, len(d.errs) > 0
 }
 
-func (d *Errors) add(err error) {
+func (d *RunError) add(err error) {
 	d.errs = append(d.errs, err)
 }
 
-func (d *Errors) Error() string {
+func (d *RunError) Error() string {
 	var all []string
 	for _, err := range d.errs {
 		all = append(all, err.Error())

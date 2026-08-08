@@ -31,14 +31,14 @@ func (n *NetworkMonitor) DisplayStats(w io.Writer) {
 
 	var sorted []*req
 
-	var min, max time.Time
+	var minVal, maxVal time.Time
 	var maxFunctionNameLength int
 	for _, r := range n.requests {
-		if min.IsZero() || r.from.Before(min) {
-			min = r.from
+		if minVal.IsZero() || r.from.Before(minVal) {
+			minVal = r.from
 		}
-		if max.IsZero() || r.to.After(max) {
-			max = r.to
+		if maxVal.IsZero() || r.to.After(maxVal) {
+			maxVal = r.to
 		}
 		if len(r.name) > maxFunctionNameLength {
 			maxFunctionNameLength = len(r.name)
@@ -53,25 +53,25 @@ func (n *NetworkMonitor) DisplayStats(w io.Writer) {
 	})
 
 	maxwidth := uint(console.GetTerminalWidth() - maxFunctionNameLength - 11) // 11 = '['+']'+' '+'('+4+'m'+'s'+')'
-	maxDuration := max.Sub(min)
+	maxDuration := maxVal.Sub(minVal)
 
 	for _, r := range sorted {
 		if len(r.retries) > 0 {
-			drawRequest(w, r.name, min, r.from, r.retries[0], maxwidth, maxDuration, "[", "X")
-			for i := 0; i < len(r.retries)-1; i++ {
-				drawRequest(w, r.name, min, r.retries[i], r.retries[i+1], maxwidth, maxDuration, "o", "X")
+			drawRequest(w, r.name, minVal, r.from, r.retries[0], maxwidth, maxDuration, "[", "X")
+			for i := range len(r.retries) - 1 {
+				drawRequest(w, r.name, minVal, r.retries[i], r.retries[i+1], maxwidth, maxDuration, "o", "X")
 			}
-			drawRequest(w, r.name, min, r.retries[len(r.retries)-1], r.to, maxwidth, maxDuration, "o", "]")
+			drawRequest(w, r.name, minVal, r.retries[len(r.retries)-1], r.to, maxwidth, maxDuration, "o", "]")
 		} else {
-			drawRequest(w, r.name, min, r.from, r.to, maxwidth, maxDuration, "[", "]")
+			drawRequest(w, r.name, minVal, r.from, r.to, maxwidth, maxDuration, "[", "]")
 		}
 	}
 }
 
-func drawRequest(w io.Writer, name string, min, from, to time.Time, maxwidth uint, maxduration time.Duration, startChar, stopChar string) {
+func drawRequest(w io.Writer, name string, minVal, from, to time.Time, maxwidth uint, maxduration time.Duration, startChar, stopChar string) {
 	duration := to.Sub(from)
 	width := uint(duration) * maxwidth / uint(maxduration)
-	before := uint(from.Sub(min)) * maxwidth / uint(maxduration)
+	before := uint(from.Sub(minVal)) * maxwidth / uint(maxduration)
 	after := maxwidth - width - before
 	fmt.Fprintf(w, "%s%s%s%s%s %s(%dms)\n", strings.Repeat(" ", int(before)), startChar, strings.Repeat("-", int(width)), stopChar, strings.Repeat(" ", int(after)), name, duration/(1000*1000))
 }

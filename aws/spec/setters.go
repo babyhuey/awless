@@ -644,7 +644,7 @@ func structSetter(s any, params map[string]any) error {
 	val := reflect.ValueOf(s).Elem()
 	stru := val.Type()
 
-	for i := 0; i < stru.NumField(); i++ {
+	for i := range stru.NumField() {
 		field := stru.Field(i)
 		tplName := field.Tag.Get("templateName")
 		var fieldType string
@@ -690,7 +690,7 @@ func structInjector(src, dest any, renv env.Running) error {
 	val := reflect.ValueOf(src).Elem()
 	stru := val.Type()
 
-	for i := 0; i < stru.NumField(); i++ {
+	for i := range stru.NumField() {
 		field := stru.Field(i)
 		if dstNames, ok := field.Tag.Lookup("awsName"); ok {
 			splits := strings.Split(dstNames, ",")
@@ -748,7 +748,7 @@ func convertSlice(rv reflect.Value, dest reflect.Type) (reflect.Value, bool) {
 	}
 
 	out := reflect.MakeSlice(dest, 0, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
+	for i := range rv.Len() {
 		e := rv.Index(i)
 		switch {
 		case deref:

@@ -20,6 +20,8 @@ var (
 func SetRootContext(ctx context.Context) {
 	rootCtxMu.Lock()
 	defer rootCtxMu.Unlock()
+	//nolint:fatcontext // Storing the process context once, not deriving a new one
+	// per iteration; fatcontext exists to catch context nesting inside loops.
 	rootCtx = ctx
 }
 

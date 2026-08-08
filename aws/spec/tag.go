@@ -83,7 +83,7 @@ func (cmd *CreateTag) ManualRun(renv env.Running) (any, error) {
 
 	start := time.Now()
 	var err error
-	for attempt := 0; attempt < 5; attempt++ {
+	for attempt := range 5 {
 		_, err = cmd.api.CreateTags(renv.RequestContext(), input)
 		if err == nil {
 			break

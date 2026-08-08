@@ -654,7 +654,7 @@ var extractStringSliceValues = func(key string) transformFn {
 		if value.Kind() != reflect.Slice {
 			return nil, fmt.Errorf("extract slice: not a slice but a %T", i)
 		}
-		for i := 0; i < value.Len(); i++ {
+		for i := range value.Len() {
 			e, err := extractFieldFn(key)(value.Index(i).Interface())
 			if err != nil {
 				return nil, err
@@ -742,7 +742,7 @@ var extractHasATrueBoolInStructSliceFn = func(key string) transformFn {
 		if value.Kind() != reflect.Slice {
 			return nil, fmt.Errorf("extract true bool: not a slice but a %T", i)
 		}
-		for i := 0; i < value.Len(); i++ {
+		for i := range value.Len() {
 			e, err := extractFieldFn(key)(value.Index(i).Interface())
 			if err != nil {
 				return res, err

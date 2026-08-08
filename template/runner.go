@@ -78,7 +78,7 @@ func (ru *Runner) Run() error {
 	// env.Running.RequestContext.
 	renv.SetRequestContext(ru.Context())
 	if _, err = tplExec.DryRun(renv); err != nil {
-		var t *Errors
+		var t *RunError
 		if errors.As(err, &t) {
 			errs, _ := t.Errors()
 			for _, e := range errs {

@@ -22,8 +22,8 @@ import (
 )
 
 func TestLoadConfigs(t *testing.T) {
-	db, close := newTestDB()
-	defer close()
+	db, closeDB := newTestDB()
+	defer closeDB()
 	configKey := "config"
 	d, err := db.GetConfigs(configKey)
 	if err != nil {

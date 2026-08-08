@@ -147,7 +147,7 @@ func (p *prefixCompleter) Do(line []rune, pos int) (newLine [][]rune, offset int
 	return
 }
 
-func doInternal(p *prefixCompleter, line string, pos int, origLine []rune) (newLine []string, offset int) {
+func doInternal(p *prefixCompleter, line string, _ int, origLine []rune) (newLine []string, offset int) {
 	if p.splitChar != "" {
 		line = splitKeepLast(line, p.splitChar)
 	}

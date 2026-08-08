@@ -39,7 +39,7 @@ func TestParseErrorChainIsInspectable(t *testing.T) {
 func TestTemplateErrorsUnwrapToSentinel(t *testing.T) {
 	sentinel := errors.New("underlying cause")
 
-	errs := &Errors{errs: []error{sentinel}}
+	errs := &RunError{errs: []error{sentinel}}
 	if !strings.Contains(errs.Error(), "underlying cause") {
 		t.Errorf("aggregate error lost the cause: %q", errs.Error())
 	}

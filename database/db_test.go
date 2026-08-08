@@ -23,8 +23,8 @@ import (
 )
 
 func TestGetSetDatabaseValues(t *testing.T) {
-	db, close := newTestDB()
-	defer close()
+	db, closeDB := newTestDB()
+	defer closeDB()
 
 	value, e := db.GetStringValue("mykey")
 	if e != nil {

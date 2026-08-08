@@ -68,7 +68,7 @@ var logCmd = &cobra.Command{
 			}); err != nil {
 				return err
 			}
-			print(all, printer)
+			printTemplates(all, printer)
 			return nil
 		}
 
@@ -97,12 +97,12 @@ var logCmd = &cobra.Command{
 			return err
 		}
 
-		print(all, printer)
+		printTemplates(all, printer)
 		return nil
 	},
 }
 
-func print(all []*database.LoadedTemplate, printer logPrinter) {
+func printTemplates(all []*database.LoadedTemplate, printer logPrinter) {
 	if limitLogCountFlag > 0 && limitLogCountFlag < len(all) {
 		all = all[len(all)-limitLogCountFlag:]
 	}

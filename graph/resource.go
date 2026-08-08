@@ -271,7 +271,7 @@ func (res *Resource) marshalFullRDF() ([]tstore.Triple, error) {
 	return triples, nil
 }
 
-func marshalToRdfObject(i any, definedBy, dataType string) (tstore.Object, error) {
+func marshalToRdfObject(i any, definedBy, _ string) (tstore.Object, error) {
 	switch definedBy {
 	case rdf.RdfsLiteral:
 		return tstore.ObjectLiteral(i)

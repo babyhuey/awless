@@ -369,17 +369,17 @@ func buildBenchmarkData() (data []*Resource) {
 		{PortRange: PortRange{FromPort: 80, ToPort: 80}, Protocol: "tcp", IPRanges: []*net.IPNet{localhost, subnetcidr}},
 		{PortRange: PortRange{FromPort: 1, ToPort: 1024}, Protocol: "udp", IPRanges: []*net.IPNet{subnetcidr}},
 	}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		vpcID := fmt.Sprintf("vpc%d", i)
 		data = append(data, vpcResource(vpcID).prop(properties.ID, vpcID).build())
 
 		routeID := fmt.Sprintf("%s_route", vpcID)
 		data = append(data, testResource(routeID, "routetable").prop(properties.ID, routeID).prop(properties.Vpc, vpcID).prop("Routes", routes).build())
 
-		for j := 0; j < 10; j++ {
+		for j := range 10 {
 			subID := fmt.Sprintf("%ssub%d", vpcID, j)
 			data = append(data, subResource(subID).prop(properties.ID, subID).prop(properties.Vpc, vpcID).prop(properties.Default, true).build())
-			for k := 0; k < 10; k++ {
+			for k := range 10 {
 				instID := fmt.Sprintf("%sinst%d", subID, k)
 
 				secGroup1Id := fmt.Sprintf("%s_securitygroup1", instID)
@@ -398,7 +398,7 @@ func BenchmarkRdfMarshaling(b *testing.B) {
 	resources := buildBenchmarkData()
 	b.ResetTimer()
 	b.Run("full RDF", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			for _, res := range resources {
 				if _, err := res.marshalFullRDF(); err != nil {
 					b.Fatal(err)
@@ -429,7 +429,7 @@ func BenchmarkRdfUnmarshaling(b *testing.B) {
 	defer pprof.StopCPUProfile()
 	b.Run("full RDF", func(b *testing.B) {
 		snap := graph.store.Snapshot()
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			for _, r := range resources {
 				rawRes := InitResource(r.Type(), r.ID())
 				if err := rawRes.unmarshalFullRdf(snap); err != nil {

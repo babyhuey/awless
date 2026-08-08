@@ -104,7 +104,7 @@ func assignAPIs(c *Config, apis ...any) {
 		}
 
 		apiType := reflect.TypeOf(api)
-		for i := 0; i < stru.NumField(); i++ {
+		for i := range stru.NumField() {
 			fieldType := stru.Field(i).Type
 			if apiType.AssignableTo(fieldType) {
 				val.Field(i).Set(reflect.ValueOf(api))

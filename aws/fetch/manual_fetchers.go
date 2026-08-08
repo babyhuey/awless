@@ -357,7 +357,6 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		g.SetLimit(maxParallelAWSCalls)
 
 		for _, lb := range lbs {
-			lb := lb
 			g.Go(func() error {
 				listenerPaginator := elbv2.NewDescribeListenersPaginator(conf.APIs.Elbv2, &elbv2.DescribeListenersInput{LoadBalancerArn: lb.LoadBalancerArn})
 				for listenerPaginator.HasMorePages() {

@@ -954,7 +954,7 @@ func TestFirewallRulesSort(t *testing.T) {
 	}
 	rules.Sort()
 	// After sorting, the order should be by string representation
-	for i := 0; i < len(rules)-1; i++ {
+	for i := range len(rules) - 1 {
 		if rules[i].String() > rules[i+1].String() {
 			t.Fatalf("rules not sorted: %s > %s", rules[i].String(), rules[i+1].String())
 		}
@@ -979,7 +979,7 @@ func TestGrantsSort(t *testing.T) {
 		{Permission: "READ"},
 	}
 	grants.Sort()
-	for i := 0; i < len(grants)-1; i++ {
+	for i := range len(grants) - 1 {
 		if grants[i].String() > grants[i+1].String() {
 			t.Fatalf("grants not sorted: %s > %s", grants[i].String(), grants[i+1].String())
 		}

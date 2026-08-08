@@ -160,7 +160,7 @@ func (c *CommandNode) ProcessRefs(refs map[string]any) {
 		}
 
 		if list, ok := param.(ListNode); ok {
-			var new []any
+			var newNode []any
 			for _, e := range list.arr {
 				newElem := e
 				if ref, isRef := e.(RefNode); isRef {
@@ -170,9 +170,9 @@ func (c *CommandNode) ProcessRefs(refs map[string]any) {
 						}
 					}
 				}
-				new = append(new, newElem)
+				newNode = append(newNode, newElem)
 			}
-			c.ParamNodes[paramKey] = new
+			c.ParamNodes[paramKey] = newNode
 		}
 	}
 }
@@ -193,7 +193,7 @@ func (c *CommandNode) ToDriverParams() map[string]any {
 
 func (c *CommandNode) ToFillerParams() map[string]any {
 	params := make(map[string]any)
-	fn := func(k string, v any) any {
+	fn := func(_ string, v any) any {
 		switch vv := v.(type) {
 		case InterfaceNode:
 			return vv.i

@@ -127,7 +127,7 @@ func (h SliceColumnDefinition) format(i any) string {
 		return fmt.Sprintf("invalid slice: %T", i)
 	}
 	var buf bytes.Buffer
-	for i := 0; i < value.Len(); i++ {
+	for i := range value.Len() {
 		s := fmt.Sprint(value.Index(i).Interface())
 		if h.ForEach != nil {
 			s = h.ForEach(s)

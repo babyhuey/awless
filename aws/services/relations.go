@@ -222,7 +222,7 @@ func (fb funcBuilder) addRelationListWithStringField() addParentFn {
 			return fmt.Errorf("add parent to %s: field not a slice: %T", res.ID(), structField.Kind())
 		}
 
-		for i := 0; i < structField.Len(); i++ {
+		for i := range structField.Len() {
 			elem := structField.Index(i).Interface()
 			var strVal string
 			switch s := elem.(type) {
@@ -263,7 +263,7 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 			return fmt.Errorf("add parent to %s: field not a slice: %T", res.ID(), structField.Kind())
 		}
 
-		for i := 0; i < structField.Len(); i++ {
+		for i := range structField.Len() {
 			listValue := structField.Index(i)
 			var listStruc reflect.Value
 			switch listValue.Kind() {

@@ -1037,46 +1037,46 @@ func resolveSortIndexes(headers []ColumnDefinition, sortingBy ...string) ([]int,
 }
 
 func colWidth(j int, t table, h ColumnDefinition, sortSymbol string) int {
-	max := twwidth.Width(h.title(sortSymbol))
+	maxLen := twwidth.Width(h.title(sortSymbol))
 	wraper := autoWraper{maxWidth: autowrapMaxSize, wrappingChar: " "}
 	for i := range t {
 		val := wraper.Wrap(h.format(t[i][j]))
 		valLen := twwidth.Width(val)
 		if valLen > tableColWidth {
-			if tableColWidth > max {
-				max = tableColWidth
+			if tableColWidth > maxLen {
+				maxLen = tableColWidth
 			}
 		}
 		lines, _ := twwarp.WrapString(val, tableColWidth)
 		for _, line := range lines {
 			width := twwidth.Width(line)
-			if width > max {
-				max = width
+			if width > maxLen {
+				maxLen = width
 			}
 		}
 	}
-	return max
+	return maxLen
 }
 
 func colWidthNoWraping(j int, t table, h ColumnDefinition, sortSymbol string) int {
-	max := twwidth.Width(h.title(sortSymbol))
+	maxLen := twwidth.Width(h.title(sortSymbol))
 	for i := range t {
 		val := h.format(t[i][j])
 		valLen := twwidth.Width(val)
 		if valLen > tableColWidth {
-			if tableColWidth > max {
-				max = tableColWidth
+			if tableColWidth > maxLen {
+				maxLen = tableColWidth
 			}
 		}
 		lines, _ := twwarp.WrapString(val, tableColWidth)
 		for _, line := range lines {
 			width := twwidth.Width(line)
-			if width > max {
-				max = width
+			if width > maxLen {
+				maxLen = width
 			}
 		}
 	}
-	return max
+	return maxLen
 }
 
 func nameOrID(res cloud.Resource) string {

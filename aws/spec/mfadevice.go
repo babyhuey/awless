@@ -178,8 +178,8 @@ func (cmd *DetachMfadevice) ParamsSpec() params.Spec {
 func displayQRCode(w io.Writer, qrCode barcode.Barcode) {
 	white := color.New(color.BgWhite)
 	black := color.New(color.BgBlack)
-	for x := 0; x < qrCode.Bounds().Dx(); x++ {
-		for y := 0; y < qrCode.Bounds().Dy(); y++ {
+	for x := range qrCode.Bounds().Dx() {
+		for y := range qrCode.Bounds().Dy() {
 			r32, g32, b32, _ := qrCode.At(x, y).RGBA()
 			r, g, b := int(r32>>8), int(g32>>8), int(b32>>8)
 			if (r+g+b)/3 > 180 {

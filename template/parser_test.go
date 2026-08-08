@@ -891,7 +891,7 @@ func assertVariableDeclarationNode(n ast.Node, expIdent string, value any, expHo
 	return nil
 }
 
-func assertDeclarationNode(n ast.Node, expIdent, expAction, expEntity string, refs map[string]string, params map[string]any, holes, aliases map[string]string) error {
+func assertDeclarationNode(n ast.Node, _, expAction, expEntity string, refs map[string]string, params map[string]any, holes, aliases map[string]string) error {
 	if err := isDeclarationNode(n); err != nil {
 		return err
 	}

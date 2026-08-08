@@ -13,173 +13,173 @@ type rBuilder struct {
 	props   map[string]any
 }
 
-func new(typ, id string) *rBuilder {
+func newResource(typ, id string) *rBuilder {
 	r := &rBuilder{id: id, typ: typ, props: make(map[string]any)}
 	return r.Prop(properties.ID, id)
 }
 
 func Region(id string) *rBuilder {
-	return new("region", id)
+	return newResource("region", id)
 }
 
 func Instance(id string) *rBuilder {
-	return new("instance", id)
+	return newResource("instance", id)
 }
 
 func Subnet(id string) *rBuilder {
-	return new("subnet", id)
+	return newResource("subnet", id)
 }
 
 func VPC(id string) *rBuilder {
-	return new("vpc", id)
+	return newResource("vpc", id)
 }
 
 func SecurityGroup(id string) *rBuilder {
-	return new("securitygroup", id)
+	return newResource("securitygroup", id)
 }
 
 func KeyPair(id string) *rBuilder {
-	return new("keypair", id)
+	return newResource("keypair", id)
 }
 
 func InternetGw(id string) *rBuilder {
-	return new("internetgateway", id)
+	return newResource("internetgateway", id)
 }
 
 func NatGw(id string) *rBuilder {
-	return new("natgateway", id)
+	return newResource("natgateway", id)
 }
 
 func RouteTable(id string) *rBuilder {
-	return new("routetable", id)
+	return newResource("routetable", id)
 }
 
 func LoadBalancer(id string) *rBuilder {
-	return new("loadbalancer", id)
+	return newResource("loadbalancer", id)
 }
 
 func ClassicLoadBalancer(id string) *rBuilder {
-	return new("classicloadbalancer", id)
+	return newResource("classicloadbalancer", id)
 }
 
 func AvailabilityZone(id string) *rBuilder {
-	return new("availabilityzone", id)
+	return newResource("availabilityzone", id)
 }
 
 func TargetGroup(id string) *rBuilder {
-	return new("targetgroup", id)
+	return newResource("targetgroup", id)
 }
 
 func Policy(id string) *rBuilder {
-	return new("policy", id)
+	return newResource("policy", id)
 }
 
 func Group(id string) *rBuilder {
-	return new("group", id)
+	return newResource("group", id)
 }
 
 func Role(id string) *rBuilder {
-	return new("role", id)
+	return newResource("role", id)
 }
 
 func User(id string) *rBuilder {
-	return new("user", id)
+	return newResource("user", id)
 }
 
 func MfaDevice(id string) *rBuilder {
-	return new("mfadevice", id)
+	return newResource("mfadevice", id)
 }
 
 func Listener(id string) *rBuilder {
-	return new("listener", id)
+	return newResource("listener", id)
 }
 
 func Bucket(id string) *rBuilder {
-	return new("bucket", id)
+	return newResource("bucket", id)
 }
 
 func Zone(id string) *rBuilder {
-	return new("zone", id)
+	return newResource("zone", id)
 }
 
 func Record(id string) *rBuilder {
-	return new("record", id)
+	return newResource("record", id)
 }
 
 func ScalingGroup(id string) *rBuilder {
-	return new("scalinggroup", id)
+	return newResource("scalinggroup", id)
 }
 
 func LaunchConfig(id string) *rBuilder {
-	return new("launchconfiguration", id)
+	return newResource("launchconfiguration", id)
 }
 
 func Subscription(id string) *rBuilder {
-	return new("subscription", id)
+	return newResource("subscription", id)
 }
 
 func Topic(id string) *rBuilder {
-	return new("topic", id)
+	return newResource("topic", id)
 }
 
 func Queue(id string) *rBuilder {
-	return new("queue", id)
+	return newResource("queue", id)
 }
 
 func Function(id string) *rBuilder {
-	return new("function", id)
+	return newResource("function", id)
 }
 
 func Alarm(id string) *rBuilder {
-	return new("alarm", id)
+	return newResource("alarm", id)
 }
 
 func Metric(id string) *rBuilder {
-	return new("metric", id)
+	return newResource("metric", id)
 }
 
 func Image(id string) *rBuilder {
-	return new("image", id)
+	return newResource("image", id)
 }
 
 func Distribution(id string) *rBuilder {
-	return new("distribution", id)
+	return newResource("distribution", id)
 }
 
 func Stack(id string) *rBuilder {
-	return new("stack", id)
+	return newResource("stack", id)
 }
 
 func Repository(id string) *rBuilder {
-	return new("repository", id)
+	return newResource("repository", id)
 }
 
 func ContainerCluster(id string) *rBuilder {
-	return new("containercluster", id)
+	return newResource("containercluster", id)
 }
 
 func ContainerTask(id string) *rBuilder {
-	return new("containertask", id)
+	return newResource("containertask", id)
 }
 
 func Container(id string) *rBuilder {
-	return new("container", id)
+	return newResource("container", id)
 }
 
 func ContainerInstance(id string) *rBuilder {
-	return new("containerinstance", id)
+	return newResource("containerinstance", id)
 }
 
 func NetworkInterface(id string) *rBuilder {
-	return new("networkinterface", id)
+	return newResource("networkinterface", id)
 }
 
 func Certificate(id string) *rBuilder {
-	return new("certificate", id)
+	return newResource("certificate", id)
 }
 
 func AccessKey(id string) *rBuilder {
-	return new("accesskey", id)
+	return newResource("accesskey", id)
 }
 
 func (b *rBuilder) Prop(key string, value any) *rBuilder {

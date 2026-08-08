@@ -15,6 +15,23 @@ linters:
     - errorlint
     - nilerr
     - noctx          # HTTP requests must carry a context
+    - copyloopvar    # redundant copy of a loop variable (Go 1.22+)
+    - errname        # error vars named ErrFoo, error types FooError
+    - exhaustive     # a switch over an enum missing cases
+    - fatcontext     # a context created inside a loop
+    - intrange       # for i := range n instead of a three-clause loop
+    - predeclared    # shadowing a predeclared identifier
+    # dupword is deliberately absent. All three findings were false positives: a
+    # repeated word inside an embedded zsh script, a "very:very:very" test fixture,
+    # and a template literal that legitimately reads "none none". Configuring
+    # ignore-words for test data would not leave anything worth catching.
+    #
+    # unparam is deliberately absent too, but it was worth running once: it found
+    # five genuinely dead parameters, since fixed. Of the fifteen findings, four were
+    # fluent builder methods in template/internal/ast whose unused return value is
+    # the point of the pattern, and three were params that happen to receive one
+    # value today but exist to be varied. Keeping it as a gate would mean suppressing
+    # a legitimate builder API.
     # Report nothing today, so they cost nothing and guard against regressions.
     - asasalint       # []any passed to a variadic func
     - contextcheck    # a function should inherit its caller's context
@@ -38,6 +55,11 @@ linters:
         - inline # noisy suggestions to inline constants; go vet does not run it
     misspell:
       locale: US
+    exhaustive:
+      # Every switch flagged here handles a few interesting cases and falls back to
+      # a default — enumerating all 26 reflect.Kind values would be worse code, not
+      # better. A default is the author saying the switch is deliberately partial.
+      default-signifies-exhaustive: true
     staticcheck:
       checks:
         - all

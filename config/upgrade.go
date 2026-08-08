@@ -148,7 +148,7 @@ func CompareSemver(current, latest string) (int, error) {
 		latests[i] = num
 	}
 
-	for i := 0; i < semverLen; i++ {
+	for i := range semverLen {
 		if latests[i] > currents[i] {
 			return -1, nil
 		} else if latests[i] == currents[i] {

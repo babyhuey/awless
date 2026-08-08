@@ -209,7 +209,7 @@ func showResource(resource cloud.Resource, gph cloud.GraphAPI) error {
 	printWithTabs := func(r cloud.Resource, distance int) error {
 		var tabs bytes.Buffer
 		tabs.WriteString(strings.Repeat("\t", count))
-		for i := 0; i < distance; i++ {
+		for range distance {
 			tabs.WriteByte('\t')
 		}
 
@@ -383,10 +383,10 @@ func printResourceList(title string, list []cloud.Resource, shortenListMsg ...st
 	sort.Sort(byTypeAndString{list})
 	all := cloud.Resources(list).Map(func(r cloud.Resource) string { return printResourceRef(r) })
 	count := len(all)
-	max := 3
+	maxLen := 3
 	if count > 0 {
-		if !listAllSiblingsFlag && len(shortenListMsg) > 0 && count > max {
-			fmt.Printf("\n%s: %s, ... (%s)\n", title, strings.Join(all[0:max], ", "), shortenListMsg[0])
+		if !listAllSiblingsFlag && len(shortenListMsg) > 0 && count > maxLen {
+			fmt.Printf("\n%s: %s, ... (%s)\n", title, strings.Join(all[0:maxLen], ", "), shortenListMsg[0])
 		} else {
 			fmt.Printf("\n%s: %s\n", title, strings.Join(all, ", "))
 		}
