@@ -87,8 +87,15 @@ type setter struct {
 	fieldType string
 }
 
-func (s setter) set(i any) error {
-	return setFieldWithType(s.val, i, s.fieldPath, s.fieldType)
+// set injects the value into i. Takes a context because a userdata field may fetch
+// a remote script, which should be cancellable along with the request it belongs to.
+//
+// `interfs ...any`, which contextcheck cannot see. Making it an explicit parameter is
+// the right fix and would touch 124 hand-written call sites; tracked as ISSUES.md I22.
+//
+//nolint:contextcheck // setFieldWithType receives the context through its variadic
+func (s setter) set(ctx context.Context, i any) error {
+	return setFieldWithType(s.val, i, s.fieldPath, s.fieldType, ctx)
 }
 
 func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...any) (err error) {
@@ -284,11 +291,14 @@ func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...an
 		var tplData any
 		fetchCtx := context.Background()
 		if len(interfs) > 0 {
-			// Callers pass either an env.Running or the bare template data map.
-			if renv, ok := interfs[0].(env.Running); ok {
-				tplData = renv.Context()
-				fetchCtx = renv.RequestContext()
-			} else {
+			// Callers pass an env.Running, a bare context, or the template data map.
+			switch v := interfs[0].(type) {
+			case env.Running:
+				tplData = v.Context()
+				fetchCtx = v.RequestContext()
+			case context.Context:
+				fetchCtx = v
+			default:
 				tplData = interfs[0]
 			}
 		}

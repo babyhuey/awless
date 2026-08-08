@@ -1,6 +1,7 @@
 package awsspec
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -102,7 +103,15 @@ type awsCall struct {
 	setters []setter
 }
 
-func (dc *awsCall) execute(input any) (output any, err error) {
+// execute calls the AWS SDK function in dc.fn with input, after applying the
+// setters.
+//
+// The call is reflective because fn's concrete type differs per operation. SDK v2
+// signatures are (context.Context, *XxxInput, ...func(*Options)), so the context
+// must be passed as the first argument — omitting it made reflect.Call panic with
+// "Call with too few input arguments", which the deferred recover turned into an
+// opaque error rather than a crash.
+func (dc *awsCall) execute(ctx context.Context, input any) (output any, err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			output = nil
@@ -111,13 +120,13 @@ func (dc *awsCall) execute(input any) (output any, err error) {
 	}()
 
 	for _, s := range dc.setters {
-		if err = s.set(input); err != nil {
+		if err = s.set(ctx, input); err != nil {
 			return nil, err
 		}
 	}
 
 	fnVal := reflect.ValueOf(dc.fn)
-	values := []reflect.Value{reflect.ValueOf(input)}
+	values := []reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(input)}
 
 	start := time.Now()
 	results := fnVal.Call(values)

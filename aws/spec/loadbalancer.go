@@ -52,7 +52,11 @@ func (cmd *CreateLoadbalancer) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateLoadbalancer) ExtractResult(i any) string {
-	return awssdk.ToString(i.(*elbv2.CreateLoadBalancerOutput).LoadBalancers[0].LoadBalancerArn)
+	out := i.(*elbv2.CreateLoadBalancerOutput)
+	if len(out.LoadBalancers) == 0 {
+		return ""
+	}
+	return awssdk.ToString(out.LoadBalancers[0].LoadBalancerArn)
 }
 
 type DeleteLoadbalancer struct {

@@ -96,7 +96,7 @@ func (cmd *StartContainertask) ManualRun(renv env.Running) (any, error) {
 			setters: setters,
 		}
 
-		return call.execute(&ecs.CreateServiceInput{})
+		return call.execute(renv.RequestContext(), &ecs.CreateServiceInput{})
 	case "task":
 		call := &awsCall{
 			fnName: "ecs.RunTask",
@@ -109,7 +109,7 @@ func (cmd *StartContainertask) ManualRun(renv env.Running) (any, error) {
 			},
 		}
 
-		output, err := call.execute(&ecs.RunTaskInput{})
+		output, err := call.execute(renv.RequestContext(), &ecs.RunTaskInput{})
 		if err != nil {
 			return nil, err
 		}
@@ -180,7 +180,7 @@ func (cmd *StopContainertask) ManualRun(renv env.Running) (any, error) {
 				{val: cmd.DeploymentName, fieldPath: "Service", fieldType: awsstr},
 			},
 		}
-		return call.execute(&ecs.DeleteServiceInput{})
+		return call.execute(renv.RequestContext(), &ecs.DeleteServiceInput{})
 	case "task":
 		call := &awsCall{
 			fnName: "ecs.StopTask",
@@ -192,7 +192,7 @@ func (cmd *StopContainertask) ManualRun(renv env.Running) (any, error) {
 			},
 		}
 
-		return call.execute(&ecs.StopTaskInput{})
+		return call.execute(renv.RequestContext(), &ecs.StopTaskInput{})
 	}
 	return nil, fmt.Errorf("invalid type '%s'", StringValue(cmd.Type))
 }

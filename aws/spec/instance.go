@@ -120,7 +120,11 @@ func (cmd *CreateInstance) convertDistroToAMI(values map[string]any) (map[string
 }
 
 func (cmd *CreateInstance) ExtractResult(i any) string {
-	return StringValue(i.(*ec2.RunInstancesOutput).Instances[0].InstanceId)
+	out := i.(*ec2.RunInstancesOutput)
+	if len(out.Instances) == 0 {
+		return ""
+	}
+	return StringValue(out.Instances[0].InstanceId)
 }
 
 func (cmd *CreateInstance) AfterRun(renv env.Running, output any) error {
@@ -170,7 +174,11 @@ func (cmd *StartInstance) ParamsSpec() params.Spec {
 }
 
 func (cmd *StartInstance) ExtractResult(i any) string {
-	return awssdk.ToString(i.(*ec2.StartInstancesOutput).StartingInstances[0].InstanceId)
+	out := i.(*ec2.StartInstancesOutput)
+	if len(out.StartingInstances) == 0 {
+		return ""
+	}
+	return awssdk.ToString(out.StartingInstances[0].InstanceId)
 }
 
 type StopInstance struct {
@@ -188,7 +196,11 @@ func (cmd *StopInstance) ParamsSpec() params.Spec {
 }
 
 func (cmd *StopInstance) ExtractResult(i any) string {
-	return StringValue(i.(*ec2.StopInstancesOutput).StoppingInstances[0].InstanceId)
+	out := i.(*ec2.StopInstancesOutput)
+	if len(out.StoppingInstances) == 0 {
+		return ""
+	}
+	return StringValue(out.StoppingInstances[0].InstanceId)
 }
 
 type RestartInstance struct {

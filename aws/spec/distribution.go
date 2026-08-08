@@ -141,7 +141,7 @@ func (cmd *CreateDistribution) ManualRun(renv env.Running) (any, error) {
 		call.setters = append(call.setters, setter{val: cmd.PriceClass, fieldPath: "DistributionConfig.PriceClass", fieldType: awsstr})
 	}
 
-	return call.execute(input)
+	return call.execute(renv.RequestContext(), input)
 }
 
 func (cmd *CreateDistribution) ExtractResult(i any) string {

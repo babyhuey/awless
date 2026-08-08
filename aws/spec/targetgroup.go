@@ -55,7 +55,11 @@ func (cmd *CreateTargetgroup) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateTargetgroup) ExtractResult(i any) string {
-	return awssdk.ToString(i.(*elbv2.CreateTargetGroupOutput).TargetGroups[0].TargetGroupArn)
+	out := i.(*elbv2.CreateTargetGroupOutput)
+	if len(out.TargetGroups) == 0 {
+		return ""
+	}
+	return awssdk.ToString(out.TargetGroups[0].TargetGroupArn)
 }
 
 type UpdateTargetgroup struct {

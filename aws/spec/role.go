@@ -85,7 +85,7 @@ func (cmd *CreateRole) ManualRun(renv env.Running) (any, error) {
 		},
 	}
 
-	output, err := call.execute(&iam.CreateRoleInput{})
+	output, err := call.execute(renv.RequestContext(), &iam.CreateRoleInput{})
 	if err != nil {
 		return nil, err
 	}

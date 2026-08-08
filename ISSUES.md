@@ -1091,3 +1091,19 @@ allocation derived from arithmetic that was assumed non-negative.
 Not enabled as a gate: over half the findings duplicate `errcheck` or describe
 inherent properties of a CLI that reads user-specified files and URLs. Worth
 re-running periodically instead.
+
+---
+
+### I22: `setFieldWithType` passes its context through a variadic `any`
+
+**Severity:** Low  
+**File:** `aws/spec/setters.go`
+
+`setFieldWithType(v, i any, fieldPath, destType string, interfs ...any)` receives
+either an `env.Running`, a bare `context.Context`, or the template data map through
+`interfs`, and type-switches on it. That is why `contextcheck` cannot see the context
+being passed and needs a suppression on `setter.set`.
+
+The fix is to make the context and the template data explicit parameters. It touches
+124 hand-written call sites, none generated, so it is mechanical but not small — kept
+separate from the change that surfaced it.

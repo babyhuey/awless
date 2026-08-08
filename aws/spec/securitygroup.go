@@ -285,7 +285,7 @@ func (cmd *AttachSecuritygroup) ManualRun(renv env.Running) (any, error) {
 			{val: groups, fieldPath: "Groups", fieldType: awsstringslice},
 		},
 	}
-	return call.execute(&ec2.ModifyInstanceAttributeInput{})
+	return call.execute(renv.RequestContext(), &ec2.ModifyInstanceAttributeInput{})
 }
 
 type DetachSecuritygroup struct {
@@ -320,7 +320,7 @@ func (cmd *DetachSecuritygroup) ManualRun(renv env.Running) (any, error) {
 			{val: cleaned, fieldPath: "Groups", fieldType: awsstringslice},
 		},
 	}
-	return call.execute(&ec2.ModifyInstanceAttributeInput{})
+	return call.execute(renv.RequestContext(), &ec2.ModifyInstanceAttributeInput{})
 }
 
 func (cmd *UpdateSecuritygroup) buildIPPermissions() ([]ec2types.IpPermission, error) {

@@ -45,7 +45,11 @@ func (cmd *CreateListener) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateListener) ExtractResult(i any) string {
-	return awssdk.ToString(i.(*elbv2.CreateListenerOutput).Listeners[0].ListenerArn)
+	out := i.(*elbv2.CreateListenerOutput)
+	if len(out.Listeners) == 0 {
+		return ""
+	}
+	return awssdk.ToString(out.Listeners[0].ListenerArn)
 }
 
 type AttachListener struct {
