@@ -371,18 +371,39 @@ func setFieldWithType(ctx context.Context, v, i any, fieldPath string, destType 
 			err = fmt.Errorf("set field awsslicestruct: field %s is not a slice, but a %s", matches[0], sliceField.Kind())
 			return
 		}
-		var elemToSet reflect.Value
-		if sliceField.Len() > 0 {
-			elemToSet = sliceField.Index(0)
-		} else {
-			elemToSet = reflect.New(sliceField.Type().Elem().Elem())
-			sliceField.Set(reflect.Append(sliceField, elemToSet))
+
+		// SDK v1 modeled these as []*Struct and v2 models them as []Struct, so both
+		// shapes have to work. Assuming a pointer made reflect.New panic with "Elem of
+		// invalid type" on every v2 field — 13 of them, across create/update listener,
+		// attach/detach classicloadbalancer and attach/detach instance.
+		elemType := sliceField.Type().Elem()
+		isPointerElem := elemType.Kind() == reflect.Pointer
+		structType := elemType
+		if isPointerElem {
+			structType = elemType.Elem()
 		}
-		if sliceField.Type().Elem().Kind() != reflect.Pointer {
-			err = fmt.Errorf("set field awsslicestruct: field %s is not a slice of struct pointer, but a %s", matches[0], sliceField.Kind())
+		if structType.Kind() != reflect.Struct {
+			err = fmt.Errorf("set field awsslicestruct: field %s is a slice of %s, not of struct", matches[0], structType.Kind())
 			return
 		}
-		setValueAtPath(elemToSet.Interface(), matches[2], v)
+
+		if sliceField.Len() == 0 {
+			zero := reflect.New(structType)
+			if isPointerElem {
+				sliceField.Set(reflect.Append(sliceField, zero))
+			} else {
+				sliceField.Set(reflect.Append(sliceField, zero.Elem()))
+			}
+		}
+
+		// The element must be addressable for the nested path to be assignable, which
+		// Index gives for a slice.
+		elem := sliceField.Index(0)
+		target := elem.Interface()
+		if !isPointerElem {
+			target = elem.Addr().Interface()
+		}
+		setValueAtPath(target, matches[2], v)
 
 		return nil
 	case awstagslice:
