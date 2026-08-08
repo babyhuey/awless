@@ -342,30 +342,64 @@ Phase 5   modernization ..... %w → linters → any → context → release too
 
 ---
 
-## Status — 2026-08-06
+## Status — 2026-08-07
 
-Phases 1–4 complete. Phase 5 outstanding.
+All five phases complete. Every issue in both backlogs is closed or closed with a
+recorded reason.
 
 | Phase | State |
 |---|---|
 | 0 Decisions | all resolved |
 | 1 Unblock CI | done — B5, I17, B1, D3, I18; triplestore D1, I1, D6, D7 |
-| 2 Correctness | done — B6, B9, B7, B8/I13 (partial), I12, B11; triplestore B1 |
-| 3 Dependencies | done — triplestore tagged v0.1.0 and adopted, module renamed, D6/D6a, I10, B4 |
+| 2 Correctness | done — B6, B9, B7, B8/I13, I12, B11; triplestore B1 |
+| 3 Dependencies | done — triplestore tagged v1.0.0 and adopted, module renamed, D6/D6a, I10, B4, I6 |
 | 4 Retire scheduler | done — v1.1.0, last wallix dependency gone |
-| 5 Modernization | not started |
+| 5 Modernization | done — I8, I9, D2, D4, I4, I11, I15, I14, I16, I19, B2, B3, B10, D1, D8, D5, I3, I5, I7, I20 |
 
-**Deviations from this plan, all recorded in the relevant commits:**
+`triplestore` is fully closed and tagged `v1.0.0`.
 
-- `triplestore` was tagged **v0.1.0**, not `v1.0.0`. Its `B2`, `B3` and `D5` are pending
-  breaking API changes, so 1.0.0 would promise stability that does not hold yet.
-- `boltdb` → `bbolt` was pulled forward from Phase 3B into Phase 2, because boltdb
-  crashes under the race detector (`checkptr`) and therefore blocked `I12`.
-- `B8`/`I13` are **partially** done. The issue claimed 5 fan-out sites; `manual_fetchers.go`
-  had never been audited and holds 5 more.
-- Generated files were rewritten in place during the module rename rather than regenerated,
-  because the generators produce non-compiling output. Escalated as `I15`.
-- Phase 4 removed **two** `isSchedulingMode()` call sites; this plan listed one.
+**Open with a recorded reason — not oversights:**
 
-**Still needs input:** `I6` (Dependabot auto-merge) requires `allow_auto_merge` on the
-repository, currently `false`. Everything else in Phase 5 is unblocked.
+| Item | Why it stays open |
+|---|---|
+| `I7` test coverage | 23.2% -> 31.2%, and the reported figure was itself wrong until `-coverpkg` was added. What remains is dominated by terminal, stdin and HTTP I/O with no test seams — a refactor, not test-writing. |
+| `I16` `os.Exit` | Every call was audited against the defers in scope. Only two actually skipped one, both leaving the terminal in raw mode, and both are fixed. The 88-site `exitOn` refactor was dropped because its original justification — that `database.Execute` held a defer that was being skipped — does not hold. |
+| `I19` lint findings | 96 of 271 fixed. `ST1003` (175) stays excluded because `template/env` exports `ALL_CAPS` identifiers and renaming them breaks the public API; `QF1002` (1) is subjective. Both reasons are written into `.golangci.yml`. |
+| `I18` Go toolchain | CI reads the version from `go.mod`. A `toolchain` directive was deliberately not added, since it would force a specific patch release on every contributor. |
+| `D9` CLI examples | 127 commands still lack examples, so `TestDocForEachCommand` stays skipped. 27 were written for the new commands. The assertion is correct; the content is missing. |
+
+**Deviations from the plan as written, each recorded in its commit:**
+
+- `triplestore` was tagged `v0.1.0` first, then `v1.0.0` once `B2`, `B3` and `D5`
+  were resolved. The plan went straight to `v1.0.0`.
+- `boltdb` -> `bbolt` moved from Phase 3B into Phase 2, because boltdb fails under
+  the race detector and so blocked `I12`.
+- `B8`/`I13` covered 10 fan-out sites, not the 5 the issue listed;
+  `manual_fetchers.go` had never been audited. One held a deadlock — `defer
+  wg.Done()` after an early return.
+- Phase 4 removed **two** `isSchedulingMode()` call sites; the plan listed one.
+- `I15` was not the ~2,400 lines of generated-code drift it appeared to be. Almost
+  all of it was a formatting bug: the generators only ran `goimports` under `go
+  generate`, never under `go run *.go`. Real drift was 21 lines of map-iteration
+  non-determinism.
+- `D1`/`D8` could not be fixed as scoped. The plan assumed 30 dead factories needed
+  reviving; in fact the whole package had no tests and no importers, and SDK v2's
+  concrete clients make interface substitution impossible. Rebuilt on smithy
+  middleware instead.
+- `I20` was not in the plan. The template parser validated entities against a
+  hand-maintained map, so a fully registered command still failed at parse time
+  with `unknown entity`. Now generated from the entity struct tags.
+
+**Bugs found that were not in either backlog.** All were found by work the plan
+scheduled for other reasons, mostly the new acceptance tests:
+
+| Bug | Impact |
+|---|---|
+| `awsstringslice` produced `[]*string` where SDK v2 wants `[]string` | all 35 such params panicked at runtime: `create tag`, `create alarm`, `create database`, `create dbsubnetgroup`, `create loadbalancer` and others |
+| `createNameTag` ran unconditionally from `AfterRun` | `create vpc cidr=...` with no `name=` nil-dereferenced; shared by every command that name-tags |
+| `parseStatement` indexed `Statements[0]` | comment-only or empty input panicked; reachable from `awless log` |
+| `readWord` allocated from an attacker-controlled length prefix (triplestore) | an 11-byte input requested 3.8 GB and killed the process with unrecoverable OOM |
+| IAM users fetcher: `defer wg.Done()` after an early return | deadlock, plus an unsynchronized `hasError` race |
+| `t.Fatal` from non-test goroutines (triplestore) | tests hung instead of failing, since `defer wg.Done()` was skipped |
+| Secrets written to the template log | command lines, Fillers and Message all persisted `password=` in cleartext |
+| Unknown `awsType` silently skipped conversion | a typo surfaced as an opaque reflect error naming types the author never wrote |
