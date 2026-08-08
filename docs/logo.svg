@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="400" height="160" role="img" aria-label="awless">
+  <title>awless</title>
+
+  <!-- Terminal panel. The rounded dark slab and the chevron carry the identity, so the
+       mark still reads as a CLI tool even if the wordmark font is substituted. -->
+  <rect x="8" y="8" width="384" height="144" rx="16" fill="#161a20"/>
+  <rect x="8" y="8" width="384" height="144" rx="16" fill="none" stroke="#2b323d" stroke-width="2"/>
+
+  <!-- Title bar dots -->
+  <circle cx="36" cy="34" r="5" fill="#3b434f"/>
+  <circle cx="54" cy="34" r="5" fill="#3b434f"/>
+  <circle cx="72" cy="34" r="5" fill="#3b434f"/>
+
+  <!-- Prompt chevron, drawn rather than typed so it never depends on a font -->
+  <path d="M40 84 L64 100 L40 116" fill="none" stroke="#22d3ee" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Wordmark -->
+  <text x="86" y="115" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace"
+        font-size="60" font-weight="700" fill="#f2f5f9" letter-spacing="1">awless</text>
+
+  <!-- Cursor block -->
+  <rect x="330" y="72" width="22" height="48" rx="3" fill="#22d3ee"/>
+</svg>

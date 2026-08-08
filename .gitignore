@@ -1,6 +1,9 @@
 *.test
 *.out
+# *.svg is for pprof call graphs; the logo is a tracked asset and needs an exception.
+# Note that gitignore has no trailing comments, so this must be on its own line.
 *.svg
+!docs/logo.svg
 *.prof
 awless
 *.zip
