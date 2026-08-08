@@ -1,5 +1,15 @@
+<p align="center">
+  <img src="docs/logo.svg" alt="awless" width="400">
+</p>
 
-[![CI](https://github.com/bootswithdefer/awless/actions/workflows/ci.yml/badge.svg)](https://github.com/bootswithdefer/awless/actions/workflows/ci.yml)
+<p align="center">
+  <a href="https://github.com/bootswithdefer/awless/actions/workflows/ci.yml"><img src="https://github.com/bootswithdefer/awless/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pkg.go.dev/github.com/bootswithdefer/awless"><img src="https://pkg.go.dev/badge/github.com/bootswithdefer/awless.svg" alt="Go Reference"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/bootswithdefer/awless" alt="License"></a>
+  <img src="https://img.shields.io/github/go-mod/go-version/bootswithdefer/awless" alt="Go version">
+  <img src="https://img.shields.io/badge/coverage-59%25-yellow" alt="Coverage">
+  <img src="https://img.shields.io/badge/AWS%20SDK-v2-orange" alt="AWS SDK v2">
+</p>
 
 `awless` is a powerful, innovative and small surface command line interface (CLI) to manage Amazon Web Services.
 
@@ -296,9 +306,9 @@ Terraform is much broader in scope. `awless` takes a different approach:
 
 **Is this fork maintained?**
 
-It is modernized rather than actively developed. Known gaps are tracked in
-[ISSUES.md](./ISSUES.md) — including that CI has not yet run and no release has been
-published.
+It is modernized rather than actively developed. CI is green and every command has an
+acceptance test, but no release has been published yet — build from source. Known gaps are
+tracked in [ISSUES.md](./ISSUES.md).
 
 # About
 

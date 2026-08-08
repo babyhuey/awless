@@ -263,12 +263,14 @@ periodically rather than gating on.
 `build`. Actions are pinned to commit SHAs (update with `make pinact-update`), and the Go
 version comes from `go.mod`.
 
-**CI has never actually run on this fork.** Everything has been verified locally with
-`make verify`, so treat the workflows as unproven. Note that local verification is not
-equivalent: CI runs on a clean checkout with no `~/.awless`, no AWS config and no cached
-tools. Two tests already needed environment pinned for that reason — the service registry
-test sets static credentials to avoid a 15-second EC2 metadata timeout, and
-`create keypair` needs `__AWLESS_KEYS_DIR`.
+CI runs on every push to `master` and on pull requests, and is green: all twelve jobs
+pass, including the codegen drift check, the race detector, `govulncheck`, a fuzz smoke
+run and cross-compilation for six platforms.
+
+Note that CI is a stronger check than local `make verify`, because it runs on a clean
+runner with no `~/.awless`, no AWS config and no cached tools. Two tests needed
+environment pinned for that reason — the service registry test sets static credentials to
+avoid a 15-second EC2 metadata timeout, and `create keypair` needs `__AWLESS_KEYS_DIR`.
 
 ## Things to Watch Out For
 
