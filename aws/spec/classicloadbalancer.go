@@ -97,11 +97,11 @@ type UpdateClassicLoadbalancer struct {
 	graph                         cloud.GraphAPI
 	api                           *elb.Client
 	Name                          *string `awsName:"LoadBalancerName" awsType:"awsstr" templateName:"name"`
-	HealthcheckHealthyThreshold   *int64  `awsName:"Healthcheck.HealthyThreshold" awsType:"awsint64" templateName:"healthy-threshold"`
-	HealthcheckUnhealthyThreshold *int64  `awsName:"Healthcheck.UnhealthyThreshold" awsType:"awsint64" templateName:"unhealthy-threshold"`
-	HealthcheckInterval           *int64  `awsName:"Healthcheck.Interval" awsType:"awsint64" templateName:"health-interval"`
-	HealthcheckTimeout            *int64  `awsName:"Healthcheck.Timeout" awsType:"awsint64" templateName:"health-timeout"`
-	HealthcheckTarget             *string `awsName:"Healthcheck.Target" awsType:"awsstr" templateName:"health-target"`
+	HealthcheckHealthyThreshold   *int64  `awsName:"HealthCheck.HealthyThreshold" awsType:"awsint64" templateName:"healthy-threshold"`
+	HealthcheckUnhealthyThreshold *int64  `awsName:"HealthCheck.UnhealthyThreshold" awsType:"awsint64" templateName:"unhealthy-threshold"`
+	HealthcheckInterval           *int64  `awsName:"HealthCheck.Interval" awsType:"awsint64" templateName:"health-interval"`
+	HealthcheckTimeout            *int64  `awsName:"HealthCheck.Timeout" awsType:"awsint64" templateName:"health-timeout"`
+	HealthcheckTarget             *string `awsName:"HealthCheck.Target" awsType:"awsstr" templateName:"health-target"`
 }
 
 func (cmd *UpdateClassicLoadbalancer) ParamsSpec() params.Spec {
