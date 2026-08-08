@@ -430,7 +430,7 @@ The only test coverage for AWS API interactions is via the broken acceptance fra
 
 ---
 
-### D9: Skipped tests — **DOCUMENTED** (both skips now state their reason; TestDocForEachCommand needs 127 CLI examples written)
+### D9: Skipped tests — **FIXED** (all 127 examples written; TestDocForEachCommand unskipped, plus a new test that every example validates)
 
 **Severity:** Low  
 **Files:**

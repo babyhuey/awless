@@ -216,9 +216,12 @@ func TestAwlessExamplesDoc(t *testing.T) {
 			},
 		},
 		{
+			// Uses a fixture registered by this test rather than a real entry:
+			// every documented command now has at least one example, so depending on
+			// a real empty entry made this break as soon as one was written.
 			name:        "action.entity with empty examples list",
-			action:      "attach",
-			entity:      "instance",
+			action:      "testonly",
+			entity:      "emptyexamples",
 			expectEmpty: true,
 		},
 		{
@@ -244,6 +247,11 @@ func TestAwlessExamplesDoc(t *testing.T) {
 			},
 		},
 	}
+
+	// An entry present but empty must render as an empty string, which is distinct
+	// from a key that is absent entirely.
+	cliExamplesDoc["testonly.emptyexamples"] = []string{}
+	t.Cleanup(func() { delete(cliExamplesDoc, "testonly.emptyexamples") })
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
