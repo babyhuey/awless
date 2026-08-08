@@ -38,7 +38,16 @@ For more read our [FAQ](#faq) below (how `awless` compares to other tools, etc.)
 
 # Install
 
-### From source (recommended)
+### Homebrew
+
+```sh
+brew install --cask bootswithdefer/tap/awless
+```
+
+A cask rather than a formula because it ships the pre-built binary; Homebrew reserves
+formulae for software built from source. Upgrade with `brew upgrade --cask awless`.
+
+### From source
 
 Requires Go 1.26+ (the version is pinned in `go.mod`):
 
@@ -57,8 +66,7 @@ make build
 ### Pre-built binaries
 
 Releases are built by GoReleaser for Linux, macOS and Windows on amd64 and arm64, with
-checksums. **No release has been published from this fork yet** — build from source for
-now.
+checksums — see [Releases](https://github.com/bootswithdefer/awless/releases).
 
 ### Development setup
 

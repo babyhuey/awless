@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -79,10 +81,10 @@ func notifyIfUpgrade(ctx context.Context, url string, messaging io.Writer) error
 	if err := dec.Decode(&latest); err == nil {
 		if IsSemverUpgrade(Version, latest.Version) {
 			var install string
-			switch BuildFor {
-			case "brew":
+			switch {
+			case BuildFor == "brew" || installedViaHomebrew():
 				install = "Run `brew upgrade awless`"
-			case "zip", "targz":
+			case BuildFor == "zip", BuildFor == "targz":
 				ext := "tar.gz"
 				if runtime.GOOS == "windows" {
 					ext = "zip"
@@ -161,4 +163,25 @@ func CompareSemver(current, latest string) (int, error) {
 	}
 
 	return 0, nil
+}
+
+// installedViaHomebrew reports whether this binary lives inside a Homebrew prefix.
+//
+// The release archives and the Homebrew cask are built from the same artifacts, so
+// BuildFor cannot distinguish them; a cask install would otherwise be told to fetch a
+// tarball by hand. Checking the binary's own path is both cheaper than a second build
+// and correct if a user moves the binary between install methods.
+func installedViaHomebrew() bool {
+	exe, err := os.Executable()
+	if err != nil {
+		return false
+	}
+	if resolved, err := filepath.EvalSymlinks(exe); err == nil {
+		exe = resolved
+	}
+	// Casks stage under Caskroom; formulae under Cellar. Both sit beneath the prefix,
+	// which is /opt/homebrew on Apple silicon, /usr/local on Intel, and
+	// /home/linuxbrew/.linuxbrew on Linux.
+	return strings.Contains(exe, "/Caskroom/") || strings.Contains(exe, "/Cellar/") ||
+		strings.Contains(exe, "/linuxbrew/")
 }

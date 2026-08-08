@@ -66,3 +66,37 @@ release:
     name: awless
   draft: false
   prerelease: auto
+
+homebrew_casks:
+  # A cask rather than a formula: Homebrew expects formulae to build from source and
+  # pre-compiled binaries to ship as casks, and GoReleaser deprecated `brews`
+  # accordingly. Install with `brew install --cask bootswithdefer/tap/awless`.
+  - name: awless
+    # The repository must be named homebrew-tap for `bootswithdefer/tap` to resolve;
+    # brew expands the short form.
+    repository:
+      owner: bootswithdefer
+      name: homebrew-tap
+      branch: main
+      # The workflow's default GITHUB_TOKEN is scoped to this repository and cannot
+      # push to the tap, so a PAT with contents:write on the tap is required. Set it
+      # as the HOMEBREW_TAP_TOKEN secret.
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Casks
+    binaries:
+      - awless
+    homepage: "https://github.com/bootswithdefer/awless"
+    description: "A powerful CLI to manage AWS, with a template DSL, revertible actions and offline resource graphs"
+    license: "Apache-2.0"
+    commit_author:
+      name: goreleaser
+      email: noreply@github.com
+    # macOS quarantines downloaded binaries; without this the first run is blocked by
+    # Gatekeeper with no clear explanation.
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system "xattr", "-dr", "com.apple.quarantine", "#{staged_path}/awless"
+          end
+
