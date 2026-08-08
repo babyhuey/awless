@@ -215,9 +215,25 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateDistribution(f.config(), f.Graph, f.Logger)
 		}
+	case "createdynamodbtable":
+		return func() any {
+			return awsspec.NewCreateDynamodbtable(f.config(), f.Graph, f.Logger)
+		}
+	case "createekscluster":
+		return func() any {
+			return awsspec.NewCreateEkscluster(f.config(), f.Graph, f.Logger)
+		}
+	case "createeksnodegroup":
+		return func() any {
+			return awsspec.NewCreateEksnodegroup(f.config(), f.Graph, f.Logger)
+		}
 	case "createelasticip":
 		return func() any {
 			return awsspec.NewCreateElasticip(f.config(), f.Graph, f.Logger)
+		}
+	case "createfilesystem":
+		return func() any {
+			return awsspec.NewCreateFilesystem(f.config(), f.Graph, f.Logger)
 		}
 	case "createfunction":
 		return func() any {
@@ -419,9 +435,25 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteDistribution(f.config(), f.Graph, f.Logger)
 		}
+	case "deletedynamodbtable":
+		return func() any {
+			return awsspec.NewDeleteDynamodbtable(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteekscluster":
+		return func() any {
+			return awsspec.NewDeleteEkscluster(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteeksnodegroup":
+		return func() any {
+			return awsspec.NewDeleteEksnodegroup(f.config(), f.Graph, f.Logger)
+		}
 	case "deleteelasticip":
 		return func() any {
 			return awsspec.NewDeleteElasticip(f.config(), f.Graph, f.Logger)
+		}
+	case "deletefilesystem":
+		return func() any {
+			return awsspec.NewDeleteFilesystem(f.config(), f.Graph, f.Logger)
 		}
 	case "deletefunction":
 		return func() any {

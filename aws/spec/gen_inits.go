@@ -123,8 +123,16 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateDbsubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "createdistribution":
 		return func() any { return NewCreateDistribution(f.Cfg, f.Graph, f.Log) }
+	case "createdynamodbtable":
+		return func() any { return NewCreateDynamodbtable(f.Cfg, f.Graph, f.Log) }
+	case "createekscluster":
+		return func() any { return NewCreateEkscluster(f.Cfg, f.Graph, f.Log) }
+	case "createeksnodegroup":
+		return func() any { return NewCreateEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "createelasticip":
 		return func() any { return NewCreateElasticip(f.Cfg, f.Graph, f.Log) }
+	case "createfilesystem":
+		return func() any { return NewCreateFilesystem(f.Cfg, f.Graph, f.Log) }
 	case "createfunction":
 		return func() any { return NewCreateFunction(f.Cfg, f.Graph, f.Log) }
 	case "creategroup":
@@ -225,8 +233,16 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteDbsubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "deletedistribution":
 		return func() any { return NewDeleteDistribution(f.Cfg, f.Graph, f.Log) }
+	case "deletedynamodbtable":
+		return func() any { return NewDeleteDynamodbtable(f.Cfg, f.Graph, f.Log) }
+	case "deleteekscluster":
+		return func() any { return NewDeleteEkscluster(f.Cfg, f.Graph, f.Log) }
+	case "deleteeksnodegroup":
+		return func() any { return NewDeleteEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "deleteelasticip":
 		return func() any { return NewDeleteElasticip(f.Cfg, f.Graph, f.Log) }
+	case "deletefilesystem":
+		return func() any { return NewDeleteFilesystem(f.Cfg, f.Graph, f.Log) }
 	case "deletefunction":
 		return func() any { return NewDeleteFunction(f.Cfg, f.Graph, f.Log) }
 	case "deletegroup":
@@ -434,7 +450,11 @@ var (
 	_ command = &CreateDatabase{}
 	_ command = &CreateDbsubnetgroup{}
 	_ command = &CreateDistribution{}
+	_ command = &CreateDynamodbtable{}
+	_ command = &CreateEkscluster{}
+	_ command = &CreateEksnodegroup{}
 	_ command = &CreateElasticip{}
+	_ command = &CreateFilesystem{}
 	_ command = &CreateFunction{}
 	_ command = &CreateGroup{}
 	_ command = &CreateImage{}
@@ -485,7 +505,11 @@ var (
 	_ command = &DeleteDatabase{}
 	_ command = &DeleteDbsubnetgroup{}
 	_ command = &DeleteDistribution{}
+	_ command = &DeleteDynamodbtable{}
+	_ command = &DeleteEkscluster{}
+	_ command = &DeleteEksnodegroup{}
 	_ command = &DeleteElasticip{}
+	_ command = &DeleteFilesystem{}
 	_ command = &DeleteFunction{}
 	_ command = &DeleteGroup{}
 	_ command = &DeleteImage{}

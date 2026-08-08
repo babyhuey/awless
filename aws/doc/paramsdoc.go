@@ -248,6 +248,58 @@ var paramsDoc = map[string]map[string]string{
 	"delete.ssmparameter": {
 		"name": "Name of the parameter to delete",
 	},
+	"create.dynamodbtable": {
+		"name":           "Name of the table",
+		"partition-key":  "Name of the partition (hash) key attribute",
+		"partition-type": "Type of the partition key attribute",
+		"sort-key":       "Name of the sort (range) key attribute",
+		"sort-type":      "Type of the sort key attribute",
+		"billing-mode":   "Billing mode; defaults to PAY_PER_REQUEST unless a capacity is given",
+		"read-capacity":  "Provisioned read capacity units; requires billing-mode=PROVISIONED",
+		"write-capacity": "Provisioned write capacity units; requires billing-mode=PROVISIONED",
+	},
+	"delete.dynamodbtable": {
+		"name": "Name of the table to delete",
+	},
+	"create.ekscluster": {
+		"name":                "Name of the cluster",
+		"role":                "ARN of the IAM role the EKS control plane assumes",
+		"subnets":             "Subnet ids for the control plane; at least two in different availability zones",
+		"securitygroups":      "Security group ids for the control plane",
+		"version":             "Kubernetes version, for example 1.29 (defaults to the latest supported)",
+		"public-access":       "Enable public access to the API server endpoint",
+		"private-access":      "Enable private access to the API server endpoint",
+		"public-access-cidrs": "CIDR blocks allowed to reach the public API server endpoint",
+	},
+	"delete.ekscluster": {
+		"name": "Name of the cluster to delete",
+	},
+	"create.eksnodegroup": {
+		"name":          "Name of the node group",
+		"cluster":       "Name of the cluster to add the node group to",
+		"role":          "ARN of the IAM role the nodes assume",
+		"subnets":       "Subnet ids the nodes launch into",
+		"instance-type": "EC2 instance type for the nodes",
+		"min-size":      "Minimum number of nodes",
+		"max-size":      "Maximum number of nodes",
+		"desired-size":  "Desired number of nodes (defaults to 2)",
+		"disk-size":     "Root volume size in GiB",
+		"ami-type":      "AMI type for the nodes",
+	},
+	"delete.eksnodegroup": {
+		"name":    "Name of the node group to delete",
+		"cluster": "Name of the cluster the node group belongs to",
+	},
+	"create.filesystem": {
+		"token":            "Creation token, used by the API as an idempotency key",
+		"performance-mode": "Performance mode of the file system",
+		"throughput-mode":  "Throughput mode of the file system",
+		"encrypted":        "Encrypt the file system at rest",
+		"kms-key":          "ARN or ID of the KMS key used for encryption",
+	},
+	"delete.filesystem": {
+		"id": "Id of the file system to delete",
+	},
 	"create.bucket": {
 		"acl":  "The canned ACL to apply to the bucket",
 		"name": "The name of bucket to create",

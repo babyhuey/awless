@@ -45,6 +45,10 @@ type cloudwatchMock struct {
 	basicMock
 }
 
+type dynamodbMock struct {
+	basicMock
+}
+
 type ec2Mock struct {
 	basicMock
 }
@@ -54,6 +58,14 @@ type ecrMock struct {
 }
 
 type ecsMock struct {
+	basicMock
+}
+
+type efsMock struct {
+	basicMock
+}
+
+type eksMock struct {
 	basicMock
 }
 

@@ -30,9 +30,12 @@ import (
 	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
 	ecs "github.com/aws/aws-sdk-go-v2/service/ecs"
+	efs "github.com/aws/aws-sdk-go-v2/service/efs"
+	eks "github.com/aws/aws-sdk-go-v2/service/eks"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
@@ -3331,6 +3334,225 @@ func (cmd *CreateDistribution) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateDynamodbtable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDynamodbtable {
+	cmd := new(CreateDynamodbtable)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = dynamodb.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateDynamodbtable) SetApi(api *dynamodb.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateDynamodbtable) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateDynamodbtable) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create dynamodbtable: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create dynamodbtable '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create dynamodbtable done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateDynamodbtable) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("dynamodbtable"), nil
+}
+
+func (cmd *CreateDynamodbtable) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateEkscluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateEkscluster {
+	cmd := new(CreateEkscluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eks.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateEkscluster) SetApi(api *eks.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateEkscluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateEkscluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create ekscluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create ekscluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create ekscluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateEkscluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("ekscluster"), nil
+}
+
+func (cmd *CreateEkscluster) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateEksnodegroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateEksnodegroup {
+	cmd := new(CreateEksnodegroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eks.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateEksnodegroup) SetApi(api *eks.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateEksnodegroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateEksnodegroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create eksnodegroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create eksnodegroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create eksnodegroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateEksnodegroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("eksnodegroup"), nil
+}
+
+func (cmd *CreateEksnodegroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateElasticip {
 	cmd := new(CreateElasticip)
 	if len(l) > 0 {
@@ -3435,6 +3657,88 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateFilesystem(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateFilesystem {
+	cmd := new(CreateFilesystem)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = efs.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateFilesystem) SetApi(api *efs.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateFilesystem) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateFilesystem) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &efs.CreateFileSystemInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in efs.CreateFileSystemInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateFileSystem(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("efs.CreateFileSystem call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create filesystem: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create filesystem '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create filesystem done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateFilesystem) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("filesystem"), nil
+}
+
+func (cmd *CreateFilesystem) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7742,6 +8046,252 @@ func (cmd *DeleteDistribution) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteDynamodbtable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDynamodbtable {
+	cmd := new(DeleteDynamodbtable)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = dynamodb.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteDynamodbtable) SetApi(api *dynamodb.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteDynamodbtable) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteDynamodbtable) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &dynamodb.DeleteTableInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in dynamodb.DeleteTableInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteTable(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("dynamodb.DeleteTable call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete dynamodbtable: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete dynamodbtable '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete dynamodbtable done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteDynamodbtable) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("dynamodbtable"), nil
+}
+
+func (cmd *DeleteDynamodbtable) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteEkscluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteEkscluster {
+	cmd := new(DeleteEkscluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eks.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteEkscluster) SetApi(api *eks.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteEkscluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteEkscluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eks.DeleteClusterInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in eks.DeleteClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eks.DeleteCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete ekscluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete ekscluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete ekscluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteEkscluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("ekscluster"), nil
+}
+
+func (cmd *DeleteEkscluster) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteEksnodegroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteEksnodegroup {
+	cmd := new(DeleteEksnodegroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eks.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteEksnodegroup) SetApi(api *eks.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteEksnodegroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteEksnodegroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eks.DeleteNodegroupInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in eks.DeleteNodegroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteNodegroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eks.DeleteNodegroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete eksnodegroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete eksnodegroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete eksnodegroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteEksnodegroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("eksnodegroup"), nil
+}
+
+func (cmd *DeleteEksnodegroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteElasticip {
 	cmd := new(DeleteElasticip)
 	if len(l) > 0 {
@@ -7846,6 +8396,88 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteFilesystem(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteFilesystem {
+	cmd := new(DeleteFilesystem)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = efs.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteFilesystem) SetApi(api *efs.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteFilesystem) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteFilesystem) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &efs.DeleteFileSystemInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in efs.DeleteFileSystemInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteFileSystem(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("efs.DeleteFileSystem call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete filesystem: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete filesystem '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete filesystem done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteFilesystem) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("filesystem"), nil
+}
+
+func (cmd *DeleteFilesystem) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

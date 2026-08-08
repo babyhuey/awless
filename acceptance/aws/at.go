@@ -76,7 +76,23 @@ func (b *ATBuilder) ExpectRevert(revert string) *ATBuilder {
 	return b
 }
 
+// Run executes the template and fails the test on any error.
 func (b *ATBuilder) Run(t *testing.T, l ...*logger.Logger) {
+	t.Helper()
+	if err := b.run(t, l...); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// RunExpectingError executes the template and returns the error rather than
+// failing, so pre-flight validation can be asserted — a command that refuses a
+// bad request before calling AWS is behavior worth testing.
+func (b *ATBuilder) RunExpectingError(t *testing.T, l ...*logger.Logger) error {
+	t.Helper()
+	return b.run(t, l...)
+}
+
+func (b *ATBuilder) run(t *testing.T, l ...*logger.Logger) error {
 	t.Helper()
 	if b.mock == nil {
 		b.mock = NewMock()
@@ -87,7 +103,7 @@ func (b *ATBuilder) Run(t *testing.T, l ...*logger.Logger) {
 
 	tpl, err := template.Parse(b.template)
 	if err != nil {
-		t.Fatal(err)
+		return fmt.Errorf("template parsing: %w", err)
 	}
 	if b.graph == nil {
 		b.graph = graph.NewGraph()
@@ -101,39 +117,41 @@ func (b *ATBuilder) Run(t *testing.T, l ...*logger.Logger) {
 	}).Build()
 	compiled, cenv, err := template.Compile(tpl, cenv, template.NewRunnerCompileMode)
 	if err != nil {
-		t.Fatal(err)
+		return fmt.Errorf("compiling: %w", err)
 	}
 
 	ran, err := compiled.Run(template.NewRunEnv(cenv))
 	if err != nil {
-		t.Fatal(err)
+		return fmt.Errorf("running: %w", err)
 	}
 	if ran.HasErrors() {
 		for _, cmd := range ran.CommandNodesIterator() {
 			if cmd.Err() != nil {
-				t.Fatal(cmd.Err())
+				return cmd.Err()
 			}
 		}
 	}
 	if len(b.expectCalls) > 0 {
 		if got, want := b.mock.Calls(), b.expectCalls; !reflect.DeepEqual(got, want) {
-			t.Fatalf("got %#v, want %#v", got, want)
+			return fmt.Errorf("calls: got %#v, want %#v", got, want)
 		}
 	}
 	if b.cmdResult != nil {
 		if got, want := fmt.Sprint(ran.CommandNodesIterator()[0].Result()), StringValue(b.cmdResult); got != want {
-			t.Fatalf("got %s, want %s", got, want)
+			return fmt.Errorf("command result: got %s, want %s", got, want)
 		}
 	}
 	if b.expectRevert != "" {
 		revert, err := ran.Revert()
 		if err != nil {
-			t.Fatal(err)
+			return fmt.Errorf("revert: %w", err)
 		}
 		if got, want := revert.String(), b.expectRevert; got != want {
-			t.Fatalf("got\n%s\nwant\n%s", got, want)
+			return fmt.Errorf("revert: got\n%s\nwant\n%s", got, want)
 		}
 	}
+
+	return nil
 }
 
 func StringValue(v *string) string {

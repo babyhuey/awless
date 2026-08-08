@@ -139,6 +139,34 @@ var cliExamplesDoc = map[string][]string{
 	"delete.ssmparameter": {
 		"awless delete ssmparameter name=/app/db/host",
 	},
+	"create.dynamodbtable": {
+		"awless create dynamodbtable name=users partition-key=id",
+		"awless create dynamodbtable name=events partition-key=id partition-type=S sort-key=ts sort-type=N",
+		"awless create dynamodbtable name=sessions partition-key=id billing-mode=PROVISIONED read-capacity=10 write-capacity=5",
+	},
+	"delete.dynamodbtable": {
+		"awless delete dynamodbtable name=users",
+	},
+	"create.ekscluster": {
+		"awless create ekscluster name=prod role=arn:aws:iam::123456789012:role/eksClusterRole subnets=@subnet-a,@subnet-b",
+	},
+	"delete.ekscluster": {
+		"awless delete ekscluster name=prod",
+	},
+	"create.eksnodegroup": {
+		"awless create eksnodegroup name=workers cluster=prod role=arn:aws:iam::123456789012:role/eksNodeRole subnets=@subnet-a,@subnet-b instance-type=t3.medium",
+		"awless create eksnodegroup name=workers cluster=prod role=arn:aws:iam::123456789012:role/eksNodeRole subnets=@subnet-a min-size=1 max-size=5 desired-size=3",
+	},
+	"delete.eksnodegroup": {
+		"awless delete eksnodegroup name=workers cluster=prod",
+	},
+	"create.filesystem": {
+		"awless create filesystem token=my-filesystem encrypted=true",
+		"awless create filesystem token=shared-data performance-mode=maxIO throughput-mode=elastic",
+	},
+	"delete.filesystem": {
+		"awless delete filesystem id=fs-0123456789abcdef",
+	},
 	"create.bucket": {
 		"awless create bucket name=my-bucket-name acl=public-read",
 	},
