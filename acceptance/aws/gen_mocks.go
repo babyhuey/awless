@@ -85,10 +85,18 @@ type s3Mock struct {
 	basicMock
 }
 
+type secretsmanagerMock struct {
+	basicMock
+}
+
 type snsMock struct {
 	basicMock
 }
 
 type sqsMock struct {
+	basicMock
+}
+
+type ssmMock struct {
 	basicMock
 }

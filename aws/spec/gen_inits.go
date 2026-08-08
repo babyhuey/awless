@@ -173,10 +173,14 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateScalinggroup(f.Cfg, f.Graph, f.Log) }
 	case "createscalingpolicy":
 		return func() any { return NewCreateScalingpolicy(f.Cfg, f.Graph, f.Log) }
+	case "createsecret":
+		return func() any { return NewCreateSecret(f.Cfg, f.Graph, f.Log) }
 	case "createsecuritygroup":
 		return func() any { return NewCreateSecuritygroup(f.Cfg, f.Graph, f.Log) }
 	case "createsnapshot":
 		return func() any { return NewCreateSnapshot(f.Cfg, f.Graph, f.Log) }
+	case "createssmparameter":
+		return func() any { return NewCreateSsmparameter(f.Cfg, f.Graph, f.Log) }
 	case "createstack":
 		return func() any { return NewCreateStack(f.Cfg, f.Graph, f.Log) }
 	case "createsubnet":
@@ -271,10 +275,14 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteScalinggroup(f.Cfg, f.Graph, f.Log) }
 	case "deletescalingpolicy":
 		return func() any { return NewDeleteScalingpolicy(f.Cfg, f.Graph, f.Log) }
+	case "deletesecret":
+		return func() any { return NewDeleteSecret(f.Cfg, f.Graph, f.Log) }
 	case "deletesecuritygroup":
 		return func() any { return NewDeleteSecuritygroup(f.Cfg, f.Graph, f.Log) }
 	case "deletesnapshot":
 		return func() any { return NewDeleteSnapshot(f.Cfg, f.Graph, f.Log) }
+	case "deletessmparameter":
+		return func() any { return NewDeleteSsmparameter(f.Cfg, f.Graph, f.Log) }
 	case "deletestack":
 		return func() any { return NewDeleteStack(f.Cfg, f.Graph, f.Log) }
 	case "deletesubnet":
@@ -369,8 +377,12 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateS3object(f.Cfg, f.Graph, f.Log) }
 	case "updatescalinggroup":
 		return func() any { return NewUpdateScalinggroup(f.Cfg, f.Graph, f.Log) }
+	case "updatesecret":
+		return func() any { return NewUpdateSecret(f.Cfg, f.Graph, f.Log) }
 	case "updatesecuritygroup":
 		return func() any { return NewUpdateSecuritygroup(f.Cfg, f.Graph, f.Log) }
+	case "updatessmparameter":
+		return func() any { return NewUpdateSsmparameter(f.Cfg, f.Graph, f.Log) }
 	case "updatestack":
 		return func() any { return NewUpdateStack(f.Cfg, f.Graph, f.Log) }
 	case "updatesubnet":
@@ -447,8 +459,10 @@ var (
 	_ command = &CreateS3object{}
 	_ command = &CreateScalinggroup{}
 	_ command = &CreateScalingpolicy{}
+	_ command = &CreateSecret{}
 	_ command = &CreateSecuritygroup{}
 	_ command = &CreateSnapshot{}
+	_ command = &CreateSsmparameter{}
 	_ command = &CreateStack{}
 	_ command = &CreateSubnet{}
 	_ command = &CreateSubscription{}
@@ -496,8 +510,10 @@ var (
 	_ command = &DeleteS3object{}
 	_ command = &DeleteScalinggroup{}
 	_ command = &DeleteScalingpolicy{}
+	_ command = &DeleteSecret{}
 	_ command = &DeleteSecuritygroup{}
 	_ command = &DeleteSnapshot{}
+	_ command = &DeleteSsmparameter{}
 	_ command = &DeleteStack{}
 	_ command = &DeleteSubnet{}
 	_ command = &DeleteSubscription{}
@@ -545,7 +561,9 @@ var (
 	_ command = &UpdateRecord{}
 	_ command = &UpdateS3object{}
 	_ command = &UpdateScalinggroup{}
+	_ command = &UpdateSecret{}
 	_ command = &UpdateSecuritygroup{}
+	_ command = &UpdateSsmparameter{}
 	_ command = &UpdateStack{}
 	_ command = &UpdateSubnet{}
 	_ command = &UpdateTargetgroup{}

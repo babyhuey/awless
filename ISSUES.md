@@ -310,7 +310,7 @@ AWS SDK v2 calls use `context.Background()` everywhere instead of accepting a co
 
 ---
 
-### D5: New services are list-only (no CRUD commands)
+### D5: New services are list-only (no CRUD commands) — **PARTIALLY FIXED** (Secrets Manager and SSM done; EKS, DynamoDB, EFS, API Gateway, CloudTrail, CloudWatch Logs remain)
 
 **Severity:** Medium  
 **Files:** New services (EKS, DynamoDB, Secrets Manager, API Gateway, SSM, EFS, CloudTrail, CloudWatch Logs) in `aws/services/gen_services.go`
@@ -501,7 +501,7 @@ The lint job builds golangci-lint from source (`go install ... @latest`). This i
 
 ---
 
-### I3: Add CRUD commands for new services
+### I3: Add CRUD commands for new services — **PARTIALLY FIXED** (priorities 1 and 2 of 5 complete)
 
 **Severity:** Medium  
 **Scope:** 8 services × common operations
@@ -524,6 +524,28 @@ Extend EKS, DynamoDB, Secrets Manager, API Gateway v2, SSM, EFS, CloudTrail, and
 No `SIGINT`/`SIGTERM` handling. If a long-running AWS operation (e.g., `create instance` waiting for status) is interrupted, there's no cleanup or cancellation. Combined with D4 (no context propagation), Ctrl+C just kills the process.
 
 **Fix:** Install signal handlers in `main.go`, create a root context, and propagate it through the command chain.
+
+---
+
+### I20: Template entity list is hand-maintained and silently gates new commands
+
+**Severity:** Medium  
+**File:** `template/internal/ast/entities.go`
+
+`entities` is a hand-written map that the template parser checks, so a command can
+be fully registered and visible in `awless <action> <entity> -h` while every
+template and one-liner using it fails with `unknown entity '<x>'`. Nothing
+connects the map to the command set, and the failure appears at parse time rather
+than at build time.
+
+Hit while adding Secrets Manager and SSM: both were registered and their help
+rendered correctly, but all six commands were unusable until `secret` and
+`ssmparameter` were added here by hand. Whoever adds EKS, DynamoDB or EFS CRUD
+will hit exactly the same wall.
+
+**Fix:** generate the map from the `entity:` struct tags already parsed out of
+`aws/spec/` by `loadCommandStructs`, so it cannot drift. The `codegen` CI job then
+catches any omission.
 
 ---
 

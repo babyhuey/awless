@@ -212,6 +212,42 @@ var paramsDoc = map[string]map[string]string{
 		"role":              "The ARN of an IAM role that allows Application Auto Scaling to modify the scalable target on your behalf",
 		"service-namespace": "The namespace of the AWS service",
 	},
+	"create.secret": {
+		"name":        "Name of the secret",
+		"secret":      "Secret value to store",
+		"description": "Description of the secret",
+		"kms-key":     "ARN or ID of the KMS key used to encrypt the secret (defaults to the account's aws/secretsmanager key)",
+	},
+	"update.secret": {
+		"id":          "Name or ARN of the secret to update",
+		"secret":      "New secret value",
+		"description": "New description of the secret",
+		"kms-key":     "ARN or ID of the KMS key used to encrypt the secret",
+	},
+	"delete.secret": {
+		"id":              "Name or ARN of the secret to delete",
+		"recovery-window": "Days before permanent deletion, between 7 and 30 (defaults to 30); cannot be combined with force",
+		"force":           "Delete immediately with no recovery window; cannot be undone",
+	},
+	"create.ssmparameter": {
+		"name":        "Name of the parameter, optionally a path such as /app/db/host",
+		"value":       "Value of the parameter",
+		"type":        "Type of the parameter",
+		"description": "Description of the parameter",
+		"kms-key":     "ARN or ID of the KMS key used to encrypt a SecureString parameter",
+		"tier":        "Parameter tier",
+	},
+	"update.ssmparameter": {
+		"name":        "Name of the parameter to update",
+		"value":       "New value of the parameter",
+		"type":        "Type of the parameter",
+		"description": "Description of the parameter",
+		"kms-key":     "ARN or ID of the KMS key used to encrypt a SecureString parameter",
+		"overwrite":   "Overwrite an existing parameter (defaults to true for update)",
+	},
+	"delete.ssmparameter": {
+		"name": "Name of the parameter to delete",
+	},
 	"create.bucket": {
 		"acl":  "The canned ACL to apply to the bucket",
 		"name": "The name of bucket to create",

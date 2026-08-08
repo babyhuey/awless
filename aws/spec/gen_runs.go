@@ -40,8 +40,10 @@ import (
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
+	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
 	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
+	ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/aws/smithy-go"
 
 	"github.com/bootswithdefer/awless/cloud"
@@ -5518,6 +5520,88 @@ func (cmd *CreateScalingpolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateSecret(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSecret {
+	cmd := new(CreateSecret)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = secretsmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateSecret) SetApi(api *secretsmanager.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateSecret) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateSecret) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &secretsmanager.CreateSecretInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in secretsmanager.CreateSecretInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateSecret(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("secretsmanager.CreateSecret call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create secret: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create secret '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create secret done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateSecret) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("secret"), nil
+}
+
+func (cmd *CreateSecret) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSecuritygroup {
 	cmd := new(CreateSecuritygroup)
 	if len(l) > 0 {
@@ -5729,6 +5813,88 @@ func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *CreateSnapshot) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateSsmparameter(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSsmparameter {
+	cmd := new(CreateSsmparameter)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ssm.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateSsmparameter) SetApi(api *ssm.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateSsmparameter) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateSsmparameter) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ssm.PutParameterInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in ssm.PutParameterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutParameter(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ssm.PutParameter call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create ssmparameter: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create ssmparameter '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create ssmparameter done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateSsmparameter) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("ssmparameter"), nil
+}
+
+func (cmd *CreateSsmparameter) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9770,6 +9936,88 @@ func (cmd *DeleteScalingpolicy) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteSecret(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSecret {
+	cmd := new(DeleteSecret)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = secretsmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteSecret) SetApi(api *secretsmanager.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteSecret) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteSecret) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &secretsmanager.DeleteSecretInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in secretsmanager.DeleteSecretInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteSecret(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("secretsmanager.DeleteSecret call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete secret: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete secret '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete secret done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteSecret) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("secret"), nil
+}
+
+func (cmd *DeleteSecret) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSecuritygroup {
 	cmd := new(DeleteSecuritygroup)
 	if len(l) > 0 {
@@ -9981,6 +10229,88 @@ func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *DeleteSnapshot) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteSsmparameter(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSsmparameter {
+	cmd := new(DeleteSsmparameter)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ssm.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteSsmparameter) SetApi(api *ssm.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteSsmparameter) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteSsmparameter) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ssm.DeleteParameterInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in ssm.DeleteParameterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteParameter(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ssm.DeleteParameter call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete ssmparameter: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete ssmparameter '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete ssmparameter done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteSsmparameter) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("ssmparameter"), nil
+}
+
+func (cmd *DeleteSsmparameter) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14009,6 +14339,88 @@ func (cmd *UpdateScalinggroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewUpdateSecret(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateSecret {
+	cmd := new(UpdateSecret)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = secretsmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateSecret) SetApi(api *secretsmanager.Client) {
+	cmd.api = api
+}
+
+func (cmd *UpdateSecret) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateSecret) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &secretsmanager.UpdateSecretInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in secretsmanager.UpdateSecretInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.UpdateSecret(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("secretsmanager.UpdateSecret call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update secret: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update secret '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update secret done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateSecret) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("secret"), nil
+}
+
+func (cmd *UpdateSecret) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewUpdateSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateSecuritygroup {
 	cmd := new(UpdateSecuritygroup)
 	if len(l) > 0 {
@@ -14075,6 +14487,88 @@ func (cmd *UpdateSecuritygroup) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *UpdateSecuritygroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateSsmparameter(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateSsmparameter {
+	cmd := new(UpdateSsmparameter)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ssm.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateSsmparameter) SetApi(api *ssm.Client) {
+	cmd.api = api
+}
+
+func (cmd *UpdateSsmparameter) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateSsmparameter) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ssm.PutParameterInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in ssm.PutParameterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutParameter(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ssm.PutParameter call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update ssmparameter: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update ssmparameter '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update ssmparameter done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateSsmparameter) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("ssmparameter"), nil
+}
+
+func (cmd *UpdateSsmparameter) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

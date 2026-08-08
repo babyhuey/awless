@@ -70,7 +70,10 @@ var EnumDoc = map[string][]string{
 	"create.appscalingpolicy.stepscaling-adjustments":      {"0::+1", ":0:-1", "75::+1"},
 	"create.appscalingpolicy.stepscaling-aggregation-type": {"Minimum", "Maximum", "Average"},
 
-	"create.bucket.acl": s3ACLs,
+	"create.ssmparameter.type": {"String", "StringList", "SecureString"},
+	"update.ssmparameter.type": {"String", "StringList", "SecureString"},
+	"create.ssmparameter.tier": {"Standard", "Advanced", "Intelligent-Tiering"},
+	"create.bucket.acl":        s3ACLs,
 
 	"create.database.engine":             {"mysql", "mariadb", "postgres", "aurora", "oracle-se1", "oracle-se2", "oracle-se", "oracle-ee", "sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"},
 	"create.database.copytagstosnapshot": boolean,

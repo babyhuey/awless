@@ -117,6 +117,28 @@ var cliExamplesDoc = map[string][]string{
 	"create.appscalingtarget": {
 		"awless create appscalingtarget dimension=ecs:service:DesiredCount min-capacity=2 max-capacity=10 resource=service/my-ecs-cluster/my-service-deployment-nameource role=arn:aws:iam::519101889238:role/ecsAutoscaleRole service-namespace=ecs",
 	},
+	"create.secret": {
+		"awless create secret name=db-password secret=s3cr3t",
+		"awless create secret name=prod/api-key secret=abc123 description=\"API key for prod\"",
+	},
+	"update.secret": {
+		"awless update secret id=db-password secret=rotated-value",
+	},
+	"delete.secret": {
+		"awless delete secret id=db-password",
+		"awless delete secret id=db-password recovery-window=7",
+		"awless delete secret id=db-password force=true",
+	},
+	"create.ssmparameter": {
+		"awless create ssmparameter name=/app/db/host value=db.internal",
+		"awless create ssmparameter name=/app/db/password value=s3cr3t type=SecureString",
+	},
+	"update.ssmparameter": {
+		"awless update ssmparameter name=/app/db/host value=db2.internal",
+	},
+	"delete.ssmparameter": {
+		"awless delete ssmparameter name=/app/db/host",
+	},
 	"create.bucket": {
 		"awless create bucket name=my-bucket-name acl=public-read",
 	},

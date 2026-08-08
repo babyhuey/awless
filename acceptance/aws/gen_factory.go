@@ -315,6 +315,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateScalingpolicy(f.config(), f.Graph, f.Logger)
 		}
+	case "createsecret":
+		return func() any {
+			return awsspec.NewCreateSecret(f.config(), f.Graph, f.Logger)
+		}
 	case "createsecuritygroup":
 		return func() any {
 			return awsspec.NewCreateSecuritygroup(f.config(), f.Graph, f.Logger)
@@ -322,6 +326,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createsnapshot":
 		return func() any {
 			return awsspec.NewCreateSnapshot(f.config(), f.Graph, f.Logger)
+		}
+	case "createssmparameter":
+		return func() any {
+			return awsspec.NewCreateSsmparameter(f.config(), f.Graph, f.Logger)
 		}
 	case "createstack":
 		return func() any {
@@ -511,6 +519,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteScalingpolicy(f.config(), f.Graph, f.Logger)
 		}
+	case "deletesecret":
+		return func() any {
+			return awsspec.NewDeleteSecret(f.config(), f.Graph, f.Logger)
+		}
 	case "deletesecuritygroup":
 		return func() any {
 			return awsspec.NewDeleteSecuritygroup(f.config(), f.Graph, f.Logger)
@@ -518,6 +530,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletesnapshot":
 		return func() any {
 			return awsspec.NewDeleteSnapshot(f.config(), f.Graph, f.Logger)
+		}
+	case "deletessmparameter":
+		return func() any {
+			return awsspec.NewDeleteSsmparameter(f.config(), f.Graph, f.Logger)
 		}
 	case "deletestack":
 		return func() any {
@@ -707,9 +723,17 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewUpdateScalinggroup(f.config(), f.Graph, f.Logger)
 		}
+	case "updatesecret":
+		return func() any {
+			return awsspec.NewUpdateSecret(f.config(), f.Graph, f.Logger)
+		}
 	case "updatesecuritygroup":
 		return func() any {
 			return awsspec.NewUpdateSecuritygroup(f.config(), f.Graph, f.Logger)
+		}
+	case "updatessmparameter":
+		return func() any {
+			return awsspec.NewUpdateSsmparameter(f.config(), f.Graph, f.Logger)
 		}
 	case "updatestack":
 		return func() any {
