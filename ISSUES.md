@@ -310,7 +310,7 @@ AWS SDK v2 calls use `context.Background()` everywhere instead of accepting a co
 
 ---
 
-### D5: New services are list-only (no CRUD commands) — **PARTIALLY FIXED** (Secrets Manager and SSM done; EKS, DynamoDB, EFS, API Gateway, CloudTrail, CloudWatch Logs remain)
+### D5: New services are list-only (no CRUD commands) — **FIXED** (all 8 services now have CRUD: Secrets Manager, SSM, EKS, DynamoDB, EFS, API Gateway v2, CloudTrail, CloudWatch Logs)
 
 **Severity:** Medium  
 **Files:** New services (EKS, DynamoDB, Secrets Manager, API Gateway, SSM, EFS, CloudTrail, CloudWatch Logs) in `aws/services/gen_services.go`
@@ -501,7 +501,7 @@ The lint job builds golangci-lint from source (`go install ... @latest`). This i
 
 ---
 
-### I3: Add CRUD commands for new services — **PARTIALLY FIXED** (priorities 1 and 2 of 5 complete)
+### I3: Add CRUD commands for new services — **FIXED** (27 commands across all 8 services; all 5 named priorities plus the remaining three services)
 
 **Severity:** Medium  
 **Scope:** 8 services × common operations

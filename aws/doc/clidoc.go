@@ -167,6 +167,32 @@ var cliExamplesDoc = map[string][]string{
 	"delete.filesystem": {
 		"awless delete filesystem id=fs-0123456789abcdef",
 	},
+	"create.trail": {
+		"awless create trail name=org-audit bucket=my-cloudtrail-bucket multiregion=true log-validation=true",
+	},
+	"delete.trail": {"awless delete trail name=org-audit"},
+	"start.trail":  {"awless start trail name=org-audit"},
+	"stop.trail":   {"awless stop trail name=org-audit"},
+	"create.loggroup": {
+		"awless create loggroup name=/aws/lambda/my-function",
+	},
+	"delete.loggroup": {"awless delete loggroup name=/aws/lambda/my-function"},
+	"update.loggroup": {
+		"awless update loggroup name=/aws/lambda/my-function retention=30",
+	},
+	"create.apigateway": {
+		"awless create apigateway name=my-api protocol=HTTP",
+		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",
+	},
+	"delete.apigateway": {"awless delete apigateway id=abc123"},
+	"create.apigatewayroute": {
+		"awless create apigatewayroute api=abc123 route-key=\"GET /items\" target=integrations/xyz789",
+	},
+	"delete.apigatewayroute": {"awless delete apigatewayroute api=abc123 id=xyz789"},
+	"create.apigatewaystage": {
+		"awless create apigatewaystage api=abc123 name=prod autodeploy=true",
+	},
+	"delete.apigatewaystage": {"awless delete apigatewaystage api=abc123 name=prod"},
 	"create.bucket": {
 		"awless create bucket name=my-bucket-name acl=public-read",
 	},

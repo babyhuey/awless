@@ -105,6 +105,12 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateAccesskey(f.Cfg, f.Graph, f.Log) }
 	case "createalarm":
 		return func() any { return NewCreateAlarm(f.Cfg, f.Graph, f.Log) }
+	case "createapigateway":
+		return func() any { return NewCreateApigateway(f.Cfg, f.Graph, f.Log) }
+	case "createapigatewayroute":
+		return func() any { return NewCreateApigatewayroute(f.Cfg, f.Graph, f.Log) }
+	case "createapigatewaystage":
+		return func() any { return NewCreateApigatewaystage(f.Cfg, f.Graph, f.Log) }
 	case "createappscalingpolicy":
 		return func() any { return NewCreateAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "createappscalingtarget":
@@ -153,6 +159,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateListener(f.Cfg, f.Graph, f.Log) }
 	case "createloadbalancer":
 		return func() any { return NewCreateLoadbalancer(f.Cfg, f.Graph, f.Log) }
+	case "createloggroup":
+		return func() any { return NewCreateLoggroup(f.Cfg, f.Graph, f.Log) }
 	case "createloginprofile":
 		return func() any { return NewCreateLoginprofile(f.Cfg, f.Graph, f.Log) }
 	case "createmfadevice":
@@ -201,6 +209,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateTargetgroup(f.Cfg, f.Graph, f.Log) }
 	case "createtopic":
 		return func() any { return NewCreateTopic(f.Cfg, f.Graph, f.Log) }
+	case "createtrail":
+		return func() any { return NewCreateTrail(f.Cfg, f.Graph, f.Log) }
 	case "createuser":
 		return func() any { return NewCreateUser(f.Cfg, f.Graph, f.Log) }
 	case "createvolume":
@@ -213,6 +223,12 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteAccesskey(f.Cfg, f.Graph, f.Log) }
 	case "deletealarm":
 		return func() any { return NewDeleteAlarm(f.Cfg, f.Graph, f.Log) }
+	case "deleteapigateway":
+		return func() any { return NewDeleteApigateway(f.Cfg, f.Graph, f.Log) }
+	case "deleteapigatewayroute":
+		return func() any { return NewDeleteApigatewayroute(f.Cfg, f.Graph, f.Log) }
+	case "deleteapigatewaystage":
+		return func() any { return NewDeleteApigatewaystage(f.Cfg, f.Graph, f.Log) }
 	case "deleteappscalingpolicy":
 		return func() any { return NewDeleteAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "deleteappscalingtarget":
@@ -263,6 +279,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteListener(f.Cfg, f.Graph, f.Log) }
 	case "deleteloadbalancer":
 		return func() any { return NewDeleteLoadbalancer(f.Cfg, f.Graph, f.Log) }
+	case "deleteloggroup":
+		return func() any { return NewDeleteLoggroup(f.Cfg, f.Graph, f.Log) }
 	case "deleteloginprofile":
 		return func() any { return NewDeleteLoginprofile(f.Cfg, f.Graph, f.Log) }
 	case "deletemfadevice":
@@ -311,6 +329,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteTargetgroup(f.Cfg, f.Graph, f.Log) }
 	case "deletetopic":
 		return func() any { return NewDeleteTopic(f.Cfg, f.Graph, f.Log) }
+	case "deletetrail":
+		return func() any { return NewDeleteTrail(f.Cfg, f.Graph, f.Log) }
 	case "deleteuser":
 		return func() any { return NewDeleteUser(f.Cfg, f.Graph, f.Log) }
 	case "deletevolume":
@@ -363,6 +383,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartDatabase(f.Cfg, f.Graph, f.Log) }
 	case "startinstance":
 		return func() any { return NewStartInstance(f.Cfg, f.Graph, f.Log) }
+	case "starttrail":
+		return func() any { return NewStartTrail(f.Cfg, f.Graph, f.Log) }
 	case "stopalarm":
 		return func() any { return NewStopAlarm(f.Cfg, f.Graph, f.Log) }
 	case "stopcontainertask":
@@ -371,6 +393,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopDatabase(f.Cfg, f.Graph, f.Log) }
 	case "stopinstance":
 		return func() any { return NewStopInstance(f.Cfg, f.Graph, f.Log) }
+	case "stoptrail":
+		return func() any { return NewStopTrail(f.Cfg, f.Graph, f.Log) }
 	case "updatebucket":
 		return func() any { return NewUpdateBucket(f.Cfg, f.Graph, f.Log) }
 	case "updateclassicloadbalancer":
@@ -383,6 +407,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateImage(f.Cfg, f.Graph, f.Log) }
 	case "updateinstance":
 		return func() any { return NewUpdateInstance(f.Cfg, f.Graph, f.Log) }
+	case "updateloggroup":
+		return func() any { return NewUpdateLoggroup(f.Cfg, f.Graph, f.Log) }
 	case "updateloginprofile":
 		return func() any { return NewUpdateLoginprofile(f.Cfg, f.Graph, f.Log) }
 	case "updatepolicy":
@@ -441,6 +467,9 @@ var (
 	_ command = &CopySnapshot{}
 	_ command = &CreateAccesskey{}
 	_ command = &CreateAlarm{}
+	_ command = &CreateApigateway{}
+	_ command = &CreateApigatewayroute{}
+	_ command = &CreateApigatewaystage{}
 	_ command = &CreateAppscalingpolicy{}
 	_ command = &CreateAppscalingtarget{}
 	_ command = &CreateBucket{}
@@ -465,6 +494,7 @@ var (
 	_ command = &CreateLaunchconfiguration{}
 	_ command = &CreateListener{}
 	_ command = &CreateLoadbalancer{}
+	_ command = &CreateLoggroup{}
 	_ command = &CreateLoginprofile{}
 	_ command = &CreateMfadevice{}
 	_ command = &CreateNatgateway{}
@@ -489,12 +519,16 @@ var (
 	_ command = &CreateTag{}
 	_ command = &CreateTargetgroup{}
 	_ command = &CreateTopic{}
+	_ command = &CreateTrail{}
 	_ command = &CreateUser{}
 	_ command = &CreateVolume{}
 	_ command = &CreateVpc{}
 	_ command = &CreateZone{}
 	_ command = &DeleteAccesskey{}
 	_ command = &DeleteAlarm{}
+	_ command = &DeleteApigateway{}
+	_ command = &DeleteApigatewayroute{}
+	_ command = &DeleteApigatewaystage{}
 	_ command = &DeleteAppscalingpolicy{}
 	_ command = &DeleteAppscalingtarget{}
 	_ command = &DeleteBucket{}
@@ -520,6 +554,7 @@ var (
 	_ command = &DeleteLaunchconfiguration{}
 	_ command = &DeleteListener{}
 	_ command = &DeleteLoadbalancer{}
+	_ command = &DeleteLoggroup{}
 	_ command = &DeleteLoginprofile{}
 	_ command = &DeleteMfadevice{}
 	_ command = &DeleteNatgateway{}
@@ -544,6 +579,7 @@ var (
 	_ command = &DeleteTag{}
 	_ command = &DeleteTargetgroup{}
 	_ command = &DeleteTopic{}
+	_ command = &DeleteTrail{}
 	_ command = &DeleteUser{}
 	_ command = &DeleteVolume{}
 	_ command = &DeleteVpc{}
@@ -570,16 +606,19 @@ var (
 	_ command = &StartContainertask{}
 	_ command = &StartDatabase{}
 	_ command = &StartInstance{}
+	_ command = &StartTrail{}
 	_ command = &StopAlarm{}
 	_ command = &StopContainertask{}
 	_ command = &StopDatabase{}
 	_ command = &StopInstance{}
+	_ command = &StopTrail{}
 	_ command = &UpdateBucket{}
 	_ command = &UpdateClassicLoadbalancer{}
 	_ command = &UpdateContainertask{}
 	_ command = &UpdateDistribution{}
 	_ command = &UpdateImage{}
 	_ command = &UpdateInstance{}
+	_ command = &UpdateLoggroup{}
 	_ command = &UpdateLoginprofile{}
 	_ command = &UpdatePolicy{}
 	_ command = &UpdateRecord{}

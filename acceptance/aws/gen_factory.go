@@ -179,6 +179,18 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateAlarm(f.config(), f.Graph, f.Logger)
 		}
+	case "createapigateway":
+		return func() any {
+			return awsspec.NewCreateApigateway(f.config(), f.Graph, f.Logger)
+		}
+	case "createapigatewayroute":
+		return func() any {
+			return awsspec.NewCreateApigatewayroute(f.config(), f.Graph, f.Logger)
+		}
+	case "createapigatewaystage":
+		return func() any {
+			return awsspec.NewCreateApigatewaystage(f.config(), f.Graph, f.Logger)
+		}
 	case "createappscalingpolicy":
 		return func() any {
 			return awsspec.NewCreateAppscalingpolicy(f.config(), f.Graph, f.Logger)
@@ -274,6 +286,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createloadbalancer":
 		return func() any {
 			return awsspec.NewCreateLoadbalancer(f.config(), f.Graph, f.Logger)
+		}
+	case "createloggroup":
+		return func() any {
+			return awsspec.NewCreateLoggroup(f.config(), f.Graph, f.Logger)
 		}
 	case "createloginprofile":
 		return func() any {
@@ -371,6 +387,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateTopic(f.config(), f.Graph, f.Logger)
 		}
+	case "createtrail":
+		return func() any {
+			return awsspec.NewCreateTrail(f.config(), f.Graph, f.Logger)
+		}
 	case "createuser":
 		return func() any {
 			return awsspec.NewCreateUser(f.config(), f.Graph, f.Logger)
@@ -394,6 +414,18 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletealarm":
 		return func() any {
 			return awsspec.NewDeleteAlarm(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteapigateway":
+		return func() any {
+			return awsspec.NewDeleteApigateway(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteapigatewayroute":
+		return func() any {
+			return awsspec.NewDeleteApigatewayroute(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteapigatewaystage":
+		return func() any {
+			return awsspec.NewDeleteApigatewaystage(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteappscalingpolicy":
 		return func() any {
@@ -495,6 +527,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
+	case "deleteloggroup":
+		return func() any {
+			return awsspec.NewDeleteLoggroup(f.config(), f.Graph, f.Logger)
+		}
 	case "deleteloginprofile":
 		return func() any {
 			return awsspec.NewDeleteLoginprofile(f.config(), f.Graph, f.Logger)
@@ -590,6 +626,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletetopic":
 		return func() any {
 			return awsspec.NewDeleteTopic(f.config(), f.Graph, f.Logger)
+		}
+	case "deletetrail":
+		return func() any {
+			return awsspec.NewDeleteTrail(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteuser":
 		return func() any {
@@ -695,6 +735,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStartInstance(f.config(), f.Graph, f.Logger)
 		}
+	case "starttrail":
+		return func() any {
+			return awsspec.NewStartTrail(f.config(), f.Graph, f.Logger)
+		}
 	case "stopalarm":
 		return func() any {
 			return awsspec.NewStopAlarm(f.config(), f.Graph, f.Logger)
@@ -710,6 +754,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "stopinstance":
 		return func() any {
 			return awsspec.NewStopInstance(f.config(), f.Graph, f.Logger)
+		}
+	case "stoptrail":
+		return func() any {
+			return awsspec.NewStopTrail(f.config(), f.Graph, f.Logger)
 		}
 	case "updatebucket":
 		return func() any {
@@ -734,6 +782,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updateinstance":
 		return func() any {
 			return awsspec.NewUpdateInstance(f.config(), f.Graph, f.Logger)
+		}
+	case "updateloggroup":
+		return func() any {
+			return awsspec.NewUpdateLoggroup(f.config(), f.Graph, f.Logger)
 		}
 	case "updateloginprofile":
 		return func() any {

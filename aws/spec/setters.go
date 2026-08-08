@@ -412,6 +412,12 @@ func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...an
 			}
 		}
 		v = triggers
+	default:
+		// An awsType that is not handled above silently skipped conversion, so the
+		// raw value reached reflect and failed there with a message about types the
+		// caller never wrote — e.g. a typo'd `awsType:"awsint32"` surfaced as
+		// "*int64 cannot be converted to *int32". Name the real problem instead.
+		return fmt.Errorf("unknown awsType %q for field %s; add a case to setFieldWithType or use an existing type", destType, fieldPath)
 	}
 
 	setValueAtPath(i, fieldPath, v)

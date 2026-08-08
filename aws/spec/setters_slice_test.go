@@ -2,6 +2,7 @@ package awsspec
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -160,4 +161,17 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 			t.Error("expected no field to be set")
 		}
 	})
+}
+
+// An unhandled awsType previously skipped conversion silently, so the raw value
+// reached reflect and failed with a message about types the caller never wrote.
+func TestSetFieldWithTypeRejectsUnknownAwsType(t *testing.T) {
+	in := &ec2.CreateVpcInput{}
+	err := setFieldWithType("10.0.0.0/16", in, "CidrBlock", "awsnosuchtype")
+	if err == nil {
+		t.Fatal("expected an unknown awsType to be reported")
+	}
+	if !strings.Contains(err.Error(), "unknown awsType") {
+		t.Errorf("error should name the awsType, got: %s", err)
+	}
 }

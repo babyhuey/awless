@@ -25,6 +25,10 @@ type acmMock struct {
 	basicMock
 }
 
+type apigatewayv2Mock struct {
+	basicMock
+}
+
 type applicationautoscalingMock struct {
 	basicMock
 }
@@ -41,7 +45,15 @@ type cloudfrontMock struct {
 	basicMock
 }
 
+type cloudtrailMock struct {
+	basicMock
+}
+
 type cloudwatchMock struct {
+	basicMock
+}
+
+type cloudwatchlogsMock struct {
 	basicMock
 }
 

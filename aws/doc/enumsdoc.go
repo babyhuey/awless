@@ -76,6 +76,8 @@ var EnumDoc = map[string][]string{
 	"create.filesystem.performance-mode":  {"generalPurpose", "maxIO"},
 	"create.filesystem.throughput-mode":   {"bursting", "provisioned", "elastic"},
 	"create.eksnodegroup.ami-type":        {"AL2_x86_64", "AL2_x86_64_GPU", "AL2_ARM_64", "AL2023_x86_64_STANDARD", "AL2023_ARM_64_STANDARD", "BOTTLEROCKET_x86_64", "BOTTLEROCKET_ARM_64"},
+	"create.apigateway.protocol":          {"HTTP", "WEBSOCKET"},
+	"create.apigatewayroute.auth-type":    {"NONE", "AWS_IAM", "CUSTOM", "JWT"},
 	"create.ssmparameter.type":            {"String", "StringList", "SecureString"},
 	"update.ssmparameter.type":            {"String", "StringList", "SecureString"},
 	"create.ssmparameter.tier":            {"Standard", "Advanced", "Intelligent-Tiering"},

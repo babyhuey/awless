@@ -25,11 +25,14 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	acm "github.com/aws/aws-sdk-go-v2/service/acm"
+	apigatewayv2 "github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	applicationautoscaling "github.com/aws/aws-sdk-go-v2/service/applicationautoscaling"
 	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
 	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
@@ -2623,6 +2626,252 @@ func (cmd *CreateAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateApigateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateApigateway {
+	cmd := new(CreateApigateway)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = apigatewayv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateApigateway) SetApi(api *apigatewayv2.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateApigateway) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateApigateway) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &apigatewayv2.CreateApiInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in apigatewayv2.CreateApiInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateApi(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("apigatewayv2.CreateApi call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create apigateway: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create apigateway '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create apigateway done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateApigateway) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("apigateway"), nil
+}
+
+func (cmd *CreateApigateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateApigatewayroute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateApigatewayroute {
+	cmd := new(CreateApigatewayroute)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = apigatewayv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateApigatewayroute) SetApi(api *apigatewayv2.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateApigatewayroute) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateApigatewayroute) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &apigatewayv2.CreateRouteInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in apigatewayv2.CreateRouteInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateRoute(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("apigatewayv2.CreateRoute call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create apigatewayroute: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create apigatewayroute '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create apigatewayroute done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateApigatewayroute) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("apigatewayroute"), nil
+}
+
+func (cmd *CreateApigatewayroute) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateApigatewaystage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateApigatewaystage {
+	cmd := new(CreateApigatewaystage)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = apigatewayv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateApigatewaystage) SetApi(api *apigatewayv2.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateApigatewaystage) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateApigatewaystage) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &apigatewayv2.CreateStageInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in apigatewayv2.CreateStageInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateStage(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("apigatewayv2.CreateStage call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create apigatewaystage: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create apigatewaystage '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create apigatewaystage done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateApigatewaystage) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("apigatewaystage"), nil
+}
+
+func (cmd *CreateApigatewaystage) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateAppscalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAppscalingpolicy {
 	cmd := new(CreateAppscalingpolicy)
 	if len(l) > 0 {
@@ -4634,6 +4883,88 @@ func (cmd *CreateLoadbalancer) dryRun(renv env.Running, params map[string]any) (
 }
 
 func (cmd *CreateLoadbalancer) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateLoggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateLoggroup {
+	cmd := new(CreateLoggroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cloudwatchlogs.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateLoggroup) SetApi(api *cloudwatchlogs.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateLoggroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateLoggroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cloudwatchlogs.CreateLogGroupInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in cloudwatchlogs.CreateLogGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateLogGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cloudwatchlogs.CreateLogGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create loggroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create loggroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create loggroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateLoggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("loggroup"), nil
+}
+
+func (cmd *CreateLoggroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -6706,6 +7037,88 @@ func (cmd *CreateTopic) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateTrail {
+	cmd := new(CreateTrail)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cloudtrail.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateTrail) SetApi(api *cloudtrail.Client) {
+	cmd.api = api
+}
+
+func (cmd *CreateTrail) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateTrail) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cloudtrail.CreateTrailInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in cloudtrail.CreateTrailInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateTrail(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cloudtrail.CreateTrail call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create trail: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create trail '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create trail done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("trail"), nil
+}
+
+func (cmd *CreateTrail) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateUser {
 	cmd := new(CreateUser)
 	if len(l) > 0 {
@@ -7245,6 +7658,252 @@ func (cmd *DeleteAlarm) dryRun(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteAlarm) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteApigateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteApigateway {
+	cmd := new(DeleteApigateway)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = apigatewayv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteApigateway) SetApi(api *apigatewayv2.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteApigateway) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteApigateway) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &apigatewayv2.DeleteApiInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in apigatewayv2.DeleteApiInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteApi(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("apigatewayv2.DeleteApi call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete apigateway: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete apigateway '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete apigateway done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteApigateway) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("apigateway"), nil
+}
+
+func (cmd *DeleteApigateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteApigatewayroute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteApigatewayroute {
+	cmd := new(DeleteApigatewayroute)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = apigatewayv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteApigatewayroute) SetApi(api *apigatewayv2.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteApigatewayroute) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteApigatewayroute) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &apigatewayv2.DeleteRouteInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in apigatewayv2.DeleteRouteInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteRoute(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("apigatewayv2.DeleteRoute call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete apigatewayroute: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete apigatewayroute '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete apigatewayroute done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteApigatewayroute) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("apigatewayroute"), nil
+}
+
+func (cmd *DeleteApigatewayroute) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteApigatewaystage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteApigatewaystage {
+	cmd := new(DeleteApigatewaystage)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = apigatewayv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteApigatewaystage) SetApi(api *apigatewayv2.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteApigatewaystage) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteApigatewaystage) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &apigatewayv2.DeleteStageInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in apigatewayv2.DeleteStageInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteStage(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("apigatewayv2.DeleteStage call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete apigatewaystage: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete apigatewaystage '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete apigatewaystage done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteApigatewaystage) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("apigatewaystage"), nil
+}
+
+func (cmd *DeleteApigatewaystage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9363,6 +10022,88 @@ func (cmd *DeleteLoadbalancer) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteLoggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLoggroup {
+	cmd := new(DeleteLoggroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cloudwatchlogs.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteLoggroup) SetApi(api *cloudwatchlogs.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteLoggroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteLoggroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cloudwatchlogs.DeleteLogGroupInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in cloudwatchlogs.DeleteLogGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteLogGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cloudwatchlogs.DeleteLogGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete loggroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete loggroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete loggroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteLoggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("loggroup"), nil
+}
+
+func (cmd *DeleteLoggroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteLoginprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteLoginprofile {
 	cmd := new(DeleteLoginprofile)
 	if len(l) > 0 {
@@ -11447,6 +12188,88 @@ func (cmd *DeleteTopic) dryRun(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteTopic) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTrail {
+	cmd := new(DeleteTrail)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cloudtrail.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteTrail) SetApi(api *cloudtrail.Client) {
+	cmd.api = api
+}
+
+func (cmd *DeleteTrail) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteTrail) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cloudtrail.DeleteTrailInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in cloudtrail.DeleteTrailInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteTrail(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cloudtrail.DeleteTrail call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete trail: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete trail '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete trail done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("trail"), nil
+}
+
+func (cmd *DeleteTrail) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13740,6 +14563,88 @@ func (cmd *StartInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewStartTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartTrail {
+	cmd := new(StartTrail)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cloudtrail.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartTrail) SetApi(api *cloudtrail.Client) {
+	cmd.api = api
+}
+
+func (cmd *StartTrail) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartTrail) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cloudtrail.StartLoggingInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in cloudtrail.StartLoggingInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StartLogging(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cloudtrail.StartLogging call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start trail: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start trail '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start trail done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("trail"), nil
+}
+
+func (cmd *StartTrail) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewStopAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopAlarm {
 	cmd := new(StopAlarm)
 	if len(l) > 0 {
@@ -14081,6 +14986,88 @@ func (cmd *StopInstance) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *StopInstance) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStopTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopTrail {
+	cmd := new(StopTrail)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cloudtrail.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StopTrail) SetApi(api *cloudtrail.Client) {
+	cmd.api = api
+}
+
+func (cmd *StopTrail) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StopTrail) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cloudtrail.StopLoggingInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in cloudtrail.StopLoggingInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StopLogging(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cloudtrail.StopLogging call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("stop trail: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("stop trail '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("stop trail done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StopTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("trail"), nil
+}
+
+func (cmd *StopTrail) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14567,6 +15554,88 @@ func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *UpdateInstance) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateLoggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateLoggroup {
+	cmd := new(UpdateLoggroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cloudwatchlogs.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateLoggroup) SetApi(api *cloudwatchlogs.Client) {
+	cmd.api = api
+}
+
+func (cmd *UpdateLoggroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateLoggroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cloudwatchlogs.PutRetentionPolicyInput{}
+	if err := structInjector(cmd, input, renv.Context()); err != nil {
+		return nil, fmt.Errorf("cannot inject in cloudwatchlogs.PutRetentionPolicyInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutRetentionPolicy(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cloudwatchlogs.PutRetentionPolicy call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update loggroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update loggroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update loggroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateLoggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunId("loggroup"), nil
+}
+
+func (cmd *UpdateLoggroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
