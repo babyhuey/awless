@@ -88,7 +88,7 @@ Quick examples:
   awless show my-resource
   awless create instance type=t2.micro distro=debian
   awless ssh my-instance`,
-	BashCompletionFunction: bash_completion_func,
+	BashCompletionFunction: bashCompletionFunc,
 	RunE: func(c *cobra.Command, args []string) error {
 		if versionGlobalFlag {
 			printVersion(c, args)
@@ -145,7 +145,7 @@ func HasCmdOnelinerChilds(cmd *cobra.Command) bool {
 }
 
 const (
-	bash_completion_func = `
+	bashCompletionFunc = `
 __awless_get_all_ids()
 {
 		local all_ids_output

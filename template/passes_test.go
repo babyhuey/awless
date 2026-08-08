@@ -233,7 +233,7 @@ func TestResolveMissingHolesPass(t *testing.T) {
 		}
 	}).Build()
 
-	cenv.Push(env.FILLERS, map[string]any{"instance.type": "t2.micro"})
+	cenv.Push(env.Fillers, map[string]any{"instance.type": "t2.micro"})
 
 	pass := newMultiPass(resolveHolesPass, resolveMissingHolesPass)
 
@@ -304,7 +304,7 @@ func TestResolveMissingSuggestedPass(t *testing.T) {
 	}
 
 	count = 0
-	cenv = buildingEnv.WithParamsMode(env.REQUIRED_PARAMS_ONLY).Build()
+	cenv = buildingEnv.WithParamsMode(env.RequiredParamsOnly).Build()
 	compiled, _, err = pass.compile(MustParse(tpl), cenv)
 	if err != nil {
 		t.Fatal(err)
@@ -318,7 +318,7 @@ func TestResolveMissingSuggestedPass(t *testing.T) {
 	}
 
 	count = 0
-	cenv = buildingEnv.WithParamsMode(env.ALL_PARAMS).Build()
+	cenv = buildingEnv.WithParamsMode(env.AllParams).Build()
 	compiled, _, err = pass.compile(MustParse(tpl), cenv)
 	if err != nil {
 		t.Fatal(err)
@@ -343,7 +343,7 @@ func TestResolveAliasPass(t *testing.T) {
 		return vals[v]
 	}).Build()
 
-	cenv.Push(env.FILLERS, map[string]any{"instance.ami": ast.NewAliasNode("my-ami")})
+	cenv.Push(env.Fillers, map[string]any{"instance.ami": ast.NewAliasNode("my-ami")})
 
 	pass := newMultiPass(resolveHolesPass, resolveAliasPass)
 
@@ -359,7 +359,7 @@ func TestResolveHolesPass(t *testing.T) {
 	tpl := MustParse("create instance count={instance.count} type={instance.type}")
 
 	cenv := NewEnv().Build()
-	cenv.Push(env.FILLERS, map[string]any{
+	cenv.Push(env.Fillers, map[string]any{
 		"instance.count": 3,
 		"instance.type":  "t2.micro",
 	})

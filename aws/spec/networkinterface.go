@@ -61,7 +61,7 @@ type DeleteNetworkinterface struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"NetworkInterfaceId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"NetworkInterfaceId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteNetworkinterface) ParamsSpec() params.Spec {
@@ -73,7 +73,7 @@ type AttachNetworkinterface struct {
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
 	api         *ec2.Client
-	Id          *string `awsName:"NetworkInterfaceId" awsType:"awsstr" templateName:"id"`
+	ID          *string `awsName:"NetworkInterfaceId" awsType:"awsstr" templateName:"id"`
 	Instance    *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
 	DeviceIndex *int64  `awsName:"DeviceIndex" awsType:"awsint64" templateName:"device-index"`
 }
@@ -93,7 +93,7 @@ type DetachNetworkinterface struct {
 	api        *ec2.Client
 	Attachment *string `awsName:"AttachmentId" awsType:"awsstr" templateName:"attachment"`
 	Instance   *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
-	Id         *string `awsName:"NetworkInterfaceId" awsType:"awsstr" templateName:"id"`
+	ID         *string `awsName:"NetworkInterfaceId" awsType:"awsstr" templateName:"id"`
 	Force      *bool   `awsName:"Force" awsType:"awsbool" templateName:"force"`
 }
 
@@ -117,10 +117,10 @@ func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]an
 		if err := setFieldWithType(cmd.Attachment, input, "AttachmentId", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
-	} else if cmd.Instance != nil && cmd.Id != nil {
-		attachId, err := cmd.findAttachmentBetweenInstanceAndNetworkInterface(cmd.Instance, cmd.Id)
-		if err == nil && attachId != "" {
-			input.AttachmentId = awssdk.String(attachId)
+	} else if cmd.Instance != nil && cmd.ID != nil {
+		attachID, err := cmd.findAttachmentBetweenInstanceAndNetworkInterface(cmd.Instance, cmd.ID)
+		if err == nil && attachID != "" {
+			input.AttachmentId = awssdk.String(attachID)
 		} else {
 			return nil, err
 		}
@@ -139,7 +139,7 @@ func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]an
 	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
-			id := fakeDryRunId("networkinterface")
+			id := fakeDryRunID("networkinterface")
 			cmd.logger.Verbose("dry run: detach networkinterface ok")
 			return id, nil
 		}
@@ -155,10 +155,10 @@ func (cmd *DetachNetworkinterface) ManualRun(renv env.Running) (any, error) {
 		if err := setFieldWithType(cmd.Attachment, input, "AttachmentId", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
-	} else if cmd.Instance != nil && cmd.Id != nil {
-		attachId, err := cmd.findAttachmentBetweenInstanceAndNetworkInterface(cmd.Instance, cmd.Id)
-		if err == nil && attachId != "" {
-			input.AttachmentId = awssdk.String(attachId)
+	} else if cmd.Instance != nil && cmd.ID != nil {
+		attachID, err := cmd.findAttachmentBetweenInstanceAndNetworkInterface(cmd.Instance, cmd.ID)
+		if err == nil && attachID != "" {
+			input.AttachmentId = awssdk.String(attachID)
 		} else {
 			return nil, err
 		}
@@ -183,7 +183,7 @@ type CheckNetworkinterface struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *ec2.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -198,11 +198,11 @@ func (cmd *CheckNetworkinterface) ParamsSpec() params.Spec {
 
 func (cmd *CheckNetworkinterface) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeNetworkInterfacesInput{
-		NetworkInterfaceIds: []string{awssdk.ToString(cmd.Id)},
+		NetworkInterfaceIds: []string{awssdk.ToString(cmd.ID)},
 	}
 
 	c := &checker{
-		description: fmt.Sprintf("network interface %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("network interface %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -218,7 +218,7 @@ func (cmd *CheckNetworkinterface) ManualRun(renv env.Running) (any, error) {
 				}
 			} else {
 				for _, neti := range output.NetworkInterfaces {
-					if StringValue(neti.NetworkInterfaceId) == StringValue(cmd.Id) {
+					if StringValue(neti.NetworkInterfaceId) == StringValue(cmd.ID) {
 						return string(neti.Status), nil
 					}
 				}
@@ -231,21 +231,21 @@ func (cmd *CheckNetworkinterface) ManualRun(renv env.Running) (any, error) {
 	return nil, c.check()
 }
 
-func (cmd *DetachNetworkinterface) findAttachmentBetweenInstanceAndNetworkInterface(instanceId, netInterfaceId *string) (string, error) {
+func (cmd *DetachNetworkinterface) findAttachmentBetweenInstanceAndNetworkInterface(instanceID, netInterfaceID *string) (string, error) {
 	filters := &ec2.DescribeInstancesInput{
 		Filters: []ec2types.Filter{
-			{Name: String("network-interface.network-interface-id"), Values: []string{StringValue(netInterfaceId)}},
-			{Name: String("instance-id"), Values: []string{StringValue(instanceId)}},
+			{Name: String("network-interface.network-interface-id"), Values: []string{StringValue(netInterfaceID)}},
+			{Name: String("instance-id"), Values: []string{StringValue(instanceID)}},
 		},
 	}
 	if out, err := cmd.api.DescribeInstances(context.Background(), filters); err != nil {
 		return "", err
 	} else if reserv := out.Reservations; len(reserv) == 1 && len(reserv[0].Instances) == 1 {
 		for _, neti := range reserv[0].Instances[0].NetworkInterfaces {
-			if StringValue(netInterfaceId) == StringValue(neti.NetworkInterfaceId) {
+			if StringValue(netInterfaceID) == StringValue(neti.NetworkInterfaceId) {
 				return StringValue(neti.Attachment.AttachmentId), nil
 			}
 		}
 	}
-	return "", fmt.Errorf("not found: attachment between instance '%s' and network interface '%s'", StringValue(instanceId), StringValue(netInterfaceId))
+	return "", fmt.Errorf("not found: attachment between instance '%s' and network interface '%s'", StringValue(instanceID), StringValue(netInterfaceID))
 }

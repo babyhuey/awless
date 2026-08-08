@@ -48,14 +48,14 @@ func (cmd *CreateSubnet) ExtractResult(i any) string {
 }
 
 func (cmd *CreateSubnet) AfterRun(renv env.Running, output any) error {
-	subnetId := awssdk.String(cmd.ExtractResult(output))
-	if err := createNameTag(subnetId, cmd.Name, renv); err != nil {
+	subnetID := awssdk.String(cmd.ExtractResult(output))
+	if err := createNameTag(subnetID, cmd.Name, renv); err != nil {
 		return err
 	}
 
 	if BoolValue(cmd.Public) {
 		updateSubnet := CommandFactory.Build("updatesubnet")().(*UpdateSubnet)
-		updateSubnet.Id = subnetId
+		updateSubnet.ID = subnetID
 		updateSubnet.Public = Bool(true)
 		if _, err := updateSubnet.Run(renv, nil); err != nil {
 			return err
@@ -70,7 +70,7 @@ type UpdateSubnet struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"SubnetId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"SubnetId" awsType:"awsstr" templateName:"id"`
 	Public *bool   `awsName:"MapPublicIpOnLaunch" awsType:"awsboolattribute" templateName:"public"`
 }
 
@@ -83,7 +83,7 @@ type DeleteSubnet struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"SubnetId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"SubnetId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteSubnet) ParamsSpec() params.Spec {

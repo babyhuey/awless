@@ -59,13 +59,13 @@ var historyCmd = &cobra.Command{
 		exitOn(err)
 
 		for i := 1; i < len(all); i++ {
-			from, err := sync.DefaultSyncer.LoadRev(all[i-1].Id)
+			from, err := sync.DefaultSyncer.LoadRev(all[i-1].ID)
 			exitOn(err)
 
-			to, err := sync.DefaultSyncer.LoadRev(all[i].Id)
+			to, err := sync.DefaultSyncer.LoadRev(all[i].ID)
 			exitOn(err)
 
-			d, err := sync.BuildDiff(from, to, root.Id())
+			d, err := sync.BuildDiff(from, to, root.ID())
 			exitOn(err)
 
 			diffs = append(diffs, d)
@@ -81,8 +81,8 @@ var historyCmd = &cobra.Command{
 
 func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resource, verbose bool) {
 	fromRevision := "repository creation"
-	if diff.From.Id != "" {
-		fromRevision = diff.From.Id[:7] + " on " + diff.From.Date.Format("Monday January 2, 15:04")
+	if diff.From.ID != "" {
+		fromRevision = diff.From.ID[:7] + " on " + diff.From.Date.Format("Monday January 2, 15:04")
 	}
 
 	var graphdiff *graph.Diff
@@ -93,7 +93,7 @@ func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resou
 	if showProperties {
 		if graphdiff.HasDiff() {
 			fmt.Println("▶", cloudService, "properties, from", fromRevision,
-				"to", diff.To.Id[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
+				"to", diff.To.ID[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
 			displayer, err := console.BuildOptions(
 				console.WithFormat("table"),
 				console.WithRootNode(root),
@@ -103,13 +103,13 @@ func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resou
 			fmt.Println()
 		} else if verbose {
 			fmt.Println("▶", cloudService, "properties, from", fromRevision,
-				"to", diff.To.Id[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
+				"to", diff.To.ID[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
 			fmt.Println("No changes.")
 		}
 	} else {
 		if graphdiff.HasDiff() {
 			fmt.Println("▶", cloudService, "resources, from", fromRevision,
-				"to", diff.To.Id[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
+				"to", diff.To.ID[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
 			displayer, err := console.BuildOptions(
 				console.WithFormat("tree"),
 				console.WithRootNode(root),
@@ -119,7 +119,7 @@ func displayRevisionDiff(diff *sync.Diff, cloudService string, root *graph.Resou
 			fmt.Println()
 		} else if verbose {
 			fmt.Println("▶", cloudService, "resources, from", fromRevision,
-				"to", diff.To.Id[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
+				"to", diff.To.ID[:7], "on", diff.To.Date.Format("Monday January 2, 15:04"))
 			fmt.Println("No resource changes.")
 		}
 	}

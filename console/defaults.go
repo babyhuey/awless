@@ -44,7 +44,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.TargetGroup:         {properties.Name, properties.Vpc, properties.CheckHTTPCode, properties.Port, properties.Protocol, properties.CheckInterval, properties.CheckPath, properties.CheckPort, properties.CheckProtocol},
 	cloud.Listener:            {properties.ID, properties.Protocol, properties.Port, properties.LoadBalancer, properties.TargetGroups, properties.AlarmActions},
 	cloud.Database:            {properties.ID, properties.Name, properties.AvailabilityZone, properties.Class, properties.State, properties.Storage, properties.Port, properties.Username, properties.Public, properties.PublicDNS, properties.ReplicaOf, properties.Engine, properties.EngineVersion, properties.Created},
-	cloud.DbSubnetGroup:       {properties.ID, properties.State, properties.Vpc, properties.Subnets, properties.Description},
+	cloud.DBSubnetGroup:       {properties.ID, properties.State, properties.Vpc, properties.Subnets, properties.Description},
 	cloud.LaunchConfiguration: {properties.Name, properties.Type, properties.Created, properties.KeyPair},
 	cloud.ScalingGroup:        {properties.Name, properties.LaunchConfigurationName, properties.DesiredCapacity, properties.State, properties.Created, properties.NewInstancesProtected},
 	cloud.ScalingPolicy:       {properties.Name, properties.Type, properties.ScalingGroupName, properties.AlarmNames, properties.AdjustmentType, properties.ScalingAdjustment},
@@ -78,9 +78,9 @@ var ColumnsInListing = map[string][]string{
 	cloud.DynamoDBTable:       {properties.Name, properties.State, properties.ItemCount, properties.SizeBytes, properties.KeySchema, properties.Created},
 	cloud.Secret:              {properties.Name, properties.Description, properties.Created, properties.Modified, properties.LastAccessed, properties.RotationEnabled},
 	cloud.Key:                 {properties.ID, properties.Name, properties.State, properties.KeyManager, properties.KeyUsage, properties.Origin, properties.Created},
-	cloud.ApiGateway:          {properties.ID, properties.Name, properties.ApiProtocol, properties.Endpoint, properties.Description, properties.Created},
-	cloud.ApiGatewayRoute:     {properties.ID, properties.RouteKey, properties.Target},
-	cloud.ApiGatewayStage:     {properties.Name, properties.DeploymentID, properties.AutoDeploy, properties.Created, properties.Modified},
+	cloud.APIGateway:          {properties.ID, properties.Name, properties.ApiProtocol, properties.Endpoint, properties.Description, properties.Created},
+	cloud.APIGatewayRoute:     {properties.ID, properties.RouteKey, properties.Target},
+	cloud.APIGatewayStage:     {properties.Name, properties.DeploymentID, properties.AutoDeploy, properties.Created, properties.Modified},
 	cloud.SSMParameter:        {properties.Name, properties.ParameterType, properties.DataType, properties.Tier, properties.Version, properties.Modified},
 	cloud.FileSystem:          {properties.ID, properties.Name, properties.State, properties.SizeBytes, properties.PerformanceMode, properties.ThroughputMode, properties.Encrypted, properties.Created},
 	cloud.MountTarget:         {properties.ID, properties.Subnet, properties.Vpc, properties.IPAddress, properties.LifecycleState},
@@ -293,7 +293,7 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.EngineVersion, Friendly: "Version"},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created, Friendly: "Created"}},
 	},
-	cloud.DbSubnetGroup: {
+	cloud.DBSubnetGroup: {
 		StringColumnDefinition{Prop: properties.ID},
 		StringColumnDefinition{Prop: properties.State, Friendly: "Status"},
 		StringColumnDefinition{Prop: properties.Vpc},
@@ -558,7 +558,7 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 	// API Gateway
-	cloud.ApiGateway: {
+	cloud.APIGateway: {
 		StringColumnDefinition{Prop: properties.ID},
 		StringColumnDefinition{Prop: properties.Name},
 		StringColumnDefinition{Prop: properties.ApiProtocol, Friendly: "Protocol"},
@@ -566,12 +566,12 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Description},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
-	cloud.ApiGatewayRoute: {
+	cloud.APIGatewayRoute: {
 		StringColumnDefinition{Prop: properties.ID},
 		StringColumnDefinition{Prop: properties.RouteKey, Friendly: "Route Key"},
 		StringColumnDefinition{Prop: properties.Target},
 	},
-	cloud.ApiGatewayStage: {
+	cloud.APIGatewayStage: {
 		StringColumnDefinition{Prop: properties.Name},
 		StringColumnDefinition{Prop: properties.DeploymentID, Friendly: "Deployment"},
 		StringColumnDefinition{Prop: properties.AutoDeploy, Friendly: "Auto Deploy"},

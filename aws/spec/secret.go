@@ -51,7 +51,7 @@ type UpdateSecret struct {
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
 	api         *secretsmanager.Client
-	Id          *string `awsName:"SecretId" awsType:"awsstr" templateName:"id"`
+	ID          *string `awsName:"SecretId" awsType:"awsstr" templateName:"id"`
 	Secret      *string `awsName:"SecretString" awsType:"awsstr" templateName:"secret"`
 	Description *string `awsName:"Description" awsType:"awsstr" templateName:"description"`
 	KmsKey      *string `awsName:"KmsKeyId" awsType:"awsstr" templateName:"kms-key"`
@@ -77,7 +77,7 @@ type DeleteSecret struct {
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
 	api            *secretsmanager.Client
-	Id             *string `awsName:"SecretId" awsType:"awsstr" templateName:"id"`
+	ID             *string `awsName:"SecretId" awsType:"awsstr" templateName:"id"`
 	RecoveryWindow *int64  `awsName:"RecoveryWindowInDays" awsType:"awsint64" templateName:"recovery-window"`
 	Force          *bool   `awsName:"ForceDeleteWithoutRecovery" awsType:"awsbool" templateName:"force"`
 }

@@ -70,7 +70,7 @@ type UpdateImage struct {
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
 	api          *ec2.Client
-	Id           *string   `awsName:"ImageId" awsType:"awsstr" templateName:"id"`
+	ID           *string   `awsName:"ImageId" awsType:"awsstr" templateName:"id"`
 	Groups       []*string `awsName:"UserGroups" awsType:"awsstringslice" templateName:"groups"`
 	Accounts     []*string `awsName:"UserIds" awsType:"awsstringslice" templateName:"accounts"`
 	Operation    *string   `awsName:"OperationType" awsType:"awsstr" templateName:"operation"`
@@ -136,7 +136,7 @@ func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]any) (any, er
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(awsErr.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			cmd.logger.ExtraVerbosef("dry run: ec2.ec2.ModifyImageAttribute call took %s", time.Since(start))
 			cmd.logger.Verbose("dry run: update image ok")
-			return fakeDryRunId("image"), nil
+			return fakeDryRunID("image"), nil
 		}
 	}
 
@@ -149,7 +149,7 @@ type CopyImage struct {
 	graph        cloud.GraphAPI
 	api          *ec2.Client
 	Name         *string `awsName:"Name" awsType:"awsstr" templateName:"name"`
-	SourceId     *string `awsName:"SourceImageId" awsType:"awsstr" templateName:"source-id"`
+	SourceID     *string `awsName:"SourceImageId" awsType:"awsstr" templateName:"source-id"`
 	SourceRegion *string `awsName:"SourceRegion" awsType:"awsstr" templateName:"source-region"`
 	Encrypted    *bool   `awsName:"Encrypted" awsType:"awsbool" templateName:"encrypted"`
 	Description  *string `awsName:"Description" awsType:"awsstr" templateName:"description"`
@@ -176,7 +176,7 @@ type ImportImage struct {
 	Platform     *string `awsName:"Platform" awsType:"awsstr" templateName:"platform"`
 	Role         *string `awsName:"RoleName" awsType:"awsstr" templateName:"role"`
 	Snapshot     *string `awsName:"DiskContainers[0]SnapshotId" awsType:"awsslicestruct" templateName:"snapshot"`
-	Url          *string `awsName:"DiskContainers[0]Url" awsType:"awsslicestruct" templateName:"url"`
+	URL          *string `awsName:"DiskContainers[0]Url" awsType:"awsslicestruct" templateName:"url"`
 	Bucket       *string `awsName:"DiskContainers[0]UserBucket.S3Bucket" awsType:"awsslicestruct" templateName:"bucket"`
 	S3object     *string `awsName:"DiskContainers[0]UserBucket.S3Key" awsType:"awsslicestruct" templateName:"s3object"`
 }
@@ -198,7 +198,7 @@ type DeleteImage struct {
 	logger          *logger.Logger
 	graph           cloud.GraphAPI
 	api             *ec2.Client
-	Id              *string `templateName:"id"`
+	ID              *string `templateName:"id"`
 	DeleteSnapshots *bool   `templateName:"delete-snapshots"`
 }
 
@@ -215,7 +215,7 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]any) (any, er
 	input := &ec2.DeregisterImageInput{}
 	input.DryRun = Bool(true)
 
-	if err := setFieldWithType(cmd.Id, input, "ImageId", awsstr); err != nil {
+	if err := setFieldWithType(cmd.ID, input, "ImageId", awsstr); err != nil {
 		return nil, err
 	}
 
@@ -235,7 +235,7 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]any) (any, er
 	if errors.As(err, &awsErr) {
 		switch code := awsErr.ErrorCode(); {
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
-			id := fakeDryRunId("image")
+			id := fakeDryRunID("image")
 			cmd.logger.Verbose("dry run: delete image ok")
 			return id, nil
 		}
@@ -247,7 +247,7 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]any) (any, er
 func (cmd *DeleteImage) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DeregisterImageInput{}
 
-	if err := setFieldWithType(cmd.Id, input, "ImageId", awsstr); err != nil {
+	if err := setFieldWithType(cmd.ID, input, "ImageId", awsstr); err != nil {
 		return nil, err
 	}
 

@@ -45,7 +45,7 @@ type DeleteRoutetable struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"RouteTableId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"RouteTableId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteRoutetable) ParamsSpec() params.Spec {
@@ -57,7 +57,7 @@ type AttachRoutetable struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"RouteTableId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"RouteTableId" awsType:"awsstr" templateName:"id"`
 	Subnet *string `awsName:"SubnetId" awsType:"awsstr" templateName:"subnet"`
 }
 

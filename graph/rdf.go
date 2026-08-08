@@ -93,7 +93,7 @@ func extractUniqueLiteralTextFromTriples(triples []tstore.Triple) (string, error
 	return tstore.ParseString(triples[0].Object())
 }
 
-func randomRdfId() string {
+func randomRdfID() string {
 	// math/rand is fine here: this is a local uniqueness suffix for RDF node
 	// naming, not a security value. The global source is auto-seeded since Go 1.20.
 	return fmt.Sprintf("%x", rand.Uint32())

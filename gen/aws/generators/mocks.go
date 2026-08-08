@@ -29,7 +29,7 @@ func generateTestMocks() {
 	for _, mock := range aws.Mocks() {
 		for _, f := range mock.Funcs {
 			if f.AWSType != "" && strings.Contains(f.AWSType, "types.") {
-				apisNeedingTypes[mock.Api] = true
+				apisNeedingTypes[mock.API] = true
 			}
 		}
 	}
@@ -46,7 +46,7 @@ func generateTestMocks() {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, aws.Mocks(), SERVICES_DIR, "gen_mocks_test.go")
+	writeTemplateToFile(templ, aws.Mocks(), servicesDir, "gen_mocks_test.go")
 }
 
 const mocksTempl = `// Auto generated implementation for the AWS cloud service
@@ -75,9 +75,9 @@ import (
   "context"
 
   {{- range $index, $mock := . }}
-  {{ $mock.Api }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $mock.Api }}"
-  {{- if NeedsTypesImport $mock.Api }}
-  {{ $mock.Api }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $mock.Api }}/types"
+  {{ $mock.API }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $mock.API }}"
+  {{- if NeedsTypesImport $mock.API }}
+  {{ $mock.API }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $mock.API }}/types"
   {{- end }}
   {{- end }}
   "github.com/bootswithdefer/awless/cloud"
@@ -136,7 +136,7 @@ func (m * {{ $mock.Name }}) FetchByType(context.Context, string) (cloud.GraphAPI
 {{ range $, $func := $mock.Funcs }}
 	{{- if not $func.Manual }}
 		{{- if eq $func.FuncType "list" }}
-			func (m * {{ $mock.Name }}) {{ $func.ApiMethod }}(ctx context.Context, input *{{ $func.Input }}, optFns ...func(*{{ $mock.Api }}.Options)) (*{{ $func.Output}}, error) {
+			func (m * {{ $mock.Name }}) {{ $func.APIMethod }}(ctx context.Context, input *{{ $func.Input }}, optFns ...func(*{{ $mock.API }}.Options)) (*{{ $func.Output}}, error) {
 				return &{{ $func.Output}}{ {{ $func.OutputsExtractor }}: m.{{ $func.MockField}} }, nil
 			}
 		{{- end }}

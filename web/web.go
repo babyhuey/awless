@@ -133,8 +133,8 @@ func (s *server) showResourceHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	resId := mux.Vars(r)["id"]
-	res, err := s.gph.FindWithProperties(map[string]any{properties.ID: resId})
+	resID := mux.Vars(r)["id"]
+	res, err := s.gph.FindWithProperties(map[string]any{properties.ID: resID})
 	if err != nil && len(res) != 1 {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -184,7 +184,7 @@ func (s *server) listResourcesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type Resource struct {
-	Id, Type   string
+	ID, Type   string
 	Properties map[string]any
 	Parents    []*Resource
 	Children   []*Resource
@@ -217,7 +217,7 @@ func (r *Resource) AddChildren(gr ...*graph.Resource) {
 }
 
 func newResource(r cloud.Resource) *Resource {
-	return &Resource{Id: r.Id(), Type: r.Type(), Properties: r.Properties()}
+	return &Resource{ID: r.ID(), Type: r.Type(), Properties: r.Properties()}
 }
 
 func loadLocalTriples(profile string) ([]tstore.Triple, error) {
@@ -317,7 +317,7 @@ const resourcesTpl = `<!DOCTYPE html>
 		         {{ $name := index .Properties "Name" }}
 			 <li>
 			  {{if $name}} {{if (ne (print $name) "")}}<b>Name:</b> {{$name}}, {{end}}{{end}}
-			  <b>Id: </b><a href="/resources/{{ urlquery .Id}}">{{.Id}}</a>
+			  <b>ID: </b><a href="/resources/{{ urlquery .Id}}">{{.Id}}</a>
 			 </li>
 		  {{end}}
 		</ul>

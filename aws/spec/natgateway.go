@@ -36,7 +36,7 @@ type CreateNatgateway struct {
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
 	api         *ec2.Client
-	ElasticipId *string `awsName:"AllocationId" awsType:"awsstr" templateName:"elasticip-id"`
+	ElasticipID *string `awsName:"AllocationId" awsType:"awsstr" templateName:"elasticip-id"`
 	Subnet      *string `awsName:"SubnetId" awsType:"awsstr" templateName:"subnet"`
 }
 
@@ -53,7 +53,7 @@ type DeleteNatgateway struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"NatGatewayId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"NatGatewayId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteNatgateway) ParamsSpec() params.Spec {
@@ -65,7 +65,7 @@ type CheckNatgateway struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *ec2.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -80,11 +80,11 @@ func (cmd *CheckNatgateway) ParamsSpec() params.Spec {
 
 func (cmd *CheckNatgateway) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeNatGatewaysInput{
-		NatGatewayIds: []string{awssdk.ToString(cmd.Id)},
+		NatGatewayIds: []string{awssdk.ToString(cmd.ID)},
 	}
 
 	c := &checker{
-		description: fmt.Sprintf("natgateway %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("natgateway %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -100,7 +100,7 @@ func (cmd *CheckNatgateway) ManualRun(renv env.Running) (any, error) {
 				}
 			} else {
 				for _, nat := range output.NatGateways {
-					if StringValue(nat.NatGatewayId) == StringValue(cmd.Id) {
+					if StringValue(nat.NatGatewayId) == StringValue(cmd.ID) {
 						return string(nat.State), nil
 					}
 				}

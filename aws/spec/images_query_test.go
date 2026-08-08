@@ -88,7 +88,7 @@ func TestParseImageQueryString(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if got, want := q.Platform.Id, tcase.out.Platform.Id; got != want {
+		if got, want := q.Platform.ID, tcase.out.Platform.ID; got != want {
 			t.Fatalf("parsing %s: query platform id: got %v, want %v", tcase.in, got, want)
 		}
 		if got, want := q.Distro, tcase.out.Distro; got != want {

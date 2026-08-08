@@ -560,7 +560,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource infra[database]")
 			return resources, objects, nil
 		}
-		paginator := rds.NewDescribeDBInstancesPaginator(conf.APIs.Rds, &rds.DescribeDBInstancesInput{})
+		paginator := rds.NewDescribeDBInstancesPaginator(conf.APIs.RDS, &rds.DescribeDBInstancesInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -588,7 +588,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource infra[dbsubnetgroup]")
 			return resources, objects, nil
 		}
-		paginator := rds.NewDescribeDBSubnetGroupsPaginator(conf.APIs.Rds, &rds.DescribeDBSubnetGroupsInput{})
+		paginator := rds.NewDescribeDBSubnetGroupsPaginator(conf.APIs.RDS, &rds.DescribeDBSubnetGroupsInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -700,7 +700,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource infra[repository]")
 			return resources, objects, nil
 		}
-		paginator := ecr.NewDescribeRepositoriesPaginator(conf.APIs.Ecr, &ecr.DescribeRepositoriesInput{})
+		paginator := ecr.NewDescribeRepositoriesPaginator(conf.APIs.ECR, &ecr.DescribeRepositoriesInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -728,7 +728,7 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource infra[certificate]")
 			return resources, objects, nil
 		}
-		paginator := acm.NewListCertificatesPaginator(conf.APIs.Acm, &acm.ListCertificatesInput{})
+		paginator := acm.NewListCertificatesPaginator(conf.APIs.ACM, &acm.ListCertificatesInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -762,7 +762,7 @@ func BuildAccessFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource access[instanceprofile]")
 			return resources, objects, nil
 		}
-		paginator := iam.NewListInstanceProfilesPaginator(conf.APIs.Iam, &iam.ListInstanceProfilesInput{})
+		paginator := iam.NewListInstanceProfilesPaginator(conf.APIs.IAM, &iam.ListInstanceProfilesInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -790,7 +790,7 @@ func BuildAccessFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource access[mfadevice]")
 			return resources, objects, nil
 		}
-		paginator := iam.NewListVirtualMFADevicesPaginator(conf.APIs.Iam, &iam.ListVirtualMFADevicesInput{})
+		paginator := iam.NewListVirtualMFADevicesPaginator(conf.APIs.IAM, &iam.ListVirtualMFADevicesInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -830,7 +830,7 @@ func BuildMessagingFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource messaging[subscription]")
 			return resources, objects, nil
 		}
-		paginator := sns.NewListSubscriptionsPaginator(conf.APIs.Sns, &sns.ListSubscriptionsInput{})
+		paginator := sns.NewListSubscriptionsPaginator(conf.APIs.SNS, &sns.ListSubscriptionsInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -858,7 +858,7 @@ func BuildMessagingFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource messaging[topic]")
 			return resources, objects, nil
 		}
-		paginator := sns.NewListTopicsPaginator(conf.APIs.Sns, &sns.ListTopicsInput{})
+		paginator := sns.NewListTopicsPaginator(conf.APIs.SNS, &sns.ListTopicsInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -879,10 +879,10 @@ func BuildMessagingFetchFuncs(conf *Config) fetch.Funcs {
 	}
 	return funcs
 }
-func BuildDnsFetchFuncs(conf *Config) fetch.Funcs {
+func BuildDNSFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
-	addManualDnsFetchFuncs(conf, funcs)
+	addManualDNSFetchFuncs(conf, funcs)
 
 	funcs["zone"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
@@ -1009,10 +1009,10 @@ func BuildMonitoringFetchFuncs(conf *Config) fetch.Funcs {
 	}
 	return funcs
 }
-func BuildCdnFetchFuncs(conf *Config) fetch.Funcs {
+func BuildCDNFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
-	addManualCdnFetchFuncs(conf, funcs)
+	addManualCDNFetchFuncs(conf, funcs)
 
 	funcs["distribution"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
@@ -1077,10 +1077,10 @@ func BuildCloudformationFetchFuncs(conf *Config) fetch.Funcs {
 	}
 	return funcs
 }
-func BuildEksFetchFuncs(conf *Config) fetch.Funcs {
+func BuildEKSFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
-	addManualEksFetchFuncs(conf, funcs)
+	addManualEKSFetchFuncs(conf, funcs)
 	return funcs
 }
 func BuildDynamodbFetchFuncs(conf *Config) fetch.Funcs {
@@ -1129,10 +1129,10 @@ func BuildApigatewayFetchFuncs(conf *Config) fetch.Funcs {
 	addManualApigatewayFetchFuncs(conf, funcs)
 	return funcs
 }
-func BuildSsmFetchFuncs(conf *Config) fetch.Funcs {
+func BuildSSMFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
-	addManualSsmFetchFuncs(conf, funcs)
+	addManualSSMFetchFuncs(conf, funcs)
 
 	funcs["ssmparameter"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
@@ -1142,7 +1142,7 @@ func BuildSsmFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource ssm[ssmparameter]")
 			return resources, objects, nil
 		}
-		paginator := ssm.NewDescribeParametersPaginator(conf.APIs.Ssm, &ssm.DescribeParametersInput{})
+		paginator := ssm.NewDescribeParametersPaginator(conf.APIs.SSM, &ssm.DescribeParametersInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -1163,10 +1163,10 @@ func BuildSsmFetchFuncs(conf *Config) fetch.Funcs {
 	}
 	return funcs
 }
-func BuildEfsFetchFuncs(conf *Config) fetch.Funcs {
+func BuildEFSFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
-	addManualEfsFetchFuncs(conf, funcs)
+	addManualEFSFetchFuncs(conf, funcs)
 
 	funcs["filesystem"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
@@ -1176,7 +1176,7 @@ func BuildEfsFetchFuncs(conf *Config) fetch.Funcs {
 			conf.Log.Verbose("sync: *disabled* for resource efs[filesystem]")
 			return resources, objects, nil
 		}
-		paginator := efs.NewDescribeFileSystemsPaginator(conf.APIs.Efs, &efs.DescribeFileSystemsInput{})
+		paginator := efs.NewDescribeFileSystemsPaginator(conf.APIs.EFS, &efs.DescribeFileSystemsInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {

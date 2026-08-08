@@ -114,7 +114,7 @@ func InitResource(source any) (*graph.Resource, error) {
 	case rdstypes.DBInstance:
 		res = graph.InitResource(cloud.Database, awssdk.ToString(ss.DBInstanceIdentifier))
 	case rdstypes.DBSubnetGroup:
-		res = graph.InitResource(cloud.DbSubnetGroup, awssdk.ToString(ss.DBSubnetGroupArn))
+		res = graph.InitResource(cloud.DBSubnetGroup, awssdk.ToString(ss.DBSubnetGroupArn))
 		// Autoscaling
 	case autoscalingtypes.LaunchConfiguration:
 		res = graph.InitResource(cloud.LaunchConfiguration, awssdk.ToString(ss.LaunchConfigurationARN))
@@ -202,11 +202,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.Key, awssdk.ToString(ss.KeyId))
 	// API Gateway
 	case apigatewayv2types.Api:
-		res = graph.InitResource(cloud.ApiGateway, awssdk.ToString(ss.ApiId))
+		res = graph.InitResource(cloud.APIGateway, awssdk.ToString(ss.ApiId))
 	case apigatewayv2types.Route:
-		res = graph.InitResource(cloud.ApiGatewayRoute, awssdk.ToString(ss.RouteId))
+		res = graph.InitResource(cloud.APIGatewayRoute, awssdk.ToString(ss.RouteId))
 	case apigatewayv2types.Stage:
-		res = graph.InitResource(cloud.ApiGatewayStage, awssdk.ToString(ss.StageName))
+		res = graph.InitResource(cloud.APIGatewayStage, awssdk.ToString(ss.StageName))
 	// SSM
 	case ssmtypes.ParameterMetadata:
 		res = graph.InitResource(cloud.SSMParameter, awssdk.ToString(ss.Name))
@@ -233,7 +233,7 @@ func NewResource(source any) (*graph.Resource, error) {
 		return res, err
 	}
 
-	res.Properties()[properties.ID] = res.Id()
+	res.Properties()[properties.ID] = res.ID()
 
 	value := reflect.ValueOf(source)
 	if !value.IsValid() {
@@ -415,7 +415,7 @@ var extractTimeWithZSuffixFn = func(i any) (any, error) {
 	return nil, fmt.Errorf("extract time: expected time pointer, got: %T", i)
 }
 
-var extractIpPermissionSliceFn = func(i any) (any, error) {
+var extractIPPermissionSliceFn = func(i any) (any, error) {
 	if _, ok := i.([]ec2types.IpPermission); !ok {
 		return nil, fmt.Errorf("extract ip permission: not a permission slice but a %T", i)
 	}
@@ -703,7 +703,7 @@ var extractRoutesSliceFn = func(i any) (any, error) {
 			}
 		}
 		if notEmptyStr(r.DestinationPrefixListId) {
-			route.DestinationPrefixListId = awssdk.ToString(r.DestinationPrefixListId)
+			route.DestinationPrefixListID = awssdk.ToString(r.DestinationPrefixListId)
 		}
 		if notEmptyStr(r.EgressOnlyInternetGatewayId) {
 			routeTarget := &graph.RouteTarget{Type: graph.EgressOnlyInternetGatewayTarget, Ref: awssdk.ToString(r.EgressOnlyInternetGatewayId)}
@@ -841,7 +841,7 @@ func extractDocumentDefaultVersion(i any) (any, error) {
 	return "", nil
 }
 
-func extractURLEncodedJson(i any) (any, error) {
+func extractURLEncodedJSON(i any) (any, error) {
 	var docStr string
 	switch v := i.(type) {
 	case *string:

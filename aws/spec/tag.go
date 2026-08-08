@@ -67,7 +67,7 @@ func (cmd *CreateTag) dryRun(renv env.Running, params map[string]any) (any, erro
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			cmd.logger.ExtraVerbosef("dry run: ec2.CreateTags call took %s", time.Since(start))
 			cmd.logger.Verbose("dry run: create tag ok")
-			return fakeDryRunId("tag"), nil
+			return fakeDryRunID("tag"), nil
 		}
 	}
 
@@ -133,7 +133,7 @@ func (cmd *DeleteTag) dryRun(renv env.Running, params map[string]any) (any, erro
 		case code == dryRunOperation, strings.HasSuffix(code, notFound):
 			cmd.logger.ExtraVerbosef("dry run: ec2.DeleteTags call took %s", time.Since(start))
 			cmd.logger.Verbose("dry run: create tag ok")
-			return fakeDryRunId("tag"), nil
+			return fakeDryRunID("tag"), nil
 		}
 	}
 

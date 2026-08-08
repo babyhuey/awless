@@ -38,6 +38,6 @@ var versionCmd = &cobra.Command{
 }
 
 func printVersion(*cobra.Command, []string) {
-	fmt.Fprint(os.Stderr, config.AWLESS_ASCII_LOGO)
+	fmt.Fprint(os.Stderr, config.AwlessASCIILogo)
 	fmt.Println(config.CurrentBuildInfo)
 }

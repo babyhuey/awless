@@ -46,21 +46,21 @@ func TestFindAncestors(t *testing.T) {
 	}
 
 	res := g.FindAncestor(inst, "region")
-	if got, want := res.Id(), "north-korea"; got != want {
+	if got, want := res.ID(), "north-korea"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 	if got, want := res.Type(), "region"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 	res = g.FindAncestor(inst, "subnet")
-	if got, want := res.Id(), "subnet_1"; got != want {
+	if got, want := res.ID(), "subnet_1"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 	if got, want := res.Type(), "subnet"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 	res = g.FindAncestor(sub, "region")
-	if got, want := res.Id(), "north-korea"; got != want {
+	if got, want := res.ID(), "north-korea"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 	if got, want := res.Type(), "region"; got != want {
@@ -210,7 +210,7 @@ func TestFind(t *testing.T) {
 		}
 		sort.Slice(res, func(i int, j int) bool {
 			if res[i].Type() == res[j].Type() {
-				return res[i].Id() <= res[j].Id()
+				return res[i].ID() <= res[j].ID()
 			}
 			return res[i].Type() < res[j].Type()
 		})
@@ -254,7 +254,7 @@ func TestFindWithProperties(t *testing.T) {
 		}
 		sort.Slice(res, func(i int, j int) bool {
 			if res[i].Type() == res[j].Type() {
-				return res[i].Id() <= res[j].Id()
+				return res[i].ID() <= res[j].ID()
 			}
 			return res[i].Type() < res[j].Type()
 		})
@@ -379,7 +379,7 @@ func TestResourceChildrenAndSiblings(t *testing.T) {
 			}
 			sort.Slice(res, func(i int, j int) bool {
 				if res[i].Type() == res[j].Type() {
-					return res[i].Id() <= res[j].Id()
+					return res[i].ID() <= res[j].ID()
 				}
 				return res[i].Type() < res[j].Type()
 			})

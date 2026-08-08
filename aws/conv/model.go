@@ -83,8 +83,8 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 	cloud.SecurityGroup: {
 		properties.Name:          {name: "GroupName", transform: extractValueFn},
 		properties.Description:   {name: "Description", transform: extractValueFn},
-		properties.InboundRules:  {name: "IpPermissions", transform: extractIpPermissionSliceFn},
-		properties.OutboundRules: {name: "IpPermissionsEgress", transform: extractIpPermissionSliceFn},
+		properties.InboundRules:  {name: "IpPermissions", transform: extractIPPermissionSliceFn},
+		properties.OutboundRules: {name: "IpPermissionsEgress", transform: extractIPPermissionSliceFn},
 		properties.Owner:         {name: "OwnerId", transform: extractValueFn},
 		properties.Vpc:           {name: "VpcId", transform: extractValueFn},
 		properties.Tags:          {name: "Tags", transform: extractTagsFn},
@@ -290,7 +290,7 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.SecurityGroups:            {name: "VpcSecurityGroups", transform: extractStringSliceValues("VpcSecurityGroupId")},
 		properties.ReplicaOf:                 {name: "ReadReplicaSourceDBInstanceIdentifier", transform: extractValueFn},
 	},
-	cloud.DbSubnetGroup: {
+	cloud.DBSubnetGroup: {
 		properties.Name:        {name: "DBSubnetGroupName", transform: extractValueFn},
 		properties.Arn:         {name: "DBSubnetGroupArn", transform: extractValueFn},
 		properties.Description: {name: "DBSubnetGroupDescription", transform: extractValueFn},
@@ -402,7 +402,7 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Created:        {name: "CreateDate", transform: extractTimeFn},
 		properties.Path:           {name: "Path", transform: extractValueFn},
 		properties.InlinePolicies: {name: "RolePolicyList", transform: extractStringSliceValues("PolicyName")},
-		properties.TrustPolicy:    {name: "AssumeRolePolicyDocument", transform: extractURLEncodedJson},
+		properties.TrustPolicy:    {name: "AssumeRolePolicyDocument", transform: extractURLEncodedJSON},
 	},
 	cloud.Group: {
 		properties.Name:           {name: "GroupName", transform: extractValueFn},
@@ -604,7 +604,7 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Enabled:    {name: "Enabled", transform: extractValueFn},
 	},
 	// API Gateway
-	cloud.ApiGateway: {
+	cloud.APIGateway: {
 		properties.Name:        {name: "Name", transform: extractValueFn},
 		properties.Description: {name: "Description", transform: extractValueFn},
 		properties.ApiProtocol: {name: "ProtocolType", transform: extractValueFn},
@@ -612,11 +612,11 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Created:     {name: "CreatedDate", transform: extractTimeFn},
 		properties.Tags:        {name: "Tags", transform: extractMapTagsFn},
 	},
-	cloud.ApiGatewayRoute: {
+	cloud.APIGatewayRoute: {
 		properties.RouteKey: {name: "RouteKey", transform: extractValueFn},
 		properties.Target:   {name: "Target", transform: extractValueFn},
 	},
-	cloud.ApiGatewayStage: {
+	cloud.APIGatewayStage: {
 		properties.Name:         {name: "StageName", transform: extractValueFn},
 		properties.DeploymentID: {name: "DeploymentId", transform: extractValueFn},
 		properties.AutoDeploy:   {name: "AutoDeploy", transform: extractValueFn},

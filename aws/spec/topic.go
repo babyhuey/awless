@@ -45,7 +45,7 @@ type DeleteTopic struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *sns.Client
-	Id     *string `awsName:"TopicArn" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"TopicArn" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteTopic) ParamsSpec() params.Spec {

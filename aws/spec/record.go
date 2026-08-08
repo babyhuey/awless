@@ -42,7 +42,7 @@ type CreateRecord struct {
 	Name    *string   `templateName:"name"`
 	Type    *string   `templateName:"type"`
 	Values  []*string `templateName:"values"`
-	Ttl     *int64    `templateName:"ttl"`
+	TTL     *int64    `templateName:"ttl"`
 	Comment *string   `templateName:"comment"`
 }
 
@@ -56,7 +56,7 @@ func (cmd *CreateRecord) ParamsSpec() params.Spec {
 
 func (cmd *CreateRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
 	start := time.Now()
-	output, err := changeResourceRecordSets(cmd.api, String("CREATE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, cmd.Comment, cmd.Ttl)
+	output, err := changeResourceRecordSets(cmd.api, String("CREATE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, cmd.Comment, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
@@ -74,7 +74,7 @@ type UpdateRecord struct {
 	Name   *string   `templateName:"name"`
 	Type   *string   `templateName:"type"`
 	Values []*string `templateName:"values"`
-	Ttl    *int64    `templateName:"ttl"`
+	TTL    *int64    `templateName:"ttl"`
 }
 
 func (cmd *UpdateRecord) ParamsSpec() params.Spec {
@@ -85,7 +85,7 @@ func (cmd *UpdateRecord) ParamsSpec() params.Spec {
 
 func (cmd *UpdateRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
 	start := time.Now()
-	output, err := changeResourceRecordSets(cmd.api, String("UPSERT"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.Ttl)
+	output, err := changeResourceRecordSets(cmd.api, String("UPSERT"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
@@ -103,7 +103,7 @@ type DeleteRecord struct {
 	Name   *string   `templateName:"name"`
 	Type   *string   `templateName:"type"`
 	Values []*string `templateName:"values"`
-	Ttl    *int64    `templateName:"ttl"`
+	TTL    *int64    `templateName:"ttl"`
 }
 
 func (cmd *DeleteRecord) ParamsSpec() params.Spec {
@@ -116,8 +116,8 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 	builder.AddReducer(valueToValues, "value")
 	builder.AddReducer(
 		func(values map[string]any) (map[string]any, error) {
-			id, hasId := values["id"].(string)
-			if hasId {
+			id, hasID := values["id"].(string)
+			if hasID {
 				delete(values, "id")
 				r, err := cmd.graph.FindOne(cloud.NewQuery(cloud.Record).Match(match.Property(properties.ID, id)))
 				if err != nil {
@@ -145,7 +145,7 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 				if len(parents) != 1 || parents[0].Type() != cloud.Zone {
 					return values, fmt.Errorf("record is not in a zone, got %v ", parents)
 				}
-				values["zone"] = parents[0].Id()
+				values["zone"] = parents[0].ID()
 			}
 			return values, nil
 		},
@@ -156,7 +156,7 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 
 func (cmd *DeleteRecord) ManualRun(renv env.Running) (any, error) { //nolint:staticcheck
 	start := time.Now()
-	output, err := changeResourceRecordSets(cmd.api, String("DELETE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.Ttl)
+	output, err := changeResourceRecordSets(cmd.api, String("DELETE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }

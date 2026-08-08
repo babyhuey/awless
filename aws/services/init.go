@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	AccessService, InfraService, StorageService, MessagingService, DnsService, LambdaService, MonitoringService, CdnService, CloudformationService cloud.Service
+	AccessService, InfraService, StorageService, MessagingService, DNSService, LambdaService, MonitoringService, CdnService, CloudformationService cloud.Service
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService        cloud.Service
 )
 
@@ -48,17 +48,17 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	InfraService = NewInfra(cfg, profile, extraConf, log)
 	StorageService = NewStorage(cfg, profile, extraConf, log)
 	MessagingService = NewMessaging(cfg, profile, extraConf, log)
-	DnsService = NewDns(cfg, profile, extraConf, log)
+	DNSService = NewDNS(cfg, profile, extraConf, log)
 	LambdaService = NewLambda(cfg, profile, extraConf, log)
 	MonitoringService = NewMonitoring(cfg, profile, extraConf, log)
-	CdnService = NewCdn(cfg, profile, extraConf, log)
+	CdnService = NewCDN(cfg, profile, extraConf, log)
 	CloudformationService = NewCloudformation(cfg, profile, extraConf, log)
-	EksService = NewEks(cfg, profile, extraConf, log)
+	EksService = NewEKS(cfg, profile, extraConf, log)
 	DynamodbService = NewDynamodb(cfg, profile, extraConf, log)
 	SecretsmanagerService = NewSecretsmanager(cfg, profile, extraConf, log)
 	ApigatewayService = NewApigateway(cfg, profile, extraConf, log)
-	SsmService = NewSsm(cfg, profile, extraConf, log)
-	EfsService = NewEfs(cfg, profile, extraConf, log)
+	SsmService = NewSSM(cfg, profile, extraConf, log)
+	EfsService = NewEFS(cfg, profile, extraConf, log)
 	CloudtrailService = NewCloudtrail(cfg, profile, extraConf, log)
 	CloudwatchlogsService = NewCloudwatchlogs(cfg, profile, extraConf, log)
 
@@ -66,7 +66,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
 	cloud.ServiceRegistry[StorageService.Name()] = StorageService
 	cloud.ServiceRegistry[MessagingService.Name()] = MessagingService
-	cloud.ServiceRegistry[DnsService.Name()] = DnsService
+	cloud.ServiceRegistry[DNSService.Name()] = DNSService
 	cloud.ServiceRegistry[LambdaService.Name()] = LambdaService
 	cloud.ServiceRegistry[MonitoringService.Name()] = MonitoringService
 	cloud.ServiceRegistry[CdnService.Name()] = CdnService

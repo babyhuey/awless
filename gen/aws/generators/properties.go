@@ -28,7 +28,7 @@ func generateProperties() {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, aws.PropertiesDefinitions, CLOUD_PROPERTIES_DIR, "gen_properties.go")
+	writeTemplateToFile(templ, aws.PropertiesDefinitions, cloudPropertiesDir, "gen_properties.go")
 }
 
 func generateRDFProperties() {
@@ -37,7 +37,7 @@ func generateRDFProperties() {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, aws.PropertiesDefinitions, CLOUD_RDF_DIR, "gen_rdf.go")
+	writeTemplateToFile(templ, aws.PropertiesDefinitions, cloudRDFDir, "gen_rdf.go")
 }
 
 const propertiesTempl = `/* Copyright 2017 WALLIX

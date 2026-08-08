@@ -44,7 +44,7 @@ type DeleteInternetgateway struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteInternetgateway) ParamsSpec() params.Spec {
@@ -56,7 +56,7 @@ type AttachInternetgateway struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
 	Vpc    *string `awsName:"VpcId" awsType:"awsstr" templateName:"vpc"`
 }
 
@@ -69,7 +69,7 @@ type DetachInternetgateway struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"InternetGatewayId" awsType:"awsstr" templateName:"id"`
 	Vpc    *string `awsName:"VpcId" awsType:"awsstr" templateName:"vpc"`
 }
 

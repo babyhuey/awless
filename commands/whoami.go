@@ -78,7 +78,7 @@ var whoamiCmd = &cobra.Command{
 			fmt.Println(me.Account)
 			return
 		case onlyMyIDFlag:
-			fmt.Println(me.UserId)
+			fmt.Println(me.UserID)
 			return
 		case onlyMyNameFlag:
 			fmt.Println(me.Resource)
@@ -92,11 +92,11 @@ var whoamiCmd = &cobra.Command{
 		}
 
 		if !me.IsUserType() {
-			fmt.Printf("ResourceType: %s, Resource: %s, Id: %s, Account: %s\n", me.ResourceType, me.Resource, me.UserId, me.Account)
+			fmt.Printf("ResourceType: %s, Resource: %s, Id: %s, Account: %s\n", me.ResourceType, me.Resource, me.UserID, me.Account)
 			return
 		}
 
-		fmt.Printf("Username: %s, Id: %s, Account: %s\n", me.Resource, me.UserId, me.Account)
+		fmt.Printf("Username: %s, Id: %s, Account: %s\n", me.Resource, me.UserID, me.Account)
 
 		policies, err := awsservices.AccessService.(*awsservices.Access).GetUserPolicies(me.Resource)
 		if err != nil {

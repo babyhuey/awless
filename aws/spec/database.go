@@ -39,7 +39,7 @@ type CreateDatabase struct {
 
 	// Required for DB
 	Type     *string `awsName:"DBInstanceClass" awsType:"awsstr" templateName:"type"`
-	Id       *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
+	ID       *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 	Engine   *string `awsName:"Engine" awsType:"awsstr" templateName:"engine"`
 	Password *string `awsName:"MasterUserPassword" awsType:"awsstr" templateName:"password"`
 	Username *string `awsName:"MasterUsername" awsType:"awsstr" templateName:"username"`
@@ -183,7 +183,7 @@ type DeleteDatabase struct {
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
 	api          *rds.Client
-	Id           *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
+	ID           *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 	SkipSnapshot *bool   `awsName:"SkipFinalSnapshot" awsType:"awsbool" templateName:"skip-snapshot"`
 	Snapshot     *string `awsName:"FinalDBSnapshotIdentifier" awsType:"awsstr" templateName:"snapshot"`
 }
@@ -199,7 +199,7 @@ type CheckDatabase struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *rds.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -218,11 +218,11 @@ func (cmd *CheckDatabase) ParamsSpec() params.Spec {
 
 func (cmd *CheckDatabase) ManualRun(renv env.Running) (any, error) {
 	input := &rds.DescribeDBInstancesInput{
-		DBInstanceIdentifier: cmd.Id,
+		DBInstanceIdentifier: cmd.ID,
 	}
 
 	c := &checker{
-		description: fmt.Sprintf("database %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("database %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -239,7 +239,7 @@ func (cmd *CheckDatabase) ManualRun(renv env.Running) (any, error) {
 			} else {
 				if res := output.DBInstances; len(res) > 0 {
 					for _, dbinst := range res {
-						if StringValue(dbinst.DBInstanceIdentifier) == StringValue(cmd.Id) {
+						if StringValue(dbinst.DBInstanceIdentifier) == StringValue(cmd.ID) {
 							return StringValue(dbinst.DBInstanceStatus), nil
 						}
 					}
@@ -258,7 +258,7 @@ type StartDatabase struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *rds.Client
-	Id     *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *StartDatabase) ParamsSpec() params.Spec {
@@ -270,7 +270,7 @@ type StopDatabase struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *rds.Client
-	Id     *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *StopDatabase) ParamsSpec() params.Spec {
@@ -282,7 +282,7 @@ type RestartDatabase struct {
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
 	api          *rds.Client
-	Id           *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
+	ID           *string `awsName:"DBInstanceIdentifier" awsType:"awsstr" templateName:"id"`
 	WithFailover *bool   `awsName:"ForceFailover" awsType:"awsbool" templateName:"with-failover"`
 }
 

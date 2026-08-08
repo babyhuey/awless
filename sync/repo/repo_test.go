@@ -26,12 +26,12 @@ import (
 
 func TestReduceToLastRevOfEachDay(t *testing.T) {
 	revs := []*Rev{
-		{Id: "1", Date: mustParse("2017-01-18 15:05")},
-		{Id: "2", Date: mustParse("2017-01-18 15:09")},
-		{Id: "3", Date: mustParse("2017-01-19 09:05")},
-		{Id: "4", Date: mustParse("2017-01-19 08:05")},
-		{Id: "5", Date: mustParse("2017-01-17 21:05")},
-		{Id: "6", Date: mustParse("2017-01-17 10:05")},
+		{ID: "1", Date: mustParse("2017-01-18 15:05")},
+		{ID: "2", Date: mustParse("2017-01-18 15:09")},
+		{ID: "3", Date: mustParse("2017-01-19 09:05")},
+		{ID: "4", Date: mustParse("2017-01-19 08:05")},
+		{ID: "5", Date: mustParse("2017-01-17 21:05")},
+		{ID: "6", Date: mustParse("2017-01-17 10:05")},
 	}
 
 	reduced := reduceToLastRevOfEachDay(revs)
@@ -41,13 +41,13 @@ func TestReduceToLastRevOfEachDay(t *testing.T) {
 	if got, want := len(reduced), 3; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := reduced[0].Id, "5"; got != want {
+	if got, want := reduced[0].ID, "5"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := reduced[1].Id, "2"; got != want {
+	if got, want := reduced[1].ID, "2"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	if got, want := reduced[2].Id, "3"; got != want {
+	if got, want := reduced[2].ID, "3"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 }
@@ -61,9 +61,9 @@ func TestReduceToLastRevOfEachDayEmpty(t *testing.T) {
 
 func TestReduceToLastRevOfEachDaySingleDay(t *testing.T) {
 	revs := []*Rev{
-		{Id: "a", Date: mustParse("2017-03-01 08:00")},
-		{Id: "b", Date: mustParse("2017-03-01 12:00")},
-		{Id: "c", Date: mustParse("2017-03-01 18:00")},
+		{ID: "a", Date: mustParse("2017-03-01 08:00")},
+		{ID: "b", Date: mustParse("2017-03-01 12:00")},
+		{ID: "c", Date: mustParse("2017-03-01 18:00")},
 	}
 
 	reduced := reduceToLastRevOfEachDay(revs)
@@ -71,27 +71,27 @@ func TestReduceToLastRevOfEachDaySingleDay(t *testing.T) {
 	if got := len(reduced); got != 1 {
 		t.Fatalf("expected 1 rev, got %d", got)
 	}
-	if got := reduced[0].Id; got != "c" {
+	if got := reduced[0].ID; got != "c" {
 		t.Fatalf("expected latest rev 'c', got %s", got)
 	}
 }
 
 func TestReduceToLastRevOfEachDaySingleRev(t *testing.T) {
 	revs := []*Rev{
-		{Id: "only", Date: mustParse("2020-06-15 10:30")},
+		{ID: "only", Date: mustParse("2020-06-15 10:30")},
 	}
 	reduced := reduceToLastRevOfEachDay(revs)
 	if got := len(reduced); got != 1 {
 		t.Fatalf("expected 1 rev, got %d", got)
 	}
-	if got := reduced[0].Id; got != "only" {
+	if got := reduced[0].ID; got != "only" {
 		t.Fatalf("expected rev 'only', got %s", got)
 	}
 }
 
 func TestRevDateString(t *testing.T) {
 	rev := &Rev{
-		Id:   "abc123",
+		ID:   "abc123",
 		Date: time.Date(2017, 1, 18, 15, 5, 30, 0, time.UTC),
 	}
 	got := rev.DateString()
@@ -103,7 +103,7 @@ func TestRevDateString(t *testing.T) {
 
 func TestRevDateStringDifferentDate(t *testing.T) {
 	rev := &Rev{
-		Id:   "def456",
+		ID:   "def456",
 		Date: time.Date(2023, 12, 25, 0, 0, 0, 0, time.UTC),
 	}
 	got := rev.DateString()
@@ -249,7 +249,7 @@ func TestGitRepoCommitAndList(t *testing.T) {
 	if len(revs) != 1 {
 		t.Fatalf("expected 1 revision, got %d", len(revs))
 	}
-	if revs[0].Id == "" {
+	if revs[0].ID == "" {
 		t.Fatal("expected non-empty revision Id")
 	}
 	if revs[0].Date.IsZero() {
@@ -335,15 +335,15 @@ func TestGitRepoLoadRev(t *testing.T) {
 	}
 
 	// Load the revision
-	rev, err := repo.LoadRev(revs[0].Id)
+	rev, err := repo.LoadRev(revs[0].ID)
 	if err != nil {
 		t.Fatalf("unexpected error loading rev: %v", err)
 	}
 	if rev == nil {
 		t.Fatal("expected non-nil rev")
 	}
-	if rev.Id != revs[0].Id {
-		t.Fatalf("expected Id %s, got %s", revs[0].Id, rev.Id)
+	if rev.ID != revs[0].ID {
+		t.Fatalf("expected Id %s, got %s", revs[0].ID, rev.ID)
 	}
 	if rev.Infra == nil {
 		t.Fatal("expected non-nil Infra graph")

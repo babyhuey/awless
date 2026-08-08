@@ -125,7 +125,7 @@ func TestBuildIpPermissionsFromParams(t *testing.T) {
 		if err := cmd.inject(tcase.params); err != nil {
 			t.Fatal(err)
 		}
-		ipPermissions, err := cmd.buildIpPermissions()
+		ipPermissions, err := cmd.buildIPPermissions()
 		if err != nil {
 			t.Fatal(i+1, ":", err)
 		}

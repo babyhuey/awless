@@ -13,12 +13,12 @@ type Resolver interface {
 	Resolve(snap tstore.RDFGraph) ([]*Resource, error)
 }
 
-type ById struct {
-	Id string
+type ByID struct {
+	ID string
 }
 
-func (r *ById) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
-	resolver := &ByProperty{Key: properties.ID, Value: r.Id}
+func (r *ByID) Resolve(snap tstore.RDFGraph) ([]*Resource, error) {
+	resolver := &ByProperty{Key: properties.ID, Value: r.ID}
 	return resolver.Resolve(snap)
 }
 

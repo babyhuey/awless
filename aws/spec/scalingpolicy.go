@@ -52,7 +52,7 @@ type DeleteScalingpolicy struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *autoscaling.Client
-	Id     *string `awsName:"PolicyName" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"PolicyName" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteScalingpolicy) ParamsSpec() params.Spec {

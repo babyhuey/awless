@@ -60,7 +60,7 @@ type DeleteLoadbalancer struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *elbv2.Client
-	Id     *string `awsName:"LoadBalancerArn" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"LoadBalancerArn" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteLoadbalancer) ParamsSpec() params.Spec {
@@ -72,7 +72,7 @@ type CheckLoadbalancer struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *elbv2.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -87,11 +87,11 @@ func (cmd *CheckLoadbalancer) ParamsSpec() params.Spec {
 
 func (cmd *CheckLoadbalancer) ManualRun(renv env.Running) (any, error) {
 	input := &elbv2.DescribeLoadBalancersInput{
-		LoadBalancerArns: []string{awssdk.ToString(cmd.Id)},
+		LoadBalancerArns: []string{awssdk.ToString(cmd.ID)},
 	}
 
 	c := &checker{
-		description: fmt.Sprintf("loadbalancer %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("loadbalancer %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -107,7 +107,7 @@ func (cmd *CheckLoadbalancer) ManualRun(renv env.Running) (any, error) {
 				}
 			} else {
 				for _, lb := range output.LoadBalancers {
-					if StringValue(lb.LoadBalancerArn) == StringValue(cmd.Id) {
+					if StringValue(lb.LoadBalancerArn) == StringValue(cmd.ID) {
 						return string(lb.State.Code), nil
 					}
 				}

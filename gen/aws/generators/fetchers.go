@@ -35,7 +35,7 @@ func generateFetcherFuncs() {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, aws.FetchersDefs, FETCHERS_DIR, "gen_fetchers.go")
+	writeTemplateToFile(templ, aws.FetchersDefs, fetchersDir, "gen_fetchers.go")
 }
 
 const fetchersTempl = `// Auto generated implementation for the AWS cloud service
@@ -93,7 +93,7 @@ func Build{{ Title $service.Name }}FetchFuncs(conf *Config) fetch.Funcs {
 		}
 
 		{{- if $fetcher.Multipage }}
-		paginator := {{ $fetcher.Api }}.New{{ $fetcher.ApiMethod }}Paginator(conf.APIs.{{ Title $fetcher.Api}}, &{{ $fetcher.Input }})
+		paginator := {{ $fetcher.API }}.New{{ $fetcher.APIMethod }}Paginator(conf.APIs.{{ Title $fetcher.API}}, &{{ $fetcher.Input }})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -119,7 +119,7 @@ func Build{{ Title $service.Name }}FetchFuncs(conf *Config) fetch.Funcs {
 		return resources, objects, nil
 		{{- else }}
 
-		out, err := conf.APIs.{{ Title $fetcher.Api}}.{{ $fetcher.ApiMethod }}(ctx, &{{ $fetcher.Input }})
+		out, err := conf.APIs.{{ Title $fetcher.API}}.{{ $fetcher.APIMethod }}(ctx, &{{ $fetcher.Input }})
 		if err != nil {
 			return resources, objects, err
 		}

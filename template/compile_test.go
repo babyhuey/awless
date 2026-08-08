@@ -181,7 +181,7 @@ create loadbalancer name=mylb subnets=subnet-1, subnet-2
 			return awsspec.MockAWSSessionFactory.Build(strings.Join(tokens, ""))()
 		}).Build()
 
-		cenv.Push(env.FILLERS, map[string]any{
+		cenv.Push(env.Fillers, map[string]any{
 			"instance.type":   "t2.micro",
 			"test.cidr":       "10.0.2.0/24",
 			"instance.count":  42,
@@ -207,11 +207,11 @@ create loadbalancer name=mylb subnets=subnet-1, subnet-2
 			t.Fatalf("%d: got\n%s\nwant\n%s", i+1, got, want)
 		}
 
-		if got, want := cenv.Get(env.PROCESSED_FILLERS), tcase.expProcessedFillers; !reflect.DeepEqual(got, want) {
+		if got, want := cenv.Get(env.ProcessedFillers), tcase.expProcessedFillers; !reflect.DeepEqual(got, want) {
 			t.Fatalf("%d: got %v, want %v", i+1, got, want)
 		}
 
-		if got, want := cenv.Get(env.RESOLVED_VARS), tcase.expResolvedVariables; !reflect.DeepEqual(got, want) {
+		if got, want := cenv.Get(env.ResolvedVars), tcase.expResolvedVariables; !reflect.DeepEqual(got, want) {
 			t.Fatalf("%d: got\n%#v\nwant\n%#v\n", i+1, got, want)
 		}
 	}
@@ -265,7 +265,7 @@ func TestExternallyProvidedParams(t *testing.T) {
 			return vals[v]
 		}).Build()
 
-		cenv.Push(env.FILLERS, externalFillters)
+		cenv.Push(env.Fillers, externalFillters)
 
 		inTpl := template.MustParse(tcase.template)
 
@@ -278,7 +278,7 @@ func TestExternallyProvidedParams(t *testing.T) {
 			t.Fatalf("%d: got\n%s\nwant\n%s", i+1, got, want)
 		}
 
-		if got, want := cenv.Get(env.PROCESSED_FILLERS), tcase.expProcessedFillers; !reflect.DeepEqual(got, want) {
+		if got, want := cenv.Get(env.ProcessedFillers), tcase.expProcessedFillers; !reflect.DeepEqual(got, want) {
 			t.Fatalf("%d: got %#v, want %#v", i+1, got, want)
 		}
 	}

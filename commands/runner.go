@@ -18,7 +18,7 @@ import (
 
 func NewRunnerRequiredParamsOnly(tpl *template.Template, msg, tplPath string, fillers ...map[string]any) *template.Runner {
 	r := NewRunner(tpl, msg, tplPath, fillers...)
-	r.ParamsSuggested = env.REQUIRED_PARAMS_ONLY
+	r.ParamsSuggested = env.RequiredParamsOnly
 	return r
 }
 
@@ -35,10 +35,10 @@ func NewRunner(tpl *template.Template, msg, tplPath string, fillers ...map[strin
 	runner.AliasFunc = resolveAliasFunc
 	runner.MissingHolesFunc = missingHolesStdinFunc()
 	if allSuggestedParamsFlag {
-		runner.ParamsSuggested = env.ALL_PARAMS
+		runner.ParamsSuggested = env.AllParams
 	}
 	if noSuggestedParamsFlag {
-		runner.ParamsSuggested = env.REQUIRED_PARAMS_ONLY
+		runner.ParamsSuggested = env.RequiredParamsOnly
 	}
 
 	runner.Validators = []template.Validator{

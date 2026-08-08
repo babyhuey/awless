@@ -32,7 +32,7 @@ import (
 
 func loadCommandStructs() map[string]cmdData {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, SPEC_DIR, func(os.FileInfo) bool { return true }, 0)
+	pkgs, err := parser.ParseDir(fset, specDir, func(os.FileInfo) bool { return true }, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -70,13 +70,13 @@ func generateCommands() {
 	if err != nil {
 		panic(err)
 	}
-	writeTemplateToFile(templ, cmdsData, SPEC_DIR, "gen_runs.go")
+	writeTemplateToFile(templ, cmdsData, specDir, "gen_runs.go")
 
 	templ, err = template.New("cmdInits").Parse(cmdInits)
 	if err != nil {
 		panic(err)
 	}
-	writeTemplateToFile(templ, cmdsData, SPEC_DIR, "gen_inits.go")
+	writeTemplateToFile(templ, cmdsData, specDir, "gen_inits.go")
 
 	templ, err = template.New("templates_definitions").Funcs(
 		template.FuncMap{
@@ -86,7 +86,7 @@ func generateCommands() {
 	if err != nil {
 		panic(err)
 	}
-	writeTemplateToFile(templ, cmdsData, SPEC_DIR, "gen_cmds_defs.go")
+	writeTemplateToFile(templ, cmdsData, specDir, "gen_cmds_defs.go")
 }
 
 type cmdData struct {
@@ -364,7 +364,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]any) (any, er
 			case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 				renv.Log().ExtraVerbosef("dry run: {{ $tag.API }}.{{ $tag.Call }} call took %s", time.Since(start))
 				renv.Log().Verbose("dry run: {{ $tag.Action }} {{ $tag.Entity }} ok")
-				return fakeDryRunId("{{ $tag.Entity }}"), nil
+				return fakeDryRunID("{{ $tag.Entity }}"), nil
 			}
 		}
 
@@ -373,7 +373,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]any) (any, er
 	{{- end }}
 {{- else }}
 func (cmd *{{ $cmdName }}) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("{{ $tag.Entity }}"), nil
+	return fakeDryRunID("{{ $tag.Entity }}"), nil
 }
 {{- end }}
 
@@ -472,7 +472,7 @@ var AWSTemplatesDefinitions = map[string]Definition{
 	"{{ $cmd.Action }}{{ $cmd.Entity }}": Definition{
 			Action: "{{ $cmd.Action }}",
 			Entity: "{{ $cmd.Entity }}",
-			Api: "{{ $cmd.API }}",
+			API: "{{ $cmd.API }}",
 			Params: new({{ $cmdName }}).ParamsSpec().Rule(),
 		},
 {{- end }}

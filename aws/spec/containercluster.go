@@ -45,7 +45,7 @@ type DeleteContainercluster struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ecs.Client
-	Id     *string `awsName:"Cluster" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"Cluster" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteContainercluster) ParamsSpec() params.Spec {

@@ -201,7 +201,7 @@ func TestTransformFunctions(t *testing.T) {
 			},
 		}
 
-		i, err := extractIpPermissionSliceFn(ipPermissions)
+		i, err := extractIPPermissionSliceFn(ipPermissions)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -331,14 +331,14 @@ func TestTransformFunctions(t *testing.T) {
 				},
 			},
 			{
-				DestinationPrefixListId: "pl-0123456",
+				DestinationPrefixListID: "pl-0123456",
 				Targets: []*graph.RouteTarget{
 					{Type: graph.GatewayTarget, Ref: "test_id_8"},
 				},
 			},
 			{
 				Destination:             &net.IPNet{IP: net.IPv4(0, 0, 0, 0), Mask: net.CIDRMask(0, 32)},
-				DestinationPrefixListId: "pl-0123456",
+				DestinationPrefixListID: "pl-0123456",
 				Targets: []*graph.RouteTarget{
 					{Type: graph.InstanceTarget, Ref: "test_id_9", Owner: "owner"},
 					{Type: graph.NetworkInterfaceTarget, Ref: "eni-123456"},
@@ -1105,10 +1105,10 @@ func TestTransformFunctions(t *testing.T) {
 		}
 	})
 
-	t.Run("extractURLEncodedJson with string", func(t *testing.T) {
+	t.Run("extractURLEncodedJSON with string", func(t *testing.T) {
 		t.Parallel()
 		encoded := "%7B%22key%22%3A%22value%22%7D"
-		val, err := extractURLEncodedJson(encoded)
+		val, err := extractURLEncodedJSON(encoded)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1117,10 +1117,10 @@ func TestTransformFunctions(t *testing.T) {
 		}
 	})
 
-	t.Run("extractURLEncodedJson with *string", func(t *testing.T) {
+	t.Run("extractURLEncodedJSON with *string", func(t *testing.T) {
 		t.Parallel()
 		encoded := "%7B%22key%22%3A%22value%22%7D"
-		val, err := extractURLEncodedJson(&encoded)
+		val, err := extractURLEncodedJSON(&encoded)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1129,18 +1129,18 @@ func TestTransformFunctions(t *testing.T) {
 		}
 	})
 
-	t.Run("extractURLEncodedJson wrong type", func(t *testing.T) {
+	t.Run("extractURLEncodedJSON wrong type", func(t *testing.T) {
 		t.Parallel()
-		_, err := extractURLEncodedJson(42)
+		_, err := extractURLEncodedJSON(42)
 		if err == nil {
 			t.Fatal("expected error")
 		}
 	})
 
-	t.Run("extractURLEncodedJson plain json", func(t *testing.T) {
+	t.Run("extractURLEncodedJSON plain json", func(t *testing.T) {
 		t.Parallel()
 		plain := `{"key":"value"}`
-		val, err := extractURLEncodedJson(plain)
+		val, err := extractURLEncodedJSON(plain)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1307,7 +1307,7 @@ func TestTransformFunctions(t *testing.T) {
 
 	t.Run("extractIpPermissions wrong type", func(t *testing.T) {
 		t.Parallel()
-		_, err := extractIpPermissionSliceFn("bad")
+		_, err := extractIPPermissionSliceFn("bad")
 		if err == nil {
 			t.Fatal("expected error")
 		}
@@ -1322,7 +1322,7 @@ func TestTransformFunctions(t *testing.T) {
 				IpProtocol: awssdk.String("icmp"),
 			},
 		}
-		val, err := extractIpPermissionSliceFn(perms)
+		val, err := extractIPPermissionSliceFn(perms)
 		if err != nil {
 			t.Fatal(err)
 		}

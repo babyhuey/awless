@@ -70,7 +70,7 @@ func ResourceTypesPerServiceName() map[string][]string {
 var arnResourceInfoRegex = regexp.MustCompile(`(root)|([\w-.]*)/([\w-./]*)`)
 
 type Identity struct {
-	Account, Arn, UserId, ResourceType, ResourcePath, Resource string
+	Account, Arn, UserID, ResourceType, ResourcePath, Resource string
 }
 
 func (i *Identity) IsRoot() bool {
@@ -82,7 +82,7 @@ func (i *Identity) IsUserType() bool {
 }
 
 func (s *Access) GetIdentity() (*Identity, error) {
-	resp, err := s.StsClient.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
+	resp, err := s.STSClient.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (s *Access) GetIdentity() (*Identity, error) {
 	ident := &Identity{
 		Account: aws.ToString(resp.Account),
 		Arn:     aws.ToString(resp.Arn),
-		UserId:  aws.ToString(resp.UserId),
+		UserID:  aws.ToString(resp.UserId),
 	}
 
 	splits := strings.Split(ident.Arn, ":")
@@ -131,7 +131,7 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		policies, err := s.IamClient.ListUserPolicies(context.Background(), &iam.ListUserPoliciesInput{
+		policies, err := s.IAMClient.ListUserPolicies(context.Background(), &iam.ListUserPoliciesInput{
 			UserName: aws.String(username),
 		})
 		if err != nil {
@@ -145,7 +145,7 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		attached, err := s.IamClient.ListAttachedUserPolicies(context.Background(), &iam.ListAttachedUserPoliciesInput{
+		attached, err := s.IAMClient.ListAttachedUserPolicies(context.Background(), &iam.ListAttachedUserPoliciesInput{
 			UserName: aws.String(username),
 		})
 		if err != nil {
@@ -161,7 +161,7 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		groups, err := s.IamClient.ListGroupsForUser(context.Background(), &iam.ListGroupsForUserInput{
+		groups, err := s.IAMClient.ListGroupsForUser(context.Background(), &iam.ListGroupsForUserInput{
 			UserName: aws.String(username),
 		})
 		if err != nil {
@@ -179,7 +179,7 @@ func (s *Access) GetUserPolicies(username string) (*UserPolicies, error) {
 			go func(name string) {
 				defer wgg.Done()
 
-				output, err := s.IamClient.ListAttachedGroupPolicies(context.Background(), &iam.ListAttachedGroupPoliciesInput{
+				output, err := s.IAMClient.ListAttachedGroupPolicies(context.Background(), &iam.ListAttachedGroupPoliciesInput{
 					GroupName: aws.String(name),
 				})
 				if err != nil {

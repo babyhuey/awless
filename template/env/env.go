@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	FILLERS = iota
-	PROCESSED_FILLERS
-	RESOLVED_VARS
+	Fillers = iota
+	ProcessedFillers
+	ResolvedVars
 )
 
 const (
-	REQUIRED_AND_SUGGESTED_PARAMS = iota
-	REQUIRED_PARAMS_ONLY
-	ALL_PARAMS
+	RequiredAndSuggestedParams = iota
+	RequiredParamsOnly
+	AllParams
 )
 
 type log interface {

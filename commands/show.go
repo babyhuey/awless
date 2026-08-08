@@ -250,7 +250,7 @@ func findResourceInLocalGraphs(ref string) (cloud.Resource, cloud.GraphAPI) {
 		logger.Infof("%d resources found with name '%s' in region '%s' for profile '%s'. Show a specific resource with:", len(resources), deprefix(ref), config.GetAWSRegion(), config.GetAWSProfile())
 		for _, res := range resources {
 			var buf bytes.Buffer
-			fmt.Fprintf(&buf, "\t`awless show %s` to show the %s", res.Id(), res.Type())
+			fmt.Fprintf(&buf, "\t`awless show %s` to show the %s", res.ID(), res.Type())
 			if state, ok := res.Properties()[properties.State].(string); ok {
 				fmt.Fprintf(&buf, " (state: '%s')", state)
 			}
@@ -318,7 +318,7 @@ func decorateWithSuggestion(err error, ref string) error {
 		}
 		for _, parent := range parents {
 			if parent.Type() == cloud.Region {
-				fmt.Fprintf(buf, "\n\tfound previously synced under region '%s' as %s. Show it with `awless show %s -r %s --local`", parent.Id(), res, res.Id(), parent.Id())
+				fmt.Fprintf(buf, "\n\tfound previously synced under region '%s' as %s. Show it with `awless show %s -r %s --local`", parent.ID(), res, res.ID(), parent.ID())
 			}
 		}
 

@@ -53,7 +53,7 @@ const (
 	Listener            string = "listener"
 	//database
 	Database      string = "database"
-	DbSubnetGroup string = "dbsubnetgroup"
+	DBSubnetGroup string = "dbsubnetgroup"
 	//access
 	User         string = "user"
 	Role         string = "role"
@@ -65,7 +65,7 @@ const (
 	//storage
 	Bucket   string = "bucket"
 	S3Object string = "s3object"
-	Acl      string = "storageacl"
+	ACL      string = "storageacl"
 	//notification
 	Subscription string = "subscription"
 	Topic        string = "topic"
@@ -107,9 +107,9 @@ const (
 	Secret string = "secret"
 	Key    string = "key"
 	//api gateway
-	ApiGateway      string = "apigateway"
-	ApiGatewayRoute string = "apigatewayroute"
-	ApiGatewayStage string = "apigatewaystage"
+	APIGateway      string = "apigateway"
+	APIGatewayRoute string = "apigatewayroute"
+	APIGatewayStage string = "apigatewaystage"
 	//ssm
 	SSMParameter string = "ssmparameter"
 	//efs

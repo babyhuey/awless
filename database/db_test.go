@@ -23,7 +23,7 @@ import (
 )
 
 func TestGetSetDatabaseValues(t *testing.T) {
-	db, close := newTestDb()
+	db, close := newTestDB()
 	defer close()
 
 	value, e := db.GetStringValue("mykey")
@@ -92,7 +92,7 @@ func TestGetSetDatabaseValues(t *testing.T) {
 }
 
 func TestGetSetBytes(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Get non-existent key returns nil
@@ -125,7 +125,7 @@ func TestGetSetBytes(t *testing.T) {
 }
 
 func TestDeleteBucket(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Delete non-existent bucket should not error
@@ -201,7 +201,7 @@ func TestOpenInvalidPath(t *testing.T) {
 }
 
 func TestSetAndGetTimeValueRoundTrip(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Test with a specific time to ensure proper round-trip
@@ -219,7 +219,7 @@ func TestSetAndGetTimeValueRoundTrip(t *testing.T) {
 }
 
 func TestGetIntValueNonNumeric(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Store a non-numeric string, then try to get as int
@@ -233,7 +233,7 @@ func TestGetIntValueNonNumeric(t *testing.T) {
 }
 
 func TestSetBytesOverwrite(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	if err := db.SetBytes("key", []byte("first")); err != nil {

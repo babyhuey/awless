@@ -34,7 +34,7 @@ import (
 )
 
 type Rev struct {
-	Id   string
+	ID   string
 	Date time.Time
 
 	Infra  *graph.Graph
@@ -109,7 +109,7 @@ func (r *gitRepo) List() ([]*Rev, error) {
 			return all, fmt.Errorf("listing repo revisions: %w", err)
 		}
 
-		all = append(all, &Rev{Id: commit.Hash.String(), Date: commit.Committer.When})
+		all = append(all, &Rev{ID: commit.Hash.String(), Date: commit.Committer.When})
 	}
 
 	sort.Slice(all, func(i, j int) bool { return all[i].Date.Before(all[j].Date) })
@@ -135,7 +135,7 @@ func reduceToLastRevOfEachDay(revs []*Rev) []*Rev {
 }
 
 func (r *gitRepo) LoadRev(version string) (*Rev, error) {
-	rev := &Rev{Id: version}
+	rev := &Rev{ID: version}
 
 	commit, err := r.repo.CommitObject(plumbing.NewHash(version))
 	if err != nil {

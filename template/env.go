@@ -30,9 +30,9 @@ func NewRunEnv(cenv env.Compiling, context ...map[string]any) env.Running {
 		}
 	}
 
-	renv.ctx["AWLESS"] = cenv.Get(env.RESOLVED_VARS)
-	renv.ctx["Variables"] = cenv.Get(env.RESOLVED_VARS)  // retro-compatibility with > v0.1.9
-	renv.ctx["References"] = cenv.Get(env.RESOLVED_VARS) // retro-compatibility with v0.1.2
+	renv.ctx["AWLESS"] = cenv.Get(env.ResolvedVars)
+	renv.ctx["Variables"] = cenv.Get(env.ResolvedVars)  // retro-compatibility with > v0.1.9
+	renv.ctx["References"] = cenv.Get(env.ResolvedVars) // retro-compatibility with v0.1.2
 
 	return renv
 }

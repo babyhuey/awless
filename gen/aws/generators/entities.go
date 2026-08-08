@@ -43,7 +43,7 @@ func generateTemplateEntities() {
 	sort.Strings(entities)
 
 	templ := template.Must(template.New("entities").Parse(entitiesTemplate))
-	writeTemplateToFile(templ, entities, TEMPLATE_AST_DIR, "gen_entities.go")
+	writeTemplateToFile(templ, entities, templateASTDir, "gen_entities.go")
 }
 
 const entitiesTemplate = `/* Copyright 2017 WALLIX

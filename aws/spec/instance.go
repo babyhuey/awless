@@ -110,8 +110,8 @@ func (cmd *CreateInstance) convertDistroToAMI(values map[string]any) (map[string
 			if fromCache {
 				caching = " from cache"
 			}
-			cmd.logger.Infof("Image %s resolved%s for distro '%s' (expanded to '%s')", images[0].Id, caching, distro, query)
-			return map[string]any{"image": images[0].Id}, nil
+			cmd.logger.Infof("Image %s resolved%s for distro '%s' (expanded to '%s')", images[0].ID, caching, distro, query)
+			return map[string]any{"image": images[0].ID}, nil
 		} else {
 			return nil, fmt.Errorf("distro: no image id found for query '%s'", query)
 		}
@@ -132,7 +132,7 @@ type UpdateInstance struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"InstanceId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"InstanceId" awsType:"awsstr" templateName:"id"`
 	Type   *string `awsName:"InstanceType.Value" awsType:"awsstr" templateName:"type"`
 	Lock   *bool   `awsName:"DisableApiTermination" awsType:"awsboolattribute" templateName:"lock"`
 }
@@ -160,7 +160,7 @@ type StartInstance struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
+	ID     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
 }
 
 func (cmd *StartInstance) ParamsSpec() params.Spec {
@@ -178,7 +178,7 @@ type StopInstance struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
+	ID     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
 }
 
 func (cmd *StopInstance) ParamsSpec() params.Spec {
@@ -196,7 +196,7 @@ type RestartInstance struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
+	ID     []*string `awsName:"InstanceIds" awsType:"awsstringslice" templateName:"ids"`
 }
 
 func (cmd *RestartInstance) ParamsSpec() params.Spec {
@@ -214,7 +214,7 @@ type CheckInstance struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *ec2.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -230,11 +230,11 @@ func (cmd *CheckInstance) ParamsSpec() params.Spec {
 
 func (cmd *CheckInstance) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeInstancesInput{
-		InstanceIds: []string{awssdk.ToString(cmd.Id)},
+		InstanceIds: []string{awssdk.ToString(cmd.ID)},
 	}
 
 	c := &checker{
-		description: fmt.Sprintf("instance %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("instance %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -252,7 +252,7 @@ func (cmd *CheckInstance) ManualRun(renv env.Running) (any, error) {
 				if res := output.Reservations; len(res) > 0 {
 					if instances := output.Reservations[0].Instances; len(instances) > 0 {
 						for _, inst := range instances {
-							if StringValue(inst.InstanceId) == StringValue(cmd.Id) {
+							if StringValue(inst.InstanceId) == StringValue(cmd.ID) {
 								return string(inst.State.Name), nil
 							}
 						}
@@ -273,7 +273,7 @@ type AttachInstance struct {
 	graph       cloud.GraphAPI
 	api         *elbv2.Client
 	Targetgroup *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"targetgroup"`
-	Id          *string `awsName:"Targets[0]Id" awsType:"awsslicestruct" templateName:"id"`
+	ID          *string `awsName:"Targets[0]Id" awsType:"awsslicestruct" templateName:"id"`
 	Port        *int64  `awsName:"Targets[0]Port" awsType:"awsslicestructint64" templateName:"port"`
 }
 
@@ -289,7 +289,7 @@ type DetachInstance struct {
 	graph       cloud.GraphAPI
 	api         *elbv2.Client
 	Targetgroup *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"targetgroup"`
-	Id          *string `awsName:"Targets[0]Id" awsType:"awsslicestruct" templateName:"id"`
+	ID          *string `awsName:"Targets[0]Id" awsType:"awsslicestruct" templateName:"id"`
 }
 
 func (cmd *DetachInstance) ParamsSpec() params.Spec {

@@ -175,7 +175,7 @@ func TestInitResource(t *testing.T) {
 		{
 			name:         "rds DBSubnetGroup",
 			input:        rdstypes.DBSubnetGroup{DBSubnetGroupArn: awssdk.String("arn:aws:rds:us-east-1:123:subgrp:mysubgrp")},
-			expectedType: cloud.DbSubnetGroup,
+			expectedType: cloud.DBSubnetGroup,
 			expectedID:   "arn:aws:rds:us-east-1:123:subgrp:mysubgrp",
 		},
 		// Autoscaling
@@ -401,19 +401,19 @@ func TestInitResource(t *testing.T) {
 		{
 			name:         "apigatewayv2 Api",
 			input:        apigatewayv2types.Api{ApiId: awssdk.String("api-001")},
-			expectedType: cloud.ApiGateway,
+			expectedType: cloud.APIGateway,
 			expectedID:   "api-001",
 		},
 		{
 			name:         "apigatewayv2 Route",
 			input:        apigatewayv2types.Route{RouteId: awssdk.String("route-001")},
-			expectedType: cloud.ApiGatewayRoute,
+			expectedType: cloud.APIGatewayRoute,
 			expectedID:   "route-001",
 		},
 		{
 			name:         "apigatewayv2 Stage",
 			input:        apigatewayv2types.Stage{StageName: awssdk.String("prod")},
-			expectedType: cloud.ApiGatewayStage,
+			expectedType: cloud.APIGatewayStage,
 			expectedID:   "prod",
 		},
 		// SSM
@@ -466,7 +466,7 @@ func TestInitResource(t *testing.T) {
 			if got, want := res.Type(), tc.expectedType; got != want {
 				t.Errorf("Type: got %q, want %q", got, want)
 			}
-			if got, want := res.Id(), tc.expectedID; got != want {
+			if got, want := res.ID(), tc.expectedID; got != want {
 				t.Errorf("ID: got %q, want %q", got, want)
 			}
 		})
@@ -488,7 +488,7 @@ func TestInitResourceNilFields(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if got := res.Id(); got != "" {
+	if got := res.ID(); got != "" {
 		t.Errorf("expected empty ID for nil field, got %q", got)
 	}
 	if got, want := res.Type(), cloud.Instance; got != want {
@@ -587,7 +587,7 @@ func TestNewResource(t *testing.T) {
 		if got, want := res.Type(), cloud.SecurityGroup; got != want {
 			t.Errorf("Type: got %q, want %q", got, want)
 		}
-		if got, want := res.Id(), "sg-123"; got != want {
+		if got, want := res.ID(), "sg-123"; got != want {
 			t.Errorf("ID: got %q, want %q", got, want)
 		}
 
@@ -630,7 +630,7 @@ func TestNewResource(t *testing.T) {
 		if got, want := res.Type(), cloud.Vpc; got != want {
 			t.Errorf("Type: got %q, want %q", got, want)
 		}
-		if got, want := res.Id(), "vpc-999"; got != want {
+		if got, want := res.ID(), "vpc-999"; got != want {
 			t.Errorf("ID: got %q, want %q", got, want)
 		}
 
@@ -663,7 +663,7 @@ func TestNewResource(t *testing.T) {
 		if err != nil {
 			t.Fatalf("NewResource returned error: %v", err)
 		}
-		if got, want := res.Id(), "subnet-001"; got != want {
+		if got, want := res.ID(), "subnet-001"; got != want {
 			t.Errorf("ID: got %q, want %q", got, want)
 		}
 
@@ -691,7 +691,7 @@ func TestNewResource(t *testing.T) {
 		if got, want := res.Type(), cloud.Bucket; got != want {
 			t.Errorf("Type: got %q, want %q", got, want)
 		}
-		if got, want := res.Id(), "my-bucket"; got != want {
+		if got, want := res.ID(), "my-bucket"; got != want {
 			t.Errorf("ID: got %q, want %q", got, want)
 		}
 		if got, want := res.Properties()[properties.ID], "my-bucket"; got != want {
@@ -762,7 +762,7 @@ func TestNewResource(t *testing.T) {
 		if got, want := res.Type(), cloud.User; got != want {
 			t.Errorf("Type: got %q, want %q", got, want)
 		}
-		if got, want := res.Id(), "AIDA12345"; got != want {
+		if got, want := res.ID(), "AIDA12345"; got != want {
 			t.Errorf("ID: got %q, want %q", got, want)
 		}
 		props := res.Properties()

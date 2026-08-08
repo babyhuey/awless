@@ -36,32 +36,32 @@ import (
 )
 
 type AWSAPI struct {
-	Iam                    *iam.Client
+	IAM                    *iam.Client
 	Ec2                    *ec2.Client
 	Elbv2                  *elasticloadbalancingv2.Client
 	Elb                    *elasticloadbalancing.Client
-	Rds                    *rds.Client
+	RDS                    *rds.Client
 	Autoscaling            *autoscaling.Client
-	Ecr                    *ecr.Client
-	Ecs                    *ecs.Client
+	ECR                    *ecr.Client
+	ECS                    *ecs.Client
 	Applicationautoscaling *applicationautoscaling.Client
-	Sts                    *sts.Client
+	STS                    *sts.Client
 	S3                     *s3.Client
-	Sns                    *sns.Client
-	Sqs                    *sqs.Client
+	SNS                    *sns.Client
+	SQS                    *sqs.Client
 	Route53                *route53.Client
 	Lambda                 *lambda.Client
 	Cloudwatch             *cloudwatch.Client
 	Cloudfront             *cloudfront.Client
 	Cloudformation         *cloudformation.Client
-	Acm                    *acm.Client
-	Eks                    *eks.Client
+	ACM                    *acm.Client
+	EKS                    *eks.Client
 	Dynamodb               *dynamodb.Client
 	Secretsmanager         *secretsmanager.Client
-	Kms                    *kms.Client
+	KMS                    *kms.Client
 	Apigatewayv2           *apigatewayv2.Client
-	Ssm                    *ssm.Client
-	Efs                    *efs.Client
+	SSM                    *ssm.Client
+	EFS                    *efs.Client
 	Cloudtrail             *cloudtrail.Client
 	Cloudwatchlogs         *cloudwatchlogs.Client
 }

@@ -52,7 +52,7 @@ func InitAwlessEnv() error {
 	}
 
 	if AwlessFirstInstall {
-		fmt.Fprint(os.Stderr, AWLESS_ASCII_LOGO)
+		fmt.Fprint(os.Stderr, AwlessASCIILogo)
 		fmt.Fprintln(os.Stderr, "Welcome! Resolving environment data...")
 		fmt.Fprintln(os.Stderr)
 

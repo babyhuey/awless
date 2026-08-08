@@ -118,7 +118,7 @@ type DeleteAccesskey struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *iam.Client
-	Id     *string `awsName:"AccessKeyId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"AccessKeyId" awsType:"awsstr" templateName:"id"`
 	User   *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 }
 
@@ -127,8 +127,8 @@ func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 	builder.AddReducer(
 		func(values map[string]any) (map[string]any, error) {
 			user, hasUser := values["user"].(string)
-			id, hasId := values["id"].(string)
-			if !hasUser && hasId {
+			id, hasID := values["id"].(string)
+			if !hasUser && hasID {
 				r, err := cmd.graph.FindOne(cloud.NewQuery(cloud.AccessKey).Match(match.Property(properties.ID, id)))
 				if err != nil || r == nil {
 					// Best effort: resolving the key's user is a convenience, so a
@@ -138,7 +138,7 @@ func (cmd *DeleteAccesskey) ParamsSpec() params.Spec {
 				if keyUser, ok := r.Property(properties.Username); ok {
 					values["user"] = keyUser
 				}
-			} else if hasUser && !hasId {
+			} else if hasUser && !hasID {
 				keys, err := cmd.api.ListAccessKeys(context.Background(), &iam.ListAccessKeysInput{
 					UserName: String(user),
 				})

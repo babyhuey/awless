@@ -54,7 +54,7 @@ type DeleteVpc struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"VpcId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"VpcId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteVpc) ParamsSpec() params.Spec {

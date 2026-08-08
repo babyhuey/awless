@@ -79,7 +79,7 @@ func (r *ImageResolverCache) Get(key string) ([]*AwsImage, bool) {
 const ImageQuerySpec = "owner:distro:variant:arch:virtualization:store"
 
 type AwsImage struct {
-	Id                 string
+	ID                 string
 	Owner              string
 	Location           string
 	Type               string
@@ -119,7 +119,7 @@ var (
 
 type Platform struct {
 	Name          string
-	Id            string
+	ID            string
 	DistroName    string
 	LatestVariant string
 	MatchFunc     func(s string, d Distro) bool
@@ -148,7 +148,7 @@ func (resolv ImageResolver) Resolve(q ImageQuery) ([]*AwsImage, bool, error) {
 	filters = append(filters,
 		ec2types.Filter{
 			Name:   awssdk.String("owner-id"),
-			Values: []string{q.Platform.Id},
+			Values: []string{q.Platform.ID},
 		},
 	)
 
@@ -189,8 +189,8 @@ func (resolv ImageResolver) Resolve(q ImageQuery) ([]*AwsImage, bool, error) {
 		}
 
 		img := &AwsImage{
-			Id:                 awssdk.ToString(ami.ImageId),
-			Owner:              q.Platform.Id,
+			ID:                 awssdk.ToString(ami.ImageId),
+			Owner:              q.Platform.ID,
 			Location:           awssdk.ToString(ami.ImageLocation),
 			Type:               string(ami.ImageType),
 			Architecture:       string(ami.Architecture),
@@ -225,56 +225,56 @@ var (
 	}
 
 	Canonical = Platform{
-		Name: "canonical", Id: "099720109477", DistroName: "ubuntu", LatestVariant: "xenial",
+		Name: "canonical", ID: "099720109477", DistroName: "ubuntu", LatestVariant: "xenial",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.HasPrefix(s, fmt.Sprintf("%s/images/%s-ssd/%s-%s", d.Name, d.Virt, d.Name, d.Variant))
 		},
 	}
 
 	RedHat = Platform{
-		Name: "redhat", Id: "309956199498", DistroName: "rhel", LatestVariant: "7.5",
+		Name: "redhat", ID: "309956199498", DistroName: "rhel", LatestVariant: "7.5",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.Contains(s, fmt.Sprintf("%s-%s", d.Name, d.Variant))
 		},
 	}
 
 	Debian = Platform{
-		Name: "debian", Id: "379101102735", DistroName: "debian", LatestVariant: "stretch",
+		Name: "debian", ID: "379101102735", DistroName: "debian", LatestVariant: "stretch",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.HasPrefix(s, fmt.Sprintf("%s-%s", d.Name, d.Variant))
 		},
 	}
 
 	CoreOS = Platform{
-		Name: "coreos", Id: "595879546273", DistroName: "coreos", LatestVariant: "1688",
+		Name: "coreos", ID: "595879546273", DistroName: "coreos", LatestVariant: "1688",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.HasPrefix(s, strings.ToLower(fmt.Sprintf("%s-stable-%s", d.Name, d.Variant)))
 		},
 	}
 
 	CentOS = Platform{
-		Name: "centos", Id: "679593333241", DistroName: "centos", LatestVariant: "7",
+		Name: "centos", ID: "679593333241", DistroName: "centos", LatestVariant: "7",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.HasPrefix(s, strings.ToLower(fmt.Sprintf("%s Linux %s", d.Name, d.Variant)))
 		},
 	}
 
 	AmazonLinux = Platform{
-		Name: "amazonlinux", Id: "137112412989", DistroName: "amzn", LatestVariant: "hvm",
+		Name: "amazonlinux", ID: "137112412989", DistroName: "amzn", LatestVariant: "hvm",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.HasPrefix(s, fmt.Sprintf("%s-ami-%s", d.Name, d.Variant))
 		},
 	}
 
 	SuseLinux = Platform{
-		Name: "suselinux", Id: "013907871322", LatestVariant: "sles-12",
+		Name: "suselinux", ID: "013907871322", LatestVariant: "sles-12",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.HasPrefix(s, fmt.Sprintf("suse-%s", d.Variant))
 		},
 	}
 
 	Windows = Platform{
-		Name: "windows", Id: "801119661308", DistroName: "server", LatestVariant: "2016",
+		Name: "windows", ID: "801119661308", DistroName: "server", LatestVariant: "2016",
 		MatchFunc: func(s string, d Distro) bool {
 			return strings.HasPrefix(s, strings.ToLower(fmt.Sprintf("windows_%s-%s-english", d.Name, d.Variant)))
 		},

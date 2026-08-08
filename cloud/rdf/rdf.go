@@ -101,11 +101,11 @@ func (r RDFProperties) IsRDFList(prop string) bool {
 }
 
 func (r RDFProperties) GetRDFId(label string) (string, error) {
-	propId, ok := Labels[label]
+	propID, ok := Labels[label]
 	if !ok {
 		return "", fmt.Errorf("get property id: label '%s' not found", label)
 	}
-	return propId, nil
+	return propID, nil
 }
 
 func (r RDFProperties) GetDataType(prop string) (string, error) {

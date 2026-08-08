@@ -113,8 +113,8 @@ func (g *Graph) GetResource(t string, id string) (*Resource, error) {
 }
 
 func (g *Graph) FindResource(id string) (*Resource, error) {
-	byId := &ById{id}
-	resources, err := byId.Resolve(g.store.Snapshot())
+	byID := &ByID{id}
+	resources, err := byID.Resolve(g.store.Snapshot())
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +314,7 @@ func (g *Graph) ListResourcesDependingOn(start *Resource) ([]*Resource, error) {
 	var resources []*Resource
 
 	snap := g.store.Snapshot()
-	for _, tri := range snap.WithPredObj(rdf.ApplyOn, tstore.Resource(start.Id())) {
+	for _, tri := range snap.WithPredObj(rdf.ApplyOn, tstore.Resource(start.ID())) {
 		id := tri.Subject()
 		rT, err := resolveResourceType(snap, id)
 		if err != nil {
@@ -338,10 +338,10 @@ func (g *Graph) ListResourcesAppliedOn(start *Resource) ([]*Resource, error) {
 
 	snap := g.store.Snapshot()
 
-	for _, tri := range snap.WithSubjPred(start.Id(), rdf.ApplyOn) {
+	for _, tri := range snap.WithSubjPred(start.ID(), rdf.ApplyOn) {
 		id, ok := tri.Object().Resource()
 		if !ok {
-			return resources, fmt.Errorf("triple %s %s: object is not a resource identifier", start.Id(), rdf.ApplyOn)
+			return resources, fmt.Errorf("triple %s %s: object is not a resource identifier", start.ID(), rdf.ApplyOn)
 		}
 		rT, err := resolveResourceType(snap, id)
 		if err != nil {
@@ -397,6 +397,6 @@ func (g *Graph) MarshalTo(w io.Writer) error {
 }
 
 func (g *Graph) addRelation(one, other *Resource, pred string) error {
-	g.store.Add(tstore.SubjPred(one.Id(), pred).Resource(other.Id()))
+	g.store.Add(tstore.SubjPred(one.ID(), pred).Resource(other.ID()))
 	return nil
 }

@@ -45,8 +45,8 @@ type DeleteElasticip struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"AllocationId" awsType:"awsstr" templateName:"id"`
-	Ip     *string `awsName:"PublicIp" awsType:"awsstr" templateName:"ip"`
+	ID     *string `awsName:"AllocationId" awsType:"awsstr" templateName:"id"`
+	IP     *string `awsName:"PublicIp" awsType:"awsstr" templateName:"ip"`
 }
 
 func (cmd *DeleteElasticip) ParamsSpec() params.Spec {
@@ -61,7 +61,7 @@ type AttachElasticip struct {
 	logger             *logger.Logger
 	graph              cloud.GraphAPI
 	api                *ec2.Client
-	Id                 *string `awsName:"AllocationId" awsType:"awsstr" templateName:"id"`
+	ID                 *string `awsName:"AllocationId" awsType:"awsstr" templateName:"id"`
 	Instance           *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
 	Networkinterface   *string `awsName:"NetworkInterfaceId" awsType:"awsstr" templateName:"networkinterface"`
 	Privateip          *string `awsName:"PrivateIpAddress" awsType:"awsstr" templateName:"privateip"`

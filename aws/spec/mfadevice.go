@@ -93,7 +93,7 @@ type DeleteMfadevice struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *iam.Client
-	Id     *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteMfadevice) ParamsSpec() params.Spec {
@@ -109,7 +109,7 @@ type AttachMfadevice struct {
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
 	api      *iam.Client
-	Id       *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
+	ID       *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
 	User     *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 	MfaCode1 *string `awsName:"AuthenticationCode1" awsType:"aws6digitsstring" templateName:"mfa-code-1"`
 	MfaCode2 *string `awsName:"AuthenticationCode2" awsType:"aws6digitsstring" templateName:"mfa-code-2"`
@@ -140,7 +140,7 @@ func (cmd *AttachMfadevice) AfterRun(renv env.Running, output any) error {
 			config := fmt.Sprintf("\n[%s]\n"+
 				"source_profile = %s\n"+
 				"mfa_serial = %s\n"+
-				"role_arn = %s", mfaProfile, srcProfile, StringValue(cmd.Id), roleArn)
+				"role_arn = %s", mfaProfile, srcProfile, StringValue(cmd.ID), roleArn)
 			if promptConfirm("\n%s\n\nAppend this to '%s'?", config, awsConfigFilepath) {
 				created, err := appendToAwsFile(config, awsConfigFilepath)
 				if err != nil {
@@ -167,7 +167,7 @@ type DetachMfadevice struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *iam.Client
-	Id     *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"SerialNumber" awsType:"awsstr" templateName:"id"`
 	User   *string `awsName:"UserName" awsType:"awsstr" templateName:"user"`
 }
 

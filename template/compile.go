@@ -141,11 +141,11 @@ func processAndValidateParamsPass(tpl *Template, cenv env.Compiling) (*Template,
 		_, optionals, suggested := params.List(rule)
 
 		switch cenv.ParamsMode() {
-		case env.REQUIRED_PARAMS_ONLY:
+		case env.RequiredParamsOnly:
 			return nil
-		case env.REQUIRED_AND_SUGGESTED_PARAMS:
+		case env.RequiredAndSuggestedParams:
 			suggested = excludeFromSlice(suggested, node.Keys())
-		case env.ALL_PARAMS:
+		case env.AllParams:
 			suggested = excludeFromSlice(optionals, node.Keys())
 		}
 
@@ -261,7 +261,7 @@ func inlineVariableValuePass(tpl *Template, cenv env.Compiling) (*Template, env.
 		if isDecl {
 			if right, isRightExpr := decl.Expr.(*ast.RightExpressionNode); isRightExpr {
 				if res := right.Result(); res != nil {
-					cenv.Push(env.RESOLVED_VARS, map[string]any{decl.Ident: res})
+					cenv.Push(env.ResolvedVars, map[string]any{decl.Ident: res})
 				}
 				ast.ProcessRefs(
 					&ast.AST{Statements: tpl.Statements[i+1:]},
@@ -277,8 +277,8 @@ func inlineVariableValuePass(tpl *Template, cenv env.Compiling) (*Template, env.
 }
 
 func resolveHolesPass(tpl *Template, cenv env.Compiling) (*Template, env.Compiling, error) {
-	processed := ast.ProcessHoles(tpl.AST, cenv.Get(env.FILLERS))
-	cenv.Push(env.PROCESSED_FILLERS, processed)
+	processed := ast.ProcessHoles(tpl.AST, cenv.Get(env.Fillers))
+	cenv.Push(env.ProcessedFillers, processed)
 
 	return tpl, cenv, nil
 }
@@ -313,12 +313,12 @@ func resolveMissingHolesPass(tpl *Template, cenv env.Compiling) (*Template, env.
 					return tpl, cenv, err
 				}
 			}
-			cenv.Push(env.FILLERS, map[string]any{k: params[k]})
+			cenv.Push(env.Fillers, map[string]any{k: params[k]})
 		}
 	}
 
-	processed := ast.ProcessHoles(tpl.AST, cenv.Get(env.FILLERS))
-	cenv.Push(env.PROCESSED_FILLERS, processed)
+	processed := ast.ProcessHoles(tpl.AST, cenv.Get(env.Fillers))
+	cenv.Push(env.ProcessedFillers, processed)
 
 	return tpl, cenv, nil
 }

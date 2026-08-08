@@ -48,13 +48,13 @@ func (p *PortScanner) Inspect(g cloud.GraphAPI) error {
 		rules := sg.Properties()["InboundRules"]
 		switch typedRules := rules.(type) {
 		case []*graph.FirewallRule:
-			p.inbounds[sg.Id()] = typedRules
+			p.inbounds[sg.ID()] = typedRules
 			res, err := g.ResourceRelations(sg, rdf.ApplyOn, false)
 			if err != nil {
 				return err
 			}
 			for _, r := range res {
-				p.applyingOn[sg.Id()] = append(p.applyingOn[sg.Id()], r.String())
+				p.applyingOn[sg.ID()] = append(p.applyingOn[sg.ID()], r.String())
 			}
 
 		}

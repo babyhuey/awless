@@ -29,16 +29,6 @@ linters:
         - all
         - -SA1019 # deprecated usage - too noisy for a migration
         # golangci-lint v2 merged gosimple and stylecheck into staticcheck.
-        # v1 enabled gosimple + staticcheck but NOT stylecheck, so ST* and QF*
-        # checks never ran here. Excluded to keep this a behavior-preserving
-        # migration: enabling them adds 255 findings. Tracked as ISSUES.md I19.
-        # ST1003 remains excluded: 175 findings, and the ALL_CAPS ones are
-        # exported identifiers in template/env, so renaming them would break the
-        # public API for a purely cosmetic gain. Tracked in ISSUES.md I19.
-        - -ST1003
-        # QF1002: one site, aws/fetch/manual_fetchers.go, switching on a sum of
-        # four counters. A tagged switch there reads worse than the boolean form.
-        - -QF1002
   exclusions:
     generated: lax
     presets:

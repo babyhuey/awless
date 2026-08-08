@@ -39,7 +39,7 @@ type CreateS3object struct {
 	Bucket *string `awsName:"Bucket" awsType:"awsstr" templateName:"bucket"`
 	File   *string `awsName:"Body" awsType:"awsstr" templateName:"file"`
 	Name   *string `awsName:"Key" awsType:"awsstr" templateName:"name"`
-	Acl    *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
+	ACL    *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
 }
 
 func (cmd *CreateS3object) ParamsSpec() params.Spec {
@@ -82,7 +82,7 @@ func (cmd *CreateS3object) ManualRun(env.Running) (any, error) {
 		return nil, err
 	}
 
-	if v := cmd.Acl; v != nil {
+	if v := cmd.ACL; v != nil {
 		if err = setFieldWithType(v, input, "ACL", awsstr); err != nil {
 			return nil, err
 		}
@@ -108,7 +108,7 @@ type UpdateS3object struct {
 	api     *s3.Client
 	Bucket  *string `awsName:"Bucket" awsType:"awsstr" templateName:"bucket"`
 	Name    *string `awsName:"Key" awsType:"awsstr" templateName:"name"`
-	Acl     *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
+	ACL     *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
 	Version *string `awsName:"VersionId" awsType:"awsstr" templateName:"version"`
 }
 

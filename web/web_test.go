@@ -36,8 +36,8 @@ func TestNewDifferentParams(t *testing.T) {
 func TestNewResource(t *testing.T) {
 	gr := graph.InitResource("instance", "i-12345")
 	r := newResource(gr)
-	if r.Id != "i-12345" {
-		t.Errorf("expected Id 'i-12345', got %q", r.Id)
+	if r.ID != "i-12345" {
+		t.Errorf("expected Id 'i-12345', got %q", r.ID)
 	}
 	if r.Type != "instance" {
 		t.Errorf("expected Type 'instance', got %q", r.Type)
@@ -59,8 +59,8 @@ func TestNewResourceDifferentTypes(t *testing.T) {
 	}
 	for _, tc := range types {
 		r := newResource(graph.InitResource(tc.kind, tc.id))
-		if r.Id != tc.id {
-			t.Errorf("expected Id %q, got %q", tc.id, r.Id)
+		if r.ID != tc.id {
+			t.Errorf("expected Id %q, got %q", tc.id, r.ID)
 		}
 		if r.Type != tc.kind {
 			t.Errorf("expected Type %q, got %q", tc.kind, r.Type)
@@ -78,11 +78,11 @@ func TestResourceAddDependsOn(t *testing.T) {
 	if len(r.DependsOn) != 2 {
 		t.Fatalf("expected 2 DependsOn, got %d", len(r.DependsOn))
 	}
-	if r.DependsOn[0].Id != "vpc-1" {
-		t.Errorf("expected first dep Id 'vpc-1', got %q", r.DependsOn[0].Id)
+	if r.DependsOn[0].ID != "vpc-1" {
+		t.Errorf("expected first dep Id 'vpc-1', got %q", r.DependsOn[0].ID)
 	}
-	if r.DependsOn[1].Id != "sub-1" {
-		t.Errorf("expected second dep Id 'sub-1', got %q", r.DependsOn[1].Id)
+	if r.DependsOn[1].ID != "sub-1" {
+		t.Errorf("expected second dep Id 'sub-1', got %q", r.DependsOn[1].ID)
 	}
 }
 
@@ -137,8 +137,8 @@ func TestResourceAddParents(t *testing.T) {
 	if len(r.Parents) != 1 {
 		t.Fatalf("expected 1 parent, got %d", len(r.Parents))
 	}
-	if r.Parents[0].Id != "us-east-1" {
-		t.Errorf("expected parent Id 'us-east-1', got %q", r.Parents[0].Id)
+	if r.Parents[0].ID != "us-east-1" {
+		t.Errorf("expected parent Id 'us-east-1', got %q", r.Parents[0].ID)
 	}
 }
 
@@ -151,11 +151,11 @@ func TestResourceAddParentsMultiple(t *testing.T) {
 	if len(r.Parents) != 2 {
 		t.Fatalf("expected 2 parents, got %d", len(r.Parents))
 	}
-	if r.Parents[0].Id != "us-east-1" {
-		t.Errorf("expected first parent Id 'us-east-1', got %q", r.Parents[0].Id)
+	if r.Parents[0].ID != "us-east-1" {
+		t.Errorf("expected first parent Id 'us-east-1', got %q", r.Parents[0].ID)
 	}
-	if r.Parents[1].Id != "vpc-123" {
-		t.Errorf("expected second parent Id 'vpc-123', got %q", r.Parents[1].Id)
+	if r.Parents[1].ID != "vpc-123" {
+		t.Errorf("expected second parent Id 'vpc-123', got %q", r.Parents[1].ID)
 	}
 }
 
@@ -176,8 +176,8 @@ func TestResourceAddChildren(t *testing.T) {
 	if len(r.Children) != 1 {
 		t.Fatalf("expected 1 child, got %d", len(r.Children))
 	}
-	if r.Children[0].Id != "i-child" {
-		t.Errorf("expected child Id 'i-child', got %q", r.Children[0].Id)
+	if r.Children[0].ID != "i-child" {
+		t.Errorf("expected child Id 'i-child', got %q", r.Children[0].ID)
 	}
 }
 
@@ -236,7 +236,7 @@ func TestHomeHandler(t *testing.T) {
 }
 
 func TestResourceAccumulation(t *testing.T) {
-	r := &Resource{Id: "test-id", Type: "instance"}
+	r := &Resource{ID: "test-id", Type: "instance"}
 
 	// Add deps in multiple calls to test accumulation
 	r.AddDependsOn(graph.InitResource("vpc", "vpc-1"))
@@ -272,8 +272,8 @@ func TestNewResourcePreservesProperties(t *testing.T) {
 		t.Fatal("expected non-nil properties")
 	}
 	// Properties map should be the same reference as the graph resource
-	if r.Id != "i-99" {
-		t.Fatalf("expected Id 'i-99', got %q", r.Id)
+	if r.ID != "i-99" {
+		t.Fatalf("expected Id 'i-99', got %q", r.ID)
 	}
 }
 

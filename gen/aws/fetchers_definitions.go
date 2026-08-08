@@ -22,7 +22,7 @@ import (
 	"github.com/bootswithdefer/awless/cloud"
 )
 
-func ApiToInterface(api string) string {
+func APIToInterface(api string) string {
 	switch api {
 	case "autoscaling":
 		return "AutoScalingAPI"
@@ -65,7 +65,7 @@ func SdkModulePath(api string) string {
 type fetchersDef struct {
 	Name     string
 	Global   bool
-	Api      []string
+	API      []string
 	Fetchers []fetcher
 }
 
@@ -74,9 +74,9 @@ func (d fetchersDef) AutoFetcherAPIs() []string {
 	seen := make(map[string]bool)
 	var apis []string
 	for _, f := range d.Fetchers {
-		if !f.ManualFetcher && !seen[f.Api] {
-			seen[f.Api] = true
-			apis = append(apis, f.Api)
+		if !f.ManualFetcher && !seen[f.API] {
+			seen[f.API] = true
+			apis = append(apis, f.API)
 		}
 	}
 	return apis
@@ -85,181 +85,181 @@ func (d fetchersDef) AutoFetcherAPIs() []string {
 type fetcher struct {
 	ResourceType                                string
 	AWSType                                     string
-	ApiMethod, Input                            string
+	APIMethod, Input                            string
 	Output, OutputsContainers, OutputsExtractor string
 	ManualFetcher                               bool
 	Multipage                                   bool
 	NextPageMarker                              string
-	Api                                         string
+	API                                         string
 }
 
 var FetchersDefs = []fetchersDef{
 	{
 		Name: "infra",
-		Api:  []string{"ec2", "elbv2", "elb", "rds", "autoscaling", "ecr", "ecs", "applicationautoscaling", "acm"},
+		API:  []string{"ec2", "elbv2", "elb", "rds", "autoscaling", "ecr", "ecs", "applicationautoscaling", "acm"},
 		Fetchers: []fetcher{
-			{Api: "ec2", ResourceType: cloud.Instance, AWSType: "ec2types.Instance", ApiMethod: "DescribeInstances", Input: "ec2.DescribeInstancesInput{}", Output: "ec2.DescribeInstancesOutput", OutputsExtractor: "Instances", OutputsContainers: "Reservations", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "ec2", ResourceType: cloud.Subnet, AWSType: "ec2types.Subnet", ApiMethod: "DescribeSubnets", Input: "ec2.DescribeSubnetsInput{}", Output: "ec2.DescribeSubnetsOutput", OutputsExtractor: "Subnets"},
-			{Api: "ec2", ResourceType: cloud.Vpc, AWSType: "ec2types.Vpc", ApiMethod: "DescribeVpcs", Input: "ec2.DescribeVpcsInput{}", Output: "ec2.DescribeVpcsOutput", OutputsExtractor: "Vpcs"},
-			{Api: "ec2", ResourceType: cloud.Keypair, AWSType: "ec2types.KeyPairInfo", ApiMethod: "DescribeKeyPairs", Input: "ec2.DescribeKeyPairsInput{}", Output: "ec2.DescribeKeyPairsOutput", OutputsExtractor: "KeyPairs"},
-			{Api: "ec2", ResourceType: cloud.SecurityGroup, AWSType: "ec2types.SecurityGroup", ApiMethod: "DescribeSecurityGroups", Input: "ec2.DescribeSecurityGroupsInput{}", Output: "ec2.DescribeSecurityGroupsOutput", OutputsExtractor: "SecurityGroups"},
-			{Api: "ec2", ResourceType: cloud.Volume, AWSType: "ec2types.Volume", ApiMethod: "DescribeVolumes", Input: "ec2.DescribeVolumesInput{}", Output: "ec2.DescribeVolumesOutput", OutputsExtractor: "Volumes", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "ec2", ResourceType: cloud.InternetGateway, AWSType: "ec2types.InternetGateway", ApiMethod: "DescribeInternetGateways", Input: "ec2.DescribeInternetGatewaysInput{}", Output: "ec2.DescribeInternetGatewaysOutput", OutputsExtractor: "InternetGateways"},
-			{Api: "ec2", ResourceType: cloud.NatGateway, AWSType: "ec2types.NatGateway", ApiMethod: "DescribeNatGateways", Input: "ec2.DescribeNatGatewaysInput{}", Output: "ec2.DescribeNatGatewaysOutput", OutputsExtractor: "NatGateways"},
-			{Api: "ec2", ResourceType: cloud.RouteTable, AWSType: "ec2types.RouteTable", ApiMethod: "DescribeRouteTables", Input: "ec2.DescribeRouteTablesInput{}", Output: "ec2.DescribeRouteTablesOutput", OutputsExtractor: "RouteTables"},
-			{Api: "ec2", ResourceType: cloud.AvailabilityZone, AWSType: "ec2types.AvailabilityZone", ApiMethod: "DescribeAvailabilityZones", Input: "ec2.DescribeAvailabilityZonesInput{}", Output: "ec2.DescribeAvailabilityZonesOutput", OutputsExtractor: "AvailabilityZones"},
-			{Api: "ec2", ResourceType: cloud.Image, AWSType: "ec2types.Image", ApiMethod: "DescribeImages", Input: "ec2.DescribeImagesInput{Owners: []string{\"self\"}}", Output: "ec2.DescribeImagesOutput", OutputsExtractor: "Images"},
-			{Api: "ec2", ResourceType: cloud.ImportImageTask, AWSType: "ec2types.ImportImageTask", ApiMethod: "DescribeImportImageTasks", Input: "ec2.DescribeImportImageTasksInput{}", Output: "ec2.DescribeImportImageTasksOutput", OutputsExtractor: "ImportImageTasks"},
-			{Api: "ec2", ResourceType: cloud.ElasticIP, AWSType: "ec2types.Address", ApiMethod: "DescribeAddresses", Input: "ec2.DescribeAddressesInput{}", Output: "ec2.DescribeAddressesOutput", OutputsExtractor: "Addresses"},
-			{Api: "ec2", ResourceType: cloud.Snapshot, AWSType: "ec2types.Snapshot", ApiMethod: "DescribeSnapshots", Input: "ec2.DescribeSnapshotsInput{OwnerIds: []string{\"self\"}}", Output: "ec2.DescribeSnapshotsOutput", OutputsExtractor: "Snapshots", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "ec2", ResourceType: cloud.NetworkInterface, AWSType: "ec2types.NetworkInterface", ApiMethod: "DescribeNetworkInterfaces", Input: "ec2.DescribeNetworkInterfacesInput{}", Output: "ec2.DescribeNetworkInterfacesOutput", OutputsExtractor: "NetworkInterfaces"},
-			{Api: "elb", ResourceType: cloud.ClassicLoadBalancer, AWSType: "elbtypes.LoadBalancerDescription", ApiMethod: "DescribeLoadBalancers", Input: "elb.DescribeLoadBalancersInput{}", Output: "elb.DescribeLoadBalancersOutput", OutputsExtractor: "LoadBalancerDescriptions", Multipage: true, NextPageMarker: "NextMarker"},
-			{Api: "elbv2", ResourceType: cloud.LoadBalancer, AWSType: "elbv2types.LoadBalancer", ApiMethod: "DescribeLoadBalancers", Input: "elbv2.DescribeLoadBalancersInput{}", Output: "elbv2.DescribeLoadBalancersOutput", OutputsExtractor: "LoadBalancers", Multipage: true, NextPageMarker: "NextMarker"},
-			{Api: "elbv2", ResourceType: cloud.TargetGroup, AWSType: "elbv2types.TargetGroup", ApiMethod: "DescribeTargetGroups", Input: "elbv2.DescribeTargetGroupsInput{}", Output: "elbv2.DescribeTargetGroupsOutput", OutputsExtractor: "TargetGroups"},
-			{Api: "elbv2", ResourceType: cloud.Listener, AWSType: "elbv2types.Listener", ManualFetcher: true},
-			{Api: "rds", ResourceType: cloud.Database, AWSType: "rdstypes.DBInstance", ApiMethod: "DescribeDBInstances", Input: "rds.DescribeDBInstancesInput{}", Output: "rds.DescribeDBInstancesOutput", OutputsExtractor: "DBInstances", Multipage: true, NextPageMarker: "Marker"},
-			{Api: "rds", ResourceType: cloud.DbSubnetGroup, AWSType: "rdstypes.DBSubnetGroup", ApiMethod: "DescribeDBSubnetGroups", Input: "rds.DescribeDBSubnetGroupsInput{}", Output: "rds.DescribeDBSubnetGroupsOutput", OutputsExtractor: "DBSubnetGroups", Multipage: true, NextPageMarker: "Marker"},
-			{Api: "autoscaling", ResourceType: cloud.LaunchConfiguration, AWSType: "autoscalingtypes.LaunchConfiguration", ApiMethod: "DescribeLaunchConfigurations", Input: "autoscaling.DescribeLaunchConfigurationsInput{}", Output: "autoscaling.DescribeLaunchConfigurationsOutput", OutputsExtractor: "LaunchConfigurations", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "autoscaling", ResourceType: cloud.ScalingGroup, AWSType: "autoscalingtypes.AutoScalingGroup", ApiMethod: "DescribeAutoScalingGroups", Input: "autoscaling.DescribeAutoScalingGroupsInput{}", Output: "autoscaling.DescribeAutoScalingGroupsOutput", OutputsExtractor: "AutoScalingGroups", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "autoscaling", ResourceType: cloud.ScalingPolicy, AWSType: "autoscalingtypes.ScalingPolicy", ApiMethod: "DescribePolicies", Input: "autoscaling.DescribePoliciesInput{}", Output: "autoscaling.DescribePoliciesOutput", OutputsExtractor: "ScalingPolicies", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "ecr", ResourceType: cloud.Repository, AWSType: "ecrtypes.Repository", ApiMethod: "DescribeRepositories", Input: "ecr.DescribeRepositoriesInput{}", Output: "ecr.DescribeRepositoriesOutput", OutputsExtractor: "Repositories", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "ecs", ResourceType: cloud.ContainerCluster, AWSType: "ecstypes.Cluster", ManualFetcher: true},
-			{Api: "ecs", ResourceType: cloud.ContainerTask, AWSType: "ecstypes.TaskDefinition", ManualFetcher: true},
-			{Api: "ecs", ResourceType: cloud.Container, AWSType: "ecstypes.Container", ManualFetcher: true},
-			{Api: "ecs", ResourceType: cloud.ContainerInstance, AWSType: "ecstypes.ContainerInstance", ManualFetcher: true},
-			{Api: "acm", ResourceType: cloud.Certificate, AWSType: "acmtypes.CertificateSummary", ApiMethod: "ListCertificates", Input: "acm.ListCertificatesInput{}", Output: "acm.ListCertificatesOutput", OutputsExtractor: "CertificateSummaryList", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ec2", ResourceType: cloud.Instance, AWSType: "ec2types.Instance", APIMethod: "DescribeInstances", Input: "ec2.DescribeInstancesInput{}", Output: "ec2.DescribeInstancesOutput", OutputsExtractor: "Instances", OutputsContainers: "Reservations", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ec2", ResourceType: cloud.Subnet, AWSType: "ec2types.Subnet", APIMethod: "DescribeSubnets", Input: "ec2.DescribeSubnetsInput{}", Output: "ec2.DescribeSubnetsOutput", OutputsExtractor: "Subnets"},
+			{API: "ec2", ResourceType: cloud.Vpc, AWSType: "ec2types.Vpc", APIMethod: "DescribeVpcs", Input: "ec2.DescribeVpcsInput{}", Output: "ec2.DescribeVpcsOutput", OutputsExtractor: "Vpcs"},
+			{API: "ec2", ResourceType: cloud.Keypair, AWSType: "ec2types.KeyPairInfo", APIMethod: "DescribeKeyPairs", Input: "ec2.DescribeKeyPairsInput{}", Output: "ec2.DescribeKeyPairsOutput", OutputsExtractor: "KeyPairs"},
+			{API: "ec2", ResourceType: cloud.SecurityGroup, AWSType: "ec2types.SecurityGroup", APIMethod: "DescribeSecurityGroups", Input: "ec2.DescribeSecurityGroupsInput{}", Output: "ec2.DescribeSecurityGroupsOutput", OutputsExtractor: "SecurityGroups"},
+			{API: "ec2", ResourceType: cloud.Volume, AWSType: "ec2types.Volume", APIMethod: "DescribeVolumes", Input: "ec2.DescribeVolumesInput{}", Output: "ec2.DescribeVolumesOutput", OutputsExtractor: "Volumes", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ec2", ResourceType: cloud.InternetGateway, AWSType: "ec2types.InternetGateway", APIMethod: "DescribeInternetGateways", Input: "ec2.DescribeInternetGatewaysInput{}", Output: "ec2.DescribeInternetGatewaysOutput", OutputsExtractor: "InternetGateways"},
+			{API: "ec2", ResourceType: cloud.NatGateway, AWSType: "ec2types.NatGateway", APIMethod: "DescribeNatGateways", Input: "ec2.DescribeNatGatewaysInput{}", Output: "ec2.DescribeNatGatewaysOutput", OutputsExtractor: "NatGateways"},
+			{API: "ec2", ResourceType: cloud.RouteTable, AWSType: "ec2types.RouteTable", APIMethod: "DescribeRouteTables", Input: "ec2.DescribeRouteTablesInput{}", Output: "ec2.DescribeRouteTablesOutput", OutputsExtractor: "RouteTables"},
+			{API: "ec2", ResourceType: cloud.AvailabilityZone, AWSType: "ec2types.AvailabilityZone", APIMethod: "DescribeAvailabilityZones", Input: "ec2.DescribeAvailabilityZonesInput{}", Output: "ec2.DescribeAvailabilityZonesOutput", OutputsExtractor: "AvailabilityZones"},
+			{API: "ec2", ResourceType: cloud.Image, AWSType: "ec2types.Image", APIMethod: "DescribeImages", Input: "ec2.DescribeImagesInput{Owners: []string{\"self\"}}", Output: "ec2.DescribeImagesOutput", OutputsExtractor: "Images"},
+			{API: "ec2", ResourceType: cloud.ImportImageTask, AWSType: "ec2types.ImportImageTask", APIMethod: "DescribeImportImageTasks", Input: "ec2.DescribeImportImageTasksInput{}", Output: "ec2.DescribeImportImageTasksOutput", OutputsExtractor: "ImportImageTasks"},
+			{API: "ec2", ResourceType: cloud.ElasticIP, AWSType: "ec2types.Address", APIMethod: "DescribeAddresses", Input: "ec2.DescribeAddressesInput{}", Output: "ec2.DescribeAddressesOutput", OutputsExtractor: "Addresses"},
+			{API: "ec2", ResourceType: cloud.Snapshot, AWSType: "ec2types.Snapshot", APIMethod: "DescribeSnapshots", Input: "ec2.DescribeSnapshotsInput{OwnerIds: []string{\"self\"}}", Output: "ec2.DescribeSnapshotsOutput", OutputsExtractor: "Snapshots", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ec2", ResourceType: cloud.NetworkInterface, AWSType: "ec2types.NetworkInterface", APIMethod: "DescribeNetworkInterfaces", Input: "ec2.DescribeNetworkInterfacesInput{}", Output: "ec2.DescribeNetworkInterfacesOutput", OutputsExtractor: "NetworkInterfaces"},
+			{API: "elb", ResourceType: cloud.ClassicLoadBalancer, AWSType: "elbtypes.LoadBalancerDescription", APIMethod: "DescribeLoadBalancers", Input: "elb.DescribeLoadBalancersInput{}", Output: "elb.DescribeLoadBalancersOutput", OutputsExtractor: "LoadBalancerDescriptions", Multipage: true, NextPageMarker: "NextMarker"},
+			{API: "elbv2", ResourceType: cloud.LoadBalancer, AWSType: "elbv2types.LoadBalancer", APIMethod: "DescribeLoadBalancers", Input: "elbv2.DescribeLoadBalancersInput{}", Output: "elbv2.DescribeLoadBalancersOutput", OutputsExtractor: "LoadBalancers", Multipage: true, NextPageMarker: "NextMarker"},
+			{API: "elbv2", ResourceType: cloud.TargetGroup, AWSType: "elbv2types.TargetGroup", APIMethod: "DescribeTargetGroups", Input: "elbv2.DescribeTargetGroupsInput{}", Output: "elbv2.DescribeTargetGroupsOutput", OutputsExtractor: "TargetGroups"},
+			{API: "elbv2", ResourceType: cloud.Listener, AWSType: "elbv2types.Listener", ManualFetcher: true},
+			{API: "rds", ResourceType: cloud.Database, AWSType: "rdstypes.DBInstance", APIMethod: "DescribeDBInstances", Input: "rds.DescribeDBInstancesInput{}", Output: "rds.DescribeDBInstancesOutput", OutputsExtractor: "DBInstances", Multipage: true, NextPageMarker: "Marker"},
+			{API: "rds", ResourceType: cloud.DBSubnetGroup, AWSType: "rdstypes.DBSubnetGroup", APIMethod: "DescribeDBSubnetGroups", Input: "rds.DescribeDBSubnetGroupsInput{}", Output: "rds.DescribeDBSubnetGroupsOutput", OutputsExtractor: "DBSubnetGroups", Multipage: true, NextPageMarker: "Marker"},
+			{API: "autoscaling", ResourceType: cloud.LaunchConfiguration, AWSType: "autoscalingtypes.LaunchConfiguration", APIMethod: "DescribeLaunchConfigurations", Input: "autoscaling.DescribeLaunchConfigurationsInput{}", Output: "autoscaling.DescribeLaunchConfigurationsOutput", OutputsExtractor: "LaunchConfigurations", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "autoscaling", ResourceType: cloud.ScalingGroup, AWSType: "autoscalingtypes.AutoScalingGroup", APIMethod: "DescribeAutoScalingGroups", Input: "autoscaling.DescribeAutoScalingGroupsInput{}", Output: "autoscaling.DescribeAutoScalingGroupsOutput", OutputsExtractor: "AutoScalingGroups", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "autoscaling", ResourceType: cloud.ScalingPolicy, AWSType: "autoscalingtypes.ScalingPolicy", APIMethod: "DescribePolicies", Input: "autoscaling.DescribePoliciesInput{}", Output: "autoscaling.DescribePoliciesOutput", OutputsExtractor: "ScalingPolicies", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ecr", ResourceType: cloud.Repository, AWSType: "ecrtypes.Repository", APIMethod: "DescribeRepositories", Input: "ecr.DescribeRepositoriesInput{}", Output: "ecr.DescribeRepositoriesOutput", OutputsExtractor: "Repositories", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ecs", ResourceType: cloud.ContainerCluster, AWSType: "ecstypes.Cluster", ManualFetcher: true},
+			{API: "ecs", ResourceType: cloud.ContainerTask, AWSType: "ecstypes.TaskDefinition", ManualFetcher: true},
+			{API: "ecs", ResourceType: cloud.Container, AWSType: "ecstypes.Container", ManualFetcher: true},
+			{API: "ecs", ResourceType: cloud.ContainerInstance, AWSType: "ecstypes.ContainerInstance", ManualFetcher: true},
+			{API: "acm", ResourceType: cloud.Certificate, AWSType: "acmtypes.CertificateSummary", APIMethod: "ListCertificates", Input: "acm.ListCertificatesInput{}", Output: "acm.ListCertificatesOutput", OutputsExtractor: "CertificateSummaryList", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
 	{
 		Name:   "access",
 		Global: true,
-		Api:    []string{"iam", "sts"},
+		API:    []string{"iam", "sts"},
 		Fetchers: []fetcher{
-			{Api: "iam", ResourceType: cloud.User, AWSType: "iamtypes.UserDetail", ManualFetcher: true},
-			{Api: "iam", ResourceType: cloud.Group, AWSType: "iamtypes.GroupDetail", ManualFetcher: true},
-			{Api: "iam", ResourceType: cloud.Role, AWSType: "iamtypes.RoleDetail", ManualFetcher: true},
-			{Api: "iam", ResourceType: cloud.Policy, AWSType: "iamtypes.Policy", ManualFetcher: true},
-			{Api: "iam", ResourceType: cloud.AccessKey, AWSType: "iamtypes.AccessKeyMetadata", ManualFetcher: true},
-			{Api: "iam", ResourceType: cloud.InstanceProfile, AWSType: "iamtypes.InstanceProfile", ApiMethod: "ListInstanceProfiles", Input: "iam.ListInstanceProfilesInput{}", Output: "iam.ListInstanceProfilesOutput", OutputsExtractor: "InstanceProfiles", Multipage: true, NextPageMarker: "Marker"},
-			{Api: "iam", ResourceType: cloud.MFADevice, AWSType: "iamtypes.VirtualMFADevice", ApiMethod: "ListVirtualMFADevices", Input: "iam.ListVirtualMFADevicesInput{}", Output: "iam.ListVirtualMFADevicesOutput", OutputsExtractor: "VirtualMFADevices", Multipage: true, NextPageMarker: "Marker"},
+			{API: "iam", ResourceType: cloud.User, AWSType: "iamtypes.UserDetail", ManualFetcher: true},
+			{API: "iam", ResourceType: cloud.Group, AWSType: "iamtypes.GroupDetail", ManualFetcher: true},
+			{API: "iam", ResourceType: cloud.Role, AWSType: "iamtypes.RoleDetail", ManualFetcher: true},
+			{API: "iam", ResourceType: cloud.Policy, AWSType: "iamtypes.Policy", ManualFetcher: true},
+			{API: "iam", ResourceType: cloud.AccessKey, AWSType: "iamtypes.AccessKeyMetadata", ManualFetcher: true},
+			{API: "iam", ResourceType: cloud.InstanceProfile, AWSType: "iamtypes.InstanceProfile", APIMethod: "ListInstanceProfiles", Input: "iam.ListInstanceProfilesInput{}", Output: "iam.ListInstanceProfilesOutput", OutputsExtractor: "InstanceProfiles", Multipage: true, NextPageMarker: "Marker"},
+			{API: "iam", ResourceType: cloud.MFADevice, AWSType: "iamtypes.VirtualMFADevice", APIMethod: "ListVirtualMFADevices", Input: "iam.ListVirtualMFADevicesInput{}", Output: "iam.ListVirtualMFADevicesOutput", OutputsExtractor: "VirtualMFADevices", Multipage: true, NextPageMarker: "Marker"},
 		},
 	},
 	{
 		Name: "storage",
-		Api:  []string{"s3"},
+		API:  []string{"s3"},
 		Fetchers: []fetcher{
-			{Api: "s3", ResourceType: cloud.Bucket, AWSType: "s3types.Bucket", ManualFetcher: true},
-			{Api: "s3", ResourceType: cloud.S3Object, AWSType: "s3types.Object", ManualFetcher: true},
+			{API: "s3", ResourceType: cloud.Bucket, AWSType: "s3types.Bucket", ManualFetcher: true},
+			{API: "s3", ResourceType: cloud.S3Object, AWSType: "s3types.Object", ManualFetcher: true},
 		},
 	},
 	{
 		Name: "messaging",
-		Api:  []string{"sns", "sqs"},
+		API:  []string{"sns", "sqs"},
 		Fetchers: []fetcher{
-			{Api: "sns", ResourceType: cloud.Subscription, AWSType: "snstypes.Subscription", ApiMethod: "ListSubscriptions", Input: "sns.ListSubscriptionsInput{}", Output: "sns.ListSubscriptionsOutput", OutputsExtractor: "Subscriptions", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "sns", ResourceType: cloud.Topic, AWSType: "snstypes.Topic", ApiMethod: "ListTopics", Input: "sns.ListTopicsInput{}", Output: "sns.ListTopicsOutput", OutputsExtractor: "Topics", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "sqs", ResourceType: cloud.Queue, AWSType: "string", ManualFetcher: true},
+			{API: "sns", ResourceType: cloud.Subscription, AWSType: "snstypes.Subscription", APIMethod: "ListSubscriptions", Input: "sns.ListSubscriptionsInput{}", Output: "sns.ListSubscriptionsOutput", OutputsExtractor: "Subscriptions", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "sns", ResourceType: cloud.Topic, AWSType: "snstypes.Topic", APIMethod: "ListTopics", Input: "sns.ListTopicsInput{}", Output: "sns.ListTopicsOutput", OutputsExtractor: "Topics", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "sqs", ResourceType: cloud.Queue, AWSType: "string", ManualFetcher: true},
 		},
 	},
 	{
 		Name:   "dns",
 		Global: true,
-		Api:    []string{"route53"},
+		API:    []string{"route53"},
 		Fetchers: []fetcher{
-			{Api: "route53", ResourceType: cloud.Zone, AWSType: "route53types.HostedZone", ApiMethod: "ListHostedZones", Input: "route53.ListHostedZonesInput{}", Output: "route53.ListHostedZonesOutput", OutputsExtractor: "HostedZones", Multipage: true, NextPageMarker: "NextMarker"},
-			{Api: "route53", ResourceType: cloud.Record, AWSType: "route53types.ResourceRecordSet", ManualFetcher: true},
+			{API: "route53", ResourceType: cloud.Zone, AWSType: "route53types.HostedZone", APIMethod: "ListHostedZones", Input: "route53.ListHostedZonesInput{}", Output: "route53.ListHostedZonesOutput", OutputsExtractor: "HostedZones", Multipage: true, NextPageMarker: "NextMarker"},
+			{API: "route53", ResourceType: cloud.Record, AWSType: "route53types.ResourceRecordSet", ManualFetcher: true},
 		},
 	},
 
 	{
 		Name: "lambda",
-		Api:  []string{"lambda"},
+		API:  []string{"lambda"},
 		Fetchers: []fetcher{
-			{Api: "lambda", ResourceType: cloud.Function, AWSType: "lambdatypes.FunctionConfiguration", ApiMethod: "ListFunctions", Input: "lambda.ListFunctionsInput{}", Output: "lambda.ListFunctionsOutput", OutputsExtractor: "Functions", Multipage: true, NextPageMarker: "NextMarker"},
+			{API: "lambda", ResourceType: cloud.Function, AWSType: "lambdatypes.FunctionConfiguration", APIMethod: "ListFunctions", Input: "lambda.ListFunctionsInput{}", Output: "lambda.ListFunctionsOutput", OutputsExtractor: "Functions", Multipage: true, NextPageMarker: "NextMarker"},
 		},
 	},
 	{
 		Name: "monitoring",
-		Api:  []string{"cloudwatch"},
+		API:  []string{"cloudwatch"},
 		Fetchers: []fetcher{
-			{Api: "cloudwatch", ResourceType: cloud.Metric, AWSType: "cloudwatchtypes.Metric", ApiMethod: "ListMetrics", Input: "cloudwatch.ListMetricsInput{}", Output: "cloudwatch.ListMetricsOutput", OutputsExtractor: "Metrics", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "cloudwatch", ResourceType: cloud.Alarm, AWSType: "cloudwatchtypes.MetricAlarm", ApiMethod: "DescribeAlarms", Input: "cloudwatch.DescribeAlarmsInput{}", Output: "cloudwatch.DescribeAlarmsOutput", OutputsExtractor: "MetricAlarms", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "cloudwatch", ResourceType: cloud.Metric, AWSType: "cloudwatchtypes.Metric", APIMethod: "ListMetrics", Input: "cloudwatch.ListMetricsInput{}", Output: "cloudwatch.ListMetricsOutput", OutputsExtractor: "Metrics", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "cloudwatch", ResourceType: cloud.Alarm, AWSType: "cloudwatchtypes.MetricAlarm", APIMethod: "DescribeAlarms", Input: "cloudwatch.DescribeAlarmsInput{}", Output: "cloudwatch.DescribeAlarmsOutput", OutputsExtractor: "MetricAlarms", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
 	{
 		Name:   "cdn",
 		Global: true,
-		Api:    []string{"cloudfront"},
+		API:    []string{"cloudfront"},
 		Fetchers: []fetcher{
-			{Api: "cloudfront", ResourceType: cloud.Distribution, AWSType: "cloudfronttypes.DistributionSummary", ApiMethod: "ListDistributions", Input: "cloudfront.ListDistributionsInput{}", Output: "cloudfront.ListDistributionsOutput", OutputsExtractor: "DistributionList.Items", Multipage: true, NextPageMarker: "DistributionList.NextMarker"},
+			{API: "cloudfront", ResourceType: cloud.Distribution, AWSType: "cloudfronttypes.DistributionSummary", APIMethod: "ListDistributions", Input: "cloudfront.ListDistributionsInput{}", Output: "cloudfront.ListDistributionsOutput", OutputsExtractor: "DistributionList.Items", Multipage: true, NextPageMarker: "DistributionList.NextMarker"},
 		},
 	},
 	{
 		Name: "cloudformation", //deployment ?
-		Api:  []string{"cloudformation"},
+		API:  []string{"cloudformation"},
 		Fetchers: []fetcher{
-			{Api: "cloudformation", ResourceType: cloud.Stack, AWSType: "cloudformationtypes.Stack", ApiMethod: "DescribeStacks", Input: "cloudformation.DescribeStacksInput{}", Output: "cloudformation.DescribeStacksOutput", OutputsExtractor: "Stacks", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "cloudformation", ResourceType: cloud.Stack, AWSType: "cloudformationtypes.Stack", APIMethod: "DescribeStacks", Input: "cloudformation.DescribeStacksInput{}", Output: "cloudformation.DescribeStacksOutput", OutputsExtractor: "Stacks", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
 	{
 		Name: "eks",
-		Api:  []string{"eks"},
+		API:  []string{"eks"},
 		Fetchers: []fetcher{
-			{Api: "eks", ResourceType: cloud.EKSCluster, AWSType: "ekstypes.Cluster", ManualFetcher: true},
-			{Api: "eks", ResourceType: cloud.EKSNodeGroup, AWSType: "ekstypes.Nodegroup", ManualFetcher: true},
+			{API: "eks", ResourceType: cloud.EKSCluster, AWSType: "ekstypes.Cluster", ManualFetcher: true},
+			{API: "eks", ResourceType: cloud.EKSNodeGroup, AWSType: "ekstypes.Nodegroup", ManualFetcher: true},
 		},
 	},
 	{
 		Name: "dynamodb",
-		Api:  []string{"dynamodb"},
+		API:  []string{"dynamodb"},
 		Fetchers: []fetcher{
-			{Api: "dynamodb", ResourceType: cloud.DynamoDBTable, AWSType: "dynamodbtypes.TableDescription", ManualFetcher: true},
+			{API: "dynamodb", ResourceType: cloud.DynamoDBTable, AWSType: "dynamodbtypes.TableDescription", ManualFetcher: true},
 		},
 	},
 	{
 		Name: "secretsmanager",
-		Api:  []string{"secretsmanager", "kms"},
+		API:  []string{"secretsmanager", "kms"},
 		Fetchers: []fetcher{
-			{Api: "secretsmanager", ResourceType: cloud.Secret, AWSType: "secretsmanagertypes.SecretListEntry", ApiMethod: "ListSecrets", Input: "secretsmanager.ListSecretsInput{}", Output: "secretsmanager.ListSecretsOutput", OutputsExtractor: "SecretList", Multipage: true, NextPageMarker: "NextToken"},
-			{Api: "kms", ResourceType: cloud.Key, AWSType: "kmstypes.KeyMetadata", ManualFetcher: true},
+			{API: "secretsmanager", ResourceType: cloud.Secret, AWSType: "secretsmanagertypes.SecretListEntry", APIMethod: "ListSecrets", Input: "secretsmanager.ListSecretsInput{}", Output: "secretsmanager.ListSecretsOutput", OutputsExtractor: "SecretList", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "kms", ResourceType: cloud.Key, AWSType: "kmstypes.KeyMetadata", ManualFetcher: true},
 		},
 	},
 	{
 		Name: "apigateway",
-		Api:  []string{"apigatewayv2"},
+		API:  []string{"apigatewayv2"},
 		Fetchers: []fetcher{
-			{Api: "apigatewayv2", ResourceType: cloud.ApiGateway, AWSType: "apigatewayv2types.Api", ManualFetcher: true},
-			{Api: "apigatewayv2", ResourceType: cloud.ApiGatewayRoute, AWSType: "apigatewayv2types.Route", ManualFetcher: true},
-			{Api: "apigatewayv2", ResourceType: cloud.ApiGatewayStage, AWSType: "apigatewayv2types.Stage", ManualFetcher: true},
+			{API: "apigatewayv2", ResourceType: cloud.APIGateway, AWSType: "apigatewayv2types.Api", ManualFetcher: true},
+			{API: "apigatewayv2", ResourceType: cloud.APIGatewayRoute, AWSType: "apigatewayv2types.Route", ManualFetcher: true},
+			{API: "apigatewayv2", ResourceType: cloud.APIGatewayStage, AWSType: "apigatewayv2types.Stage", ManualFetcher: true},
 		},
 	},
 	{
 		Name: "ssm",
-		Api:  []string{"ssm"},
+		API:  []string{"ssm"},
 		Fetchers: []fetcher{
-			{Api: "ssm", ResourceType: cloud.SSMParameter, AWSType: "ssmtypes.ParameterMetadata", ApiMethod: "DescribeParameters", Input: "ssm.DescribeParametersInput{}", Output: "ssm.DescribeParametersOutput", OutputsExtractor: "Parameters", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ssm", ResourceType: cloud.SSMParameter, AWSType: "ssmtypes.ParameterMetadata", APIMethod: "DescribeParameters", Input: "ssm.DescribeParametersInput{}", Output: "ssm.DescribeParametersOutput", OutputsExtractor: "Parameters", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
 	{
 		Name: "efs",
-		Api:  []string{"efs"},
+		API:  []string{"efs"},
 		Fetchers: []fetcher{
-			{Api: "efs", ResourceType: cloud.FileSystem, AWSType: "efstypes.FileSystemDescription", ApiMethod: "DescribeFileSystems", Input: "efs.DescribeFileSystemsInput{}", Output: "efs.DescribeFileSystemsOutput", OutputsExtractor: "FileSystems", Multipage: true, NextPageMarker: "NextMarker"},
-			{Api: "efs", ResourceType: cloud.MountTarget, AWSType: "efstypes.MountTargetDescription", ManualFetcher: true},
+			{API: "efs", ResourceType: cloud.FileSystem, AWSType: "efstypes.FileSystemDescription", APIMethod: "DescribeFileSystems", Input: "efs.DescribeFileSystemsInput{}", Output: "efs.DescribeFileSystemsOutput", OutputsExtractor: "FileSystems", Multipage: true, NextPageMarker: "NextMarker"},
+			{API: "efs", ResourceType: cloud.MountTarget, AWSType: "efstypes.MountTargetDescription", ManualFetcher: true},
 		},
 	},
 	{
 		Name: "cloudtrail",
-		Api:  []string{"cloudtrail"},
+		API:  []string{"cloudtrail"},
 		Fetchers: []fetcher{
-			{Api: "cloudtrail", ResourceType: cloud.Trail, AWSType: "cloudtrailtypes.Trail", ApiMethod: "DescribeTrails", Input: "cloudtrail.DescribeTrailsInput{}", Output: "cloudtrail.DescribeTrailsOutput", OutputsExtractor: "TrailList"},
+			{API: "cloudtrail", ResourceType: cloud.Trail, AWSType: "cloudtrailtypes.Trail", APIMethod: "DescribeTrails", Input: "cloudtrail.DescribeTrailsInput{}", Output: "cloudtrail.DescribeTrailsOutput", OutputsExtractor: "TrailList"},
 		},
 	},
 	{
 		Name: "cloudwatchlogs",
-		Api:  []string{"cloudwatchlogs"},
+		API:  []string{"cloudwatchlogs"},
 		Fetchers: []fetcher{
-			{Api: "cloudwatchlogs", ResourceType: cloud.LogGroup, AWSType: "cloudwatchlogstypes.LogGroup", ApiMethod: "DescribeLogGroups", Input: "cloudwatchlogs.DescribeLogGroupsInput{}", Output: "cloudwatchlogs.DescribeLogGroupsOutput", OutputsExtractor: "LogGroups", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "cloudwatchlogs", ResourceType: cloud.LogGroup, AWSType: "cloudwatchlogstypes.LogGroup", APIMethod: "DescribeLogGroups", Input: "cloudwatchlogs.DescribeLogGroupsInput{}", Output: "cloudwatchlogs.DescribeLogGroupsOutput", OutputsExtractor: "LogGroups", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
 }

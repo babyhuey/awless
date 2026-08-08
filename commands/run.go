@@ -414,7 +414,7 @@ func resolveAliasFunc(paramPath, alias string) string {
 		}
 	}
 
-	return matchingResource.Id()
+	return matchingResource.ID()
 }
 
 func availableActionsForEntity(entity string) string {
@@ -442,8 +442,8 @@ func oneLinerShortDesc(action string, entities []string) string {
 }
 
 const (
-	DEFAULT_REPO_PREFIX = "https://raw.githubusercontent.com/wallix/awless-templates/master"
-	FILE_EXT            = ".aws"
+	defaultRepoPrefix = "https://raw.githubusercontent.com/wallix/awless-templates/master"
+	fileExt           = ".aws"
 )
 
 type templateMetadata struct {
@@ -453,15 +453,15 @@ type templateMetadata struct {
 
 func getTemplateText(path string) (content []byte, expanded string, err error) {
 	if strings.HasPrefix(path, "repo:") {
-		path = fmt.Sprintf("%s/%s", DEFAULT_REPO_PREFIX, strings.TrimPrefix(path[5:], "/"))
-		path = fmt.Sprintf("%s%s", strings.TrimSuffix(path, FILE_EXT), FILE_EXT)
+		path = fmt.Sprintf("%s/%s", defaultRepoPrefix, strings.TrimPrefix(path[5:], "/"))
+		path = fmt.Sprintf("%s%s", strings.TrimSuffix(path, fileExt), fileExt)
 	}
 
 	expanded = path
 
 	if strings.HasPrefix(path, "http") {
 		logger.ExtraVerbosef("fetching remote template at '%s'", path)
-		content, err = readHttpContent(path)
+		content, err = readHTTPContent(path)
 	} else {
 		f, ferr := os.Open(path)
 		if ferr != nil {
@@ -526,7 +526,7 @@ func detectMinimalVersionInTemplate(content []byte) (string, bool) {
 }
 
 func listRemoteTemplates() error {
-	manifestFile, err := readHttpContent(DEFAULT_REPO_PREFIX + "/manifest.json")
+	manifestFile, err := readHTTPContent(defaultRepoPrefix + "/manifest.json")
 	if err != nil {
 		return err
 	}
@@ -549,7 +549,7 @@ func listRemoteTemplates() error {
 	return nil
 }
 
-func readHttpContent(path string) ([]byte, error) {
+func readHTTPContent(path string) ([]byte, error) {
 	resp, err := http.Get(path)
 	if err != nil {
 		return nil, err

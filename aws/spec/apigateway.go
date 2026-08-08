@@ -58,7 +58,7 @@ type DeleteApigateway struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *apigatewayv2.Client
-	Id     *string `awsName:"ApiId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"ApiId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteApigateway) ParamsSpec() params.Spec {
@@ -70,7 +70,7 @@ type CreateApigatewayroute struct {
 	logger     *logger.Logger
 	graph      cloud.GraphAPI
 	api        *apigatewayv2.Client
-	Api        *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
+	API        *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
 	RouteKey   *string `awsName:"RouteKey" awsType:"awsstr" templateName:"route-key"`
 	Target     *string `awsName:"Target" awsType:"awsstr" templateName:"target"`
 	Authorizer *string `awsName:"AuthorizerId" awsType:"awsstr" templateName:"authorizer"`
@@ -93,8 +93,8 @@ type DeleteApigatewayroute struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *apigatewayv2.Client
-	Api    *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
-	Id     *string `awsName:"RouteId" awsType:"awsstr" templateName:"id"`
+	API    *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
+	ID     *string `awsName:"RouteId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteApigatewayroute) ParamsSpec() params.Spec {
@@ -106,7 +106,7 @@ type CreateApigatewaystage struct {
 	logger     *logger.Logger
 	graph      cloud.GraphAPI
 	api        *apigatewayv2.Client
-	Api        *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
+	API        *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
 	Name       *string `awsName:"StageName" awsType:"awsstr" templateName:"name"`
 	Autodeploy *bool   `awsName:"AutoDeploy" awsType:"awsbool" templateName:"autodeploy"`
 	Deployment *string `awsName:"DeploymentId" awsType:"awsstr" templateName:"deployment"`
@@ -129,7 +129,7 @@ type DeleteApigatewaystage struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *apigatewayv2.Client
-	Api    *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
+	API    *string `awsName:"ApiId" awsType:"awsstr" templateName:"api"`
 	Name   *string `awsName:"StageName" awsType:"awsstr" templateName:"name"`
 }
 

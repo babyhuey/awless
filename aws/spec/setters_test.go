@@ -683,21 +683,21 @@ type TestStruct struct {
 	MultiCloudField     *int64    `awsName:"CloudField1,CloudField2" awsType:"awsint64" templateName:"fmultistring"`
 }
 
-func (ts *TestStruct) Validate_FieldStringRequired() (err error) {
+func (ts *TestStruct) ValidateFieldStringRequired() (err error) {
 	if len(*ts.FieldStringRequired) == 0 {
 		err = errors.New("fstringrequired should not be empty")
 	}
 	return
 }
 
-func (ts *TestStruct) Validate_FieldString() (err error) {
+func (ts *TestStruct) ValidateFieldString() (err error) {
 	if len(*ts.FieldString) != 10 {
 		err = errors.New("fstring should be 10 chars")
 	}
 	return
 }
 
-func (ts *TestStruct) Validate_FieldInt64() (err error) {
+func (ts *TestStruct) ValidateFieldInt64() (err error) {
 	if *ts.FieldInt64 > 10 {
 		err = errors.New("fint should not exceed 10")
 	}

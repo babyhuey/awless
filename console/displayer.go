@@ -481,7 +481,7 @@ func (d *jsonDisplayer) Print(w io.Writer) error {
 		return err
 	}
 
-	sort.Slice(resources, func(i, j int) bool { return resources[i].Id() < resources[j].Id() })
+	sort.Slice(resources, func(i, j int) bool { return resources[i].ID() < resources[j].ID() })
 
 	var props []map[string]any
 	for _, res := range resources {
@@ -777,7 +777,7 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 				res.Type(), color.New(color.FgRed).SprintFunc()("- " + nameOrID(res)), "", "",
 			})
 		default:
-			fromCommons[res.Id()] = res
+			fromCommons[res.ID()] = res
 		}
 		return nil
 	}
@@ -794,7 +794,7 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 				res.Type(), color.New(color.FgGreen).SprintFunc()("+ " + nameOrID(res)), "", "",
 			})
 		default:
-			toCommons[res.Id()] = res
+			toCommons[res.ID()] = res
 		}
 		return nil
 	}
@@ -807,7 +807,7 @@ func (d *diffTableDisplayer) Print(w io.Writer) error {
 		resType := common.Type()
 		naming := nameOrID(common)
 
-		if rem, ok := toCommons[common.Id()]; ok {
+		if rem, ok := toCommons[common.ID()]; ok {
 			added := graph.Subtract(rem.Properties(), common.Properties())
 			for k, v := range added {
 				values = append(values, []any{
@@ -895,14 +895,14 @@ func (d *diffTreeDisplayer) Print(w io.Writer) error {
 		switch diffMeta {
 		case "extra":
 			color.Set(color.FgGreen)
-			fmt.Fprintf(w, "+%s%s, %s\n", tabs, res.Type(), res.Id())
+			fmt.Fprintf(w, "+%s%s, %s\n", tabs, res.Type(), res.ID())
 			color.Unset()
 		case "missing":
 			color.Set(color.FgRed)
-			fmt.Fprintf(w, "-%s%s, %s\n", tabs, res.Type(), res.Id())
+			fmt.Fprintf(w, "-%s%s, %s\n", tabs, res.Type(), res.ID())
 			color.Unset()
 		default:
-			fmt.Fprintf(w, "%s%s, %s\n", tabs, res.Type(), res.Id())
+			fmt.Fprintf(w, "%s%s, %s\n", tabs, res.Type(), res.ID())
 		}
 		return nil
 	}
@@ -1081,5 +1081,5 @@ func nameOrID(res cloud.Resource) string {
 	if id, ok := res.Property("Id"); ok && id != "" {
 		return fmt.Sprint(id)
 	}
-	return res.Id()
+	return res.ID()
 }

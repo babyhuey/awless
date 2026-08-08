@@ -54,7 +54,7 @@ type DeleteQueue struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *sqs.Client
-	Url    *string `awsName:"QueueUrl" awsType:"awsstr" templateName:"url"`
+	URL    *string `awsName:"QueueUrl" awsType:"awsstr" templateName:"url"`
 }
 
 func (cmd *DeleteQueue) ParamsSpec() params.Spec {

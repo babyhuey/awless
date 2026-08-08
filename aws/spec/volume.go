@@ -53,7 +53,7 @@ type CheckVolume struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *ec2.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -68,10 +68,10 @@ func (cmd *CheckVolume) ParamsSpec() params.Spec {
 }
 
 func (cmd *CheckVolume) ManualRun(renv env.Running) (any, error) {
-	input := &ec2.DescribeVolumesInput{VolumeIds: []string{awssdk.ToString(cmd.Id)}}
+	input := &ec2.DescribeVolumesInput{VolumeIds: []string{awssdk.ToString(cmd.ID)}}
 
 	c := &checker{
-		description: fmt.Sprintf("volume %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("volume %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -87,7 +87,7 @@ func (cmd *CheckVolume) ManualRun(renv env.Running) (any, error) {
 				}
 			} else {
 				for _, vol := range output.Volumes {
-					if StringValue(vol.VolumeId) == StringValue(cmd.Id) {
+					if StringValue(vol.VolumeId) == StringValue(cmd.ID) {
 						return string(vol.State), nil
 					}
 				}
@@ -105,7 +105,7 @@ type DeleteVolume struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteVolume) ParamsSpec() params.Spec {
@@ -118,7 +118,7 @@ type AttachVolume struct {
 	graph    cloud.GraphAPI
 	api      *ec2.Client
 	Device   *string `awsName:"Device" awsType:"awsstr" templateName:"device"`
-	Id       *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
+	ID       *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
 	Instance *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
 }
 
@@ -135,7 +135,7 @@ type DetachVolume struct {
 	graph    cloud.GraphAPI
 	api      *ec2.Client
 	Device   *string `awsName:"Device" awsType:"awsstr" templateName:"device"`
-	Id       *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
+	ID       *string `awsName:"VolumeId" awsType:"awsstr" templateName:"id"`
 	Instance *string `awsName:"InstanceId" awsType:"awsstr" templateName:"instance"`
 	Force    *bool   `awsName:"Force" awsType:"awsbool" templateName:"force"`
 }

@@ -71,8 +71,8 @@ func (r *FirewallRule) marshalToTriples(id string) []tstore.Triple {
 }
 
 func (r *FirewallRule) unmarshalFromTriples(g tstore.RDFGraph, id string) error {
-	portRangeTs := g.WithSubjPred(id, rdf.PortRange)
-	ports, err := extractUniqueLiteralTextFromTriples(portRangeTs)
+	portRangeTS := g.WithSubjPred(id, rdf.PortRange)
+	ports, err := extractUniqueLiteralTextFromTriples(portRangeTS)
 	if err != nil {
 		return fmt.Errorf("unmarshal firewall rule: port range: %w", err)
 	}
@@ -82,15 +82,15 @@ func (r *FirewallRule) unmarshalFromTriples(g tstore.RDFGraph, id string) error 
 	}
 	r.PortRange = pr
 
-	protocolTs := g.WithSubjPred(id, rdf.Protocol)
-	protocol, err := extractUniqueLiteralTextFromTriples(protocolTs)
+	protocolTS := g.WithSubjPred(id, rdf.Protocol)
+	protocol, err := extractUniqueLiteralTextFromTriples(protocolTS)
 	if err != nil {
 		return fmt.Errorf("unmarshal firewall rule: protocol: %w", err)
 	}
 	r.Protocol = protocol
 
-	cidrTs := g.WithSubjPred(id, rdf.CIDR)
-	for _, cidrT := range cidrTs {
+	cidrTS := g.WithSubjPred(id, rdf.CIDR)
+	for _, cidrT := range cidrTS {
 		cidrTxt, err := tstore.ParseString(cidrT.Object())
 		if err != nil {
 			return fmt.Errorf("unmarshal firewall rule: cidr: %w", err)
@@ -102,8 +102,8 @@ func (r *FirewallRule) unmarshalFromTriples(g tstore.RDFGraph, id string) error 
 		r.IPRanges = append(r.IPRanges, cidr)
 	}
 
-	sourceTs := g.WithSubjPred(id, rdf.Source)
-	for _, sourceT := range sourceTs {
+	sourceTS := g.WithSubjPred(id, rdf.Source)
+	for _, sourceT := range sourceTS {
 		source, err := tstore.ParseString(sourceT.Object())
 		if err != nil {
 			return fmt.Errorf("unmarshal firewall rule: source: %w", err)
@@ -214,12 +214,12 @@ func (routes Routes) Sort() {
 type Route struct {
 	Destination             *net.IPNet     `predicate:"net:cidr"`
 	DestinationIPv6         *net.IPNet     `predicate:"net:cidrv6"`
-	DestinationPrefixListId string         `predicate:"net:routeDestinationPrefixList"`
+	DestinationPrefixListID string         `predicate:"net:routeDestinationPrefixList"`
 	Targets                 []*RouteTarget `predicate:"net:routeTargets"`
 }
 
 func (r *Route) String() string {
-	return fmt.Sprintf("Destination:%+v; DestinationIPv6:%+v; DestinationPrefixListId:%s; Targets:%+v", r.Destination, r.DestinationIPv6, r.DestinationPrefixListId, r.Targets)
+	return fmt.Sprintf("Destination:%+v; DestinationIPv6:%+v; DestinationPrefixListID:%s; Targets:%+v", r.Destination, r.DestinationIPv6, r.DestinationPrefixListID, r.Targets)
 }
 
 func (r *Route) marshalToTriples(id string) []tstore.Triple {
@@ -230,9 +230,9 @@ func (r *Route) marshalToTriples(id string) []tstore.Triple {
 }
 
 func (r *Route) unmarshalFromTriples(g tstore.RDFGraph, id string) error {
-	routeDestTs := g.WithSubjPred(id, rdf.CIDR)
-	if len(routeDestTs) > 0 {
-		dest, err := extractUniqueLiteralTextFromTriples(routeDestTs)
+	routeDestTS := g.WithSubjPred(id, rdf.CIDR)
+	if len(routeDestTS) > 0 {
+		dest, err := extractUniqueLiteralTextFromTriples(routeDestTS)
 		if err != nil {
 			return fmt.Errorf("unmarshal route: destination: %w", err)
 		}
@@ -255,17 +255,17 @@ func (r *Route) unmarshalFromTriples(g tstore.RDFGraph, id string) error {
 		}
 	}
 
-	destPrefixTs := g.WithSubjPred(id, rdf.NetDestinationPrefixList)
-	if len(destPrefixTs) > 0 {
+	destPrefixTS := g.WithSubjPred(id, rdf.NetDestinationPrefixList)
+	if len(destPrefixTS) > 0 {
 		var err error
-		r.DestinationPrefixListId, err = extractUniqueLiteralTextFromTriples(destPrefixTs)
+		r.DestinationPrefixListID, err = extractUniqueLiteralTextFromTriples(destPrefixTS)
 		if err != nil {
 			return fmt.Errorf("unmarshal route: destination prefix: %w", err)
 		}
 	}
 
-	targetTs := g.WithSubjPred(id, rdf.NetRouteTargets)
-	for _, targetT := range targetTs {
+	targetTS := g.WithSubjPred(id, rdf.NetRouteTargets)
+	for _, targetT := range targetTS {
 		litText, err := tstore.ParseString(targetT.Object())
 		if err != nil {
 			return err
@@ -312,38 +312,38 @@ func (g *Grant) marshalToTriples(id string) []tstore.Triple {
 }
 
 func (g *Grant) unmarshalFromTriples(gph tstore.RDFGraph, id string) error {
-	permissionTs := gph.WithSubjPred(id, rdf.Permission)
+	permissionTS := gph.WithSubjPred(id, rdf.Permission)
 	var err error
-	g.Permission, err = extractUniqueLiteralTextFromTriples(permissionTs)
+	g.Permission, err = extractUniqueLiteralTextFromTriples(permissionTS)
 	if err != nil {
 		return fmt.Errorf("unmarshal grant: permission: %w", err)
 	}
-	granteeTs := gph.WithSubjPred(id, rdf.Grantee)
-	if len(granteeTs) != 1 {
-		return fmt.Errorf("unmarshal grant: expect 1 grantee got: %d", len(granteeTs))
+	granteeTS := gph.WithSubjPred(id, rdf.Grantee)
+	if len(granteeTS) != 1 {
+		return fmt.Errorf("unmarshal grant: expect 1 grantee got: %d", len(granteeTS))
 	}
-	granteeNode, ok := granteeTs[0].Object().Bnode()
+	granteeNode, ok := granteeTS[0].Object().Bnode()
 	if !ok {
 		return fmt.Errorf("unmarshal grant: grantee does not contain a resource identifier")
 	}
-	granteeIdTs := gph.WithSubjPred(granteeNode, rdf.ID)
-	if len(granteeIdTs) > 0 {
-		g.Grantee.GranteeID, err = extractUniqueLiteralTextFromTriples(granteeIdTs)
+	granteeIDTS := gph.WithSubjPred(granteeNode, rdf.ID)
+	if len(granteeIDTS) > 0 {
+		g.Grantee.GranteeID, err = extractUniqueLiteralTextFromTriples(granteeIDTS)
 		if err != nil {
 			return fmt.Errorf("unmarshal grant: grantee id: %w", err)
 		}
 	}
-	granteeNameTs := gph.WithSubjPred(granteeNode, rdf.Name)
-	if len(granteeNameTs) > 0 {
-		g.Grantee.GranteeDisplayName, err = extractUniqueLiteralTextFromTriples(granteeNameTs)
+	granteeNameTS := gph.WithSubjPred(granteeNode, rdf.Name)
+	if len(granteeNameTS) > 0 {
+		g.Grantee.GranteeDisplayName, err = extractUniqueLiteralTextFromTriples(granteeNameTS)
 		if err != nil {
 			return fmt.Errorf("unmarshal grant: grantee name: %w", err)
 		}
 	}
 
-	granteeTypeTs := gph.WithSubjPred(granteeNode, rdf.GranteeType)
-	if len(granteeTypeTs) > 0 {
-		g.Grantee.GranteeType, err = extractUniqueLiteralTextFromTriples(granteeTypeTs)
+	granteeTypeTS := gph.WithSubjPred(granteeNode, rdf.GranteeType)
+	if len(granteeTypeTS) > 0 {
+		g.Grantee.GranteeType, err = extractUniqueLiteralTextFromTriples(granteeTypeTS)
 		if err != nil {
 			return fmt.Errorf("unmarshal grant: grantee type: %w", err)
 		}

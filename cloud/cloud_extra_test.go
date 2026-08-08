@@ -234,7 +234,7 @@ func TestServicesNames(t *testing.T) {
 
 func TestResourcesMap(t *testing.T) {
 	res := Resources{&stubResource{id: "i-123", typ: "instance"}, &stubResource{id: "i-456", typ: "instance"}}
-	ids := res.Map(func(r Resource) string { return r.Id() })
+	ids := res.Map(func(r Resource) string { return r.ID() })
 	if len(ids) != 2 {
 		t.Fatalf("expected 2 ids, got %d", len(ids))
 	}
@@ -265,7 +265,7 @@ type stubResource struct {
 }
 
 func (r *stubResource) Type() string                { return r.typ }
-func (r *stubResource) Id() string                  { return r.id }
+func (r *stubResource) ID() string                  { return r.id }
 func (r *stubResource) String() string              { return r.id }
 func (r *stubResource) Format(string) string        { return r.id }
 func (r *stubResource) Properties() map[string]any  { return nil }
@@ -376,7 +376,7 @@ func TestServicesNamesEmpty(t *testing.T) {
 
 func TestResourcesMapEmpty(t *testing.T) {
 	res := Resources{}
-	ids := res.Map(func(r Resource) string { return r.Id() })
+	ids := res.Map(func(r Resource) string { return r.ID() })
 	if len(ids) != 0 {
 		t.Fatalf("expected 0 ids, got %d", len(ids))
 	}

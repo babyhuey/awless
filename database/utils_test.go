@@ -20,7 +20,7 @@ import (
 	"os"
 )
 
-func newTestDb() (*DB, func()) {
+func newTestDB() (*DB, func()) {
 	f, e := os.MkdirTemp(".", "test")
 	if e != nil {
 		panic(e)

@@ -58,7 +58,7 @@ type UpdateSecuritygroup struct {
 	logger        *logger.Logger
 	graph         cloud.GraphAPI
 	api           *ec2.Client
-	Id            *string `templateName:"id"`
+	ID            *string `templateName:"id"`
 	Protocol      *string `templateName:"protocol"`
 	CIDR          *string `templateName:"cidr"`
 	Securitygroup *string `templateName:"securitygroup"`
@@ -92,7 +92,7 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
 	}
-	ipPerms, err := cmd.buildIpPermissions()
+	ipPerms, err := cmd.buildIPPermissions()
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 		return nil, fmt.Errorf("expect either 'inbound' or 'outbound' parameter")
 	}
 
-	err = setFieldWithType(cmd.Id, input, "GroupId", awsstr)
+	err = setFieldWithType(cmd.ID, input, "GroupId", awsstr)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 }
 
 func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (any, error) {
-	ipPerms, err := cmd.buildIpPermissions()
+	ipPerms, err := cmd.buildIPPermissions()
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	}
 
 	// Required params
-	err = setFieldWithType(cmd.Id, input, "GroupId", awsstr)
+	err = setFieldWithType(cmd.ID, input, "GroupId", awsstr)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ type DeleteSecuritygroup struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"GroupId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"GroupId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteSecuritygroup) ParamsSpec() params.Spec {
@@ -212,7 +212,7 @@ type CheckSecuritygroup struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *ec2.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -228,12 +228,12 @@ func (cmd *CheckSecuritygroup) ParamsSpec() params.Spec {
 func (cmd *CheckSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DescribeNetworkInterfacesInput{
 		Filters: []ec2types.Filter{
-			{Name: String("group-id"), Values: []string{awssdk.ToString(cmd.Id)}},
+			{Name: String("group-id"), Values: []string{awssdk.ToString(cmd.ID)}},
 		},
 	}
 
 	c := &checker{
-		description: fmt.Sprintf("securitygroup %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("securitygroup %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -261,7 +261,7 @@ type AttachSecuritygroup struct {
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
 	api      *ec2.Client
-	Id       *string `templateName:"id"`
+	ID       *string `templateName:"id"`
 	Instance *string `templateName:"instance"`
 }
 
@@ -275,7 +275,7 @@ func (cmd *AttachSecuritygroup) ManualRun(renv env.Running) (any, error) {
 		return nil, fmt.Errorf("fetching securitygroups for instance %s: %w", StringValue(cmd.Instance), err)
 	}
 
-	groups = append(groups, StringValue(cmd.Id))
+	groups = append(groups, StringValue(cmd.ID))
 	call := &awsCall{
 		fnName: "ec2.ModifyInstanceAttribute",
 		fn:     cmd.api.ModifyInstanceAttribute,
@@ -293,7 +293,7 @@ type DetachSecuritygroup struct {
 	logger   *logger.Logger
 	graph    cloud.GraphAPI
 	api      *ec2.Client
-	Id       *string `templateName:"id"`
+	ID       *string `templateName:"id"`
 	Instance *string `templateName:"instance"`
 }
 
@@ -307,7 +307,7 @@ func (cmd *DetachSecuritygroup) ManualRun(renv env.Running) (any, error) {
 		return nil, fmt.Errorf("fetching securitygroups for instance %s: %w", StringValue(cmd.Instance), err)
 	}
 
-	cleaned := removeString(groups, StringValue(cmd.Id))
+	cleaned := removeString(groups, StringValue(cmd.ID))
 	if len(cleaned) == 0 {
 		cmd.logger.Errorf("AWS instances must have at least one securitygroup")
 	}
@@ -323,7 +323,7 @@ func (cmd *DetachSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	return call.execute(&ec2.ModifyInstanceAttributeInput{})
 }
 
-func (cmd *UpdateSecuritygroup) buildIpPermissions() ([]ec2types.IpPermission, error) {
+func (cmd *UpdateSecuritygroup) buildIPPermissions() ([]ec2types.IpPermission, error) {
 	ipPerm := ec2types.IpPermission{}
 	if cidr := cmd.CIDR; cidr != nil {
 		ipPerm.IpRanges = []ec2types.IpRange{{CidrIp: cidr}}

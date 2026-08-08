@@ -12,7 +12,7 @@ import (
 
 func generateAcceptanceMocks() {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, SPEC_DIR, func(os.FileInfo) bool { return true }, 0)
+	pkgs, err := parser.ParseDir(fset, specDir, func(os.FileInfo) bool { return true }, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -51,12 +51,12 @@ func generateAcceptanceMocks() {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, apiList, AWSAT_DIR, "gen_mocks.go")
+	writeTemplateToFile(templ, apiList, awsatDir, "gen_mocks.go")
 }
 
 func generateAcceptanceFactory() {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, SPEC_DIR, func(os.FileInfo) bool { return true }, 0)
+	pkgs, err := parser.ParseDir(fset, specDir, func(os.FileInfo) bool { return true }, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +77,7 @@ func generateAcceptanceFactory() {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, finder.result, AWSAT_DIR, "gen_factory.go")
+	writeTemplateToFile(templ, finder.result, awsatDir, "gen_factory.go")
 }
 
 const atMocksCmdBuilders = `/* Copyright 2017 WALLIX

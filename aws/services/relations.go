@@ -38,9 +38,9 @@ import (
 )
 
 const (
-	PARENT_OF = iota // default
-	APPLIES_ON
-	DEPENDING_ON
+	ParentOf = iota // default
+	AppliesOn
+	DependingOn
 )
 
 type funcBuilder struct {
@@ -58,83 +58,83 @@ var addParentsFns = map[string][]addParentFn{
 	},
 	cloud.Instance: {
 		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId"}.build(),
-		funcBuilder{parent: cloud.SecurityGroup, fieldName: "GroupId", listName: "SecurityGroups", relation: APPLIES_ON}.build(),
-		funcBuilder{parent: cloud.Keypair, fieldName: "KeyName", relation: APPLIES_ON}.build(),
+		funcBuilder{parent: cloud.SecurityGroup, fieldName: "GroupId", listName: "SecurityGroups", relation: AppliesOn}.build(),
+		funcBuilder{parent: cloud.Keypair, fieldName: "KeyName", relation: AppliesOn}.build(),
 	},
 	cloud.SecurityGroup: {
 		funcBuilder{parent: cloud.Vpc, fieldName: "VpcId"}.build(),
 	},
 	cloud.InternetGateway: {
 		addRegionParent,
-		funcBuilder{parent: cloud.Vpc, fieldName: "VpcId", listName: "Attachments", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.Vpc, fieldName: "VpcId", listName: "Attachments", relation: DependingOn}.build(),
 	},
 	cloud.NatGateway: {
 		addRegionParent,
 		funcBuilder{parent: cloud.Vpc, fieldName: "VpcId"}.build(),
-		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", relation: DependingOn}.build(),
 	},
 	cloud.RouteTable: {
-		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", listName: "Associations", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", listName: "Associations", relation: DependingOn}.build(),
 		funcBuilder{parent: cloud.Vpc, fieldName: "VpcId"}.build(),
 	},
 	cloud.Volume: {
 		funcBuilder{parent: cloud.AvailabilityZone, fieldName: "AvailabilityZone"}.build(),
-		funcBuilder{parent: cloud.Instance, fieldName: "InstanceId", listName: "Attachments", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.Instance, fieldName: "InstanceId", listName: "Attachments", relation: DependingOn}.build(),
 	},
 	cloud.ElasticIP: {
 		addRegionParent,
-		funcBuilder{parent: cloud.Instance, fieldName: "InstanceId", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.Instance, fieldName: "InstanceId", relation: DependingOn}.build(),
 	},
 	cloud.Snapshot: {
 		addRegionParent,
-		funcBuilder{parent: cloud.Volume, fieldName: "VolumeId", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.Volume, fieldName: "VolumeId", relation: DependingOn}.build(),
 	},
 	cloud.NetworkInterface: {
-		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", relation: PARENT_OF}.build(),
-		funcBuilder{parent: cloud.SecurityGroup, fieldName: "GroupId", listName: "Groups", relation: APPLIES_ON}.build(),
-		funcBuilder{parent: cloud.Instance, fieldName: "Attachment.InstanceId", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", relation: ParentOf}.build(),
+		funcBuilder{parent: cloud.SecurityGroup, fieldName: "GroupId", listName: "Groups", relation: AppliesOn}.build(),
+		funcBuilder{parent: cloud.Instance, fieldName: "Attachment.InstanceId", relation: DependingOn}.build(),
 	},
 	// Loadbalancer
 	cloud.LoadBalancer: {
 		funcBuilder{parent: cloud.Vpc, fieldName: "VpcId"}.build(),
-		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", listName: "AvailabilityZones", relation: DEPENDING_ON}.build(),
-		funcBuilder{parent: cloud.AvailabilityZone, fieldName: "ZoneName", listName: "AvailabilityZones", relation: DEPENDING_ON}.build(),
-		funcBuilder{parent: cloud.SecurityGroup, stringListName: "SecurityGroups", relation: APPLIES_ON}.build(),
+		funcBuilder{parent: cloud.Subnet, fieldName: "SubnetId", listName: "AvailabilityZones", relation: DependingOn}.build(),
+		funcBuilder{parent: cloud.AvailabilityZone, fieldName: "ZoneName", listName: "AvailabilityZones", relation: DependingOn}.build(),
+		funcBuilder{parent: cloud.SecurityGroup, stringListName: "SecurityGroups", relation: AppliesOn}.build(),
 	},
 	cloud.ClassicLoadBalancer: {
 		funcBuilder{parent: cloud.Vpc, fieldName: "VPCId"}.build(),
-		funcBuilder{parent: cloud.Subnet, stringListName: "Subnets", relation: DEPENDING_ON}.build(),
-		funcBuilder{parent: cloud.AvailabilityZone, stringListName: "AvailabilityZones", relation: DEPENDING_ON}.build(),
-		funcBuilder{parent: cloud.SecurityGroup, stringListName: "SecurityGroups", relation: APPLIES_ON}.build(),
+		funcBuilder{parent: cloud.Subnet, stringListName: "Subnets", relation: DependingOn}.build(),
+		funcBuilder{parent: cloud.AvailabilityZone, stringListName: "AvailabilityZones", relation: DependingOn}.build(),
+		funcBuilder{parent: cloud.SecurityGroup, stringListName: "SecurityGroups", relation: AppliesOn}.build(),
 	},
 	cloud.Listener: {
 		funcBuilder{parent: cloud.LoadBalancer, fieldName: "LoadBalancerArn"}.build(),
 	},
 	cloud.TargetGroup: {
 		funcBuilder{parent: cloud.Vpc, fieldName: "VpcId"}.build(),
-		funcBuilder{parent: cloud.LoadBalancer, stringListName: "LoadBalancerArns", relation: APPLIES_ON}.build(),
+		funcBuilder{parent: cloud.LoadBalancer, stringListName: "LoadBalancerArns", relation: AppliesOn}.build(),
 		fetchTargetsAndAddRelations,
 	},
 	// Database
 	cloud.Database: {
 		funcBuilder{parent: cloud.AvailabilityZone, fieldName: "AvailabilityZone"}.build(),
-		funcBuilder{parent: cloud.SecurityGroup, listName: "VpcSecurityGroups", fieldName: "VpcSecurityGroupId", relation: APPLIES_ON}.build(),
+		funcBuilder{parent: cloud.SecurityGroup, listName: "VpcSecurityGroups", fieldName: "VpcSecurityGroupId", relation: AppliesOn}.build(),
 	},
 	// Autoscaling
 	cloud.LaunchConfiguration: {
 		addRegionParent,
-		funcBuilder{parent: cloud.Keypair, fieldName: "KeyName", relation: APPLIES_ON}.build(),
+		funcBuilder{parent: cloud.Keypair, fieldName: "KeyName", relation: AppliesOn}.build(),
 	},
 	cloud.ScalingGroup: {
 		addRegionParent,
-		funcBuilder{parent: cloud.AvailabilityZone, stringListName: "AvailabilityZones", relation: APPLIES_ON}.build(),
-		funcBuilder{parent: cloud.Instance, fieldName: "InstanceId", listName: "Instances", relation: DEPENDING_ON}.build(),
-		funcBuilder{parent: cloud.TargetGroup, stringListName: "TargetGroupARNs", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.AvailabilityZone, stringListName: "AvailabilityZones", relation: AppliesOn}.build(),
+		funcBuilder{parent: cloud.Instance, fieldName: "InstanceId", listName: "Instances", relation: DependingOn}.build(),
+		funcBuilder{parent: cloud.TargetGroup, stringListName: "TargetGroupARNs", relation: DependingOn}.build(),
 		addScalingGroupSubnets,
 	},
 	// Container
 	cloud.ContainerInstance: {
-		funcBuilder{parent: cloud.Instance, fieldName: "Ec2InstanceId", relation: APPLIES_ON}.build(),
+		funcBuilder{parent: cloud.Instance, fieldName: "Ec2InstanceId", relation: AppliesOn}.build(),
 	},
 	cloud.Subscription: {
 		funcBuilder{parent: cloud.Topic, fieldName: "TopicArn"}.build(),
@@ -157,7 +157,7 @@ var addParentsFns = map[string][]addParentFn{
 	cloud.Metric:           {addRegionParent},
 	cloud.Stack:            {addRegionParent},
 	cloud.MFADevice: {
-		funcBuilder{parent: cloud.User, fieldName: "User.UserId", relation: DEPENDING_ON}.build(),
+		funcBuilder{parent: cloud.User, fieldName: "User.UserId", relation: DependingOn}.build(),
 	},
 }
 
@@ -219,7 +219,7 @@ func (fb funcBuilder) addRelationListWithStringField() addParentFn {
 		}
 
 		if !structField.IsValid() || structField.Kind() != reflect.Slice {
-			return fmt.Errorf("add parent to %s: field not a slice: %T", res.Id(), structField.Kind())
+			return fmt.Errorf("add parent to %s: field not a slice: %T", res.ID(), structField.Kind())
 		}
 
 		for i := 0; i < structField.Len(); i++ {
@@ -231,7 +231,7 @@ func (fb funcBuilder) addRelationListWithStringField() addParentFn {
 			case string:
 				strVal = s
 			default:
-				return fmt.Errorf("add parent to %s: not a string: %T", res.Id(), elem)
+				return fmt.Errorf("add parent to %s: not a string: %T", res.ID(), elem)
 			}
 
 			if strVal == "" {
@@ -260,7 +260,7 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 		}
 
 		if !structField.IsValid() || structField.Kind() != reflect.Slice {
-			return fmt.Errorf("add parent to %s: field not a slice: %T", res.Id(), structField.Kind())
+			return fmt.Errorf("add parent to %s: field not a slice: %T", res.ID(), structField.Kind())
 		}
 
 		for i := 0; i < structField.Len(); i++ {
@@ -272,14 +272,14 @@ func (fb funcBuilder) addRelationListWithField() addParentFn {
 			case reflect.Struct:
 				listStruc = listValue
 			default:
-				return fmt.Errorf("add parent to %s: not a struct or pointer: %s", res.Id(), listValue.Kind())
+				return fmt.Errorf("add parent to %s: not a struct or pointer: %s", res.ID(), listValue.Kind())
 			}
 			if listStruc.Kind() != reflect.Struct {
-				return fmt.Errorf("add parent to %s: not a struct: %s", res.Id(), listStruc.Kind())
+				return fmt.Errorf("add parent to %s: not a struct: %s", res.ID(), listStruc.Kind())
 			}
 			listStructField := listStruc.FieldByName(fb.fieldName)
 			if !listStructField.IsValid() {
-				return fmt.Errorf("add parent to %s: unknown field %s in %d", res.Id(), listStructField, i)
+				return fmt.Errorf("add parent to %s: unknown field %s in %d", res.ID(), listStructField, i)
 			}
 
 			var strVal string
@@ -325,11 +325,11 @@ func verifyValidStructField(i any, name string) (reflect.Value, error) {
 
 func addRelation(g *graph.Graph, first, other *graph.Resource, relation int) error {
 	switch relation {
-	case PARENT_OF:
+	case ParentOf:
 		return g.AddParentRelation(first, other)
-	case APPLIES_ON:
+	case AppliesOn:
 		return g.AddAppliesOnRelation(first, other)
-	case DEPENDING_ON:
+	case DependingOn:
 		return g.AddAppliesOnRelation(other, first)
 	default:
 		return errors.New("unknown relation type")
@@ -351,20 +351,20 @@ func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 	}
 	value := reflect.ValueOf(i)
 	if value.Kind() != reflect.Pointer {
-		return fmt.Errorf("add parent to %s: unknown type %T", res.Id(), i)
+		return fmt.Errorf("add parent to %s: unknown type %T", res.ID(), i)
 	}
 	struc := value.Elem()
 	if struc.Kind() != reflect.Struct {
-		return fmt.Errorf("add parent to %s: unknown type %T", res.Id(), i)
+		return fmt.Errorf("add parent to %s: unknown type %T", res.ID(), i)
 	}
 
 	structField := struc.FieldByName("AttachedManagedPolicies")
 	if !structField.IsValid() {
-		return fmt.Errorf("add parent to %s: unknown field %s in %d", res.Id(), structField, i)
+		return fmt.Errorf("add parent to %s: unknown field %s in %d", res.ID(), structField, i)
 	}
 	policies, ok := structField.Interface().([]iamtypes.AttachedPolicy)
 	if !ok {
-		return fmt.Errorf("add parent to %s: not a valid attached policy list: %T", res.Id(), structField.Interface())
+		return fmt.Errorf("add parent to %s: not a valid attached policy list: %T", res.ID(), structField.Interface())
 	}
 
 	for _, policy := range policies {
@@ -373,7 +373,7 @@ func addManagedPoliciesRelations(g *graph.Graph, snap tstore.RDFGraph, region st
 			return err
 		}
 		if len(policies) != 1 {
-			fmt.Fprintf(os.Stderr, "add parent to '%s/%s': unknown policy named '%s'. Ignoring it.\n", res.Type(), res.Id(), aws.ToString(policy.PolicyName))
+			fmt.Fprintf(os.Stderr, "add parent to '%s/%s': unknown policy named '%s'. Ignoring it.\n", res.Type(), res.ID(), aws.ToString(policy.PolicyName))
 			return nil
 		}
 		if err := g.AddAppliesOnRelation(policies[0], res); err != nil {
@@ -401,13 +401,13 @@ func userAddGroupsRelations(g *graph.Graph, snap tstore.RDFGraph, region string,
 		}
 		switch len(resources) {
 		case 0:
-			fmt.Fprintf(os.Stderr, "no group with name %s found for user %s\n", groupName, n.Id())
+			fmt.Fprintf(os.Stderr, "no group with name %s found for user %s\n", groupName, n.ID())
 		case 1:
 			if err := g.AddAppliesOnRelation(resources[0], n); err != nil {
 				return err
 			}
 		default:
-			fmt.Fprintf(os.Stderr, "multiple groups with name %s found for user %s:%v\n", groupName, n.Id(), resources)
+			fmt.Fprintf(os.Stderr, "multiple groups with name %s found for user %s:%v\n", groupName, n.ID(), resources)
 		}
 	}
 	return nil

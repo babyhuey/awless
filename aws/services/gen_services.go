@@ -345,12 +345,12 @@ type Infra struct {
 	Ec2Client                    *ec2.Client
 	Elbv2Client                  *elbv2.Client
 	ElbClient                    *elb.Client
-	RdsClient                    *rds.Client
+	RDSClient                    *rds.Client
 	AutoscalingClient            *autoscaling.Client
-	EcrClient                    *ecr.Client
-	EcsClient                    *ecs.Client
+	ECRClient                    *ecr.Client
+	ECSClient                    *ecs.Client
 	ApplicationautoscalingClient *applicationautoscaling.Client
-	AcmClient                    *acm.Client
+	ACMClient                    *acm.Client
 }
 
 func NewInfra(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
@@ -383,12 +383,12 @@ func NewInfra(cfg aws.Config, profile string, extraConf map[string]any, log *log
 		Ec2Client:                    ec2Client,
 		Elbv2Client:                  elbv2Client,
 		ElbClient:                    elbClient,
-		RdsClient:                    rdsClient,
+		RDSClient:                    rdsClient,
 		AutoscalingClient:            autoscalingClient,
-		EcrClient:                    ecrClient,
-		EcsClient:                    ecsClient,
+		ECRClient:                    ecrClient,
+		ECSClient:                    ecsClient,
 		ApplicationautoscalingClient: applicationautoscalingClient,
-		AcmClient:                    acmClient,
+		ACMClient:                    acmClient,
 		fetcher:                      fetch.NewFetcher(awsfetch.BuildInfraFetchFuncs(fetchConfig)),
 		config:                       extraConf,
 		region:                       region,
@@ -1169,8 +1169,8 @@ type Access struct {
 	region, profile string
 	config          map[string]any
 	log             *logger.Logger
-	IamClient       *iam.Client
-	StsClient       *sts.Client
+	IAMClient       *iam.Client
+	STSClient       *sts.Client
 }
 
 func NewAccess(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
@@ -1186,8 +1186,8 @@ func NewAccess(cfg aws.Config, profile string, extraConf map[string]any, log *lo
 	fetchConfig.Log = log
 
 	return &Access{
-		IamClient: iamClient,
-		StsClient: stsClient,
+		IAMClient: iamClient,
+		STSClient: stsClient,
 		fetcher:   fetch.NewFetcher(awsfetch.BuildAccessFetchFuncs(fetchConfig)),
 		config:    extraConf,
 		region:    region,
@@ -1590,8 +1590,8 @@ type Messaging struct {
 	region, profile string
 	config          map[string]any
 	log             *logger.Logger
-	SnsClient       *sns.Client
-	SqsClient       *sqs.Client
+	SNSClient       *sns.Client
+	SQSClient       *sqs.Client
 }
 
 func NewMessaging(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
@@ -1607,8 +1607,8 @@ func NewMessaging(cfg aws.Config, profile string, extraConf map[string]any, log 
 	fetchConfig.Log = log
 
 	return &Messaging{
-		SnsClient: snsClient,
-		SqsClient: sqsClient,
+		SNSClient: snsClient,
+		SQSClient: sqsClient,
 		fetcher:   fetch.NewFetcher(awsfetch.BuildMessagingFetchFuncs(fetchConfig)),
 		config:    extraConf,
 		region:    region,
@@ -1763,7 +1763,7 @@ func (s *Messaging) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.messaging.sync", true)
 }
 
-type Dns struct {
+type DNS struct {
 	fetcher         fetch.Fetcher
 	region, profile string
 	config          map[string]any
@@ -1771,7 +1771,7 @@ type Dns struct {
 	Route53Client   *route53.Client
 }
 
-func NewDns(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+func NewDNS(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
 	region := "global"
 	route53Client := route53.NewFromConfig(cfg)
 
@@ -1781,9 +1781,9 @@ func NewDns(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	fetchConfig.Extra = extraConf
 	fetchConfig.Log = log
 
-	return &Dns{
+	return &DNS{
 		Route53Client: route53Client,
-		fetcher:       fetch.NewFetcher(awsfetch.BuildDnsFetchFuncs(fetchConfig)),
+		fetcher:       fetch.NewFetcher(awsfetch.BuildDNSFetchFuncs(fetchConfig)),
 		config:        extraConf,
 		region:        region,
 		profile:       profile,
@@ -1791,26 +1791,26 @@ func NewDns(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	}
 }
 
-func (s *Dns) Name() string {
+func (s *DNS) Name() string {
 	return "dns"
 }
 
-func (s *Dns) Region() string {
+func (s *DNS) Region() string {
 	return s.region
 }
 
-func (s *Dns) Profile() string {
+func (s *DNS) Profile() string {
 	return s.profile
 }
 
-func (s *Dns) ResourceTypes() []string {
+func (s *DNS) ResourceTypes() []string {
 	return []string{
 		"zone",
 		"record",
 	}
 }
 
-func (s *Dns) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+func (s *DNS) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	if s.IsSyncDisabled() {
 		return graph.NewGraph(), nil
 	}
@@ -1905,12 +1905,12 @@ func (s *Dns) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	return gph, nil
 }
 
-func (s *Dns) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+func (s *DNS) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
 	defer s.fetcher.Reset()
 	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
 }
 
-func (s *Dns) IsSyncDisabled() bool {
+func (s *DNS) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.dns.sync", true)
 }
 
@@ -2193,7 +2193,7 @@ func (s *Monitoring) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.monitoring.sync", true)
 }
 
-type Cdn struct {
+type CDN struct {
 	fetcher          fetch.Fetcher
 	region, profile  string
 	config           map[string]any
@@ -2201,7 +2201,7 @@ type Cdn struct {
 	CloudfrontClient *cloudfront.Client
 }
 
-func NewCdn(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+func NewCDN(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
 	region := "global"
 	cloudfrontClient := cloudfront.NewFromConfig(cfg)
 
@@ -2211,9 +2211,9 @@ func NewCdn(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	fetchConfig.Extra = extraConf
 	fetchConfig.Log = log
 
-	return &Cdn{
+	return &CDN{
 		CloudfrontClient: cloudfrontClient,
-		fetcher:          fetch.NewFetcher(awsfetch.BuildCdnFetchFuncs(fetchConfig)),
+		fetcher:          fetch.NewFetcher(awsfetch.BuildCDNFetchFuncs(fetchConfig)),
 		config:           extraConf,
 		region:           region,
 		profile:          profile,
@@ -2221,25 +2221,25 @@ func NewCdn(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	}
 }
 
-func (s *Cdn) Name() string {
+func (s *CDN) Name() string {
 	return "cdn"
 }
 
-func (s *Cdn) Region() string {
+func (s *CDN) Region() string {
 	return s.region
 }
 
-func (s *Cdn) Profile() string {
+func (s *CDN) Profile() string {
 	return s.profile
 }
 
-func (s *Cdn) ResourceTypes() []string {
+func (s *CDN) ResourceTypes() []string {
 	return []string{
 		"distribution",
 	}
 }
 
-func (s *Cdn) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+func (s *CDN) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	if s.IsSyncDisabled() {
 		return graph.NewGraph(), nil
 	}
@@ -2312,12 +2312,12 @@ func (s *Cdn) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	return gph, nil
 }
 
-func (s *Cdn) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+func (s *CDN) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
 	defer s.fetcher.Reset()
 	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
 }
 
-func (s *Cdn) IsSyncDisabled() bool {
+func (s *CDN) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.cdn.sync", true)
 }
 
@@ -2449,15 +2449,15 @@ func (s *Cloudformation) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.cloudformation.sync", true)
 }
 
-type Eks struct {
+type EKS struct {
 	fetcher         fetch.Fetcher
 	region, profile string
 	config          map[string]any
 	log             *logger.Logger
-	EksClient       *eks.Client
+	EKSClient       *eks.Client
 }
 
-func NewEks(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+func NewEKS(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
 	region := cfg.Region
 	eksClient := eks.NewFromConfig(cfg)
 
@@ -2467,9 +2467,9 @@ func NewEks(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	fetchConfig.Extra = extraConf
 	fetchConfig.Log = log
 
-	return &Eks{
-		EksClient: eksClient,
-		fetcher:   fetch.NewFetcher(awsfetch.BuildEksFetchFuncs(fetchConfig)),
+	return &EKS{
+		EKSClient: eksClient,
+		fetcher:   fetch.NewFetcher(awsfetch.BuildEKSFetchFuncs(fetchConfig)),
 		config:    extraConf,
 		region:    region,
 		profile:   profile,
@@ -2477,26 +2477,26 @@ func NewEks(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	}
 }
 
-func (s *Eks) Name() string {
+func (s *EKS) Name() string {
 	return "eks"
 }
 
-func (s *Eks) Region() string {
+func (s *EKS) Region() string {
 	return s.region
 }
 
-func (s *Eks) Profile() string {
+func (s *EKS) Profile() string {
 	return s.profile
 }
 
-func (s *Eks) ResourceTypes() []string {
+func (s *EKS) ResourceTypes() []string {
 	return []string{
 		"ekscluster",
 		"eksnodegroup",
 	}
 }
 
-func (s *Eks) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+func (s *EKS) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	if s.IsSyncDisabled() {
 		return graph.NewGraph(), nil
 	}
@@ -2591,12 +2591,12 @@ func (s *Eks) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	return gph, nil
 }
 
-func (s *Eks) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+func (s *EKS) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
 	defer s.fetcher.Reset()
 	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
 }
 
-func (s *Eks) IsSyncDisabled() bool {
+func (s *EKS) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.eks.sync", true)
 }
 
@@ -2734,7 +2734,7 @@ type Secretsmanager struct {
 	config               map[string]any
 	log                  *logger.Logger
 	SecretsmanagerClient *secretsmanager.Client
-	KmsClient            *kms.Client
+	KMSClient            *kms.Client
 }
 
 func NewSecretsmanager(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
@@ -2751,7 +2751,7 @@ func NewSecretsmanager(cfg aws.Config, profile string, extraConf map[string]any,
 
 	return &Secretsmanager{
 		SecretsmanagerClient: secretsmanagerClient,
-		KmsClient:            kmsClient,
+		KMSClient:            kmsClient,
 		fetcher:              fetch.NewFetcher(awsfetch.BuildSecretsmanagerFetchFuncs(fetchConfig)),
 		config:               extraConf,
 		region:               region,
@@ -3057,15 +3057,15 @@ func (s *Apigateway) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.apigateway.sync", true)
 }
 
-type Ssm struct {
+type SSM struct {
 	fetcher         fetch.Fetcher
 	region, profile string
 	config          map[string]any
 	log             *logger.Logger
-	SsmClient       *ssm.Client
+	SSMClient       *ssm.Client
 }
 
-func NewSsm(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+func NewSSM(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
 	region := cfg.Region
 	ssmClient := ssm.NewFromConfig(cfg)
 
@@ -3075,9 +3075,9 @@ func NewSsm(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	fetchConfig.Extra = extraConf
 	fetchConfig.Log = log
 
-	return &Ssm{
-		SsmClient: ssmClient,
-		fetcher:   fetch.NewFetcher(awsfetch.BuildSsmFetchFuncs(fetchConfig)),
+	return &SSM{
+		SSMClient: ssmClient,
+		fetcher:   fetch.NewFetcher(awsfetch.BuildSSMFetchFuncs(fetchConfig)),
 		config:    extraConf,
 		region:    region,
 		profile:   profile,
@@ -3085,25 +3085,25 @@ func NewSsm(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	}
 }
 
-func (s *Ssm) Name() string {
+func (s *SSM) Name() string {
 	return "ssm"
 }
 
-func (s *Ssm) Region() string {
+func (s *SSM) Region() string {
 	return s.region
 }
 
-func (s *Ssm) Profile() string {
+func (s *SSM) Profile() string {
 	return s.profile
 }
 
-func (s *Ssm) ResourceTypes() []string {
+func (s *SSM) ResourceTypes() []string {
 	return []string{
 		"ssmparameter",
 	}
 }
 
-func (s *Ssm) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+func (s *SSM) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	if s.IsSyncDisabled() {
 		return graph.NewGraph(), nil
 	}
@@ -3176,24 +3176,24 @@ func (s *Ssm) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	return gph, nil
 }
 
-func (s *Ssm) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+func (s *SSM) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
 	defer s.fetcher.Reset()
 	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
 }
 
-func (s *Ssm) IsSyncDisabled() bool {
+func (s *SSM) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.ssm.sync", true)
 }
 
-type Efs struct {
+type EFS struct {
 	fetcher         fetch.Fetcher
 	region, profile string
 	config          map[string]any
 	log             *logger.Logger
-	EfsClient       *efs.Client
+	EFSClient       *efs.Client
 }
 
-func NewEfs(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+func NewEFS(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
 	region := cfg.Region
 	efsClient := efs.NewFromConfig(cfg)
 
@@ -3203,9 +3203,9 @@ func NewEfs(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	fetchConfig.Extra = extraConf
 	fetchConfig.Log = log
 
-	return &Efs{
-		EfsClient: efsClient,
-		fetcher:   fetch.NewFetcher(awsfetch.BuildEfsFetchFuncs(fetchConfig)),
+	return &EFS{
+		EFSClient: efsClient,
+		fetcher:   fetch.NewFetcher(awsfetch.BuildEFSFetchFuncs(fetchConfig)),
 		config:    extraConf,
 		region:    region,
 		profile:   profile,
@@ -3213,26 +3213,26 @@ func NewEfs(cfg aws.Config, profile string, extraConf map[string]any, log *logge
 	}
 }
 
-func (s *Efs) Name() string {
+func (s *EFS) Name() string {
 	return "efs"
 }
 
-func (s *Efs) Region() string {
+func (s *EFS) Region() string {
 	return s.region
 }
 
-func (s *Efs) Profile() string {
+func (s *EFS) Profile() string {
 	return s.profile
 }
 
-func (s *Efs) ResourceTypes() []string {
+func (s *EFS) ResourceTypes() []string {
 	return []string{
 		"filesystem",
 		"mounttarget",
 	}
 }
 
-func (s *Efs) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+func (s *EFS) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	if s.IsSyncDisabled() {
 		return graph.NewGraph(), nil
 	}
@@ -3327,12 +3327,12 @@ func (s *Efs) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 	return gph, nil
 }
 
-func (s *Efs) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+func (s *EFS) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
 	defer s.fetcher.Reset()
 	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
 }
 
-func (s *Efs) IsSyncDisabled() bool {
+func (s *EFS) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.efs.sync", true)
 }
 

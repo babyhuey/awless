@@ -63,7 +63,7 @@ type UpdateTargetgroup struct {
 	logger              *logger.Logger
 	graph               cloud.GraphAPI
 	api                 *elbv2.Client
-	Id                  *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"id"`
+	ID                  *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"id"`
 	Deregistrationdelay *string `awsType:"awsstr" templateName:"deregistrationdelay"`
 	Stickiness          *string `awsType:"awsstr" templateName:"stickiness"`
 	Stickinessduration  *string `awsType:"awsstr" templateName:"stickinessduration"`
@@ -84,7 +84,7 @@ func (cmd *UpdateTargetgroup) ParamsSpec() params.Spec {
 }
 
 func (cmd *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
-	tgArn := StringValue(cmd.Id)
+	tgArn := StringValue(cmd.ID)
 
 	attrsInput := &elbv2.ModifyTargetGroupAttributesInput{}
 	var areTargetAttrsModified bool
@@ -192,7 +192,7 @@ type DeleteTargetgroup struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *elbv2.Client
-	Id     *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"TargetGroupArn" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteTargetgroup) ParamsSpec() params.Spec {

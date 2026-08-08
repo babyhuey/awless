@@ -53,7 +53,7 @@ type DeleteZone struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *route53.Client
-	Id     *string `awsName:"Id" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"Id" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteZone) ParamsSpec() params.Spec {

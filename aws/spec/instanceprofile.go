@@ -93,18 +93,18 @@ func (cmd *AttachInstanceprofile) dryRun(renv env.Running, params map[string]any
 		}
 	}
 	cmd.logger.Verbose("params dry run: attach instanceprofile ok")
-	return fakeDryRunId("instanceprofile"), nil
+	return fakeDryRunID("instanceprofile"), nil
 }
 
 func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
-	instanceId := StringValue(cmd.Instance)
+	instanceID := StringValue(cmd.Instance)
 	profileName := StringValue(cmd.Name)
 
 	if BoolValue(cmd.Replace) {
 		out, err := cmd.api.DescribeIamInstanceProfileAssociations(renv.RequestContext(),
 			&ec2.DescribeIamInstanceProfileAssociationsInput{
 				Filters: []ec2types.Filter{
-					{Name: String("instance-id"), Values: []string{instanceId}},
+					{Name: String("instance-id"), Values: []string{instanceID}},
 					{Name: String("state"), Values: []string{"associated"}},
 				},
 			})
@@ -114,14 +114,14 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 		assoc := out.IamInstanceProfileAssociations
 		if len(assoc) > 0 {
 			start := time.Now()
-			assocId := StringValue(assoc[0].AssociationId)
-			assocInstId := StringValue(assoc[0].InstanceId)
+			assocID := StringValue(assoc[0].AssociationId)
+			assocInstID := StringValue(assoc[0].InstanceId)
 			oldProfileArn := StringValue(assoc[0].IamInstanceProfile.Arn)
 			cmd.logger.ExtraVerbosef("attach profile: found existing profile to replace with %s", profileName)
-			if assocInstId == instanceId {
+			if assocInstID == instanceID {
 				out, err := cmd.api.ReplaceIamInstanceProfileAssociation(renv.RequestContext(),
 					&ec2.ReplaceIamInstanceProfileAssociationInput{
-						AssociationId: String(assocId),
+						AssociationId: String(assocID),
 						IamInstanceProfile: &ec2types.IamInstanceProfileSpecification{
 							Name: String(profileName),
 						},
@@ -130,7 +130,7 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 					return nil, fmt.Errorf("attach instanceprofile: replace mode on: cannot replace with new instance profile: %w", err)
 				}
 
-				cmd.logger.Verbosef("attach profile: replaced profile '%s' with '%s' on instance %s", oldProfileArn, profileName, instanceId)
+				cmd.logger.Verbosef("attach profile: replaced profile '%s' with '%s' on instance %s", oldProfileArn, profileName, instanceID)
 				cmd.logger.ExtraVerbosef("ec2.ReplaceIamInstanceProfileAssociation call took %s", time.Since(start))
 
 				return out, nil
@@ -139,7 +139,7 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 	}
 
 	input := &ec2.AssociateIamInstanceProfileInput{}
-	if err := setFieldWithType(instanceId, input, "InstanceId", awsstr, renv.Context()); err != nil {
+	if err := setFieldWithType(instanceID, input, "InstanceId", awsstr, renv.Context()); err != nil {
 		return nil, err
 	}
 	if err := setFieldWithType(profileName, input, "IamInstanceProfile.Name", awsstr, renv.Context()); err != nil {
@@ -166,26 +166,26 @@ func (cmd *DetachInstanceprofile) ParamsSpec() params.Spec {
 }
 
 func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (any, error) {
-	instanceId := StringValue(cmd.Instance)
+	instanceID := StringValue(cmd.Instance)
 	profileName := StringValue(cmd.Name)
 
 	out, err := cmd.api.DescribeIamInstanceProfileAssociations(renv.RequestContext(),
 		&ec2.DescribeIamInstanceProfileAssociationsInput{
 			Filters: []ec2types.Filter{
-				{Name: String("instance-id"), Values: []string{instanceId}},
+				{Name: String("instance-id"), Values: []string{instanceID}},
 			},
 		})
 	if err != nil {
-		return nil, fmt.Errorf("cannot list profile on instance %s: %w", instanceId, err)
+		return nil, fmt.Errorf("cannot list profile on instance %s: %w", instanceID, err)
 	}
 
 	assocs := out.IamInstanceProfileAssociations
 	if len(assocs) < 1 {
-		cmd.logger.Infof("detach instanceprofile: nothing to be detached on instance %s", instanceId)
+		cmd.logger.Infof("detach instanceprofile: nothing to be detached on instance %s", instanceID)
 		return nil, nil
 	}
 
-	var lastId string
+	var lastID string
 	for _, ass := range assocs {
 		if strings.Contains(StringValue(ass.IamInstanceProfile.Arn), profileName) {
 			input := &ec2.DisassociateIamInstanceProfileInput{
@@ -199,11 +199,11 @@ func (cmd *DetachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 			}
 			cmd.logger.ExtraVerbosef("ec2.DisassociateIamInstanceProfile call took %s", time.Since(start))
 			id := StringValue(output.IamInstanceProfileAssociation.IamInstanceProfile.Id)
-			lastId = id
+			lastID = id
 		}
 	}
 
-	return lastId, nil
+	return lastID, nil
 }
 
 func (cmd *DetachInstanceprofile) ExtractResult(i any) string {

@@ -59,7 +59,7 @@ func TestFilterGraph(t *testing.T) {
 	if got, want := len(instances), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := instances[0].Id(), "inst_2"; got != want {
+	if got, want := instances[0].ID(), "inst_2"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 	if got, want := instances[0].Properties()["Name"], "redis"; got != want {
@@ -78,7 +78,7 @@ func TestFilterGraph(t *testing.T) {
 	if got, want := len(instances), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := instances[0].Id(), "inst_2"; got != want {
+	if got, want := instances[0].ID(), "inst_2"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 	if got, want := instances[0].Properties()["Name"], "redis"; got != want {
@@ -143,7 +143,7 @@ func TestFilterGraph(t *testing.T) {
 
 func hasResource(arr []*graph.Resource, r *graph.Resource) bool {
 	for _, a := range arr {
-		if a.Id() == r.Id() {
+		if a.ID() == r.ID() {
 			return true
 		}
 	}

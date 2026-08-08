@@ -46,7 +46,7 @@ func generateServicesFuncs() {
 		panic(err)
 	}
 
-	writeTemplateToFile(templ, aws.FetchersDefs, SERVICES_DIR, "gen_services.go")
+	writeTemplateToFile(templ, aws.FetchersDefs, servicesDir, "gen_services.go")
 }
 
 const servicesTempl = `// Auto generated implementation for the AWS cloud service
@@ -78,7 +78,7 @@ import (
 
   "github.com/aws/aws-sdk-go-v2/aws"
   {{- range $index, $service := . }}
-  {{- range $, $api := $service.Api }}
+  {{- range $, $api := $service.API }}
   {{ $api }} "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}"
   {{- if NeedsTypesImport $api }}
   {{ $api }}types "github.com/aws/aws-sdk-go-v2/service/{{ SdkModulePath $api }}/types"
@@ -112,7 +112,7 @@ var ResourceTypes = []string {
 
 var ServicePerAPI = map[string]string {
 {{- range $index, $service := . }}
-{{- range $, $api := $service.Api }}
+{{- range $, $api := $service.API }}
   "{{ $api }}": "{{ $service.Name }}",
 {{- end }}
 {{- end }}
@@ -129,7 +129,7 @@ var ServicePerResourceType = map[string]string {
 var APIPerResourceType = map[string]string {
 {{- range $index, $service := . }}
   {{- range $idx, $fetcher := $service.Fetchers }}
-  "{{ $fetcher.ResourceType }}": "{{ $fetcher.Api }}",
+  "{{ $fetcher.ResourceType }}": "{{ $fetcher.API }}",
   {{- end }}
 {{- end }}
 }
@@ -140,7 +140,7 @@ type {{ Title $service.Name }} struct {
   region, profile string
 	config map[string]any
 	log *logger.Logger
-	{{- range $, $api := $service.Api }}
+	{{- range $, $api := $service.API }}
 		{{ Title $api }}Client *{{ $api }}.Client
 	{{- end }}
 }
@@ -152,12 +152,12 @@ func New{{ Title $service.Name }}(cfg aws.Config, profile string, extraConf map[
 	region := cfg.Region
 	{{- end}}
 
-	{{- range $, $api := $service.Api }}
+	{{- range $, $api := $service.API }}
 		{{ $api }}Client := {{ $api }}.NewFromConfig(cfg)
 	{{- end }}
 
 	fetchConfig := awsfetch.NewConfig(
-		{{- range $, $api := $service.Api }}
+		{{- range $, $api := $service.API }}
 			{{ $api }}Client,
 		{{- end }}
 	)
@@ -165,7 +165,7 @@ func New{{ Title $service.Name }}(cfg aws.Config, profile string, extraConf map[
 	fetchConfig.Log = log
 
 	return &{{ Title $service.Name }}{
-	{{- range $, $api := $service.Api }}
+	{{- range $, $api := $service.API }}
 		{{ Title $api }}Client: {{ $api }}Client,
 	{{- end }}
 		fetcher: fetch.NewFetcher(awsfetch.Build{{ Title $service.Name }}FetchFuncs(fetchConfig)),

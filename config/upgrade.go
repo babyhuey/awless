@@ -30,12 +30,12 @@ import (
 )
 
 const (
-	lastUpgradeCheckDbKey = "upgrade.lastcheck"
+	lastUpgradeCheckDBKey = "upgrade.lastcheck"
 )
 
 func VerifyNewVersionAvailable(url string, messaging io.Writer) error {
 	return database.Execute(func(db *database.DB) error {
-		last, err := db.GetTimeValue(lastUpgradeCheckDbKey)
+		last, err := db.GetTimeValue(lastUpgradeCheckDBKey)
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func VerifyNewVersionAvailable(url string, messaging io.Writer) error {
 			_ = notifyIfUpgrade(url, messaging)
 		}
 
-		return db.SetTimeValue(lastUpgradeCheckDbKey, time.Now())
+		return db.SetTimeValue(lastUpgradeCheckDBKey, time.Now())
 	})
 }
 

@@ -39,7 +39,7 @@ func newTestTemplateExecution(id string, cmdLine string) *template.TemplateExecu
 }
 
 func TestAddAndGetTemplate(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	tplExec := newTestTemplateExecution("tpl-001", "create instance name=test")
@@ -70,7 +70,7 @@ func TestAddAndGetTemplate(t *testing.T) {
 }
 
 func TestAddTemplateEmptyID(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	tplExec := newTestTemplateExecution("", "create instance name=test")
@@ -83,7 +83,7 @@ func TestAddTemplateEmptyID(t *testing.T) {
 }
 
 func TestGetTemplateNotFound(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	_, err := db.GetTemplate("nonexistent")
@@ -93,7 +93,7 @@ func TestGetTemplateNotFound(t *testing.T) {
 }
 
 func TestGetTemplateNoBucket(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// No templates added yet, so bucket doesn't exist
@@ -104,7 +104,7 @@ func TestGetTemplateNoBucket(t *testing.T) {
 }
 
 func TestDeleteTemplates(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Delete when no bucket exists should succeed
@@ -143,7 +143,7 @@ func TestDeleteTemplates(t *testing.T) {
 }
 
 func TestDeleteTemplate(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Delete when no bucket exists should error
@@ -184,7 +184,7 @@ func TestDeleteTemplate(t *testing.T) {
 }
 
 func TestGetLoadedTemplate(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Error when no bucket
@@ -229,7 +229,7 @@ func TestGetLoadedTemplate(t *testing.T) {
 }
 
 func TestListTemplates(t *testing.T) {
-	db, cleanup := newTestDb()
+	db, cleanup := newTestDB()
 	defer cleanup()
 
 	// Empty list when no bucket

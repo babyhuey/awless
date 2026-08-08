@@ -81,7 +81,7 @@ func holeAutoCompletion(g cloud.GraphAPI, paramPaths []string) readline.AutoComp
 		}
 		if validPropName == "" {
 			for _, r := range resources {
-				possibleSuggests = append(possibleSuggests, r.Id())
+				possibleSuggests = append(possibleSuggests, r.ID())
 				possibleSuggests = appendWithNameAliases(possibleSuggests, r)
 			}
 			continue

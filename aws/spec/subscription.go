@@ -47,7 +47,7 @@ type DeleteSubscription struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *sns.Client
-	Id     *string `awsName:"SubscriptionArn" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"SubscriptionArn" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteSubscription) ParamsSpec() params.Spec {

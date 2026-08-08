@@ -50,10 +50,10 @@ type CreateDistribution struct {
 	Enable         *bool     `templateName:"enable"`
 	ForwardCookies *string   `templateName:"forward-cookies"`
 	ForwardQueries *bool     `templateName:"forward-queries"`
-	HttpsBehavior  *string   `templateName:"https-behavior"`
+	HTTPSBehavior  *string   `templateName:"https-behavior"`
 	OriginPath     *string   `templateName:"origin-path"`
 	PriceClass     *string   `templateName:"price-class"`
-	MinTtl         *int64    `templateName:"min-ttl"`
+	MinTTL         *int64    `templateName:"min-ttl"`
 }
 
 func (cmd *CreateDistribution) ParamsSpec() params.Spec {
@@ -63,7 +63,7 @@ func (cmd *CreateDistribution) ParamsSpec() params.Spec {
 }
 
 func (cmd *CreateDistribution) ManualRun(renv env.Running) (any, error) {
-	originId := "orig_1"
+	originID := "orig_1"
 	input := &cloudfront.CreateDistributionInput{
 		DistributionConfig: &cloudfronttypes.DistributionConfig{
 			CallerReference: aws.String(CallerReferenceFunc()),
@@ -78,14 +78,14 @@ func (cmd *CreateDistribution) ManualRun(renv env.Running) (any, error) {
 					Enabled:  aws.Bool(false),
 					Quantity: aws.Int32(0),
 				},
-				TargetOriginId:       aws.String(originId),
+				TargetOriginId:       aws.String(originID),
 				ViewerProtocolPolicy: cloudfronttypes.ViewerProtocolPolicyAllowAll,
 			},
 			Enabled: aws.Bool(true),
 			Origins: &cloudfronttypes.Origins{
 				Quantity: aws.Int32(1),
 				Items: []cloudfronttypes.Origin{
-					{Id: aws.String(originId)},
+					{Id: aws.String(originID)},
 				},
 			},
 		},
@@ -128,11 +128,11 @@ func (cmd *CreateDistribution) ManualRun(renv env.Running) (any, error) {
 	if cmd.ForwardQueries != nil {
 		call.setters = append(call.setters, setter{val: cmd.ForwardQueries, fieldPath: "DistributionConfig.DefaultCacheBehavior.ForwardedValues.QueryString", fieldType: awsbool})
 	}
-	if cmd.HttpsBehavior != nil {
-		call.setters = append(call.setters, setter{val: cmd.HttpsBehavior, fieldPath: "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", fieldType: awsstr})
+	if cmd.HTTPSBehavior != nil {
+		call.setters = append(call.setters, setter{val: cmd.HTTPSBehavior, fieldPath: "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", fieldType: awsstr})
 	}
-	if cmd.MinTtl != nil {
-		call.setters = append(call.setters, setter{val: cmd.MinTtl, fieldPath: "DistributionConfig.DefaultCacheBehavior.MinTTL", fieldType: awsint64})
+	if cmd.MinTTL != nil {
+		call.setters = append(call.setters, setter{val: cmd.MinTTL, fieldPath: "DistributionConfig.DefaultCacheBehavior.MinTTL", fieldType: awsint64})
 	}
 	if cmd.OriginPath != nil {
 		call.setters = append(call.setters, setter{val: cmd.OriginPath, fieldPath: "DistributionConfig.Origins.Items[0].OriginPath", fieldType: awsstr})
@@ -153,7 +153,7 @@ type CheckDistribution struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *cloudfront.Client
-	Id      *string `templateName:"id"`
+	ID      *string `templateName:"id"`
 	State   *string `templateName:"state"`
 	Timeout *int64  `templateName:"timeout"`
 }
@@ -168,11 +168,11 @@ func (cmd *CheckDistribution) ParamsSpec() params.Spec {
 
 func (cmd *CheckDistribution) ManualRun(renv env.Running) (any, error) {
 	input := &cloudfront.GetDistributionInput{
-		Id: cmd.Id,
+		Id: cmd.ID,
 	}
 
 	c := &checker{
-		description: fmt.Sprintf("distribution %s", StringValue(cmd.Id)),
+		description: fmt.Sprintf("distribution %s", StringValue(cmd.ID)),
 		timeout:     time.Duration(Int64AsIntValue(cmd.Timeout)) * time.Second,
 		frequency:   5 * time.Second,
 		fetchFunc: func() (string, error) {
@@ -202,7 +202,7 @@ type UpdateDistribution struct {
 	logger         *logger.Logger
 	graph          cloud.GraphAPI
 	api            *cloudfront.Client
-	Id             *string   `awsName:"Id" awsType:"awsstr" templateName:"id"`
+	ID             *string   `awsName:"Id" awsType:"awsstr" templateName:"id"`
 	OriginDomain   *string   `templateName:"origin-domain"`
 	Certificate    *string   `templateName:"certificate"`
 	Comment        *string   `templateName:"comment"`
@@ -211,10 +211,10 @@ type UpdateDistribution struct {
 	Enable         *bool     `templateName:"enable"`
 	ForwardCookies *string   `templateName:"forward-cookies"`
 	ForwardQueries *bool     `templateName:"forward-queries"`
-	HttpsBehavior  *string   `templateName:"https-behavior"`
+	HTTPSBehavior  *string   `templateName:"https-behavior"`
 	OriginPath     *string   `templateName:"origin-path"`
 	PriceClass     *string   `templateName:"price-class"`
-	MinTtl         *int64    `templateName:"min-ttl"`
+	MinTTL         *int64    `templateName:"min-ttl"`
 }
 
 func (cmd *UpdateDistribution) ParamsSpec() params.Spec {
@@ -225,7 +225,7 @@ func (cmd *UpdateDistribution) ParamsSpec() params.Spec {
 
 func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 	distribOutput, err := cmd.api.GetDistribution(renv.RequestContext(), &cloudfront.GetDistributionInput{
-		Id: cmd.Id,
+		Id: cmd.ID,
 	})
 	if err != nil {
 		return nil, err
@@ -240,7 +240,7 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 		DistributionConfig: distriToUpdate.DistributionConfig,
 	}
 
-	if err = setFieldWithType(cmd.Id, input, "Id", awsstr); err != nil {
+	if err = setFieldWithType(cmd.ID, input, "Id", awsstr); err != nil {
 		return nil, err
 	}
 	if cmd.Enable != nil && BoolValue(cmd.Enable) != BoolValue(distriToUpdate.DistributionConfig.Enabled) {
@@ -311,13 +311,13 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 			return nil, err
 		}
 	}
-	if cmd.HttpsBehavior != nil {
-		if err = setFieldWithType(cmd.HttpsBehavior, input, "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", awsstr); err != nil {
+	if cmd.HTTPSBehavior != nil {
+		if err = setFieldWithType(cmd.HTTPSBehavior, input, "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", awsstr); err != nil {
 			return nil, err
 		}
 	}
-	if cmd.MinTtl != nil {
-		if err = setFieldWithType(cmd.MinTtl, input, "DistributionConfig.DefaultCacheBehavior.MinTTL", awsint64); err != nil {
+	if cmd.MinTTL != nil {
+		if err = setFieldWithType(cmd.MinTTL, input, "DistributionConfig.DefaultCacheBehavior.MinTTL", awsint64); err != nil {
 			return nil, err
 		}
 	}
@@ -332,7 +332,7 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 	}
 
 	if beforeUpdate == fmt.Sprintf("%v", input.DistributionConfig) {
-		cmd.logger.Infof("no property has been changed to distribution '%s'", StringValue(cmd.Id))
+		cmd.logger.Infof("no property has been changed to distribution '%s'", StringValue(cmd.ID))
 		return distribOutput, nil
 	}
 
@@ -359,7 +359,7 @@ type DeleteDistribution struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *cloudfront.Client
-	Id     *string `awsName:"Id" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"Id" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteDistribution) ParamsSpec() params.Spec {
@@ -370,7 +370,7 @@ func (cmd *DeleteDistribution) ManualRun(renv env.Running) (any, error) {
 	cmd.logger.Info("disabling distribution")
 	updateDistribution := CommandFactory.Build("updatedistribution")().(*UpdateDistribution)
 	entries := map[string]any{
-		"id":     cmd.Id,
+		"id":     cmd.ID,
 		"enable": false,
 	}
 	if err := params.Validate(updateDistribution.ParamsSpec().Validators(), entries); err != nil {
@@ -387,7 +387,7 @@ func (cmd *DeleteDistribution) ManualRun(renv env.Running) (any, error) {
 	cmd.logger.Info("check distribution disabling has been propagated")
 	checkDistribution := CommandFactory.Build("checkdistribution")().(*CheckDistribution)
 	entries = map[string]any{
-		"id":      cmd.Id,
+		"id":      cmd.ID,
 		"state":   "Deployed",
 		"timeout": 1800,
 	}
@@ -401,7 +401,7 @@ func (cmd *DeleteDistribution) ManualRun(renv env.Running) (any, error) {
 
 	input := &cloudfront.DeleteDistributionInput{IfMatch: aws.String(fmt.Sprint(etag))}
 
-	if err := setFieldWithType(cmd.Id, input, "Id", awsstr); err != nil {
+	if err := setFieldWithType(cmd.ID, input, "Id", awsstr); err != nil {
 		return nil, err
 	}
 

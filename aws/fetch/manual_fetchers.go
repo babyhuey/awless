@@ -52,13 +52,13 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		clusterArns, err := getClusterArns(ctx, cache, conf.APIs.Ecs)
+		clusterArns, err := getClusterArns(ctx, cache, conf.APIs.ECS)
 		if err != nil {
 			return resources, objects, err
 		}
 
 		for _, cluster := range clusterArns {
-			paginator := ecs.NewListContainerInstancesPaginator(conf.APIs.Ecs, &ecs.ListContainerInstancesInput{Cluster: &cluster})
+			paginator := ecs.NewListContainerInstancesPaginator(conf.APIs.ECS, &ecs.ListContainerInstancesInput{Cluster: &cluster})
 			for paginator.HasMorePages() {
 				out, err := paginator.NextPage(ctx)
 				if err != nil {
@@ -68,7 +68,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 					continue
 				}
 
-				containerInstancesOut, err := conf.APIs.Ecs.DescribeContainerInstances(ctx, &ecs.DescribeContainerInstancesInput{Cluster: &cluster, ContainerInstances: out.ContainerInstanceArns})
+				containerInstancesOut, err := conf.APIs.ECS.DescribeContainerInstances(ctx, &ecs.DescribeContainerInstancesInput{Cluster: &cluster, ContainerInstances: out.ContainerInstanceArns})
 				if err != nil {
 					return resources, objects, err
 				}
@@ -101,7 +101,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		var tasks []ecstypes.Task
 
 		if val, e := cache.Get("getAllTasks", func() (any, error) {
-			return getAllTasks(ctx, cache, conf.APIs.Ecs)
+			return getAllTasks(ctx, cache, conf.APIs.ECS)
 		}); e != nil {
 			return resources, objects, e
 		} else if v, ok := val.([]ecstypes.Task); ok {
@@ -169,7 +169,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			fetchDefinitionsInput.FamilyPrefix = &givenFamilyPrefix
 		}
 
-		paginator := ecs.NewListTaskDefinitionsPaginator(conf.APIs.Ecs, fetchDefinitionsInput)
+		paginator := ecs.NewListTaskDefinitionsPaginator(conf.APIs.ECS, fetchDefinitionsInput)
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
@@ -193,7 +193,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		for _, arn := range arns {
 			taskDefArn := arn
 			descG.Go(func() error {
-				tasksOut, err := conf.APIs.Ecs.DescribeTaskDefinition(ctx, &ecs.DescribeTaskDefinitionInput{TaskDefinition: &taskDefArn})
+				tasksOut, err := conf.APIs.ECS.DescribeTaskDefinition(ctx, &ecs.DescribeTaskDefinitionInput{TaskDefinition: &taskDefArn})
 				mu.Lock()
 				defer mu.Unlock()
 				if err != nil {
@@ -208,7 +208,7 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 
 		var tasks []ecstypes.Task
 		if val, e := cache.Get("getAllTasks", func() (any, error) {
-			return getAllTasks(ctx, cache, conf.APIs.Ecs)
+			return getAllTasks(ctx, cache, conf.APIs.ECS)
 		}); e != nil {
 			return resources, objects, e
 		} else if v, ok := val.([]ecstypes.Task); ok {
@@ -261,8 +261,8 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			if len(deployments) > 0 {
 				graphres.Properties()[properties.Deployments] = deployments
 			}
-			switch {
-			case runningServicesCount+stoppedServicesCount+runningTasksCount+stoppedTasksCount == 0:
+			switch runningServicesCount + stoppedServicesCount + runningTasksCount + stoppedTasksCount {
+			case 0:
 				if state := strings.ToLower(string(res.res.Status)); state == "active" {
 					graphres.Properties()[properties.State] = "ready"
 				} else {
@@ -306,13 +306,13 @@ func addManualInfraFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		clusterNames, err := getClusterArns(ctx, cache, conf.APIs.Ecs)
+		clusterNames, err := getClusterArns(ctx, cache, conf.APIs.ECS)
 		if err != nil {
 			return resources, objects, err
 		}
 
 		for _, clusterArns := range sliceOfSlice(clusterNames, 100) {
-			clustersOut, err := conf.APIs.Ecs.DescribeClusters(ctx, &ecs.DescribeClustersInput{Clusters: clusterArns})
+			clustersOut, err := conf.APIs.ECS.DescribeClusters(ctx, &ecs.DescribeClustersInput{Clusters: clusterArns})
 			if err != nil {
 				return resources, objects, err
 			}
@@ -405,7 +405,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.Iam)
+			accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.IAM)
 			if err != nil {
 				errC <- err
 				return
@@ -424,7 +424,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			paginator := iam.NewListUsersPaginator(conf.APIs.Iam, &iam.ListUsersInput{})
+			paginator := iam.NewListUsersPaginator(conf.APIs.IAM, &iam.ListUsersInput{})
 			for paginator.HasMorePages() {
 				page, err := paginator.NextPage(ctx)
 				if err != nil {
@@ -480,7 +480,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.Iam)
+		accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.IAM)
 		if err != nil {
 			return resources, objects, err
 		}
@@ -506,7 +506,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.Iam)
+		accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.IAM)
 		if err != nil {
 			return resources, objects, err
 		}
@@ -542,7 +542,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		go func() {
 			defer wg.Done()
 
-			accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.Iam)
+			accountDetails, err := getAccountAuthorizationDetails(ctx, cache, conf.APIs.IAM)
 			if err != nil {
 				errC <- err
 				return
@@ -612,7 +612,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		)
 		g.SetLimit(maxParallelAWSCalls)
 
-		usersPaginator := iam.NewListUsersPaginator(conf.APIs.Iam, &iam.ListUsersInput{})
+		usersPaginator := iam.NewListUsersPaginator(conf.APIs.IAM, &iam.ListUsersInput{})
 		for usersPaginator.HasMorePages() {
 			outUsers, err := usersPaginator.NextPage(ctx)
 			if err != nil {
@@ -629,7 +629,7 @@ func addManualAccessFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 					return err
 				}
 
-				akPaginator := iam.NewListAccessKeysPaginator(conf.APIs.Iam, &iam.ListAccessKeysInput{UserName: u.UserName})
+				akPaginator := iam.NewListAccessKeysPaginator(conf.APIs.IAM, &iam.ListAccessKeysInput{UserName: u.UserName})
 				for akPaginator.HasMorePages() {
 					out, err := akPaginator.NextPage(ctx)
 					if err != nil {
@@ -733,7 +733,7 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		out, err := conf.APIs.Sqs.ListQueues(ctx, &sqs.ListQueuesInput{})
+		out, err := conf.APIs.SQS.ListQueues(ctx, &sqs.ListQueuesInput{})
 		if err != nil {
 			return nil, objects, err
 		}
@@ -753,7 +753,7 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 				mu.Unlock()
 				res := graph.InitResource(cloud.Queue, url)
 				res.Properties()[properties.ID] = url
-				attrs, err := conf.APIs.Sqs.GetQueueAttributes(ctx, &sqs.GetQueueAttributesInput{AttributeNames: []sqstypes.QueueAttributeName{sqstypes.QueueAttributeNameAll}, QueueUrl: &url})
+				attrs, err := conf.APIs.SQS.GetQueueAttributes(ctx, &sqs.GetQueueAttributesInput{AttributeNames: []sqstypes.QueueAttributeName{sqstypes.QueueAttributeNameAll}, QueueUrl: &url})
 				if err != nil {
 					var apiErr smithy.APIError
 					if errors.As(err, &apiErr) && (apiErr.ErrorCode() == "AWS.SimpleQueueService.NonExistentQueue" || apiErr.ErrorCode() == "AWS.SimpleQueueService.QueueDeletedRecently") {
@@ -810,7 +810,7 @@ func addManualMessagingFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 }
-func addManualDnsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+func addManualDNSFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	funcs["record"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var objects []route53types.ResourceRecordSet
 		var resources []*graph.Resource
@@ -894,12 +894,12 @@ func addManualLambdaFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 func addManualMonitoringFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
-func addManualCdnFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+func addManualCDNFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 func addManualCloudformationFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
-func addManualEksFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+func addManualEKSFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	funcs["ekscluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ekstypes.Cluster
@@ -909,14 +909,14 @@ func addManualEksFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		paginator := eks.NewListClustersPaginator(conf.APIs.Eks, &eks.ListClustersInput{})
+		paginator := eks.NewListClustersPaginator(conf.APIs.EKS, &eks.ListClustersInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
 				return resources, objects, err
 			}
 			for _, name := range out.Clusters {
-				descOut, err := conf.APIs.Eks.DescribeCluster(ctx, &eks.DescribeClusterInput{Name: &name})
+				descOut, err := conf.APIs.EKS.DescribeCluster(ctx, &eks.DescribeClusterInput{Name: &name})
 				if err != nil {
 					return resources, objects, err
 				}
@@ -942,21 +942,21 @@ func addManualEksFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		clusterPaginator := eks.NewListClustersPaginator(conf.APIs.Eks, &eks.ListClustersInput{})
+		clusterPaginator := eks.NewListClustersPaginator(conf.APIs.EKS, &eks.ListClustersInput{})
 		for clusterPaginator.HasMorePages() {
 			cOut, err := clusterPaginator.NextPage(ctx)
 			if err != nil {
 				return resources, objects, err
 			}
 			for _, clusterName := range cOut.Clusters {
-				ngPaginator := eks.NewListNodegroupsPaginator(conf.APIs.Eks, &eks.ListNodegroupsInput{ClusterName: &clusterName})
+				ngPaginator := eks.NewListNodegroupsPaginator(conf.APIs.EKS, &eks.ListNodegroupsInput{ClusterName: &clusterName})
 				for ngPaginator.HasMorePages() {
 					ngOut, err := ngPaginator.NextPage(ctx)
 					if err != nil {
 						return resources, objects, err
 					}
 					for _, ngName := range ngOut.Nodegroups {
-						descOut, err := conf.APIs.Eks.DescribeNodegroup(ctx, &eks.DescribeNodegroupInput{ClusterName: &clusterName, NodegroupName: &ngName})
+						descOut, err := conf.APIs.EKS.DescribeNodegroup(ctx, &eks.DescribeNodegroupInput{ClusterName: &clusterName, NodegroupName: &ngName})
 						if err != nil {
 							return resources, objects, err
 						}
@@ -1023,14 +1023,14 @@ func addManualSecretsmanagerFetchFuncs(conf *Config, funcs map[string]fetch.Func
 			return resources, objects, nil
 		}
 
-		paginator := kms.NewListKeysPaginator(conf.APIs.Kms, &kms.ListKeysInput{})
+		paginator := kms.NewListKeysPaginator(conf.APIs.KMS, &kms.ListKeysInput{})
 		for paginator.HasMorePages() {
 			out, err := paginator.NextPage(ctx)
 			if err != nil {
 				return resources, objects, err
 			}
 			for _, keyEntry := range out.Keys {
-				descOut, err := conf.APIs.Kms.DescribeKey(ctx, &kms.DescribeKeyInput{KeyId: keyEntry.KeyId})
+				descOut, err := conf.APIs.KMS.DescribeKey(ctx, &kms.DescribeKeyInput{KeyId: keyEntry.KeyId})
 				if err != nil {
 					return resources, objects, err
 				}
@@ -1104,7 +1104,7 @@ func addManualApigatewayFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 				if err != nil {
 					return resources, objects, err
 				}
-				parent := graph.InitResource(cloud.ApiGateway, awssdk.ToString(api.ApiId))
+				parent := graph.InitResource(cloud.APIGateway, awssdk.ToString(api.ApiId))
 				res.AddRelation(rdf.ChildrenOfRel, parent)
 				resources = append(resources, res)
 			}
@@ -1136,7 +1136,7 @@ func addManualApigatewayFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 				if err != nil {
 					return resources, objects, err
 				}
-				parent := graph.InitResource(cloud.ApiGateway, awssdk.ToString(api.ApiId))
+				parent := graph.InitResource(cloud.APIGateway, awssdk.ToString(api.ApiId))
 				res.AddRelation(rdf.ChildrenOfRel, parent)
 				resources = append(resources, res)
 			}
@@ -1145,13 +1145,13 @@ func addManualApigatewayFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	}
 }
 
-func addManualSsmFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+func addManualSSMFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualCloudtrailFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
-func addManualEfsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+func addManualEFSFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 	funcs["mounttarget"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []efstypes.MountTargetDescription
@@ -1161,12 +1161,12 @@ func addManualEfsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 			return resources, objects, nil
 		}
 
-		fsOut, err := conf.APIs.Efs.DescribeFileSystems(ctx, &efs.DescribeFileSystemsInput{})
+		fsOut, err := conf.APIs.EFS.DescribeFileSystems(ctx, &efs.DescribeFileSystemsInput{})
 		if err != nil {
 			return resources, objects, err
 		}
 		for _, fs := range fsOut.FileSystems {
-			mtOut, err := conf.APIs.Efs.DescribeMountTargets(ctx, &efs.DescribeMountTargetsInput{FileSystemId: fs.FileSystemId})
+			mtOut, err := conf.APIs.EFS.DescribeMountTargets(ctx, &efs.DescribeMountTargetsInput{FileSystemId: fs.FileSystemId})
 			if err != nil {
 				return resources, objects, err
 			}

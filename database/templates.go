@@ -25,7 +25,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-const TEMPLATES_BUCKET = "templates"
+const templatesBucket = "templates"
 
 func (db *DB) AddTemplate(tplExec *template.TemplateExecution) error {
 	return db.bolt.Update(func(tx *bolt.Tx) error {
@@ -33,9 +33,9 @@ func (db *DB) AddTemplate(tplExec *template.TemplateExecution) error {
 			return errors.New("cannot persist template with empty ID")
 		}
 
-		bucket, err := tx.CreateBucketIfNotExists([]byte(TEMPLATES_BUCKET))
+		bucket, err := tx.CreateBucketIfNotExists([]byte(templatesBucket))
 		if err != nil {
-			return fmt.Errorf("create bucket %s: %w", TEMPLATES_BUCKET, err)
+			return fmt.Errorf("create bucket %s: %w", templatesBucket, err)
 		}
 
 		b, err := tplExec.MarshalJSON()
@@ -51,7 +51,7 @@ func (db *DB) GetTemplate(id string) (*template.TemplateExecution, error) {
 	tplExec := &template.TemplateExecution{}
 
 	err := db.bolt.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(TEMPLATES_BUCKET))
+		b := tx.Bucket([]byte(templatesBucket))
 		if b == nil {
 			return errors.New("no templates stored yet")
 		}
@@ -67,17 +67,17 @@ func (db *DB) GetTemplate(id string) (*template.TemplateExecution, error) {
 
 func (db *DB) DeleteTemplates() error {
 	return db.bolt.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(TEMPLATES_BUCKET))
+		b := tx.Bucket([]byte(templatesBucket))
 		if b == nil {
 			return nil
 		}
-		return tx.DeleteBucket([]byte(TEMPLATES_BUCKET))
+		return tx.DeleteBucket([]byte(templatesBucket))
 	})
 }
 
 func (db *DB) DeleteTemplate(id string) error {
 	return db.bolt.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(TEMPLATES_BUCKET))
+		b := tx.Bucket([]byte(templatesBucket))
 		if b == nil {
 			return errors.New("no templates stored yet")
 		}
@@ -95,7 +95,7 @@ func (db *DB) GetLoadedTemplate(id string) (*LoadedTemplate, error) {
 	loadedTpl := &LoadedTemplate{}
 
 	err := db.bolt.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(TEMPLATES_BUCKET))
+		b := tx.Bucket([]byte(templatesBucket))
 		if b == nil {
 			return errors.New("no templates stored yet")
 		}
@@ -118,7 +118,7 @@ func (db *DB) ListTemplates() ([]*LoadedTemplate, error) {
 	var results []*LoadedTemplate
 
 	err := db.bolt.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(TEMPLATES_BUCKET))
+		b := tx.Bucket([]byte(templatesBucket))
 		if b == nil {
 			return nil
 		}

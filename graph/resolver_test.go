@@ -29,7 +29,7 @@ func TestResolvers(t *testing.T) {
 		if got, want := len(resources), 1; got != want {
 			t.Fatalf("got %d want %d", got, want)
 		}
-		if got, want := resources[0].Id(), "inst_1"; got != want {
+		if got, want := resources[0].ID(), "inst_1"; got != want {
 			t.Fatalf("got %s want %s", got, want)
 		}
 
@@ -59,7 +59,7 @@ func TestResolvers(t *testing.T) {
 		if got, want := len(resources), 1; got != want {
 			t.Fatalf("got %d want %d", got, want)
 		}
-		if got, want := resources[0].Id(), "sub_1"; got != want {
+		if got, want := resources[0].ID(), "sub_1"; got != want {
 			t.Fatalf("got %s want %s", got, want)
 		}
 	})
@@ -74,7 +74,7 @@ func TestResolvers(t *testing.T) {
 		if got, want := len(resources), 1; got != want {
 			t.Fatalf("got %d want %d", got, want)
 		}
-		if got, want := resources[0].Id(), "inst_1"; got != want {
+		if got, want := resources[0].ID(), "inst_1"; got != want {
 			t.Fatalf("got %s want %s", got, want)
 		}
 

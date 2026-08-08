@@ -125,7 +125,7 @@ var sshCmd = &cobra.Command{
 			} else {
 				exitOn(fmt.Errorf(
 					"no private IP resolved for instance %s (state '%s')",
-					connectionCtx.instance.Id(), connectionCtx.state,
+					connectionCtx.instance.ID(), connectionCtx.state,
 				))
 			}
 		} else {
@@ -134,7 +134,7 @@ var sshCmd = &cobra.Command{
 			} else if priv := connectionCtx.privip; priv != "" {
 				firsHopClient.IP = connectionCtx.privip
 			} else {
-				exitOn(fmt.Errorf("no public/private IP resolved for instance %s (state '%s')", connectionCtx.instance.Id(), connectionCtx.state))
+				exitOn(fmt.Errorf("no public/private IP resolved for instance %s (state '%s')", connectionCtx.instance.ID(), connectionCtx.state))
 			}
 		}
 
@@ -226,7 +226,7 @@ func initInstanceConnectionContext(userhost, keypath string) (*instanceConnectio
 		ctx.instance = resources[0]
 	default:
 		idStatus := cloud.Resources(resources).Map(func(r cloud.Resource) string {
-			return fmt.Sprintf("%s (%s)", r.Id(), r.Properties()[properties.State])
+			return fmt.Sprintf("%s (%s)", r.ID(), r.Properties()[properties.State])
 		})
 		logger.Infof("Found %d resources with name '%s': %s", len(resources), ctx.instanceName, strings.Join(idStatus, ", "))
 
@@ -239,7 +239,7 @@ func initInstanceConnectionContext(userhost, keypath string) (*instanceConnectio
 			logger.Warning("None of them is running, cannot connect through SSH")
 			return ctx, errors.New("non running instances")
 		case 1:
-			logger.Infof("Found only one instance running: %s. Will connect to this instance.", running[0].Id())
+			logger.Infof("Found only one instance running: %s. Will connect to this instance.", running[0].ID())
 			ctx.instance = running[0]
 		default:
 			logger.Warning("Connect through the running ones using their id:")
@@ -248,7 +248,7 @@ func initInstanceConnectionContext(userhost, keypath string) (*instanceConnectio
 				if uptime, ok := res.Properties()[properties.Launched].(time.Time); ok {
 					up = fmt.Sprintf("\t\t(uptime: %s)", console.HumanizeTime(uptime))
 				}
-				logger.Warningf("\t`awless ssh %s`%s", res.Id(), up)
+				logger.Warningf("\t`awless ssh %s`%s", res.ID(), up)
 			}
 			return ctx, errors.New("use instances ids")
 		}
@@ -322,7 +322,7 @@ func (ctx *instanceConnectionContext) checkInstanceAccessible() (err error) {
 	if st := ctx.state; st != "running" {
 		logger.Warningf("this instance is '%s' (cannot ssh to a non running state)", st)
 		if st == "stopped" {
-			logger.Warningf("you can start it with `awless -f start instance id=%s`", ctx.instance.Id())
+			logger.Warningf("you can start it with `awless -f start instance id=%s`", ctx.instance.ID())
 		}
 		return errors.New("instance not accessible")
 	}
@@ -334,7 +334,7 @@ func (ctx *instanceConnectionContext) checkInstanceAccessible() (err error) {
 			var sgroup cloud.Resource
 			sgroup, err = findResource(ctx.resourcesGraph, id, cloud.SecurityGroup)
 			if err != nil {
-				logger.Errorf("cannot get securitygroup '%s' for instance '%s': %s", id, ctx.instance.Id(), err)
+				logger.Errorf("cannot get securitygroup '%s' for instance '%s': %s", id, ctx.instance.ID(), err)
 				break
 			}
 

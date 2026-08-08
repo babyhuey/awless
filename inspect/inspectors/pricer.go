@@ -143,5 +143,5 @@ func getRegion(g cloud.GraphAPI) (string, error) {
 		return "", errors.New("cannot resolve region from graph")
 	}
 
-	return all[0].Id(), nil
+	return all[0].ID(), nil
 }

@@ -123,7 +123,7 @@ func (cmd *AttachAlarm) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *AttachAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("alarm"), nil
+	return fakeDryRunID("alarm"), nil
 }
 
 func (cmd *AttachAlarm) inject(params map[string]any) error {
@@ -205,7 +205,7 @@ func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]an
 }
 
 func (cmd *AttachClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("classicloadbalancer"), nil
+	return fakeDryRunID("classicloadbalancer"), nil
 }
 
 func (cmd *AttachClassicLoadbalancer) inject(params map[string]any) error {
@@ -278,7 +278,7 @@ func (cmd *AttachContainertask) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *AttachContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("containertask"), nil
+	return fakeDryRunID("containertask"), nil
 }
 
 func (cmd *AttachContainertask) inject(params map[string]any) error {
@@ -381,7 +381,7 @@ func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]any) (any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AssociateAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach elasticip ok")
-			return fakeDryRunId("elasticip"), nil
+			return fakeDryRunID("elasticip"), nil
 		}
 	}
 
@@ -467,7 +467,7 @@ func (cmd *AttachInstance) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *AttachInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("instance"), nil
+	return fakeDryRunID("instance"), nil
 }
 
 func (cmd *AttachInstance) inject(params map[string]any) error {
@@ -639,7 +639,7 @@ func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AttachInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach internetgateway ok")
-			return fakeDryRunId("internetgateway"), nil
+			return fakeDryRunID("internetgateway"), nil
 		}
 	}
 
@@ -725,7 +725,7 @@ func (cmd *AttachListener) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *AttachListener) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("listener"), nil
+	return fakeDryRunID("listener"), nil
 }
 
 func (cmd *AttachListener) inject(params map[string]any) error {
@@ -807,7 +807,7 @@ func (cmd *AttachMfadevice) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *AttachMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("mfadevice"), nil
+	return fakeDryRunID("mfadevice"), nil
 }
 
 func (cmd *AttachMfadevice) inject(params map[string]any) error {
@@ -910,7 +910,7 @@ func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]an
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AttachNetworkInterface call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach networkinterface ok")
-			return fakeDryRunId("networkinterface"), nil
+			return fakeDryRunID("networkinterface"), nil
 		}
 	}
 
@@ -987,7 +987,7 @@ func (cmd *AttachPolicy) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *AttachPolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("policy"), nil
+	return fakeDryRunID("policy"), nil
 }
 
 func (cmd *AttachPolicy) inject(params map[string]any) error {
@@ -1069,7 +1069,7 @@ func (cmd *AttachRole) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *AttachRole) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("role"), nil
+	return fakeDryRunID("role"), nil
 }
 
 func (cmd *AttachRole) inject(params map[string]any) error {
@@ -1172,7 +1172,7 @@ func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]any) (an
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AssociateRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach routetable ok")
-			return fakeDryRunId("routetable"), nil
+			return fakeDryRunID("routetable"), nil
 		}
 	}
 
@@ -1249,7 +1249,7 @@ func (cmd *AttachSecuritygroup) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *AttachSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("securitygroup"), nil
+	return fakeDryRunID("securitygroup"), nil
 }
 
 func (cmd *AttachSecuritygroup) inject(params map[string]any) error {
@@ -1331,7 +1331,7 @@ func (cmd *AttachUser) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *AttachUser) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("user"), nil
+	return fakeDryRunID("user"), nil
 }
 
 func (cmd *AttachUser) inject(params map[string]any) error {
@@ -1434,7 +1434,7 @@ func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AttachVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: attach volume ok")
-			return fakeDryRunId("volume"), nil
+			return fakeDryRunID("volume"), nil
 		}
 	}
 
@@ -1511,7 +1511,7 @@ func (cmd *AuthenticateRegistry) run(renv env.Running, params map[string]any) (a
 }
 
 func (cmd *AuthenticateRegistry) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("registry"), nil
+	return fakeDryRunID("registry"), nil
 }
 
 func (cmd *AuthenticateRegistry) inject(params map[string]any) error {
@@ -1584,7 +1584,7 @@ func (cmd *CheckCertificate) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *CheckCertificate) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("certificate"), nil
+	return fakeDryRunID("certificate"), nil
 }
 
 func (cmd *CheckCertificate) inject(params map[string]any) error {
@@ -1657,7 +1657,7 @@ func (cmd *CheckDatabase) run(renv env.Running, params map[string]any) (any, err
 }
 
 func (cmd *CheckDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("database"), nil
+	return fakeDryRunID("database"), nil
 }
 
 func (cmd *CheckDatabase) inject(params map[string]any) error {
@@ -1730,7 +1730,7 @@ func (cmd *CheckDistribution) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *CheckDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("distribution"), nil
+	return fakeDryRunID("distribution"), nil
 }
 
 func (cmd *CheckDistribution) inject(params map[string]any) error {
@@ -1803,7 +1803,7 @@ func (cmd *CheckInstance) run(renv env.Running, params map[string]any) (any, err
 }
 
 func (cmd *CheckInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("instance"), nil
+	return fakeDryRunID("instance"), nil
 }
 
 func (cmd *CheckInstance) inject(params map[string]any) error {
@@ -1876,7 +1876,7 @@ func (cmd *CheckLoadbalancer) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *CheckLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loadbalancer"), nil
+	return fakeDryRunID("loadbalancer"), nil
 }
 
 func (cmd *CheckLoadbalancer) inject(params map[string]any) error {
@@ -1949,7 +1949,7 @@ func (cmd *CheckNatgateway) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *CheckNatgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("natgateway"), nil
+	return fakeDryRunID("natgateway"), nil
 }
 
 func (cmd *CheckNatgateway) inject(params map[string]any) error {
@@ -2022,7 +2022,7 @@ func (cmd *CheckNetworkinterface) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *CheckNetworkinterface) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("networkinterface"), nil
+	return fakeDryRunID("networkinterface"), nil
 }
 
 func (cmd *CheckNetworkinterface) inject(params map[string]any) error {
@@ -2095,7 +2095,7 @@ func (cmd *CheckScalinggroup) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *CheckScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("scalinggroup"), nil
+	return fakeDryRunID("scalinggroup"), nil
 }
 
 func (cmd *CheckScalinggroup) inject(params map[string]any) error {
@@ -2168,7 +2168,7 @@ func (cmd *CheckSecuritygroup) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CheckSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("securitygroup"), nil
+	return fakeDryRunID("securitygroup"), nil
 }
 
 func (cmd *CheckSecuritygroup) inject(params map[string]any) error {
@@ -2241,7 +2241,7 @@ func (cmd *CheckVolume) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *CheckVolume) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("volume"), nil
+	return fakeDryRunID("volume"), nil
 }
 
 func (cmd *CheckVolume) inject(params map[string]any) error {
@@ -2344,7 +2344,7 @@ func (cmd *CopyImage) dryRun(renv env.Running, params map[string]any) (any, erro
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CopyImage call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: copy image ok")
-			return fakeDryRunId("image"), nil
+			return fakeDryRunID("image"), nil
 		}
 	}
 
@@ -2451,7 +2451,7 @@ func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CopySnapshot call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: copy snapshot ok")
-			return fakeDryRunId("snapshot"), nil
+			return fakeDryRunID("snapshot"), nil
 		}
 	}
 
@@ -2537,7 +2537,7 @@ func (cmd *CreateAccesskey) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *CreateAccesskey) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("accesskey"), nil
+	return fakeDryRunID("accesskey"), nil
 }
 
 func (cmd *CreateAccesskey) inject(params map[string]any) error {
@@ -2619,7 +2619,7 @@ func (cmd *CreateAlarm) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *CreateAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("alarm"), nil
+	return fakeDryRunID("alarm"), nil
 }
 
 func (cmd *CreateAlarm) inject(params map[string]any) error {
@@ -2701,7 +2701,7 @@ func (cmd *CreateApigateway) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *CreateApigateway) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("apigateway"), nil
+	return fakeDryRunID("apigateway"), nil
 }
 
 func (cmd *CreateApigateway) inject(params map[string]any) error {
@@ -2783,7 +2783,7 @@ func (cmd *CreateApigatewayroute) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *CreateApigatewayroute) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("apigatewayroute"), nil
+	return fakeDryRunID("apigatewayroute"), nil
 }
 
 func (cmd *CreateApigatewayroute) inject(params map[string]any) error {
@@ -2865,7 +2865,7 @@ func (cmd *CreateApigatewaystage) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *CreateApigatewaystage) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("apigatewaystage"), nil
+	return fakeDryRunID("apigatewaystage"), nil
 }
 
 func (cmd *CreateApigatewaystage) inject(params map[string]any) error {
@@ -2947,7 +2947,7 @@ func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]any) 
 }
 
 func (cmd *CreateAppscalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("appscalingpolicy"), nil
+	return fakeDryRunID("appscalingpolicy"), nil
 }
 
 func (cmd *CreateAppscalingpolicy) inject(params map[string]any) error {
@@ -3029,7 +3029,7 @@ func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]any) 
 }
 
 func (cmd *CreateAppscalingtarget) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("appscalingtarget"), nil
+	return fakeDryRunID("appscalingtarget"), nil
 }
 
 func (cmd *CreateAppscalingtarget) inject(params map[string]any) error {
@@ -3111,7 +3111,7 @@ func (cmd *CreateBucket) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *CreateBucket) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("bucket"), nil
+	return fakeDryRunID("bucket"), nil
 }
 
 func (cmd *CreateBucket) inject(params map[string]any) error {
@@ -3184,7 +3184,7 @@ func (cmd *CreateCertificate) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *CreateCertificate) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("certificate"), nil
+	return fakeDryRunID("certificate"), nil
 }
 
 func (cmd *CreateCertificate) inject(params map[string]any) error {
@@ -3266,7 +3266,7 @@ func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]an
 }
 
 func (cmd *CreateClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("classicloadbalancer"), nil
+	return fakeDryRunID("classicloadbalancer"), nil
 }
 
 func (cmd *CreateClassicLoadbalancer) inject(params map[string]any) error {
@@ -3348,7 +3348,7 @@ func (cmd *CreateContainercluster) run(renv env.Running, params map[string]any) 
 }
 
 func (cmd *CreateContainercluster) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("containercluster"), nil
+	return fakeDryRunID("containercluster"), nil
 }
 
 func (cmd *CreateContainercluster) inject(params map[string]any) error {
@@ -3421,7 +3421,7 @@ func (cmd *CreateDatabase) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *CreateDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("database"), nil
+	return fakeDryRunID("database"), nil
 }
 
 func (cmd *CreateDatabase) inject(params map[string]any) error {
@@ -3503,7 +3503,7 @@ func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *CreateDbsubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("dbsubnetgroup"), nil
+	return fakeDryRunID("dbsubnetgroup"), nil
 }
 
 func (cmd *CreateDbsubnetgroup) inject(params map[string]any) error {
@@ -3576,7 +3576,7 @@ func (cmd *CreateDistribution) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("distribution"), nil
+	return fakeDryRunID("distribution"), nil
 }
 
 func (cmd *CreateDistribution) inject(params map[string]any) error {
@@ -3649,7 +3649,7 @@ func (cmd *CreateDynamodbtable) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *CreateDynamodbtable) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("dynamodbtable"), nil
+	return fakeDryRunID("dynamodbtable"), nil
 }
 
 func (cmd *CreateDynamodbtable) inject(params map[string]any) error {
@@ -3722,7 +3722,7 @@ func (cmd *CreateEkscluster) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *CreateEkscluster) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("ekscluster"), nil
+	return fakeDryRunID("ekscluster"), nil
 }
 
 func (cmd *CreateEkscluster) inject(params map[string]any) error {
@@ -3795,7 +3795,7 @@ func (cmd *CreateEksnodegroup) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateEksnodegroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("eksnodegroup"), nil
+	return fakeDryRunID("eksnodegroup"), nil
 }
 
 func (cmd *CreateEksnodegroup) inject(params map[string]any) error {
@@ -3898,7 +3898,7 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.AllocateAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create elasticip ok")
-			return fakeDryRunId("elasticip"), nil
+			return fakeDryRunID("elasticip"), nil
 		}
 	}
 
@@ -3984,7 +3984,7 @@ func (cmd *CreateFilesystem) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *CreateFilesystem) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("filesystem"), nil
+	return fakeDryRunID("filesystem"), nil
 }
 
 func (cmd *CreateFilesystem) inject(params map[string]any) error {
@@ -4066,7 +4066,7 @@ func (cmd *CreateFunction) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *CreateFunction) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("function"), nil
+	return fakeDryRunID("function"), nil
 }
 
 func (cmd *CreateFunction) inject(params map[string]any) error {
@@ -4148,7 +4148,7 @@ func (cmd *CreateGroup) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *CreateGroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("group"), nil
+	return fakeDryRunID("group"), nil
 }
 
 func (cmd *CreateGroup) inject(params map[string]any) error {
@@ -4251,7 +4251,7 @@ func (cmd *CreateImage) dryRun(renv env.Running, params map[string]any) (any, er
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateImage call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create image ok")
-			return fakeDryRunId("image"), nil
+			return fakeDryRunID("image"), nil
 		}
 	}
 
@@ -4358,7 +4358,7 @@ func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]any) (any,
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.RunInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create instance ok")
-			return fakeDryRunId("instance"), nil
+			return fakeDryRunID("instance"), nil
 		}
 	}
 
@@ -4444,7 +4444,7 @@ func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *CreateInstanceprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("instanceprofile"), nil
+	return fakeDryRunID("instanceprofile"), nil
 }
 
 func (cmd *CreateInstanceprofile) inject(params map[string]any) error {
@@ -4547,7 +4547,7 @@ func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create internetgateway ok")
-			return fakeDryRunId("internetgateway"), nil
+			return fakeDryRunID("internetgateway"), nil
 		}
 	}
 
@@ -4633,7 +4633,7 @@ func (cmd *CreateKeypair) run(renv env.Running, params map[string]any) (any, err
 }
 
 func (cmd *CreateKeypair) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("keypair"), nil
+	return fakeDryRunID("keypair"), nil
 }
 
 func (cmd *CreateKeypair) inject(params map[string]any) error {
@@ -4715,7 +4715,7 @@ func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]an
 }
 
 func (cmd *CreateLaunchconfiguration) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("launchconfiguration"), nil
+	return fakeDryRunID("launchconfiguration"), nil
 }
 
 func (cmd *CreateLaunchconfiguration) inject(params map[string]any) error {
@@ -4797,7 +4797,7 @@ func (cmd *CreateListener) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *CreateListener) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("listener"), nil
+	return fakeDryRunID("listener"), nil
 }
 
 func (cmd *CreateListener) inject(params map[string]any) error {
@@ -4879,7 +4879,7 @@ func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loadbalancer"), nil
+	return fakeDryRunID("loadbalancer"), nil
 }
 
 func (cmd *CreateLoadbalancer) inject(params map[string]any) error {
@@ -4961,7 +4961,7 @@ func (cmd *CreateLoggroup) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *CreateLoggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loggroup"), nil
+	return fakeDryRunID("loggroup"), nil
 }
 
 func (cmd *CreateLoggroup) inject(params map[string]any) error {
@@ -5043,7 +5043,7 @@ func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateLoginprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loginprofile"), nil
+	return fakeDryRunID("loginprofile"), nil
 }
 
 func (cmd *CreateLoginprofile) inject(params map[string]any) error {
@@ -5116,7 +5116,7 @@ func (cmd *CreateMfadevice) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *CreateMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("mfadevice"), nil
+	return fakeDryRunID("mfadevice"), nil
 }
 
 func (cmd *CreateMfadevice) inject(params map[string]any) error {
@@ -5198,7 +5198,7 @@ func (cmd *CreateNatgateway) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *CreateNatgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("natgateway"), nil
+	return fakeDryRunID("natgateway"), nil
 }
 
 func (cmd *CreateNatgateway) inject(params map[string]any) error {
@@ -5301,7 +5301,7 @@ func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]an
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateNetworkInterface call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create networkinterface ok")
-			return fakeDryRunId("networkinterface"), nil
+			return fakeDryRunID("networkinterface"), nil
 		}
 	}
 
@@ -5387,7 +5387,7 @@ func (cmd *CreatePolicy) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *CreatePolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("policy"), nil
+	return fakeDryRunID("policy"), nil
 }
 
 func (cmd *CreatePolicy) inject(params map[string]any) error {
@@ -5469,7 +5469,7 @@ func (cmd *CreateQueue) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *CreateQueue) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("queue"), nil
+	return fakeDryRunID("queue"), nil
 }
 
 func (cmd *CreateQueue) inject(params map[string]any) error {
@@ -5542,7 +5542,7 @@ func (cmd *CreateRecord) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *CreateRecord) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("record"), nil
+	return fakeDryRunID("record"), nil
 }
 
 func (cmd *CreateRecord) inject(params map[string]any) error {
@@ -5624,7 +5624,7 @@ func (cmd *CreateRepository) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *CreateRepository) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("repository"), nil
+	return fakeDryRunID("repository"), nil
 }
 
 func (cmd *CreateRepository) inject(params map[string]any) error {
@@ -5697,7 +5697,7 @@ func (cmd *CreateRole) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *CreateRole) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("role"), nil
+	return fakeDryRunID("role"), nil
 }
 
 func (cmd *CreateRole) inject(params map[string]any) error {
@@ -5800,7 +5800,7 @@ func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]any) (any, er
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateRoute call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create route ok")
-			return fakeDryRunId("route"), nil
+			return fakeDryRunID("route"), nil
 		}
 	}
 
@@ -5907,7 +5907,7 @@ func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]any) (an
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create routetable ok")
-			return fakeDryRunId("routetable"), nil
+			return fakeDryRunID("routetable"), nil
 		}
 	}
 
@@ -5984,7 +5984,7 @@ func (cmd *CreateS3object) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *CreateS3object) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("s3object"), nil
+	return fakeDryRunID("s3object"), nil
 }
 
 func (cmd *CreateS3object) inject(params map[string]any) error {
@@ -6066,7 +6066,7 @@ func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("scalinggroup"), nil
+	return fakeDryRunID("scalinggroup"), nil
 }
 
 func (cmd *CreateScalinggroup) inject(params map[string]any) error {
@@ -6148,7 +6148,7 @@ func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *CreateScalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("scalingpolicy"), nil
+	return fakeDryRunID("scalingpolicy"), nil
 }
 
 func (cmd *CreateScalingpolicy) inject(params map[string]any) error {
@@ -6230,7 +6230,7 @@ func (cmd *CreateSecret) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *CreateSecret) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("secret"), nil
+	return fakeDryRunID("secret"), nil
 }
 
 func (cmd *CreateSecret) inject(params map[string]any) error {
@@ -6333,7 +6333,7 @@ func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateSecurityGroup call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create securitygroup ok")
-			return fakeDryRunId("securitygroup"), nil
+			return fakeDryRunID("securitygroup"), nil
 		}
 	}
 
@@ -6440,7 +6440,7 @@ func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateSnapshot call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create snapshot ok")
-			return fakeDryRunId("snapshot"), nil
+			return fakeDryRunID("snapshot"), nil
 		}
 	}
 
@@ -6526,7 +6526,7 @@ func (cmd *CreateSsmparameter) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateSsmparameter) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("ssmparameter"), nil
+	return fakeDryRunID("ssmparameter"), nil
 }
 
 func (cmd *CreateSsmparameter) inject(params map[string]any) error {
@@ -6608,7 +6608,7 @@ func (cmd *CreateStack) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *CreateStack) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("stack"), nil
+	return fakeDryRunID("stack"), nil
 }
 
 func (cmd *CreateStack) inject(params map[string]any) error {
@@ -6711,7 +6711,7 @@ func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateSubnet call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create subnet ok")
-			return fakeDryRunId("subnet"), nil
+			return fakeDryRunID("subnet"), nil
 		}
 	}
 
@@ -6797,7 +6797,7 @@ func (cmd *CreateSubscription) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateSubscription) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("subscription"), nil
+	return fakeDryRunID("subscription"), nil
 }
 
 func (cmd *CreateSubscription) inject(params map[string]any) error {
@@ -6948,7 +6948,7 @@ func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *CreateTargetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("targetgroup"), nil
+	return fakeDryRunID("targetgroup"), nil
 }
 
 func (cmd *CreateTargetgroup) inject(params map[string]any) error {
@@ -7030,7 +7030,7 @@ func (cmd *CreateTopic) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *CreateTopic) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("topic"), nil
+	return fakeDryRunID("topic"), nil
 }
 
 func (cmd *CreateTopic) inject(params map[string]any) error {
@@ -7112,7 +7112,7 @@ func (cmd *CreateTrail) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *CreateTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("trail"), nil
+	return fakeDryRunID("trail"), nil
 }
 
 func (cmd *CreateTrail) inject(params map[string]any) error {
@@ -7194,7 +7194,7 @@ func (cmd *CreateUser) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *CreateUser) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("user"), nil
+	return fakeDryRunID("user"), nil
 }
 
 func (cmd *CreateUser) inject(params map[string]any) error {
@@ -7297,7 +7297,7 @@ func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create volume ok")
-			return fakeDryRunId("volume"), nil
+			return fakeDryRunID("volume"), nil
 		}
 	}
 
@@ -7404,7 +7404,7 @@ func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.CreateVpc call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: create vpc ok")
-			return fakeDryRunId("vpc"), nil
+			return fakeDryRunID("vpc"), nil
 		}
 	}
 
@@ -7490,7 +7490,7 @@ func (cmd *CreateZone) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *CreateZone) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("zone"), nil
+	return fakeDryRunID("zone"), nil
 }
 
 func (cmd *CreateZone) inject(params map[string]any) error {
@@ -7572,7 +7572,7 @@ func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *DeleteAccesskey) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("accesskey"), nil
+	return fakeDryRunID("accesskey"), nil
 }
 
 func (cmd *DeleteAccesskey) inject(params map[string]any) error {
@@ -7654,7 +7654,7 @@ func (cmd *DeleteAlarm) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *DeleteAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("alarm"), nil
+	return fakeDryRunID("alarm"), nil
 }
 
 func (cmd *DeleteAlarm) inject(params map[string]any) error {
@@ -7736,7 +7736,7 @@ func (cmd *DeleteApigateway) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *DeleteApigateway) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("apigateway"), nil
+	return fakeDryRunID("apigateway"), nil
 }
 
 func (cmd *DeleteApigateway) inject(params map[string]any) error {
@@ -7818,7 +7818,7 @@ func (cmd *DeleteApigatewayroute) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *DeleteApigatewayroute) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("apigatewayroute"), nil
+	return fakeDryRunID("apigatewayroute"), nil
 }
 
 func (cmd *DeleteApigatewayroute) inject(params map[string]any) error {
@@ -7900,7 +7900,7 @@ func (cmd *DeleteApigatewaystage) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *DeleteApigatewaystage) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("apigatewaystage"), nil
+	return fakeDryRunID("apigatewaystage"), nil
 }
 
 func (cmd *DeleteApigatewaystage) inject(params map[string]any) error {
@@ -7982,7 +7982,7 @@ func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]any) 
 }
 
 func (cmd *DeleteAppscalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("appscalingpolicy"), nil
+	return fakeDryRunID("appscalingpolicy"), nil
 }
 
 func (cmd *DeleteAppscalingpolicy) inject(params map[string]any) error {
@@ -8064,7 +8064,7 @@ func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]any) 
 }
 
 func (cmd *DeleteAppscalingtarget) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("appscalingtarget"), nil
+	return fakeDryRunID("appscalingtarget"), nil
 }
 
 func (cmd *DeleteAppscalingtarget) inject(params map[string]any) error {
@@ -8146,7 +8146,7 @@ func (cmd *DeleteBucket) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DeleteBucket) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("bucket"), nil
+	return fakeDryRunID("bucket"), nil
 }
 
 func (cmd *DeleteBucket) inject(params map[string]any) error {
@@ -8228,7 +8228,7 @@ func (cmd *DeleteCertificate) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *DeleteCertificate) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("certificate"), nil
+	return fakeDryRunID("certificate"), nil
 }
 
 func (cmd *DeleteCertificate) inject(params map[string]any) error {
@@ -8310,7 +8310,7 @@ func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]an
 }
 
 func (cmd *DeleteClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("classicloadbalancer"), nil
+	return fakeDryRunID("classicloadbalancer"), nil
 }
 
 func (cmd *DeleteClassicLoadbalancer) inject(params map[string]any) error {
@@ -8392,7 +8392,7 @@ func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]any) 
 }
 
 func (cmd *DeleteContainercluster) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("containercluster"), nil
+	return fakeDryRunID("containercluster"), nil
 }
 
 func (cmd *DeleteContainercluster) inject(params map[string]any) error {
@@ -8543,7 +8543,7 @@ func (cmd *DeleteDatabase) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("database"), nil
+	return fakeDryRunID("database"), nil
 }
 
 func (cmd *DeleteDatabase) inject(params map[string]any) error {
@@ -8625,7 +8625,7 @@ func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *DeleteDbsubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("dbsubnetgroup"), nil
+	return fakeDryRunID("dbsubnetgroup"), nil
 }
 
 func (cmd *DeleteDbsubnetgroup) inject(params map[string]any) error {
@@ -8698,7 +8698,7 @@ func (cmd *DeleteDistribution) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("distribution"), nil
+	return fakeDryRunID("distribution"), nil
 }
 
 func (cmd *DeleteDistribution) inject(params map[string]any) error {
@@ -8780,7 +8780,7 @@ func (cmd *DeleteDynamodbtable) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *DeleteDynamodbtable) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("dynamodbtable"), nil
+	return fakeDryRunID("dynamodbtable"), nil
 }
 
 func (cmd *DeleteDynamodbtable) inject(params map[string]any) error {
@@ -8862,7 +8862,7 @@ func (cmd *DeleteEkscluster) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *DeleteEkscluster) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("ekscluster"), nil
+	return fakeDryRunID("ekscluster"), nil
 }
 
 func (cmd *DeleteEkscluster) inject(params map[string]any) error {
@@ -8944,7 +8944,7 @@ func (cmd *DeleteEksnodegroup) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteEksnodegroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("eksnodegroup"), nil
+	return fakeDryRunID("eksnodegroup"), nil
 }
 
 func (cmd *DeleteEksnodegroup) inject(params map[string]any) error {
@@ -9047,7 +9047,7 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]any) (any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.ReleaseAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete elasticip ok")
-			return fakeDryRunId("elasticip"), nil
+			return fakeDryRunID("elasticip"), nil
 		}
 	}
 
@@ -9133,7 +9133,7 @@ func (cmd *DeleteFilesystem) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *DeleteFilesystem) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("filesystem"), nil
+	return fakeDryRunID("filesystem"), nil
 }
 
 func (cmd *DeleteFilesystem) inject(params map[string]any) error {
@@ -9215,7 +9215,7 @@ func (cmd *DeleteFunction) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteFunction) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("function"), nil
+	return fakeDryRunID("function"), nil
 }
 
 func (cmd *DeleteFunction) inject(params map[string]any) error {
@@ -9297,7 +9297,7 @@ func (cmd *DeleteGroup) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *DeleteGroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("group"), nil
+	return fakeDryRunID("group"), nil
 }
 
 func (cmd *DeleteGroup) inject(params map[string]any) error {
@@ -9469,7 +9469,7 @@ func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]any) (any,
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.TerminateInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete instance ok")
-			return fakeDryRunId("instance"), nil
+			return fakeDryRunID("instance"), nil
 		}
 	}
 
@@ -9555,7 +9555,7 @@ func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *DeleteInstanceprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("instanceprofile"), nil
+	return fakeDryRunID("instanceprofile"), nil
 }
 
 func (cmd *DeleteInstanceprofile) inject(params map[string]any) error {
@@ -9658,7 +9658,7 @@ func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete internetgateway ok")
-			return fakeDryRunId("internetgateway"), nil
+			return fakeDryRunID("internetgateway"), nil
 		}
 	}
 
@@ -9765,7 +9765,7 @@ func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]any) (any, 
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteKeyPair call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete keypair ok")
-			return fakeDryRunId("keypair"), nil
+			return fakeDryRunID("keypair"), nil
 		}
 	}
 
@@ -9851,7 +9851,7 @@ func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]an
 }
 
 func (cmd *DeleteLaunchconfiguration) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("launchconfiguration"), nil
+	return fakeDryRunID("launchconfiguration"), nil
 }
 
 func (cmd *DeleteLaunchconfiguration) inject(params map[string]any) error {
@@ -9933,7 +9933,7 @@ func (cmd *DeleteListener) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteListener) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("listener"), nil
+	return fakeDryRunID("listener"), nil
 }
 
 func (cmd *DeleteListener) inject(params map[string]any) error {
@@ -10015,7 +10015,7 @@ func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loadbalancer"), nil
+	return fakeDryRunID("loadbalancer"), nil
 }
 
 func (cmd *DeleteLoadbalancer) inject(params map[string]any) error {
@@ -10097,7 +10097,7 @@ func (cmd *DeleteLoggroup) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteLoggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loggroup"), nil
+	return fakeDryRunID("loggroup"), nil
 }
 
 func (cmd *DeleteLoggroup) inject(params map[string]any) error {
@@ -10179,7 +10179,7 @@ func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteLoginprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loginprofile"), nil
+	return fakeDryRunID("loginprofile"), nil
 }
 
 func (cmd *DeleteLoginprofile) inject(params map[string]any) error {
@@ -10261,7 +10261,7 @@ func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *DeleteMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("mfadevice"), nil
+	return fakeDryRunID("mfadevice"), nil
 }
 
 func (cmd *DeleteMfadevice) inject(params map[string]any) error {
@@ -10343,7 +10343,7 @@ func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *DeleteNatgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("natgateway"), nil
+	return fakeDryRunID("natgateway"), nil
 }
 
 func (cmd *DeleteNatgateway) inject(params map[string]any) error {
@@ -10446,7 +10446,7 @@ func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]an
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteNetworkInterface call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete networkinterface ok")
-			return fakeDryRunId("networkinterface"), nil
+			return fakeDryRunID("networkinterface"), nil
 		}
 	}
 
@@ -10532,7 +10532,7 @@ func (cmd *DeletePolicy) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DeletePolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("policy"), nil
+	return fakeDryRunID("policy"), nil
 }
 
 func (cmd *DeletePolicy) inject(params map[string]any) error {
@@ -10614,7 +10614,7 @@ func (cmd *DeleteQueue) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *DeleteQueue) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("queue"), nil
+	return fakeDryRunID("queue"), nil
 }
 
 func (cmd *DeleteQueue) inject(params map[string]any) error {
@@ -10687,7 +10687,7 @@ func (cmd *DeleteRecord) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DeleteRecord) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("record"), nil
+	return fakeDryRunID("record"), nil
 }
 
 func (cmd *DeleteRecord) inject(params map[string]any) error {
@@ -10769,7 +10769,7 @@ func (cmd *DeleteRepository) run(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *DeleteRepository) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("repository"), nil
+	return fakeDryRunID("repository"), nil
 }
 
 func (cmd *DeleteRepository) inject(params map[string]any) error {
@@ -10842,7 +10842,7 @@ func (cmd *DeleteRole) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *DeleteRole) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("role"), nil
+	return fakeDryRunID("role"), nil
 }
 
 func (cmd *DeleteRole) inject(params map[string]any) error {
@@ -10945,7 +10945,7 @@ func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]any) (any, er
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteRoute call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete route ok")
-			return fakeDryRunId("route"), nil
+			return fakeDryRunID("route"), nil
 		}
 	}
 
@@ -11052,7 +11052,7 @@ func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]any) (an
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete routetable ok")
-			return fakeDryRunId("routetable"), nil
+			return fakeDryRunID("routetable"), nil
 		}
 	}
 
@@ -11138,7 +11138,7 @@ func (cmd *DeleteS3object) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteS3object) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("s3object"), nil
+	return fakeDryRunID("s3object"), nil
 }
 
 func (cmd *DeleteS3object) inject(params map[string]any) error {
@@ -11220,7 +11220,7 @@ func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("scalinggroup"), nil
+	return fakeDryRunID("scalinggroup"), nil
 }
 
 func (cmd *DeleteScalinggroup) inject(params map[string]any) error {
@@ -11302,7 +11302,7 @@ func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *DeleteScalingpolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("scalingpolicy"), nil
+	return fakeDryRunID("scalingpolicy"), nil
 }
 
 func (cmd *DeleteScalingpolicy) inject(params map[string]any) error {
@@ -11384,7 +11384,7 @@ func (cmd *DeleteSecret) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DeleteSecret) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("secret"), nil
+	return fakeDryRunID("secret"), nil
 }
 
 func (cmd *DeleteSecret) inject(params map[string]any) error {
@@ -11487,7 +11487,7 @@ func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteSecurityGroup call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete securitygroup ok")
-			return fakeDryRunId("securitygroup"), nil
+			return fakeDryRunID("securitygroup"), nil
 		}
 	}
 
@@ -11594,7 +11594,7 @@ func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteSnapshot call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete snapshot ok")
-			return fakeDryRunId("snapshot"), nil
+			return fakeDryRunID("snapshot"), nil
 		}
 	}
 
@@ -11680,7 +11680,7 @@ func (cmd *DeleteSsmparameter) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteSsmparameter) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("ssmparameter"), nil
+	return fakeDryRunID("ssmparameter"), nil
 }
 
 func (cmd *DeleteSsmparameter) inject(params map[string]any) error {
@@ -11762,7 +11762,7 @@ func (cmd *DeleteStack) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *DeleteStack) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("stack"), nil
+	return fakeDryRunID("stack"), nil
 }
 
 func (cmd *DeleteStack) inject(params map[string]any) error {
@@ -11865,7 +11865,7 @@ func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteSubnet call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete subnet ok")
-			return fakeDryRunId("subnet"), nil
+			return fakeDryRunID("subnet"), nil
 		}
 	}
 
@@ -11951,7 +11951,7 @@ func (cmd *DeleteSubscription) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteSubscription) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("subscription"), nil
+	return fakeDryRunID("subscription"), nil
 }
 
 func (cmd *DeleteSubscription) inject(params map[string]any) error {
@@ -12102,7 +12102,7 @@ func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *DeleteTargetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("targetgroup"), nil
+	return fakeDryRunID("targetgroup"), nil
 }
 
 func (cmd *DeleteTargetgroup) inject(params map[string]any) error {
@@ -12184,7 +12184,7 @@ func (cmd *DeleteTopic) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *DeleteTopic) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("topic"), nil
+	return fakeDryRunID("topic"), nil
 }
 
 func (cmd *DeleteTopic) inject(params map[string]any) error {
@@ -12266,7 +12266,7 @@ func (cmd *DeleteTrail) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *DeleteTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("trail"), nil
+	return fakeDryRunID("trail"), nil
 }
 
 func (cmd *DeleteTrail) inject(params map[string]any) error {
@@ -12348,7 +12348,7 @@ func (cmd *DeleteUser) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *DeleteUser) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("user"), nil
+	return fakeDryRunID("user"), nil
 }
 
 func (cmd *DeleteUser) inject(params map[string]any) error {
@@ -12451,7 +12451,7 @@ func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete volume ok")
-			return fakeDryRunId("volume"), nil
+			return fakeDryRunID("volume"), nil
 		}
 	}
 
@@ -12558,7 +12558,7 @@ func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DeleteVpc call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: delete vpc ok")
-			return fakeDryRunId("vpc"), nil
+			return fakeDryRunID("vpc"), nil
 		}
 	}
 
@@ -12644,7 +12644,7 @@ func (cmd *DeleteZone) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *DeleteZone) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("zone"), nil
+	return fakeDryRunID("zone"), nil
 }
 
 func (cmd *DeleteZone) inject(params map[string]any) error {
@@ -12717,7 +12717,7 @@ func (cmd *DetachAlarm) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *DetachAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("alarm"), nil
+	return fakeDryRunID("alarm"), nil
 }
 
 func (cmd *DetachAlarm) inject(params map[string]any) error {
@@ -12799,7 +12799,7 @@ func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]an
 }
 
 func (cmd *DetachClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("classicloadbalancer"), nil
+	return fakeDryRunID("classicloadbalancer"), nil
 }
 
 func (cmd *DetachClassicLoadbalancer) inject(params map[string]any) error {
@@ -12872,7 +12872,7 @@ func (cmd *DetachContainertask) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *DetachContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("containertask"), nil
+	return fakeDryRunID("containertask"), nil
 }
 
 func (cmd *DetachContainertask) inject(params map[string]any) error {
@@ -12975,7 +12975,7 @@ func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]any) (any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DisassociateAddress call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach elasticip ok")
-			return fakeDryRunId("elasticip"), nil
+			return fakeDryRunID("elasticip"), nil
 		}
 	}
 
@@ -13061,7 +13061,7 @@ func (cmd *DetachInstance) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DetachInstance) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("instance"), nil
+	return fakeDryRunID("instance"), nil
 }
 
 func (cmd *DetachInstance) inject(params map[string]any) error {
@@ -13134,7 +13134,7 @@ func (cmd *DetachInstanceprofile) run(renv env.Running, params map[string]any) (
 }
 
 func (cmd *DetachInstanceprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("instanceprofile"), nil
+	return fakeDryRunID("instanceprofile"), nil
 }
 
 func (cmd *DetachInstanceprofile) inject(params map[string]any) error {
@@ -13237,7 +13237,7 @@ func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DetachInternetGateway call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach internetgateway ok")
-			return fakeDryRunId("internetgateway"), nil
+			return fakeDryRunID("internetgateway"), nil
 		}
 	}
 
@@ -13323,7 +13323,7 @@ func (cmd *DetachMfadevice) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *DetachMfadevice) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("mfadevice"), nil
+	return fakeDryRunID("mfadevice"), nil
 }
 
 func (cmd *DetachMfadevice) inject(params map[string]any) error {
@@ -13465,7 +13465,7 @@ func (cmd *DetachPolicy) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DetachPolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("policy"), nil
+	return fakeDryRunID("policy"), nil
 }
 
 func (cmd *DetachPolicy) inject(params map[string]any) error {
@@ -13547,7 +13547,7 @@ func (cmd *DetachRole) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *DetachRole) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("role"), nil
+	return fakeDryRunID("role"), nil
 }
 
 func (cmd *DetachRole) inject(params map[string]any) error {
@@ -13650,7 +13650,7 @@ func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]any) (an
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DisassociateRouteTable call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach routetable ok")
-			return fakeDryRunId("routetable"), nil
+			return fakeDryRunID("routetable"), nil
 		}
 	}
 
@@ -13727,7 +13727,7 @@ func (cmd *DetachSecuritygroup) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *DetachSecuritygroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("securitygroup"), nil
+	return fakeDryRunID("securitygroup"), nil
 }
 
 func (cmd *DetachSecuritygroup) inject(params map[string]any) error {
@@ -13809,7 +13809,7 @@ func (cmd *DetachUser) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *DetachUser) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("user"), nil
+	return fakeDryRunID("user"), nil
 }
 
 func (cmd *DetachUser) inject(params map[string]any) error {
@@ -13912,7 +13912,7 @@ func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.DetachVolume call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: detach volume ok")
-			return fakeDryRunId("volume"), nil
+			return fakeDryRunID("volume"), nil
 		}
 	}
 
@@ -14019,7 +14019,7 @@ func (cmd *ImportImage) dryRun(renv env.Running, params map[string]any) (any, er
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.ImportImage call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: import image ok")
-			return fakeDryRunId("image"), nil
+			return fakeDryRunID("image"), nil
 		}
 	}
 
@@ -14105,7 +14105,7 @@ func (cmd *RestartDatabase) run(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *RestartDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("database"), nil
+	return fakeDryRunID("database"), nil
 }
 
 func (cmd *RestartDatabase) inject(params map[string]any) error {
@@ -14208,7 +14208,7 @@ func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]any) (any
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.RebootInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: restart instance ok")
-			return fakeDryRunId("instance"), nil
+			return fakeDryRunID("instance"), nil
 		}
 	}
 
@@ -14294,7 +14294,7 @@ func (cmd *StartAlarm) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *StartAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("alarm"), nil
+	return fakeDryRunID("alarm"), nil
 }
 
 func (cmd *StartAlarm) inject(params map[string]any) error {
@@ -14367,7 +14367,7 @@ func (cmd *StartContainertask) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *StartContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("containertask"), nil
+	return fakeDryRunID("containertask"), nil
 }
 
 func (cmd *StartContainertask) inject(params map[string]any) error {
@@ -14449,7 +14449,7 @@ func (cmd *StartDatabase) run(renv env.Running, params map[string]any) (any, err
 }
 
 func (cmd *StartDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("database"), nil
+	return fakeDryRunID("database"), nil
 }
 
 func (cmd *StartDatabase) inject(params map[string]any) error {
@@ -14552,7 +14552,7 @@ func (cmd *StartInstance) dryRun(renv env.Running, params map[string]any) (any, 
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.StartInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: start instance ok")
-			return fakeDryRunId("instance"), nil
+			return fakeDryRunID("instance"), nil
 		}
 	}
 
@@ -14638,7 +14638,7 @@ func (cmd *StartTrail) run(renv env.Running, params map[string]any) (any, error)
 }
 
 func (cmd *StartTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("trail"), nil
+	return fakeDryRunID("trail"), nil
 }
 
 func (cmd *StartTrail) inject(params map[string]any) error {
@@ -14720,7 +14720,7 @@ func (cmd *StopAlarm) run(renv env.Running, params map[string]any) (any, error) 
 }
 
 func (cmd *StopAlarm) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("alarm"), nil
+	return fakeDryRunID("alarm"), nil
 }
 
 func (cmd *StopAlarm) inject(params map[string]any) error {
@@ -14793,7 +14793,7 @@ func (cmd *StopContainertask) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *StopContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("containertask"), nil
+	return fakeDryRunID("containertask"), nil
 }
 
 func (cmd *StopContainertask) inject(params map[string]any) error {
@@ -14875,7 +14875,7 @@ func (cmd *StopDatabase) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *StopDatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("database"), nil
+	return fakeDryRunID("database"), nil
 }
 
 func (cmd *StopDatabase) inject(params map[string]any) error {
@@ -14978,7 +14978,7 @@ func (cmd *StopInstance) dryRun(renv env.Running, params map[string]any) (any, e
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.StopInstances call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: stop instance ok")
-			return fakeDryRunId("instance"), nil
+			return fakeDryRunID("instance"), nil
 		}
 	}
 
@@ -15064,7 +15064,7 @@ func (cmd *StopTrail) run(renv env.Running, params map[string]any) (any, error) 
 }
 
 func (cmd *StopTrail) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("trail"), nil
+	return fakeDryRunID("trail"), nil
 }
 
 func (cmd *StopTrail) inject(params map[string]any) error {
@@ -15137,7 +15137,7 @@ func (cmd *UpdateBucket) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *UpdateBucket) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("bucket"), nil
+	return fakeDryRunID("bucket"), nil
 }
 
 func (cmd *UpdateBucket) inject(params map[string]any) error {
@@ -15219,7 +15219,7 @@ func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]an
 }
 
 func (cmd *UpdateClassicLoadbalancer) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("classicloadbalancer"), nil
+	return fakeDryRunID("classicloadbalancer"), nil
 }
 
 func (cmd *UpdateClassicLoadbalancer) inject(params map[string]any) error {
@@ -15301,7 +15301,7 @@ func (cmd *UpdateContainertask) run(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *UpdateContainertask) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("containertask"), nil
+	return fakeDryRunID("containertask"), nil
 }
 
 func (cmd *UpdateContainertask) inject(params map[string]any) error {
@@ -15374,7 +15374,7 @@ func (cmd *UpdateDistribution) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *UpdateDistribution) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("distribution"), nil
+	return fakeDryRunID("distribution"), nil
 }
 
 func (cmd *UpdateDistribution) inject(params map[string]any) error {
@@ -15546,7 +15546,7 @@ func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]any) (any,
 		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
 			renv.Log().ExtraVerbosef("dry run: ec2.ModifyInstanceAttribute call took %s", time.Since(start))
 			renv.Log().Verbose("dry run: update instance ok")
-			return fakeDryRunId("instance"), nil
+			return fakeDryRunID("instance"), nil
 		}
 	}
 
@@ -15632,7 +15632,7 @@ func (cmd *UpdateLoggroup) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *UpdateLoggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loggroup"), nil
+	return fakeDryRunID("loggroup"), nil
 }
 
 func (cmd *UpdateLoggroup) inject(params map[string]any) error {
@@ -15714,7 +15714,7 @@ func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *UpdateLoginprofile) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("loginprofile"), nil
+	return fakeDryRunID("loginprofile"), nil
 }
 
 func (cmd *UpdateLoginprofile) inject(params map[string]any) error {
@@ -15796,7 +15796,7 @@ func (cmd *UpdatePolicy) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *UpdatePolicy) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("policy"), nil
+	return fakeDryRunID("policy"), nil
 }
 
 func (cmd *UpdatePolicy) inject(params map[string]any) error {
@@ -15869,7 +15869,7 @@ func (cmd *UpdateRecord) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *UpdateRecord) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("record"), nil
+	return fakeDryRunID("record"), nil
 }
 
 func (cmd *UpdateRecord) inject(params map[string]any) error {
@@ -15951,7 +15951,7 @@ func (cmd *UpdateS3object) run(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *UpdateS3object) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("s3object"), nil
+	return fakeDryRunID("s3object"), nil
 }
 
 func (cmd *UpdateS3object) inject(params map[string]any) error {
@@ -16033,7 +16033,7 @@ func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *UpdateScalinggroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("scalinggroup"), nil
+	return fakeDryRunID("scalinggroup"), nil
 }
 
 func (cmd *UpdateScalinggroup) inject(params map[string]any) error {
@@ -16115,7 +16115,7 @@ func (cmd *UpdateSecret) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *UpdateSecret) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("secret"), nil
+	return fakeDryRunID("secret"), nil
 }
 
 func (cmd *UpdateSecret) inject(params map[string]any) error {
@@ -16266,7 +16266,7 @@ func (cmd *UpdateSsmparameter) run(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *UpdateSsmparameter) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("ssmparameter"), nil
+	return fakeDryRunID("ssmparameter"), nil
 }
 
 func (cmd *UpdateSsmparameter) inject(params map[string]any) error {
@@ -16348,7 +16348,7 @@ func (cmd *UpdateStack) run(renv env.Running, params map[string]any) (any, error
 }
 
 func (cmd *UpdateStack) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("stack"), nil
+	return fakeDryRunID("stack"), nil
 }
 
 func (cmd *UpdateStack) inject(params map[string]any) error {
@@ -16430,7 +16430,7 @@ func (cmd *UpdateSubnet) run(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *UpdateSubnet) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("subnet"), nil
+	return fakeDryRunID("subnet"), nil
 }
 
 func (cmd *UpdateSubnet) inject(params map[string]any) error {
@@ -16503,7 +16503,7 @@ func (cmd *UpdateTargetgroup) run(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *UpdateTargetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
-	return fakeDryRunId("targetgroup"), nil
+	return fakeDryRunID("targetgroup"), nil
 }
 
 func (cmd *UpdateTargetgroup) inject(params map[string]any) error {

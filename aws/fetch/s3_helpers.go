@@ -175,18 +175,18 @@ func fetchAndExtractGrantsFn(ctx context.Context, api *s3.Client, bucketName str
 	for _, acl := range acls.Grants {
 		displayName := awssdk.ToString(acl.Grantee.DisplayName)
 		granteeType := string(acl.Grantee.Type)
-		granteeId := awssdk.ToString(acl.Grantee.ID)
+		granteeID := awssdk.ToString(acl.Grantee.ID)
 
 		if awssdk.ToString(acl.Grantee.EmailAddress) != "" {
 			displayName += "<" + awssdk.ToString(acl.Grantee.EmailAddress) + ">"
 		}
 		if granteeType == "Group" {
-			granteeId += awssdk.ToString(acl.Grantee.URI)
+			granteeID += awssdk.ToString(acl.Grantee.URI)
 		}
 		grant := &graph.Grant{
 			Permission: string(acl.Permission),
 			Grantee: graph.Grantee{
-				GranteeID:          granteeId,
+				GranteeID:          granteeID,
 				GranteeType:        granteeType,
 				GranteeDisplayName: displayName,
 			},

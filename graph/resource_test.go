@@ -150,7 +150,7 @@ func TestMarshalUnmarshalFullRdf(t *testing.T) {
 			t.Fatal(err)
 		}
 		g.store.Add(triples...)
-		rawRes := InitResource(r.Type(), r.Id())
+		rawRes := InitResource(r.Type(), r.ID())
 		err = rawRes.unmarshalFullRdf(g.store.Snapshot())
 		if err != nil {
 			t.Fatal(err)
@@ -177,7 +177,7 @@ func TestResourceMarshalUnmarshalHandlesNilValues(t *testing.T) {
 	}
 	g.store.Add(triples...)
 
-	rawRes := InitResource(r.Type(), r.Id())
+	rawRes := InitResource(r.Type(), r.ID())
 	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
 	if err != nil {
 		t.Fatal(err)
@@ -196,7 +196,7 @@ func TestMarshalUnmarshalList(t *testing.T) {
 		t.Fatal(err)
 	}
 	g.store.Add(triples...)
-	rawRes := InitResource(r.Type(), r.Id())
+	rawRes := InitResource(r.Type(), r.ID())
 	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
 	if err != nil {
 		t.Fatal(err)
@@ -230,7 +230,7 @@ func TestMarshalUnmarshalFirewallRules(t *testing.T) {
 		t.Fatal(err)
 	}
 	g.store.Add(triples...)
-	rawRes := InitResource(r.Type(), r.Id())
+	rawRes := InitResource(r.Type(), r.ID())
 	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
 	if err != nil {
 		t.Fatal(err)
@@ -251,8 +251,8 @@ func TestMarshalUnmarshalRouteTables(t *testing.T) {
 	_, subnet2ipv6, _ := net.ParseCIDR("2001:db8::/110")
 	r := testResource("rt1", "routetable").prop(properties.ID, "rt1").prop(
 		"Routes", []*Route{
-			{Destination: subnet1cidr, DestinationPrefixListId: "toto", Targets: []*RouteTarget{{Type: InstanceTarget, Ref: "ref_1", Owner: "me"}, {Type: GatewayTarget, Ref: "ref_2"}}},
-			{Destination: subnet2cidr, DestinationIPv6: subnet2ipv6, DestinationPrefixListId: "tata", Targets: []*RouteTarget{{Type: NetworkInterfaceTarget, Ref: "ref_3"}}},
+			{Destination: subnet1cidr, DestinationPrefixListID: "toto", Targets: []*RouteTarget{{Type: InstanceTarget, Ref: "ref_1", Owner: "me"}, {Type: GatewayTarget, Ref: "ref_2"}}},
+			{Destination: subnet2cidr, DestinationIPv6: subnet2ipv6, DestinationPrefixListID: "tata", Targets: []*RouteTarget{{Type: NetworkInterfaceTarget, Ref: "ref_3"}}},
 		}).build()
 	g := NewGraph()
 	triples, err := r.marshalFullRDF()
@@ -260,7 +260,7 @@ func TestMarshalUnmarshalRouteTables(t *testing.T) {
 		t.Fatal(err)
 	}
 	g.store.Add(triples...)
-	rawRes := InitResource(r.Type(), r.Id())
+	rawRes := InitResource(r.Type(), r.ID())
 	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
 	if err != nil {
 		t.Fatal(err)
@@ -287,7 +287,7 @@ func TestMarshalUnmarshalGrants(t *testing.T) {
 		t.Fatal(err)
 	}
 	g.store.Add(triples...)
-	rawRes := InitResource(r.Type(), r.Id())
+	rawRes := InitResource(r.Type(), r.ID())
 
 	snap := g.store.Snapshot()
 	if err := rawRes.unmarshalFullRdf(snap); err != nil {
@@ -340,7 +340,7 @@ func TestMarshalUnmarshalIPPermissions(t *testing.T) {
 	if got, want := len(res), len(expected); got != want {
 		t.Fatalf("got %d want %d", got, want)
 	}
-	if got, want := res[0].Id(), expected[0].Id(); got != want {
+	if got, want := res[0].ID(), expected[0].ID(); got != want {
 		t.Fatalf("got %s want %s", got, want)
 	}
 	if got, want := res[0].Type(), expected[0].Type(); got != want {
@@ -362,32 +362,32 @@ func buildBenchmarkData() (data []*Resource) {
 	_, subnet2cidr, _ := net.ParseCIDR("10.20.24.0/24")
 	_, subnet2ipv6, _ := net.ParseCIDR("2001:db8::/110")
 	routes := []*Route{
-		{Destination: subnetcidr, DestinationPrefixListId: "toto", Targets: []*RouteTarget{{Type: InstanceTarget, Ref: "ref_1", Owner: "me"}, {Type: GatewayTarget, Ref: "ref_2"}}},
-		{Destination: subnet2cidr, DestinationIPv6: subnet2ipv6, DestinationPrefixListId: "tata", Targets: []*RouteTarget{{Type: NetworkInterfaceTarget, Ref: "ref_3"}}},
+		{Destination: subnetcidr, DestinationPrefixListID: "toto", Targets: []*RouteTarget{{Type: InstanceTarget, Ref: "ref_1", Owner: "me"}, {Type: GatewayTarget, Ref: "ref_2"}}},
+		{Destination: subnet2cidr, DestinationIPv6: subnet2ipv6, DestinationPrefixListID: "tata", Targets: []*RouteTarget{{Type: NetworkInterfaceTarget, Ref: "ref_3"}}},
 	}
 	rules := []*FirewallRule{
 		{PortRange: PortRange{FromPort: 80, ToPort: 80}, Protocol: "tcp", IPRanges: []*net.IPNet{localhost, subnetcidr}},
 		{PortRange: PortRange{FromPort: 1, ToPort: 1024}, Protocol: "udp", IPRanges: []*net.IPNet{subnetcidr}},
 	}
 	for i := 0; i < 10; i++ {
-		vpcId := fmt.Sprintf("vpc%d", i)
-		data = append(data, vpcResource(vpcId).prop(properties.ID, vpcId).build())
+		vpcID := fmt.Sprintf("vpc%d", i)
+		data = append(data, vpcResource(vpcID).prop(properties.ID, vpcID).build())
 
-		routeId := fmt.Sprintf("%s_route", vpcId)
-		data = append(data, testResource(routeId, "routetable").prop(properties.ID, routeId).prop(properties.Vpc, vpcId).prop("Routes", routes).build())
+		routeID := fmt.Sprintf("%s_route", vpcID)
+		data = append(data, testResource(routeID, "routetable").prop(properties.ID, routeID).prop(properties.Vpc, vpcID).prop("Routes", routes).build())
 
 		for j := 0; j < 10; j++ {
-			subId := fmt.Sprintf("%ssub%d", vpcId, j)
-			data = append(data, subResource(subId).prop(properties.ID, subId).prop(properties.Vpc, vpcId).prop(properties.Default, true).build())
+			subID := fmt.Sprintf("%ssub%d", vpcID, j)
+			data = append(data, subResource(subID).prop(properties.ID, subID).prop(properties.Vpc, vpcID).prop(properties.Default, true).build())
 			for k := 0; k < 10; k++ {
-				instId := fmt.Sprintf("%sinst%d", subId, k)
+				instID := fmt.Sprintf("%sinst%d", subID, k)
 
-				secGroup1Id := fmt.Sprintf("%s_securitygroup1", instId)
-				data = append(data, sGrpResource(secGroup1Id).prop(properties.ID, secGroup1Id).prop("InboundRules", rules).prop("OutboundRules", rules).prop(properties.Vpc, vpcId).prop(properties.Launched, time.Now()).build())
-				secGroup2Id := fmt.Sprintf("%s_securitygroup2", instId)
-				data = append(data, sGrpResource(secGroup2Id).prop(properties.ID, secGroup2Id).prop("InboundRules", rules).prop("OutboundRules", rules).prop(properties.Vpc, vpcId).prop(properties.Launched, time.Now()).build())
+				secGroup1Id := fmt.Sprintf("%s_securitygroup1", instID)
+				data = append(data, sGrpResource(secGroup1Id).prop(properties.ID, secGroup1Id).prop("InboundRules", rules).prop("OutboundRules", rules).prop(properties.Vpc, vpcID).prop(properties.Launched, time.Now()).build())
+				secGroup2Id := fmt.Sprintf("%s_securitygroup2", instID)
+				data = append(data, sGrpResource(secGroup2Id).prop(properties.ID, secGroup2Id).prop("InboundRules", rules).prop("OutboundRules", rules).prop(properties.Vpc, vpcID).prop(properties.Launched, time.Now()).build())
 
-				data = append(data, instResource(instId).prop(properties.ID, instId).prop("Name", instId+"name").prop(properties.Subnet, subId).prop(properties.Vpc, vpcId).prop(properties.Launched, time.Now()).prop(properties.SecurityGroups, []string{secGroup1Id, secGroup2Id}).build())
+				data = append(data, instResource(instID).prop(properties.ID, instID).prop("Name", instID+"name").prop(properties.Subnet, subID).prop(properties.Vpc, vpcID).prop(properties.Launched, time.Now()).prop(properties.SecurityGroups, []string{secGroup1Id, secGroup2Id}).build())
 			}
 		}
 	}
@@ -431,7 +431,7 @@ func BenchmarkRdfUnmarshaling(b *testing.B) {
 		snap := graph.store.Snapshot()
 		for i := 0; i < b.N; i++ {
 			for _, r := range resources {
-				rawRes := InitResource(r.Type(), r.Id())
+				rawRes := InitResource(r.Type(), r.ID())
 				if err := rawRes.unmarshalFullRdf(snap); err != nil {
 					b.Fatal(err)
 				}

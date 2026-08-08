@@ -445,39 +445,49 @@ Tests that are permanently skipped are dead weight and may mask regressions.
 
 ## Improvements
 
-### I19: Findings deferred by the golangci-lint v2 migration — **MOSTLY FIXED**
+### I19: Findings deferred by the golangci-lint v2 migration — **FIXED**
 
 **Severity:** Low  
 **File:** `.golangci.yml`
 
-Of the 271 findings excluded when the v2 migration landed, 96 are fixed and the
-checks are enabled:
+All `ST*` and `QF*` checks now run with nothing excluded, and `make lint` reports
+zero issues. The exclusions and their justifications are gone from
+`.golangci.yml`.
 
-| Check | Count | Resolution |
-|---|---|---|
-| `inline` (govet) | 16 | `reflect.Ptr` → `reflect.Pointer`; the alias is deprecated |
-| `QF1012` | 21 | `WriteString(fmt.Sprintf(...))` → `fmt.Fprintf` |
-| `ST1005` | 20 | Error strings uncapitalised, trailing punctuation dropped |
-| `QF1008` | 20 | Redundant embedded fields removed from selectors |
-| `ST1016` | 7 | Receiver names aligned per type |
-| `QF1004` | 5 | `strings.Replace(..., -1)` → `strings.ReplaceAll` |
-| `ST1012` | 2 | `SemverInvalidFormatErr` → `ErrSemverInvalidFormat`, `optErr` → `errOpt` |
-| **`QF1009`** | **1** | **`time.Time` compared with `==` → `.Equal()`** |
+The `ST1003` count in the original entry (175) and the recorded reason were both
+wrong by the time this was picked up:
 
-`QF1009` was the one with real consequences: `aws/tailers/scaling_activity.go`
-compared `time.Time` with `==`, which compares the wall clock, the monotonic
-reading *and* the location, so two values for the same instant could differ.
+- The real count was 50, the rest having been fixed incidentally by earlier work.
+- The blocker was recorded as "the ALL_CAPS ones are exported identifiers in
+  `template/env`, so renaming breaks the public API". Nothing imports this fork as
+  a library — the module path itself only changed recently — so there is no
+  external API to break. `env.FILLERS` and friends are now `env.Fillers`,
+  `env.RequiredAndSuggestedParams` and so on.
 
-**Two remain excluded, both deliberately:**
+What the fix actually required, beyond renaming identifiers:
 
-- **`ST1003`, 175 findings.** Nearly all are `ALL_CAPS` identifiers, and the ones
-  in `template/env` are **exported** (`PROCESSED_FILLERS`, `RESOLVED_VARS`,
-  `ALL_PARAMS`, …). Renaming them breaks the public API for a purely cosmetic
-  gain, so the check stays off rather than being half-applied.
-- **`QF1002`, 1 finding.** A switch on the sum of four counters in
-  `manual_fetchers.go`; the tagged form reads worse than the boolean one.
+- **The generator had to become initialism-aware.** Generated identifiers come from
+  `capitalize`, so the `dns` service produced `Dns`, `BuildDnsFetchFuncs` and
+  `DnsClient`, and the hand-written functions they call had to spell the initialism
+  the same wrong way. `capitalize` now consults an initialism table, which fixed
+  the generated and hand-written sides together. `api` is deliberately absent from
+  that table: `capitalize` also renders SDK type names, and apigatewayv2's type is
+  `Api`, so upper-casing it produces a reference that does not exist.
+- **`AWSAPI` and the service client fields followed.** `conf.APIs.Rds` became
+  `conf.APIs.RDS`, `IamClient` became `IAMClient`, and so on, to match what the
+  generator now emits.
+- **`cloud.Resource.Id()` became `ID()`** across the interface, its implementations
+  and 103 call sites.
 
----
+`QF1002` was called subjective in the original entry. Looking at the site, the
+tagged switch reads better than comparing a four-term sum to zero, so it was
+converted rather than excluded.
+
+Care was needed throughout to leave AWS SDK identifiers alone: several renames had
+to be reverted where a regex reached an SDK struct field
+(`ec2types.Route.DestinationPrefixListId`, `cloudfronttypes.Origin.Id`,
+`sts.GetCallerIdentityOutput.UserId`, `apigatewayv2types.Api`). Generated output is
+byte-identical across runs.
 
 ### I1: Add `arm64` to release builds — **FIXED** (GoReleaser, I11)
 

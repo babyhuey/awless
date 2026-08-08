@@ -34,7 +34,7 @@ type GraphAPI interface {
 
 type Resource interface {
 	Type() string
-	Id() string
+	ID() string
 	String() string
 	Format(string) string
 	Properties() map[string]any

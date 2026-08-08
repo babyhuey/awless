@@ -63,7 +63,7 @@ type DeleteFilesystem struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *efs.Client
-	Id     *string `awsName:"FileSystemId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"FileSystemId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteFilesystem) ParamsSpec() params.Spec {

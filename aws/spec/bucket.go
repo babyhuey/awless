@@ -35,7 +35,7 @@ type CreateBucket struct {
 	graph  cloud.GraphAPI
 	api    *s3.Client
 	Name   *string `awsName:"Bucket" awsType:"awsstr" templateName:"name"`
-	Acl    *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
+	ACL    *string `awsName:"ACL" awsType:"awsstr" templateName:"acl"`
 }
 
 func (cmd *CreateBucket) ParamsSpec() params.Spec {
@@ -54,11 +54,11 @@ type UpdateBucket struct {
 	graph            cloud.GraphAPI
 	api              *s3.Client
 	Name             *string `templateName:"name"`
-	Acl              *string `templateName:"acl"`
+	ACL              *string `templateName:"acl"`
 	PublicWebsite    *bool   `templateName:"public-website"`
 	RedirectHostname *string `templateName:"redirect-hostname"`
 	IndexSuffix      *string `templateName:"index-suffix"`
-	EnforceHttps     *bool   `templateName:"enforce-https"`
+	EnforceHTTPS     *bool   `templateName:"enforce-https"`
 }
 
 func (cmd *UpdateBucket) ParamsSpec() params.Spec {
@@ -70,12 +70,12 @@ func (cmd *UpdateBucket) ParamsSpec() params.Spec {
 func (cmd *UpdateBucket) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
 
-	if cmd.Acl != nil { // Update the canned ACL to apply to the bucket
+	if cmd.ACL != nil { // Update the canned ACL to apply to the bucket
 		input := &s3.PutBucketAclInput{
 			Bucket: cmd.Name,
 		}
 
-		if err := setFieldWithType(cmd.Acl, input, "ACL", awsstr); err != nil {
+		if err := setFieldWithType(cmd.ACL, input, "ACL", awsstr); err != nil {
 			return nil, err
 		}
 
@@ -95,7 +95,7 @@ func (cmd *UpdateBucket) ManualRun(renv env.Running) (any, error) {
 			}
 			if cmd.RedirectHostname != nil {
 				input.WebsiteConfiguration.RedirectAllRequestsTo = &s3types.RedirectAllRequestsTo{HostName: cmd.RedirectHostname}
-				if BoolValue(cmd.EnforceHttps) {
+				if BoolValue(cmd.EnforceHTTPS) {
 					input.WebsiteConfiguration.RedirectAllRequestsTo.Protocol = s3types.ProtocolHttps
 				}
 			} else if cmd.IndexSuffix != nil {

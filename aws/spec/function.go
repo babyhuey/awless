@@ -58,7 +58,7 @@ type DeleteFunction struct {
 	logger  *logger.Logger
 	graph   cloud.GraphAPI
 	api     *lambda.Client
-	Id      *string `awsName:"FunctionName" awsType:"awsstr" templateName:"id"`
+	ID      *string `awsName:"FunctionName" awsType:"awsstr" templateName:"id"`
 	Version *string `awsName:"Qualifier" awsType:"awsstr" templateName:"version"`
 }
 

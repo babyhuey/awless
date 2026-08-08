@@ -87,7 +87,7 @@ func (v *SiblingsVisitor) Visit(g *Graph) error {
 }
 
 func prepareRDFVisit(g *Graph, root *Resource, each visitEachFunc, includeRoot bool) (string, func(g tstore.RDFGraph, n string, i int) error, error) {
-	rootNode := root.Id()
+	rootNode := root.ID()
 
 	foreach := func(rdfG tstore.RDFGraph, n string, i int) error {
 		rT, err := resolveResourceType(rdfG, n)

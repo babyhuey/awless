@@ -22,7 +22,7 @@ import (
 )
 
 func TestLoadConfigs(t *testing.T) {
-	db, close := newTestDb()
+	db, close := newTestDB()
 	defer close()
 	configKey := "config"
 	d, err := db.GetConfigs(configKey)

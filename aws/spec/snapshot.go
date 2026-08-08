@@ -48,7 +48,7 @@ type DeleteSnapshot struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *ec2.Client
-	Id     *string `awsName:"SnapshotId" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"SnapshotId" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteSnapshot) ParamsSpec() params.Spec {
@@ -60,7 +60,7 @@ type CopySnapshot struct {
 	logger       *logger.Logger
 	graph        cloud.GraphAPI
 	api          *ec2.Client
-	SourceId     *string `awsName:"SourceSnapshotId" awsType:"awsstr" templateName:"source-id"`
+	SourceID     *string `awsName:"SourceSnapshotId" awsType:"awsstr" templateName:"source-id"`
 	SourceRegion *string `awsName:"SourceRegion" awsType:"awsstr" templateName:"source-region"`
 	Encrypted    *bool   `awsName:"Encrypted" awsType:"awsbool" templateName:"encrypted"`
 	Description  *string `awsName:"Description" awsType:"awsstr" templateName:"description"`

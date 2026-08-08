@@ -28,7 +28,7 @@ import (
 
 var (
 	deleteAllLogsFlag             bool
-	deleteFromIdLogsFlag          string
+	deleteFromIDLogsFlag          string
 	limitLogCountFlag             int
 	rawJSONLogFlag, idOnlyLogFlag bool
 	fullLogFlag, shortLogFlag     bool
@@ -38,7 +38,7 @@ func init() {
 	RootCmd.AddCommand(logCmd)
 
 	logCmd.Flags().BoolVar(&deleteAllLogsFlag, "delete-all", false, "Delete all logs from local db")
-	logCmd.Flags().StringVar(&deleteFromIdLogsFlag, "delete", "", "Delete a specifc log entry given its id")
+	logCmd.Flags().StringVar(&deleteFromIDLogsFlag, "delete", "", "Delete a specifc log entry given its id")
 	logCmd.Flags().IntVarP(&limitLogCountFlag, "number", "n", 0, "Limit log output to the last n logs")
 	logCmd.Flags().BoolVar(&rawJSONLogFlag, "raw", false, "Display logs as raw json with template context info, usually for debug")
 	logCmd.Flags().BoolVar(&shortLogFlag, "short", false, "Display one or more template log with less info")
@@ -77,7 +77,7 @@ var logCmd = &cobra.Command{
 			return nil
 		}
 
-		if tid := deleteFromIdLogsFlag; tid != "" {
+		if tid := deleteFromIDLogsFlag; tid != "" {
 			exitOn(database.Execute(func(db *database.DB) error {
 				return db.DeleteTemplate(tid)
 			}))

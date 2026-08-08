@@ -53,7 +53,7 @@ type AttachListener struct {
 	logger      *logger.Logger
 	graph       cloud.GraphAPI
 	api         *elbv2.Client
-	Id          *string `awsName:"ListenerArn" awsType:"awsstr" templateName:"id"`
+	ID          *string `awsName:"ListenerArn" awsType:"awsstr" templateName:"id"`
 	Certificate *string `awsName:"Certificates[0]CertificateArn" awsType:"awsslicestruct" templateName:"certificate"`
 }
 
@@ -66,7 +66,7 @@ type DeleteListener struct {
 	logger *logger.Logger
 	graph  cloud.GraphAPI
 	api    *elbv2.Client
-	Id     *string `awsName:"ListenerArn" awsType:"awsstr" templateName:"id"`
+	ID     *string `awsName:"ListenerArn" awsType:"awsstr" templateName:"id"`
 }
 
 func (cmd *DeleteListener) ParamsSpec() params.Spec {

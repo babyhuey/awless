@@ -28,7 +28,7 @@ func TestInitResource(t *testing.T) {
 		if got, want := r.Type(), tc.kind; got != want {
 			t.Fatalf("Type(): got %q, want %q", got, want)
 		}
-		if got, want := r.Id(), tc.id; got != want {
+		if got, want := r.ID(), tc.id; got != want {
 			t.Fatalf("Id(): got %q, want %q", got, want)
 		}
 		if r.Properties() == nil {
@@ -42,7 +42,7 @@ func TestInitResource(t *testing.T) {
 
 func TestNotFoundResource(t *testing.T) {
 	r := NotFoundResource("missing-abc")
-	if got, want := r.Id(), "missing-abc"; got != want {
+	if got, want := r.ID(), "missing-abc"; got != want {
 		t.Fatalf("Id(): got %q, want %q", got, want)
 	}
 	if got, want := r.Type(), notFoundResourceType; got != want {
@@ -302,7 +302,7 @@ func TestResolveResourcesWithProp(t *testing.T) {
 	if got, want := len(results), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := results[0].Id(), "i1"; got != want {
+	if got, want := results[0].ID(), "i1"; got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
 
@@ -314,7 +314,7 @@ func TestResolveResourcesWithProp(t *testing.T) {
 	if got, want := len(results), 1; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	if got, want := results[0].Id(), "s1"; got != want {
+	if got, want := results[0].ID(), "s1"; got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
 
@@ -382,7 +382,7 @@ func TestAddResourceRelation(t *testing.T) {
 	if got, want := len(r.relations["children"]), 1; got != want {
 		t.Fatalf("got %d relations, want %d", got, want)
 	}
-	if got, want := r.relations["children"][0].Id(), "vol-1"; got != want {
+	if got, want := r.relations["children"][0].ID(), "vol-1"; got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
 }
@@ -507,7 +507,7 @@ func TestVisitRelations(t *testing.T) {
 	t.Run("ChildrenOfRel", func(t *testing.T) {
 		var collected []string
 		err := g.VisitRelations(v1, rdf.ChildrenOfRel, false, func(r cloud.Resource, depth int) error {
-			collected = append(collected, r.Id())
+			collected = append(collected, r.ID())
 			return nil
 		})
 		if err != nil {
@@ -521,7 +521,7 @@ func TestVisitRelations(t *testing.T) {
 	t.Run("ChildrenOfRel with IncludeFrom", func(t *testing.T) {
 		var collected []string
 		err := g.VisitRelations(v1, rdf.ChildrenOfRel, true, func(r cloud.Resource, depth int) error {
-			collected = append(collected, r.Id())
+			collected = append(collected, r.ID())
 			return nil
 		})
 		if err != nil {
@@ -541,7 +541,7 @@ func TestVisitRelations(t *testing.T) {
 	t.Run("DependingOnRel", func(t *testing.T) {
 		var collected []string
 		err := g.VisitRelations(i1, rdf.DependingOnRel, false, func(r cloud.Resource, depth int) error {
-			collected = append(collected, r.Id())
+			collected = append(collected, r.ID())
 			return nil
 		})
 		if err != nil {
@@ -555,7 +555,7 @@ func TestVisitRelations(t *testing.T) {
 	t.Run("ApplyOn", func(t *testing.T) {
 		var collected []string
 		err := g.VisitRelations(sg1, rdf.ApplyOn, false, func(r cloud.Resource, depth int) error {
-			collected = append(collected, r.Id())
+			collected = append(collected, r.ID())
 			return nil
 		})
 		if err != nil {
@@ -569,7 +569,7 @@ func TestVisitRelations(t *testing.T) {
 	t.Run("default relation (ParentOf)", func(t *testing.T) {
 		var collected []string
 		err := g.VisitRelations(i1, rdf.ParentOf, false, func(r cloud.Resource, depth int) error {
-			collected = append(collected, r.Id())
+			collected = append(collected, r.ID())
 			return nil
 		})
 		if err != nil {
@@ -605,7 +605,7 @@ func TestListResourcesDependingOn(t *testing.T) {
 	}
 	ids := map[string]bool{}
 	for _, r := range resources {
-		ids[r.Id()] = true
+		ids[r.ID()] = true
 	}
 	if !ids["sg_1"] || !ids["sg_2"] {
 		t.Fatalf("expected sg_1 and sg_2 in results, got %v", ids)
@@ -636,7 +636,7 @@ func TestListResourcesAppliedOn(t *testing.T) {
 	}
 	ids := map[string]bool{}
 	for _, r := range resources {
-		ids[r.Id()] = true
+		ids[r.ID()] = true
 	}
 	if !ids["inst_1"] || !ids["inst_2"] {
 		t.Fatalf("expected inst_1 and inst_2 in results, got %v", ids)
@@ -710,7 +710,7 @@ func TestAddResourceWithChildrenRelation(t *testing.T) {
 	}
 	// The child should be added and the parent relation created
 	snap := g.store.Snapshot()
-	triples := snap.WithSubjPred(child.Id(), rdf.ParentOf)
+	triples := snap.WithSubjPred(child.ID(), rdf.ParentOf)
 	if len(triples) != 1 {
 		t.Fatalf("expected 1 parent relation, got %d", len(triples))
 	}
@@ -726,7 +726,7 @@ func TestAddResourceWithDependingOnRelation(t *testing.T) {
 		t.Fatal(err)
 	}
 	snap := g.store.Snapshot()
-	triples := snap.WithSubjPred(inst.Id(), rdf.ApplyOn)
+	triples := snap.WithSubjPred(inst.ID(), rdf.ApplyOn)
 	if len(triples) != 1 {
 		t.Fatalf("expected 1 apply-on relation, got %d", len(triples))
 	}
@@ -832,11 +832,11 @@ func TestFirewallRuleString(t *testing.T) {
 
 func TestRouteString(t *testing.T) {
 	route := &Route{
-		DestinationPrefixListId: "pl-123",
+		DestinationPrefixListID: "pl-123",
 	}
 	s := route.String()
-	if !strings.Contains(s, "DestinationPrefixListId:pl-123") {
-		t.Fatalf("expected DestinationPrefixListId in %q", s)
+	if !strings.Contains(s, "DestinationPrefixListID:pl-123") {
+		t.Fatalf("expected DestinationPrefixListID in %q", s)
 	}
 }
 
@@ -892,7 +892,7 @@ func TestMarshalUnmarshalKeyValues(t *testing.T) {
 		t.Fatal(err)
 	}
 	g.store.Add(triples...)
-	rawRes := InitResource(r.Type(), r.Id())
+	rawRes := InitResource(r.Type(), r.ID())
 	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
 	if err != nil {
 		t.Fatal(err)
@@ -918,7 +918,7 @@ func TestMarshalUnmarshalDistributionOrigins(t *testing.T) {
 		t.Fatal(err)
 	}
 	g.store.Add(triples...)
-	rawRes := InitResource(r.Type(), r.Id())
+	rawRes := InitResource(r.Type(), r.ID())
 	err = rawRes.unmarshalFullRdf(g.store.Snapshot())
 	if err != nil {
 		t.Fatal(err)
@@ -937,7 +937,7 @@ func TestResourcesMap(t *testing.T) {
 		InitResource("instance", "i1"),
 		InitResource("subnet", "s1"),
 	}
-	ids := res.Map(func(r *Resource) string { return r.Id() })
+	ids := res.Map(func(r *Resource) string { return r.ID() })
 	if got, want := len(ids), 2; got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
@@ -963,11 +963,11 @@ func TestFirewallRulesSort(t *testing.T) {
 
 func TestRoutesSort(t *testing.T) {
 	routes := Routes{
-		{DestinationPrefixListId: "pl-zzz"},
-		{DestinationPrefixListId: "pl-aaa"},
+		{DestinationPrefixListID: "pl-zzz"},
+		{DestinationPrefixListID: "pl-aaa"},
 	}
 	routes.Sort()
-	if routes[0].DestinationPrefixListId > routes[1].DestinationPrefixListId {
+	if routes[0].DestinationPrefixListID > routes[1].DestinationPrefixListID {
 		t.Fatal("routes not sorted properly")
 	}
 }

@@ -30,14 +30,14 @@ import (
 )
 
 var (
-	showIdsOnlyFlag, showIdOnlyFlag, showLatestIdOnly bool
+	showIdsOnlyFlag, showIDOnlyFlag, showLatestIDOnly bool
 )
 
 func init() {
 	RootCmd.AddCommand(searchCmd)
 
-	awsImagesCmd.Flags().BoolVar(&showLatestIdOnly, "latest-id", false, "Returns the id only of the latest AMI matching your query")
-	awsImagesCmd.Flags().BoolVar(&showIdOnlyFlag, "id-only", false, "(DEPRECATED, use latest-id) Returns only one (the latest) AMI id matching the query")
+	awsImagesCmd.Flags().BoolVar(&showLatestIDOnly, "latest-id", false, "Returns the id only of the latest AMI matching your query")
+	awsImagesCmd.Flags().BoolVar(&showIDOnlyFlag, "id-only", false, "(DEPRECATED, use latest-id) Returns only one (the latest) AMI id matching the query")
 
 	searchCmd.AddCommand(awsImagesCmd)
 }
@@ -77,7 +77,7 @@ var awsImagesCmd = &cobra.Command{
 
 		var ids []string
 		for _, img := range imgs {
-			ids = append(ids, img.Id)
+			ids = append(ids, img.ID)
 		}
 
 		if showIdsOnlyFlag {
@@ -87,7 +87,7 @@ var awsImagesCmd = &cobra.Command{
 			return
 		}
 
-		if showLatestIdOnly || showIdOnlyFlag {
+		if showLatestIDOnly || showIDOnlyFlag {
 			for i, id := range ids {
 				fmt.Println(id)
 				if i == 0 {

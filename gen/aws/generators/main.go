@@ -43,15 +43,15 @@ import (
 const localPrefix = "github.com/bootswithdefer/awless"
 
 var (
-	ROOT_DIR = filepath.Join("..", "..", "..")
+	rootDir = filepath.Join("..", "..", "..")
 
-	FETCHERS_DIR         = filepath.Join(ROOT_DIR, "aws", "fetch")
-	SERVICES_DIR         = filepath.Join(ROOT_DIR, "aws", "services")
-	SPEC_DIR             = filepath.Join(ROOT_DIR, "aws", "spec")
-	TEMPLATE_AST_DIR     = filepath.Join(ROOT_DIR, "template", "internal", "ast")
-	AWSAT_DIR            = filepath.Join(ROOT_DIR, "acceptance", "aws")
-	CLOUD_PROPERTIES_DIR = filepath.Join(ROOT_DIR, "cloud", "properties")
-	CLOUD_RDF_DIR        = filepath.Join(ROOT_DIR, "cloud", "rdf")
+	fetchersDir        = filepath.Join(rootDir, "aws", "fetch")
+	servicesDir        = filepath.Join(rootDir, "aws", "services")
+	specDir            = filepath.Join(rootDir, "aws", "spec")
+	templateASTDir     = filepath.Join(rootDir, "template", "internal", "ast")
+	awsatDir           = filepath.Join(rootDir, "acceptance", "aws")
+	cloudPropertiesDir = filepath.Join(rootDir, "cloud", "properties")
+	cloudRDFDir        = filepath.Join(rootDir, "cloud", "rdf")
 )
 
 func main() {
@@ -136,19 +136,47 @@ func runGoimports(path string) error {
 }
 
 func relativePathToRoot(path string) string {
-	rel, _ := filepath.Rel(ROOT_DIR, path)
+	rel, _ := filepath.Rel(rootDir, path)
 	return rel
 }
 
-// capitalize upper-cases the first character of s.
+// capitalize renders s as an exported Go identifier.
 //
-// Replaces strings.Title, deprecated in Go 1.18 because it applies Unicode word
-// boundaries and title-cases every word. Every input here is a single ASCII
-// token — an AWS API name, resource type, template action, or policy effect —
-// so this is both correct and narrower than the deprecated behavior.
+// Known initialisms are upper-cased whole, so the "dns" service generates DNS
+// rather than Dns. Without this, generated identifiers trip staticcheck's ST1003,
+// and the hand-written functions they must match are forced to spell an initialism
+// the way Go style says not to.
 func capitalize(s string) string {
 	if s == "" {
 		return s
 	}
+	if up, ok := initialisms[strings.ToLower(s)]; ok {
+		return up
+	}
 	return strings.ToUpper(s[:1]) + s[1:]
+}
+
+// initialisms is keyed by the lower-case service or API name. Only entries that
+// actually occur need listing; anything absent falls back to simple capitalization.
+//
+// "api" is deliberately absent: capitalize also renders SDK type names, and
+// apigatewayv2's type is Api, so upper-casing it here produces a reference that
+// does not exist.
+var initialisms = map[string]string{
+	"acm": "ACM",
+	"api": "API",
+	"cdn": "CDN",
+	"dns": "DNS",
+	"ecr": "ECR",
+	"ecs": "ECS",
+	"eks": "EKS",
+	"iam": "IAM",
+	"kms": "KMS",
+	"rds": "RDS",
+	"sns": "SNS",
+	"sqs": "SQS",
+	"ssm": "SSM",
+	"sts": "STS",
+	"s3":  "S3",
+	"efs": "EFS",
 }

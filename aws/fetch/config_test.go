@@ -12,16 +12,16 @@ func TestAssignAPIs(t *testing.T) {
 	ec2Client := &ec2.Client{}
 
 	conf := NewConfig(iamClient, ec2Client, nil)
-	if conf.APIs.Iam == nil {
+	if conf.APIs.IAM == nil {
 		t.Fatal("unexpected nil")
 	}
 	if conf.APIs.Ec2 == nil {
 		t.Fatal("unexpected nil")
 	}
-	if conf.APIs.Rds != nil {
+	if conf.APIs.RDS != nil {
 		t.Fatal("expected nil")
 	}
-	if conf.APIs.Ecr != nil {
+	if conf.APIs.ECR != nil {
 		t.Fatal("expected nil")
 	}
 }

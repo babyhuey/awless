@@ -49,7 +49,7 @@ func (ru *Runner) Run() error {
 
 	cenv := NewEnv().WithAliasFunc(ru.AliasFunc).WithMissingHolesFunc(ru.MissingHolesFunc).
 		WithLookupCommandFunc(ru.CmdLookuper).WithLog(ru.Log).WithParamsMode(ru.ParamsSuggested).Build()
-	cenv.Push(env.FILLERS, ru.Fillers...)
+	cenv.Push(env.Fillers, ru.Fillers...)
 
 	var err error
 	tplExec.Template, cenv, err = Compile(tplExec.Template, cenv, NewRunnerCompileMode)
@@ -57,7 +57,7 @@ func (ru *Runner) Run() error {
 		return err
 	}
 
-	tplExec.Fillers = cenv.Get(env.PROCESSED_FILLERS)
+	tplExec.Fillers = cenv.Get(env.ProcessedFillers)
 
 	errs := tplExec.Validate(ru.Validators...)
 	if len(errs) > 0 {
