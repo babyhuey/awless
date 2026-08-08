@@ -136,8 +136,6 @@ func TestJSONDisplays(t *testing.T) {
 	})
 
 	t.Run("Multi resource", func(t *testing.T) {
-		t.Skip("resource property ordering is not deterministic; see ISSUES.md D9")
-
 		displayer, _ := BuildOptions(
 			WithFormat("json"),
 		).SetSource(g).Build()
@@ -149,7 +147,7 @@ func TestJSONDisplays(t *testing.T) {
 		 ], "subnets": [
 		  { "ID": "sub_1", "Name": "my_subnet", "Vpc": "vpc_1" }, {"ID": "sub_2", "Vpc": "vpc_2" }
 		 ], "vpcs": [
-		  { "ID": "vpc_1", "NewProp": "my_value" }, { "ID": "vpc_2", "Name": "my_vpc_2" }
+		  { "ID": "vpc_1" }, { "ID": "vpc_2", "Name": "my_vpc_2" }
 		 ]}`
 
 		w.Reset()

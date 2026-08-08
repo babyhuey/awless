@@ -736,6 +736,11 @@ func (d *multiResourcesJSONDisplayer) Print(w io.Writer) error {
 		if err != nil {
 			return err
 		}
+		// Graph.Find does not promise an order, so sort by ID to keep output stable.
+		// Unsorted output makes JSON unusable for diffing between runs.
+		sort.Slice(resources, func(i, j int) bool {
+			return resources[i].ID() < resources[j].ID()
+		})
 		var props []map[string]any
 		for _, res := range resources {
 			props = append(props, res.Properties())
