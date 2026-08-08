@@ -34,15 +34,32 @@ linters:
     # a legitimate builder API.
     # Report nothing today, so they cost nothing and guard against regressions.
     - asasalint       # []any passed to a variadic func
+    - asciicheck      # non-ASCII characters in identifiers
+    - bidichk         # bidirectional Unicode that renders unlike it compiles
+    - canonicalheader # non-canonical HTTP header keys
     - contextcheck    # a function should inherit its caller's context
+    - decorder        # declaration order and count within a file
     - durationcheck   # multiplying two durations
+    - errchkjson      # unchecked json.Marshal errors, and checks that cannot fail
+    - exptostd        # golang.org/x/exp code now in the standard library
+    - gocheckcompilerdirectives # a malformed //go: directive, silently ignored
+    - gosmopolitan    # locale-dependent string handling
+    - iface           # redundant or unused interfaces
     - iotamixing      # iota mixed with explicit values in one const block
+    - loggercheck     # key/value pairs in structured log calls
     - makezero        # slice made with a length then appended to
     - nilnesserr      # returns an error that is always nil
     - nolintlint      # a //nolint must be specific and explained
+    - nosprintfhostport # Sprintf building a host:port, which breaks on IPv6
+    - protogetter     # protobuf field access instead of a getter
     - reassign        # assigning to another package's variable
     - recvcheck       # mixed pointer and value receivers on one type
+    - rowserrcheck    # unchecked sql.Rows.Err
+    - spancheck       # unended OpenTelemetry spans
     - sqlclosecheck   # unclosed sql.Rows / sql.Stmt
+    - testableexamples # Example functions without verifiable output
+    - tparallel       # inconsistent t.Parallel between a test and its subtests
+    - unqueryvet      # SELECT * in a query
     - usestdlibvars   # stdlib constants instead of literals
     - wastedassign    # a value assigned and never used
   settings:
