@@ -1129,3 +1129,31 @@ Enabling the check then found a real gap it had been masking:
 `changeResourceRecordSets` called `api.ChangeResourceRecordSets(context.Background(), ...)`
 while holding a usable context, so `create record` and `delete record` ignored
 cancellation.
+
+---
+
+### I23: Terminal, stdin and network I/O have no test seams
+
+**Severity:** Low  
+**Files:** `console/terminal.go`, `config/init.go`, `aws/config/validator.go`, `config/upgrade.go`, `ssh/`
+
+What remains uncovered after `I7` is concentrated in code that talks directly to a
+terminal, to stdin, or to the network, with no interface to substitute:
+
+| File | What blocks a test |
+|---|---|
+| `console/terminal.go` | reads the real terminal size, raw mode and signal state |
+| `aws/config/validator.go` | the stdin selectors construct their own readline instance |
+| `config/init.go` | writes into the real `~/.awless` |
+| `config/upgrade.go` | builds its own `http.Client` |
+| `ssh/ssh.go` | dials for real; `DialWithUsers` and `NewClientWithProxy` are untested |
+
+Covering these means introducing seams first — an interface for terminal size and
+interactivity, a writer for the readline prompts, an injectable `http.Client`, and a
+filesystem root for config. That is a refactor of production code for testability, not
+test-writing, and it is the reason `I7` stopped at 58.9% rather than pushing higher.
+
+Worth doing for `ssh/` in particular, since `DialWithUsers` iterates candidate usernames
+and its behaviour on partial failure is untested. The two readline `os.Exit` calls noted
+in `I16` would also become removable, since a seam would give those callbacks somewhere
+to return an error to.

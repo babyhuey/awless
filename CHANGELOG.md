@@ -1,5 +1,8 @@
 ## v1.1.0
 
+First release of this fork. Everything below is relative to upstream
+[wallix/awless](https://github.com/wallix/awless) v0.1.11, released in 2018.
+
 ### Changed (breaking)
 
 - **`https-behaviour` renamed to `https-behavior`** on `create distribution` and
@@ -9,6 +12,10 @@
   Templates and one-liners using `https-behaviour=` must be updated. Reverting a
   previously logged distribution creation will also fail, since the persisted command
   line carries the old parameter name.
+
+- **The web UI now listens on loopback.** `awless web` was serving on `0.0.0.0:8080`
+  with no authentication and no timeouts. Exposing it beyond localhost is now an
+  explicit opt-in.
 
 ### Removed
 
@@ -24,11 +31,98 @@
   For deferred infrastructure changes use EventBridge Scheduler, cron with `awless`, or a
   CI schedule. `awless revert` on a logged template execution covers the manual case.
 
+### Added
+
+- **Eight AWS services, all writable rather than list-only.** EKS, DynamoDB, Secrets
+  Manager, KMS, API Gateway v2, SSM, EFS, CloudTrail and CloudWatch Logs, adding 27
+  create/update/delete commands. `awless` now ships 194 CRUD one-liners.
+- **`awless create secret` / `create ssmparameter`** and the rest of the new commands each
+  carry `-h` documentation, worked examples and enumerated valid values.
+- Every command now has a documented CLI example; `awless <action> <entity> -h` shows one.
+
+### Fixed
+
+Nine of these came from the SDK v1 → v2 migration and were invisible to the compiler,
+because `awless` maps template parameters onto AWS request structs by reflection:
+
+- `create role`, `create/update distribution`, `attach/detach securitygroup` and four
+  `containertask` commands all failed. The reflective call passed the request without the
+  `context.Context` that SDK v2 requires, and a `recover` turned the resulting panic into
+  an opaque error.
+- 35 parameters taking a list of strings panicked: v1 modeled them as `[]*string`, v2 uses
+  `[]string`.
+- 13 parameters taking a list of structs panicked, for the same reason.
+- `create instance count` reached neither `MinCount` nor `MaxCount`, from a
+  one-character typo in a struct tag (`awsin64`).
+- `update classicloadbalancer` silently sent an empty request. Its field paths were
+  spelled `Healthcheck` where the SDK field is `HealthCheck`, and an unmatched field is
+  skipped rather than reported.
+- `create distribution` silently dropped its origin domain, because indexed field paths
+  such as `Origins.Items[0].DomainName` were not resolved.
+- `create/start/stop instance`, `create listener`, `create loadbalancer` and
+  `create targetgroup` panicked on an empty AWS response.
+- `create vpc` without `name=` crashed while tagging the new VPC. Every command that
+  name-tags shared the fault.
+- `awless log` crashed on a comment-only or empty template.
+
+Also fixed:
+
+- **`awless` exited 0 on failure**, which broke shell scripting.
+- **A deadlock in the IAM users fetcher**, from a `defer wg.Done()` placed after an early
+  return, plus an unsynchronized error flag.
+- **Ten fan-out sites leaked goroutines** on the first error and ran unbounded, throttling
+  large accounts. All now use a bounded `errgroup`.
+- **`awless list --sort` panicked** on mixed-type columns.
+- **`awless web` crashed on its own resource page.** The template referenced a field that
+  no longer existed, and four of its conditionals were malformed, so those sections never
+  rendered.
+- **Multi-resource JSON output was unordered**, making it useless for diffing between runs.
+- Two crashes in the `-v` network monitor: a divide by zero when every request completed
+  within the same instant, and an unbounded allocation when the terminal was narrow.
+- `detach instanceprofile` panicked after successfully detaching.
+
+### Security
+
+- **Secrets are no longer written to the template log in cleartext.** Command lines,
+  fillers and messages all persisted `password=` values, and `awless log` replayed them.
+  They are now redacted at the persistence boundary.
+- **A denial of service in `triplestore`'s decoder**: an 11-byte input could request
+  3.8 GB and kill the process. Found with fuzzing.
+- `govulncheck` runs in CI, and patched a reachable AWS SDK eventstream vulnerability
+  (GO-2026-5764).
+- Ctrl-C now cancels in-flight AWS calls, via a signal-cancelled root context threaded to
+  every request.
+
 ### Changed
 
 - **Module path is now `github.com/bootswithdefer/awless`.** Install with
   `go install github.com/bootswithdefer/awless@latest`. The old path installed upstream's
   2018 code rather than this fork.
+- **AWS SDK v2** throughout; **Go modules** replacing `dep` and a vendor directory; **Go
+  1.26** with the toolchain pinned.
+- **`github.com/bootswithdefer/triplestore` v1.0.0** for graph storage, the first tagged
+  release that library has ever had.
+- **bbolt** replaces the archived `boltdb/bolt`, which crashes under the race detector.
+- Archived dependencies replaced: `yaml.v2` → `go.yaml.in/yaml/v3`, `oklog/ulid` → `/v2`,
+  `src-d/go-git.v4` → `go-git/go-git/v5`, and `mitchellh/ioprogress` inlined.
+- Releases are built by GoReleaser for Linux, macOS and Windows on amd64 and arm64.
+
+### Internal
+
+Not user-facing, but the reason the fixes above were findable:
+
+- **200 acceptance tests covering all 194 commands**, running with no network access. They
+  assert the mapping from template params to AWS request fields, which is applied by
+  reflection and therefore unchecked by the compiler. Nine of the bugs above were found
+  this way.
+- 51 linters enabled, including `errcheck`, `errorlint`, `noctx`, `contextcheck`,
+  `musttag` and `bidichk`. Test coverage went from 23% to 59%.
+- Native Go fuzzing, CI actions pinned to commit SHAs, and a CI job that fails on
+  generated-code drift.
+- `main` holds the single `os.Exit`; commands return errors, so deferred cleanup runs.
+- The template parser's entity list is generated from the command struct tags. Previously
+  hand-maintained, it could leave a fully registered command failing with
+  `unknown entity`.
 
 ## v0.1.11 [2018-06-21]
 

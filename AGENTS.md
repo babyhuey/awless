@@ -6,13 +6,13 @@ Guide for AI agents working in this repository.
 
 `awless` is a CLI tool for managing AWS resources. It provides a template DSL for infrastructure creation/revert, local graph-based resource sync, smart SSH, and human-friendly output. This is a modernized fork of [wallix/awless](https://github.com/wallix/awless) maintained at [bootswithdefer/awless](https://github.com/bootswithdefer/awless).
 
-- **Language:** Go 1.26
+- **Language:** Go 1.26 (`go 1.26.1` with `toolchain go1.26.5` in `go.mod`)
 - **Module path:** `github.com/bootswithdefer/awless`
 - **AWS SDK:** v2 (`github.com/aws/aws-sdk-go-v2`)
 - **CLI framework:** `github.com/spf13/cobra`
-- **Graph storage:** `github.com/bootswithdefer/triplestore` (RDF triples)
+- **Graph storage:** `github.com/bootswithdefer/triplestore` v1.0.0 (RDF triples)
 - **Local DB:** bbolt (`go.etcd.io/bbolt`)
-- **Version:** v1.0.0 (set in `config/version.go`)
+- **Version:** `v1.1.0` in `config/version.go`; release builds inject it from the git tag via GoReleaser
 
 ## Build & Test
 
@@ -28,8 +28,9 @@ make vet           # go vet ./...
 make vuln          # govulncheck ./...
 make fmt           # gofmt -s + goimports -local github.com/bootswithdefer/awless
 make fmt-check     # fail if anything non-generated is unformatted
-make cover         # coverage profile + total
+make cover         # coverage profile + total (uses -coverpkg, see below)
 make generate      # regenerate gen_*.go (see caveat below)
+make fuzz          # run the native fuzzers briefly
 make tools         # install pinned dev tools
 make release-snapshot  # build release artifacts locally (no publish)
 
@@ -38,6 +39,14 @@ make verify        # full gate:  fmt-check vet lint test-race vuln  (mirrors CI)
 ```
 
 `make verify` is the gate to run before committing; it is what CI enforces.
+
+**Check the exit status of `make verify` directly.** Piping it into `tail` or wrapping
+it in `if ... then ... fi` gates on the wrong command's status and will happily let a
+failing lint through.
+
+`make cover` passes `-coverpkg=./...`. Without it, Go credits coverage only to the
+package under test, and the large amount of `aws/spec` driven by the acceptance tests
+is reported as uncovered — that alone understated the total by about seven points.
 
 `make generate` requires `goimports` on PATH (`make tools` installs it): the
 generators shell out to it to prune the unused imports their templates emit.
@@ -48,7 +57,7 @@ Output is deterministic, and CI enforces that committed generated files match
 
 ```
 .
-├── main.go                  # Entry point — delegates to commands.RootCmd.Execute()
+├── main.go                  # Entry point — the single os.Exit; see "Error handling"
 ├── commands/                # Cobra CLI commands (list, run, show, ssh, sync, etc.)
 ├── aws/
 │   ├── services/            # Service implementations (gen_services.go is generated)
@@ -56,29 +65,26 @@ Output is deterministic, and CI enforces that committed generated files match
 │   ├── fetch/               # Data fetchers (gen_fetchers.go is generated)
 │   ├── conv/                # AWS SDK type → internal model conversion
 │   ├── config/              # AWS config validation
-│   ├── doc/                 # CLI documentation helpers
+│   ├── doc/                 # CLI documentation: params, examples, enums
 │   └── tailers/             # CloudFormation/ASG event tailers
 ├── cloud/                   # Cloud abstraction layer (interfaces, properties, RDF)
 │   ├── properties/          # Generated property constants
 │   └── rdf/                 # Generated RDF namespace constants
 ├── template/                # Template DSL engine
-│   ├── internal/ast/        # PEG grammar + parser (awless-template-syntax.peg)
+│   ├── internal/ast/        # PEG grammar + parser; gen_entities.go is generated
 │   ├── env/                 # Template execution environment
-│   ├── params/              # Parameter validation
-│   └── fuzz/                # Fuzz testing corpus
+│   └── params/              # Parameter validation
 ├── graph/                   # RDF-based resource graph
 ├── gen/aws/                 # Code generation
 │   ├── generators/          # Generator programs (go run *.go)
 │   ├── properties_definitions.go
 │   ├── fetchers_definitions.go
 │   └── mock_definitions.go
-├── acceptance/aws/          # Acceptance test framework (currently broken — SDK v2 mocking TODO)
+├── acceptance/aws/          # Acceptance test framework — 200 tests over all 194 commands
 ├── config/                  # App config, versioning, upgrade logic
 ├── console/                 # Terminal display, table formatting, column headers
-├── database/                # BoltDB-backed local storage
-├── fetch/                   # Generic fetch framework
+├── database/                # bbolt-backed local storage
 ├── inspect/                 # Infrastructure analysis inspectors
-├── logger/                  # Custom logger
 ├── ssh/                     # SSH client implementation
 ├── sync/                    # Cloud → local graph sync
 ├── web/                     # Web-based resource viewer
@@ -89,92 +95,192 @@ Output is deterministic, and CI enforces that committed generated files match
 
 ## Code Generation
 
-This project uses Go code generation extensively. Generated files follow the `gen_*.go` naming convention and are excluded from linting (see `.golangci.yml`).
-
-**How to regenerate:**
+Generated files follow the `gen_*.go` naming convention and are excluded from linting.
 
 ```sh
-cd gen/aws/generators && go run *.go
+make generate   # or: cd gen/aws/generators && go run *.go
 ```
 
-**What gets generated:**
-
-| Definition file | Output |
+| Definition source | Output |
 |----------------|--------|
 | `gen/aws/properties_definitions.go` | `cloud/properties/gen_properties.go`, `cloud/rdf/gen_rdf.go` |
 | `gen/aws/fetchers_definitions.go` | `aws/fetch/gen_fetchers.go` |
-| `gen/aws/mock_definitions.go` | `aws/services/gen_mocks_test.go`, `acceptance/aws/gen_mocks.go`, `acceptance/aws/gen_factory.go` |
-| Definitions in generators/*.go | `aws/services/gen_services.go`, `aws/spec/gen_runs.go`, `aws/spec/gen_cmds_defs.go`, `aws/spec/gen_inits.go` |
+| `gen/aws/mock_definitions.go` | `aws/services/gen_mocks_test.go`, `acceptance/aws/gen_mocks.go` |
+| `entity:` struct tags in `aws/spec/` | `template/internal/ast/gen_entities.go`, `acceptance/aws/gen_factory.go` |
+| Definitions in `generators/*.go` | `aws/services/gen_services.go`, `aws/spec/gen_runs.go`, `aws/spec/gen_cmds_defs.go`, `aws/spec/gen_inits.go` |
 
 **Do NOT edit `gen_*.go` files directly.** Edit the definitions in `gen/aws/` or the generator templates in `gen/aws/generators/`, then regenerate.
 
+The generators validate that their output parses as Go before overwriting, so a broken
+template fails without destroying the previous good file. They also apply an initialism
+table (`capitalize` in `generators/main.go`) so the `dns` service generates `DNS` rather
+than `Dns`. `api` is deliberately absent from that table, because `capitalize` also
+renders SDK type names and apigatewayv2's type is `Api`.
+
 ## Adding a New AWS Service
 
-Follow this pattern (see `SERVICES_TODO.md` for candidates):
+See `SERVICES_TODO.md` for ranked candidates.
 
 1. Add SDK dependency: `go get github.com/aws/aws-sdk-go-v2/service/<servicename>`
 2. Define resources in `gen/aws/properties_definitions.go` (properties, RDF types)
 3. Define fetchers in `gen/aws/fetchers_definitions.go`
 4. Add service struct in `gen/aws/generators/services.go`
 5. Add mock definition in `gen/aws/mock_definitions.go`
-6. Run `cd gen/aws/generators && go run *.go` to regenerate
+6. Run `make generate`
 7. Implement manual fetchers in `aws/fetch/manual_fetchers.go` for complex APIs
 8. Add conversion logic in `aws/conv/model.go` and `aws/conv/convert.go`
-9. Register the service in `aws/services/init.go`
+9. Register the service in `aws/services/init.go` — a service that is generated but never
+   registered compiles fine and is invisible at runtime
 10. Add resource-specific command specs in `aws/spec/<resource>.go`
 11. Wire display columns in `console/defaults.go` and `console/headers.go`
+12. Add param docs and CLI examples in `aws/doc/` — `TestDocForEachParam` and
+    `TestDocForEachCommand` both fail without them
+13. Add an acceptance test in `acceptance/aws/`
 
-## Template DSL
+The template parser's entity list is generated from the `entity:` struct tags, so a new
+entity needs no manual registration. That was not always true: a command could
+previously be fully registered and still fail every template with `unknown entity`.
 
-The template language uses a PEG grammar at `template/internal/ast/awless-template-syntax.peg`. The compiled parser is `awless-template-syntax.peg.go` (generated by [pointlander/peg](https://github.com/pointlander/peg)).
+## Command Specs and the Reflective Setters
 
-Template syntax: `ACTION ENTITY param=value [param=value ...]`
+A command is a struct in `aws/spec/` whose tags drive everything:
 
-Examples:
+```go
+type CreateVpc struct {
+    _    string  `action:"create" entity:"vpc" awsAPI:"ec2" awsCall:"CreateVpc" awsInput:"ec2.CreateVpcInput" awsOutput:"ec2.CreateVpcOutput" awsDryRun:""`
+    CIDR *string `awsName:"CidrBlock" awsType:"awsstr" templateName:"cidr"`
+}
 ```
-create instance type=t2.micro subnet=@my-subnet name=web-server
-attach securitygroup id={instance.SecurityGroups} instance=$instance_id
+
+`templateName` is what users type. `awsName` is the field path on the AWS input, and
+`awsType` selects a conversion in `aws/spec/setters.go`. **All of this is applied by
+reflection, so the compiler checks none of it.** Nine bugs of exactly this shape were
+found and fixed; the recurring causes are worth knowing:
+
+- **SDK v1 vs v2 shapes.** v1 modeled lists as `[]*string` and `[]*Struct`; v2 uses
+  `[]string` and `[]Struct`. The setters convert both ways now, but a new `awsType` must
+  handle the value form.
+- **A wrong `awsName` is silent.** `setValueAtPath` ignores a field it cannot find,
+  deliberately, since these tags are usually generated. A case mismatch
+  (`Healthcheck` vs `HealthCheck`) therefore made a command send an empty request and
+  report success.
+- **A wrong `awsType` is loud.** `setFieldWithType` returns an error naming the tag and
+  field for an unrecognized type. That guard caught an `awsin64` typo.
+- **Field paths may be indexed**, as in `DistributionConfig.Origins.Items[0].DomainName`.
+
+`awsCall` commands with a hand-written `ManualRun` build their own request; those use
+`renv.RequestContext()` for the AWS call.
+
+## Error Handling and Exit Codes
+
+`main.go` holds the **single** `os.Exit`. Commands return errors through cobra, so
+deferred cleanup always runs, and `RootCmd` sets `SilenceErrors` so reporting happens in
+exactly one place. Two sentinels in `commands/errors.go` carry outcomes that are not
+plain failures:
+
+- `ErrExitZero` — the command has already told the user what they need; exit 0 silently.
+- `ErrReported` — the reason was already printed, usually with a suggested command; exit
+  non-zero without printing again.
+
+Two `os.Exit` calls remain outside `main`, both readline interrupt paths whose enclosing
+signature has no error to return (a template env `MissingHolesFunc` and a
+`stdinParamProviderFn`). Both close readline explicitly first, because `os.Exit` skips
+the deferred close and would leave the terminal in raw mode. Both record that reasoning
+in place.
+
+## Context
+
+`main.go` installs a `signal.NotifyContext` root context, reachable as
+`commands.RootContext()` and threaded to commands as `env.Running.RequestContext()`.
+`Context()` on that interface is the **template variable map**, not a `context.Context` —
+they are easy to confuse.
+
+Every outbound call must carry the context: `noctx` and `contextcheck` are enabled and
+have each caught commands that could not be interrupted.
+
+## Acceptance Tests
+
+`acceptance/aws/` drives real command execution with no network access. SDK v2 exposes
+concrete `*service.Client` structs, so mocking works by injecting a smithy middleware on
+the Initialize step — the outermost step, which is the only one still carrying typed
+input parameters and whose short-circuit result becomes the operation output.
+
+```go
+mock := NewMock().On("CreateVpc", &ec2.CreateVpcOutput{Vpc: &ec2types.Vpc{VpcId: awssdk.String("vpc-1234")}})
+
+Template("create vpc cidr=10.0.0.0/16").
+    Mock(mock).
+    ExpectCalls("CreateVpc").
+    ExpectCommandResult("vpc-1234").
+    ExpectRevert("delete vpc id=vpc-1234").
+    Run(t)
+
+in := mock.InputFor("CreateVpc").(*ec2.CreateVpcInput)   // assert the input mapping
 ```
 
-**Do NOT edit the `.peg.go` file.** Edit the `.peg` file and regenerate with `peg`.
+Also available: `RunExpectingError` for asserting pre-flight validation, `DryRun()` to
+exercise the generated `dryRun` path, and `OnAPIError` for AWS error codes. An operation
+with no registered output returns an explanatory error rather than a zero value, since a
+zero value surfaces as a nil dereference deep inside result extraction.
+
+Assert the **input mapping**, not just that a call happened — that is what catches the
+reflective-tag bugs. If a test needs an unexpected extra mock, read why: several
+commands legitimately make more calls than they appear to (`delete role` also tears down
+its instance profile, `create securitygroup`'s revert waits for the group to become
+unused).
+
+Keep timeouts small in `check *` tests. Those commands poll, so a fixture whose state
+never matches hangs the suite instead of failing it.
 
 ## Conventions
 
-- **Imports:** Group stdlib, then third-party, then `github.com/bootswithdefer/awless` (enforced by goimports with `-local`)
-- **Error handling:** Wrap with context; use `fmt.Errorf` or `decorateAWSError()` for AWS errors
-- **Pointer helpers:** Use `String()`, `StringValue()`, `Int64()`, `Bool()` from `aws/spec/spec.go`
-- **Resource types:** Constants defined in `cloud/cloud.go` (e.g., `cloud.Instance`, `cloud.Vpc`)
-- **Service naming:** Lowercase single word (e.g., `infra`, `access`, `eks`, `dynamodb`)
-- **Generated file prefix:** `gen_` — never hand-edit these
-- **Test file suffix:** `_test.go` for unit tests, `_extra_test.go` for integration-style tests in external test packages
+- **Imports:** stdlib, then third-party, then `github.com/bootswithdefer/awless` (enforced by goimports with `-local`)
+- **Error handling:** wrap with `%w`; use `decorateAWSError()` for AWS errors
+- **Pointer helpers:** `String()`, `StringValue()`, `Int64()`, `Bool()` from `aws/spec/spec.go`
+- **Resource types:** constants in `cloud/cloud.go` (e.g. `cloud.Instance`, `cloud.Vpc`)
+- **Spelling:** American. `misspell` runs with `locale: US`, so `behaviour` and
+  `initialise` fail the build.
+- **Generated file prefix:** `gen_` — never hand-edit
+- **Test file suffix:** `_test.go`, or `_extra_test.go` for external test packages
 
-## CI/CD
+## Linting
 
-GitHub Actions (`.github/workflows/ci.yml`):
-- **test:** `go test -count=1 -coverprofile=coverage.out ./...` on Go 1.26
-- **lint:** `go vet ./...` then `golangci-lint run ./...`
-- **build:** Cross-compile for linux/darwin/windows × amd64/arm64
+`.golangci.yml` enables 51 linters. The set was expanded deliberately, and the config
+records why anything is absent — `dupword` and `unparam` were run once, found only false
+positives or a legitimate builder pattern, and are excluded with that reasoning in place.
 
-## Linting Configuration
+`SA1019` (deprecated usage) is suppressed; `gen_*.go` and the PEG parser are excluded;
+`fieldalignment` and `shadow` are off for govet, and so is `inline`.
 
-`.golangci.yml` enables: govet, ineffassign, staticcheck, unused, gosimple, gofmt, goimports, misspell, unconvert.
+`gosec` is deliberately **not** enabled — see `ISSUES.md` I21. It was reviewed once
+rather than adopted: over half its findings duplicate `errcheck` or describe inherent
+properties of a CLI that reads user-specified files and URLs. Worth re-running
+periodically rather than gating on.
 
-Notable exclusions:
-- `SA1019` (deprecated usage) is suppressed — too noisy during SDK migration
-- `gen_*.go` and `awless-template-syntax.peg.go` are excluded from linting
-- `fieldalignment` and `shadow` disabled for govet
+## CI
 
-## Key Interfaces
+`.github/workflows/ci.yml` runs `test`, `race`, `codegen`, `fuzz`, `vuln`, `lint` and
+`build`. Actions are pinned to commit SHAs (update with `make pinact-update`), and the Go
+version comes from `go.mod`.
 
-- `cloud.Service` — implemented per AWS service group (access, infra, storage, etc.)
-- `cloud.Resource` — generic resource with properties, used throughout graph/display
-- `command` (in `aws/spec/spec.go`) — template command with `ParamsSpec()`, `inject()`, `Run()`
-- `BeforeRunner` / `AfterRunner` / `ResultExtractor` — lifecycle hooks on commands
+**CI has never actually run on this fork.** Everything has been verified locally with
+`make verify`, so treat the workflows as unproven. Note that local verification is not
+equivalent: CI runs on a clean checkout with no `~/.awless`, no AWS config and no cached
+tools. Two tests already needed environment pinned for that reason — the service registry
+test sets static credentials to avoid a 15-second EC2 metadata timeout, and
+`create keypair` needs `__AWLESS_KEYS_DIR`.
 
 ## Things to Watch Out For
 
-- **Two compiled binaries in git:** `./generators` (root) and `gen/aws/generators/generators` — these should not be committed but currently are
-- **Acceptance tests are broken:** All 30 factory functions in `acceptance/aws/gen_factory.go` have `// TODO: SDK v2 mocking needs rework`
-- **`strings.Title` is deprecated:** Used in 5 generator files — produces lint warnings with newer Go versions
-- **`.travis.yml` is stale:** References Go 1.9–1.11, completely superseded by GitHub Actions
-- **Template PEG regeneration:** Requires the `peg` tool (`go install github.com/pointlander/peg@latest`)
+- **`triplestore`'s `(*triple).key()` format is a wire contract.** Changing it
+  invalidates every binary-encoded graph already cached in users' `~/.awless`.
+- **Persisted template log lines are re-parsed** by `UnmarshalJSON`, so redaction
+  placeholders must stay grammar-parseable (`*****` is in the `UnquotedParam` class).
+- **`template/env` exports were renamed** from `ALL_CAPS` (`env.FILLERS` is now
+  `env.Fillers`).
+- **`wallix/awless-templates` references in `commands/run.go`** point at a *different*
+  upstream repo and must stay.
+- **Template PEG regeneration** requires the `peg` tool
+  (`go install github.com/pointlander/peg@latest`). Edit the `.peg` file, never the
+  `.peg.go`.
+- **The scheduler is gone.** `--run-in` and `--revert-in` were removed in v1.1.0.

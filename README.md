@@ -1,12 +1,15 @@
 
 [![CI](https://github.com/bootswithdefer/awless/actions/workflows/ci.yml/badge.svg)](https://github.com/bootswithdefer/awless/actions/workflows/ci.yml)
-[![Go Coverage](https://github.com/bootswithdefer/awless/wiki/coverage.svg)](https://raw.githack.com/wiki/bootswithdefer/awless/coverage.html)
 
 `awless` is a powerful, innovative and small surface command line interface (CLI) to manage Amazon Web Services.
 
-> This is a modernized fork of [wallix/awless](https://github.com/wallix/awless). It migrates from AWS SDK v1 to v2, uses Go modules, and adds support for newer AWS services.
+> **This is a modernized fork of [wallix/awless](https://github.com/wallix/awless)**, which was last released in 2018. It migrates to AWS SDK v2, replaces `dep`/vendor with Go modules, adds 8 AWS services, and fixes a number of bugs that the SDK migration left behind. See [Changes in this fork](#changes-in-this-fork).
 
-[Upstream Wiki](https://github.com/wallix/awless/wiki) | [Changelog](https://github.com/wallix/awless/blob/master/CHANGELOG.md#readme)
+[Upstream Wiki](https://github.com/wallix/awless/wiki) | [Changelog](./CHANGELOG.md)
+
+The upstream wiki is still the best guide to concepts — the template language, the sync
+model and the getting-started tour are unchanged. Where this fork differs, it is noted
+below.
 
 # Why awless
 
@@ -27,7 +30,7 @@ For more read our [FAQ](#faq) below (how `awless` compares to other tools, etc.)
 
 ### From source (recommended)
 
-Requires Go 1.21+:
+Requires Go 1.26+ (the version is pinned in `go.mod`):
 
 ```sh
 go install github.com/bootswithdefer/awless@latest
@@ -38,28 +41,32 @@ Or clone and build:
 ```sh
 git clone https://github.com/bootswithdefer/awless.git
 cd awless
-go build -o awless .
-```
-
-### Development setup
-
-After cloning, enable the pre-commit hooks to catch formatting and lint errors before pushing:
-
-```sh
-git config core.hooksPath .githooks
+make build
 ```
 
 ### Pre-built binaries
 
-Download the latest `awless` binaries (Windows/Linux/macOS) [from Github releases](https://github.com/bootswithdefer/awless/releases/latest).
+Releases are built by GoReleaser for Linux, macOS and Windows on amd64 and arm64, with
+checksums. **No release has been published from this fork yet** — build from source for
+now.
+
+### Development setup
+
+```sh
+git config core.hooksPath .githooks   # gofmt + lint before each commit
+make tools                            # install pinned dev tools
+make verify                           # the full gate: fmt, vet, lint, race, vuln
+```
+
+`make help` lists every target. Contributors should read [AGENTS.md](./AGENTS.md), which
+documents the code generation pipeline and the reflective command-spec system — the two
+things most likely to surprise you.
 
 ### Configuration
 
 If you have previously used the AWS CLI or aws-shell, you don't need to configure anything! Your config will be automatically loaded (i.e. `~/.aws/{credentials,config}`) and `awless` will prompt for any missing info (more at the [getting started wiki](https://github.com/wallix/awless/wiki/Getting-Started)).
 
 # Supported AWS services
-
-`awless` supports the following AWS services:
 
 | Service | Resources |
 |---------|-----------|
@@ -90,7 +97,8 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **CloudTrail** | trails |
 | **CloudWatch Logs** | log groups |
 
-Services in **bold** are new in this fork.
+Services in **bold** are new in this fork. All of them support create/update/delete, not
+just listing — see [Changes in this fork](#changes-in-this-fork).
 
 # Main features
 
@@ -122,11 +130,15 @@ Services in **bold** are new in this fork.
       $ awless run ~/templates/my-infra.aws
       etc.
 
-- **Hundreds of powerful CRUD CLI one-liners** integrated in the awless templating engine:
+- **194 CRUD one-liners** integrated in the awless templating engine, each with `-h`
+  documentation and worked examples:
 
       $ awless create instance -h
       $ awless create vpc -h
       $ awless attach policy -h
+      $ awless create secret name=db-password secret=s3cr3t
+      $ awless create ssmparameter name=/app/db/host value=db.internal type=SecureString
+      $ awless create dynamodbtable name=users partition-key=id
       $ ...
       (see awless -h)
 
@@ -176,13 +188,86 @@ Take the tour at [Getting Started (wiki)](https://github.com/wallix/awless/wiki/
 
 # Changes in this fork
 
-- **AWS SDK v2**: Migrated from AWS SDK for Go v1 to v2
-- **Go modules**: Replaced `dep`/vendor with Go modules
-- **6 new AWS services**: EKS, DynamoDB, Secrets Manager/KMS, API Gateway v2, SSM, EFS
-- **Bug fixes from upstream issues**:
-  - [#296](https://github.com/wallix/awless/issues/296): `--filter` now uses exact matching instead of substring matching
-  - [#281](https://github.com/wallix/awless/issues/281): Added `ebs-optimized` flag to `create instance`
-  - [#289](https://github.com/wallix/awless/issues/289): RDS endpoint now shown in `list databases`
+### Platform
+
+- **AWS SDK v2** throughout, replacing the v1 SDK
+- **Go modules**, replacing `dep` and a vendor directory
+- **Go 1.26**, with the toolchain pinned in `go.mod`
+- **`github.com/bootswithdefer/triplestore` v1.0.0** for graph storage, the first tagged
+  release that library has ever had
+- **bbolt** replaces the archived `boltdb/bolt`, which crashes under the race detector
+
+### New services
+
+EKS, DynamoDB, Secrets Manager, KMS, API Gateway v2, SSM, EFS, CloudTrail and CloudWatch
+Logs. All are writable, not list-only: 27 create/update/delete commands were added across
+them.
+
+### Bugs fixed
+
+Nine of these came from the SDK v1 → v2 migration and were invisible to the compiler,
+because `awless` maps template parameters onto AWS request structs by reflection:
+
+- `create role`, `create/update distribution`, `attach/detach securitygroup` and four
+  `containertask` commands all failed — the reflective call passed the request without the
+  context that SDK v2 requires
+- 35 parameters that take a list of strings panicked, because v1 modeled them as
+  `[]*string` and v2 uses `[]string`
+- 13 parameters that take a list of structs panicked, for the same reason
+- `create instance count` reached neither `MinCount` nor `MaxCount`, from a one-character
+  typo in a struct tag
+- `update classicloadbalancer` silently sent an empty request: its field paths were
+  spelled `Healthcheck` where the SDK field is `HealthCheck`
+- `create distribution` silently dropped its origin domain, because indexed field paths
+  such as `Origins.Items[0].DomainName` were not resolved
+- `create/start/stop instance`, `create listener`, `create loadbalancer` and
+  `create targetgroup` panicked on an empty AWS response
+- `create vpc` without `name=` crashed while trying to tag the new VPC
+- `awless log` crashed on a comment-only or empty template
+
+And, found separately:
+
+- **Secrets were written to the template log in cleartext** — command lines, fillers and
+  messages all persisted `password=` values. They are now redacted at the persistence
+  boundary.
+- **The web UI listened on `0.0.0.0` with no authentication or timeouts.** It now defaults
+  to loopback and requires an explicit opt-in to expose.
+- **A deadlock in the IAM users fetcher**, plus an unsynchronized error flag.
+- **Ten fan-out sites leaked goroutines** on the first error and ran unbounded, which
+  throttled large accounts. All now use a bounded `errgroup`.
+- **`awless` exited 0 on failure**, which broke shell scripting.
+- **A denial of service in `triplestore`'s decoder**: an 11-byte input could request 3.8 GB
+  and kill the process. Found with fuzzing.
+
+### Upstream issues closed
+
+- [#296](https://github.com/wallix/awless/issues/296): `--filter` now uses exact matching instead of substring matching
+- [#281](https://github.com/wallix/awless/issues/281): Added `ebs-optimized` flag to `create instance`
+- [#289](https://github.com/wallix/awless/issues/289): RDS endpoint now shown in `list databases`
+
+### Removed
+
+- **The scheduler is gone.** `--run-in`, `--revert-in` and the hidden `awless scheduler`
+  command required a daemon that had been unbuildable since 2018 and exposed an
+  unauthenticated endpoint that executed templates against the host's AWS credentials.
+  Use EventBridge Scheduler, cron, or a CI schedule instead.
+
+### Breaking changes
+
+See [CHANGELOG.md](./CHANGELOG.md). The one to know about: `https-behaviour` is now
+`https-behavior` on `create/update distribution`, for consistency with the American
+spelling used everywhere else. Existing templates must be updated, and reverting a
+previously logged distribution creation will fail because the stored command line carries
+the old spelling.
+
+### Engineering
+
+- **200 acceptance tests covering all 194 commands**, running with no network access
+- 51 linters enabled, including `errcheck`, `errorlint`, `noctx`, `contextcheck`,
+  `musttag` and `bidichk`
+- Native Go fuzzing, `govulncheck` in CI, and CI actions pinned to commit SHAs
+- Ctrl-C cancels in-flight AWS calls, via a signal-cancelled root context threaded to
+  every request
 
 # FAQ
 
@@ -209,6 +294,12 @@ Terraform is much broader in scope. `awless` takes a different approach:
 - Provides rollback on any ran template
 - Logs all actions against the cloud with rich, revertable logs
 
+**Is this fork maintained?**
+
+It is modernized rather than actively developed. Known gaps are tracked in
+[ISSUES.md](./ISSUES.md) — including that CI has not yet run and no release has been
+published.
+
 # About
 
 `awless` was originally created by Henri Binsztok, Quentin Bourgerie, Simon Caplette and Francois-Xavier Aguessy at [WALLIX](https://github.com/wallix). This fork is maintained by [bootswithdefer](https://github.com/bootswithdefer).
@@ -219,4 +310,4 @@ Terraform is much broader in scope. `awless` takes a different approach:
     we will not be responsible for any cloud costs incurred (even if you create a
     million instances using awless templates).
 
-Contributors are welcome! Note that `awless` uses [triplestore](https://github.com/bootswithdefer/triplestore) another project developed at WALLIX.
+Contributors are welcome! Note that `awless` uses [triplestore](https://github.com/bootswithdefer/triplestore), another project originally developed at WALLIX and also forked here.
