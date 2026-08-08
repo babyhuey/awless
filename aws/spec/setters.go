@@ -18,6 +18,7 @@ package awsspec
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -42,6 +43,7 @@ import (
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/bootswithdefer/awless/logger"
+	"github.com/bootswithdefer/awless/template/env"
 )
 
 const (
@@ -280,10 +282,17 @@ func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...an
 		v = stepAdjustments
 	case awsuserdatatobase64:
 		var tplData any
+		fetchCtx := context.Background()
 		if len(interfs) > 0 {
-			tplData = interfs[0]
+			// Callers pass either an env.Running or the bare template data map.
+			if renv, ok := interfs[0].(env.Running); ok {
+				tplData = renv.Context()
+				fetchCtx = renv.RequestContext()
+			} else {
+				tplData = interfs[0]
+			}
 		}
-		v, err = userDataContentAsBase64(v, tplData)
+		v, err = userDataContentAsBase64(fetchCtx, v, tplData)
 		if err != nil {
 			return err
 		}
@@ -581,7 +590,7 @@ func castStringPointerSlice(v any) []*string {
 	}
 }
 
-func userDataContentAsBase64(v any, tplData any) (string, error) {
+func userDataContentAsBase64(ctx context.Context, v any, tplData any) (string, error) {
 	userdata := castString(v)
 
 	var readErr error
@@ -594,7 +603,11 @@ func userDataContentAsBase64(v any, tplData any) (string, error) {
 		client := &http.Client{Timeout: 5 * time.Second}
 
 		logger.ExtraVerbosef("fetching remote userdata at '%s'", userdata)
-		resp, err := client.Get(userdata)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, userdata, nil)
+		if err != nil {
+			return "", err
+		}
+		resp, err := client.Do(req)
 		if err != nil {
 			return "", err
 		}
@@ -668,7 +681,12 @@ func structSetter(s any, params map[string]any) error {
 	return nil
 }
 
-func structInjector(src, dest any, ctx map[string]any) error {
+// structInjector copies src's tagged fields into dest.
+//
+// Takes env.Running rather than just the template data map because a userdata
+// param may fetch a remote script, which needs the request context to be
+// cancellable.
+func structInjector(src, dest any, renv env.Running) error {
 	val := reflect.ValueOf(src).Elem()
 	stru := val.Type()
 
@@ -681,7 +699,7 @@ func structInjector(src, dest any, ctx map[string]any) error {
 				if dstType, tok := field.Tag.Lookup("awsType"); tok {
 					fieldValue := val.Field(i)
 					if fieldValue.IsValid() && fieldValue.Interface() != nil && !fieldValue.IsNil() {
-						if err := setFieldWithType(fieldValue.Interface(), dest, destName, dstType, ctx); err != nil {
+						if err := setFieldWithType(fieldValue.Interface(), dest, destName, dstType, renv); err != nil {
 							fieldName := field.Name
 							if tplName, ok := field.Tag.Lookup("templateName"); ok {
 								fieldName = tplName

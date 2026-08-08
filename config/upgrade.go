@@ -16,6 +16,7 @@ limitations under the License.
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,7 +34,7 @@ const (
 	lastUpgradeCheckDBKey = "upgrade.lastcheck"
 )
 
-func VerifyNewVersionAvailable(url string, messaging io.Writer) error {
+func VerifyNewVersionAvailable(ctx context.Context, url string, messaging io.Writer) error {
 	return database.Execute(func(db *database.DB) error {
 		last, err := db.GetTimeValue(lastUpgradeCheckDBKey)
 		if err != nil {
@@ -48,16 +49,19 @@ func VerifyNewVersionAvailable(url string, messaging io.Writer) error {
 		if time.Since(last) > upgradeFreq {
 			// Advisory only: failing to reach the release endpoint must never
 			// affect the command the user actually ran.
-			_ = notifyIfUpgrade(url, messaging)
+			_ = notifyIfUpgrade(ctx, url, messaging)
 		}
 
 		return db.SetTimeValue(lastUpgradeCheckDBKey, time.Now())
 	})
 }
 
-func notifyIfUpgrade(url string, messaging io.Writer) error {
+func notifyIfUpgrade(ctx context.Context, url string, messaging io.Writer) error {
 	client := &http.Client{Timeout: 1500 * time.Millisecond}
-	req, _ := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
 	req.Header.Set("User-Agent", "awless-client-"+Version)
 	resp, err := client.Do(req)
 	if err != nil {

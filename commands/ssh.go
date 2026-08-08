@@ -104,7 +104,7 @@ var sshCmd = &cobra.Command{
 			return err
 		}
 
-		firsHopClient, err := ssh.InitClient(connectionCtx.keypath, config.KeysDir, filepath.Join(os.Getenv("HOME"), ".ssh"))
+		firsHopClient, err := ssh.InitClient(RootContext(), connectionCtx.keypath, config.KeysDir, filepath.Join(os.Getenv("HOME"), ".ssh"))
 		if err != nil {
 			return err
 		}
@@ -323,7 +323,7 @@ func (ctx *instanceConnectionContext) fetchConnectionInfo() error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		myip = getMyIP()
+		myip = getMyIP(RootContext())
 	}()
 	go func() {
 		wg.Wait()

@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -74,7 +75,7 @@ hTSx5geAH2W73IyiTK8zIdgPMJPh69//5OhFzhQ8Ug==
 	}
 
 	for _, tcase := range tcases {
-		client, err := InitClient(tcase.keyname, tcase.keyfolders...)
+		client, err := InitClient(context.Background(), tcase.keyname, tcase.keyfolders...)
 		if err != nil {
 			t.Fatal(err)
 		}

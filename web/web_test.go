@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -212,7 +213,7 @@ func TestRoutes(t *testing.T) {
 
 func TestHomeHandler(t *testing.T) {
 	s := New(":8080", "test")
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 	rr := httptest.NewRecorder()
 
 	s.homeHandler(rr, req)
@@ -281,7 +282,7 @@ func TestListResourcesHandlerWithEmptyGraph(t *testing.T) {
 	s := New(":8080", "test")
 	s.gph = graph.NewGraph()
 
-	req := httptest.NewRequest(http.MethodGet, "/resources", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/resources", nil)
 	rr := httptest.NewRecorder()
 
 	s.listResourcesHandler(rr, req)
@@ -309,7 +310,7 @@ func TestGraphHandlerWithEmptyGraph(t *testing.T) {
 	os.Setenv("__AWLESS_HOME", tmpDir)
 	defer os.Setenv("__AWLESS_HOME", origHome)
 
-	req := httptest.NewRequest(http.MethodGet, "/graph", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/graph", nil)
 	rr := httptest.NewRecorder()
 
 	s.graphHandler(rr, req)
@@ -332,7 +333,7 @@ func TestRdfHandlerWithEmptyData(t *testing.T) {
 	os.Setenv("__AWLESS_HOME", tmpDir)
 	defer os.Setenv("__AWLESS_HOME", origHome)
 
-	req := httptest.NewRequest(http.MethodGet, "/rdf", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/rdf", nil)
 	rr := httptest.NewRecorder()
 
 	s.rdfHandler(rr, req)
@@ -355,7 +356,7 @@ func TestRdfHandlerNamespaced(t *testing.T) {
 	os.Setenv("__AWLESS_HOME", tmpDir)
 	defer os.Setenv("__AWLESS_HOME", origHome)
 
-	req := httptest.NewRequest(http.MethodGet, "/rdf?namespaced=true", nil)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/rdf?namespaced=true", nil)
 	rr := httptest.NewRecorder()
 
 	s.rdfHandler(rr, req)
@@ -372,7 +373,11 @@ func TestRoutesServesHome(t *testing.T) {
 	srv := httptest.NewServer(s.routes())
 	defer srv.Close()
 
-	resp, err := http.Get(srv.URL + "/")
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, srv.URL+"/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -390,7 +395,11 @@ func TestRoutesServesResources(t *testing.T) {
 	srv := httptest.NewServer(s.routes())
 	defer srv.Close()
 
-	resp, err := http.Get(srv.URL + "/resources")
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, srv.URL+"/resources", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -84,9 +84,9 @@ func (cmd *UpdateImage) ParamsSpec() params.Spec {
 	))
 }
 
-func (cmd *UpdateImage) prepareImageAttributeInput(ctx map[string]any) (*ec2.ModifyImageAttributeInput, error) {
+func (cmd *UpdateImage) prepareImageAttributeInput(renv env.Running) (*ec2.ModifyImageAttributeInput, error) {
 	input := &ec2.ModifyImageAttributeInput{}
-	if err := structInjector(cmd, input, ctx); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %w", err)
 	}
 	if cmd.Accounts != nil || cmd.Groups != nil {
@@ -102,11 +102,11 @@ func (cmd *UpdateImage) prepareImageAttributeInput(ctx map[string]any) (*ec2.Mod
 }
 
 func (cmd *UpdateImage) ManualRun(renv env.Running) (any, error) {
-	input, err := cmd.prepareImageAttributeInput(renv.Context())
+	input, err := cmd.prepareImageAttributeInput(renv)
 	if err != nil {
 		return nil, err
 	}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyImageAttributeInput: %w", err)
 	}
 	start := time.Now()
@@ -119,12 +119,12 @@ func (cmd *UpdateImage) dryRun(renv env.Running, params map[string]any) (any, er
 	if err := cmd.inject(params); err != nil {
 		return nil, fmt.Errorf("dry run: cannot set params on command struct: %w", err)
 	}
-	input, err := cmd.prepareImageAttributeInput(renv.Context())
+	input, err := cmd.prepareImageAttributeInput(renv)
 	if err != nil {
 		return nil, err
 	}
 	input.DryRun = awssdk.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("dry run: cannot inject in ec2.ModifyImageAttributeInput: %w", err)
 	}
 

@@ -296,7 +296,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]any) (any, er
 	
 	{{ if $tag.Call }}
 	input := &{{ $tag.Input }}{}
-	if err := structInjector(cmd, input, renv.Context()) ; err != nil {
+	if err := structInjector(cmd, input, renv) ; err != nil {
 		return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -349,7 +349,7 @@ func (cmd *{{ $cmdName }}) run(renv env.Running, params map[string]any) (any, er
 
 		input := &{{ $tag.Input }}{}
 		input.DryRun = aws.Bool(true)
-		if err := structInjector(cmd, input, renv.Context()) ; err != nil {
+		if err := structInjector(cmd, input, renv) ; err != nil {
 			return nil, fmt.Errorf("cannot inject in {{ $tag.Input }}: %w", err)
 		}
 		if v, ok := implementsInputPostProcessor(cmd); ok {

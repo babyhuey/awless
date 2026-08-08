@@ -17,6 +17,7 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -34,7 +35,7 @@ func TestUpgradeMessaging(t *testing.T) {
 		_, _ = w.Write([]byte(`{"URL":"https://github.com/bootswithdefer/awless/releases/latest","Version":"1000.0.0"}`))
 	}))
 	var buff bytes.Buffer
-	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+	if err := notifyIfUpgrade(context.Background(), tserver.URL, &buff); err != nil {
 		t.Fatal(err)
 	}
 

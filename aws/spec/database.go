@@ -145,7 +145,7 @@ func (cmd *CreateDatabase) ParamsSpec() params.Spec {
 func (cmd *CreateDatabase) ManualRun(renv env.Running) (output any, err error) {
 	if replica := cmd.ReadReplicaIdentifier; replica != nil {
 		input := &rds.CreateDBInstanceReadReplicaInput{}
-		if ierr := structInjector(cmd, input, renv.Context()); ierr != nil {
+		if ierr := structInjector(cmd, input, renv); ierr != nil {
 			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceReadReplicaInput: %w", ierr)
 		}
 		start := time.Now()
@@ -153,7 +153,7 @@ func (cmd *CreateDatabase) ManualRun(renv env.Running) (output any, err error) {
 		cmd.logger.ExtraVerbosef("rds.CreateDBInstanceReadReplica call took %s", time.Since(start))
 	} else {
 		input := &rds.CreateDBInstanceInput{}
-		if ierr := structInjector(cmd, input, renv.Context()); ierr != nil {
+		if ierr := structInjector(cmd, input, renv); ierr != nil {
 			return nil, fmt.Errorf("cannot inject in rds.CreateDBInstanceInput: %w", ierr)
 		}
 		start := time.Now()

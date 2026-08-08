@@ -1,6 +1,7 @@
 package ssh
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -12,8 +13,9 @@ import (
 	"golang.org/x/term"
 )
 
-func agentAuth() (ssh.AuthMethod, error) {
-	sock, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK"))
+func agentAuth(ctx context.Context) (ssh.AuthMethod, error) {
+	var d net.Dialer
+	sock, err := d.DialContext(ctx, "unix", os.Getenv("SSH_AUTH_SOCK"))
 	if err != nil {
 		return nil, err
 	}

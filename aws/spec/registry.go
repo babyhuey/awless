@@ -93,7 +93,7 @@ func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (any, error) {
 					return nil, nil
 				}
 			}
-			dockerCmd := exec.Command("docker", torun[1:]...)
+			dockerCmd := exec.CommandContext(renv.RequestContext(), "docker", torun[1:]...)
 			out, err := dockerCmd.Output()
 			if err != nil {
 				var e *exec.ExitError

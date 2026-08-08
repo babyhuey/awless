@@ -221,7 +221,7 @@ func verifyNewVersionHook(cmd *cobra.Command, args []string) error {
 	}
 	// Advisory only: a failed update check must never affect the command the
 	// user ran.
-	_ = config.VerifyNewVersionAvailable("https://updates.awless.io", os.Stderr)
+	_ = config.VerifyNewVersionAvailable(RootContext(), "https://updates.awless.io", os.Stderr)
 	return nil
 }
 

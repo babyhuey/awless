@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -701,7 +702,7 @@ func TestNotifyIfUpgradeBrew(t *testing.T) {
 	defer tserver.Close()
 
 	var buff bytes.Buffer
-	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+	if err := notifyIfUpgrade(context.Background(), tserver.URL, &buff); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(buff.String(), "brew upgrade awless") {
@@ -720,7 +721,7 @@ func TestNotifyIfUpgradeGoGet(t *testing.T) {
 	defer tserver.Close()
 
 	var buff bytes.Buffer
-	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+	if err := notifyIfUpgrade(context.Background(), tserver.URL, &buff); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(buff.String(), "go install") {
@@ -735,7 +736,7 @@ func TestNotifyIfUpgradeNoUpgrade(t *testing.T) {
 	defer tserver.Close()
 
 	var buff bytes.Buffer
-	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+	if err := notifyIfUpgrade(context.Background(), tserver.URL, &buff); err != nil {
 		t.Fatal(err)
 	}
 	if buff.Len() != 0 {
@@ -751,7 +752,7 @@ func TestNotifyIfUpgradeInvalidJSON(t *testing.T) {
 
 	var buff bytes.Buffer
 	// Should not error even with invalid JSON
-	if err := notifyIfUpgrade(tserver.URL, &buff); err != nil {
+	if err := notifyIfUpgrade(context.Background(), tserver.URL, &buff); err != nil {
 		t.Fatal(err)
 	}
 	if buff.Len() != 0 {
@@ -761,7 +762,7 @@ func TestNotifyIfUpgradeInvalidJSON(t *testing.T) {
 
 func TestNotifyIfUpgradeServerDown(t *testing.T) {
 	var buff bytes.Buffer
-	err := notifyIfUpgrade("http://localhost:1", &buff)
+	err := notifyIfUpgrade(context.Background(), "http://localhost:1", &buff)
 	if err == nil {
 		t.Fatal("expected error for unreachable server")
 	}

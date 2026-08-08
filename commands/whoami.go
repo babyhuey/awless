@@ -17,6 +17,7 @@ limitations under the License.
 package commands
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net"
@@ -55,7 +56,7 @@ var whoamiCmd = &cobra.Command{
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if onlyMyIPFlag {
-			fmt.Println(getMyIP())
+			fmt.Println(getMyIP(RootContext()))
 			return nil
 		}
 
@@ -136,9 +137,13 @@ var whoamiCmd = &cobra.Command{
 	},
 }
 
-func getMyIP() net.IP {
+func getMyIP(ctx context.Context) net.IP {
 	client := &http.Client{Timeout: 3 * time.Second}
-	if resp, err := client.Get("http://checkip.amazonaws.com/"); err == nil {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://checkip.amazonaws.com/", nil)
+	if err != nil {
+		return nil
+	}
+	if resp, err := client.Do(req); err == nil {
 		b, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		return net.ParseIP(strings.TrimSpace(string(b)))

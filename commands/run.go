@@ -19,6 +19,7 @@ package commands
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -504,7 +505,7 @@ func getTemplateText(path string) (content []byte, expanded string, err error) {
 
 	if strings.HasPrefix(path, "http") {
 		logger.ExtraVerbosef("fetching remote template at '%s'", path)
-		content, err = readHTTPContent(path)
+		content, err = readHTTPContent(RootContext(), path)
 	} else {
 		f, ferr := os.Open(path)
 		if ferr != nil {
@@ -569,7 +570,7 @@ func detectMinimalVersionInTemplate(content []byte) (string, bool) {
 }
 
 func listRemoteTemplates() error {
-	manifestFile, err := readHTTPContent(defaultRepoPrefix + "/manifest.json")
+	manifestFile, err := readHTTPContent(RootContext(), defaultRepoPrefix+"/manifest.json")
 	if err != nil {
 		return err
 	}
@@ -592,8 +593,12 @@ func listRemoteTemplates() error {
 	return nil
 }
 
-func readHTTPContent(path string) ([]byte, error) {
-	resp, err := http.Get(path)
+func readHTTPContent(ctx context.Context, path string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

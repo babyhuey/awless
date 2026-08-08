@@ -167,7 +167,7 @@ func (cmd *AttachClassicLoadbalancer) run(renv env.Running, params map[string]an
 	}
 
 	input := &elb.RegisterInstancesWithLoadBalancerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elb.RegisterInstancesWithLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -322,7 +322,7 @@ func (cmd *AttachElasticip) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &ec2.AssociateAddressInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -366,7 +366,7 @@ func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]any) (any
 
 	input := &ec2.AssociateAddressInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -429,7 +429,7 @@ func (cmd *AttachInstance) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &elbv2.RegisterTargetsInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.RegisterTargetsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -580,7 +580,7 @@ func (cmd *AttachInternetgateway) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &ec2.AttachInternetGatewayInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -624,7 +624,7 @@ func (cmd *AttachInternetgateway) dryRun(renv env.Running, params map[string]any
 
 	input := &ec2.AttachInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -687,7 +687,7 @@ func (cmd *AttachListener) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &elbv2.AddListenerCertificatesInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.AddListenerCertificatesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -769,7 +769,7 @@ func (cmd *AttachMfadevice) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &iam.EnableMFADeviceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.EnableMFADeviceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -851,7 +851,7 @@ func (cmd *AttachNetworkinterface) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &ec2.AttachNetworkInterfaceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -895,7 +895,7 @@ func (cmd *AttachNetworkinterface) dryRun(renv env.Running, params map[string]an
 
 	input := &ec2.AttachNetworkInterfaceInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -1031,7 +1031,7 @@ func (cmd *AttachRole) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &iam.AddRoleToInstanceProfileInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.AddRoleToInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -1113,7 +1113,7 @@ func (cmd *AttachRoutetable) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ec2.AssociateRouteTableInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -1157,7 +1157,7 @@ func (cmd *AttachRoutetable) dryRun(renv env.Running, params map[string]any) (an
 
 	input := &ec2.AssociateRouteTableInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AssociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -1293,7 +1293,7 @@ func (cmd *AttachUser) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &iam.AddUserToGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.AddUserToGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -1375,7 +1375,7 @@ func (cmd *AttachVolume) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.AttachVolumeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -1419,7 +1419,7 @@ func (cmd *AttachVolume) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.AttachVolumeInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AttachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2285,7 +2285,7 @@ func (cmd *CopyImage) run(renv env.Running, params map[string]any) (any, error) 
 	}
 
 	input := &ec2.CopyImageInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2329,7 +2329,7 @@ func (cmd *CopyImage) dryRun(renv env.Running, params map[string]any) (any, erro
 
 	input := &ec2.CopyImageInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CopyImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2392,7 +2392,7 @@ func (cmd *CopySnapshot) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.CopySnapshotInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2436,7 +2436,7 @@ func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.CopySnapshotInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CopySnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2499,7 +2499,7 @@ func (cmd *CreateAccesskey) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &iam.CreateAccessKeyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.CreateAccessKeyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2581,7 +2581,7 @@ func (cmd *CreateAlarm) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &cloudwatch.PutMetricAlarmInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudwatch.PutMetricAlarmInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2663,7 +2663,7 @@ func (cmd *CreateApigateway) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &apigatewayv2.CreateApiInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in apigatewayv2.CreateApiInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2745,7 +2745,7 @@ func (cmd *CreateApigatewayroute) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &apigatewayv2.CreateRouteInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in apigatewayv2.CreateRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2827,7 +2827,7 @@ func (cmd *CreateApigatewaystage) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &apigatewayv2.CreateStageInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in apigatewayv2.CreateStageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2909,7 +2909,7 @@ func (cmd *CreateAppscalingpolicy) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &applicationautoscaling.PutScalingPolicyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.PutScalingPolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -2991,7 +2991,7 @@ func (cmd *CreateAppscalingtarget) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &applicationautoscaling.RegisterScalableTargetInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.RegisterScalableTargetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -3073,7 +3073,7 @@ func (cmd *CreateBucket) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &s3.CreateBucketInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in s3.CreateBucketInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -3228,7 +3228,7 @@ func (cmd *CreateClassicLoadbalancer) run(renv env.Running, params map[string]an
 	}
 
 	input := &elb.CreateLoadBalancerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elb.CreateLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -3310,7 +3310,7 @@ func (cmd *CreateContainercluster) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &ecs.CreateClusterInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ecs.CreateClusterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -3465,7 +3465,7 @@ func (cmd *CreateDbsubnetgroup) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &rds.CreateDBSubnetGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in rds.CreateDBSubnetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -3839,7 +3839,7 @@ func (cmd *CreateElasticip) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &ec2.AllocateAddressInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -3883,7 +3883,7 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any
 
 	input := &ec2.AllocateAddressInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.AllocateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -3946,7 +3946,7 @@ func (cmd *CreateFilesystem) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &efs.CreateFileSystemInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in efs.CreateFileSystemInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4028,7 +4028,7 @@ func (cmd *CreateFunction) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &lambda.CreateFunctionInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in lambda.CreateFunctionInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4110,7 +4110,7 @@ func (cmd *CreateGroup) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &iam.CreateGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.CreateGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4192,7 +4192,7 @@ func (cmd *CreateImage) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &ec2.CreateImageInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4236,7 +4236,7 @@ func (cmd *CreateImage) dryRun(renv env.Running, params map[string]any) (any, er
 
 	input := &ec2.CreateImageInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4299,7 +4299,7 @@ func (cmd *CreateInstance) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &ec2.RunInstancesInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4343,7 +4343,7 @@ func (cmd *CreateInstance) dryRun(renv env.Running, params map[string]any) (any,
 
 	input := &ec2.RunInstancesInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.RunInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4406,7 +4406,7 @@ func (cmd *CreateInstanceprofile) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &iam.CreateInstanceProfileInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.CreateInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4488,7 +4488,7 @@ func (cmd *CreateInternetgateway) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &ec2.CreateInternetGatewayInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4532,7 +4532,7 @@ func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]any
 
 	input := &ec2.CreateInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4595,7 +4595,7 @@ func (cmd *CreateKeypair) run(renv env.Running, params map[string]any) (any, err
 	}
 
 	input := &ec2.ImportKeyPairInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ImportKeyPairInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4677,7 +4677,7 @@ func (cmd *CreateLaunchconfiguration) run(renv env.Running, params map[string]an
 	}
 
 	input := &autoscaling.CreateLaunchConfigurationInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in autoscaling.CreateLaunchConfigurationInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4759,7 +4759,7 @@ func (cmd *CreateListener) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &elbv2.CreateListenerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.CreateListenerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4841,7 +4841,7 @@ func (cmd *CreateLoadbalancer) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &elbv2.CreateLoadBalancerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.CreateLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -4923,7 +4923,7 @@ func (cmd *CreateLoggroup) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &cloudwatchlogs.CreateLogGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudwatchlogs.CreateLogGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5005,7 +5005,7 @@ func (cmd *CreateLoginprofile) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &iam.CreateLoginProfileInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.CreateLoginProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5160,7 +5160,7 @@ func (cmd *CreateNatgateway) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ec2.CreateNatGatewayInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateNatGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5242,7 +5242,7 @@ func (cmd *CreateNetworkinterface) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &ec2.CreateNetworkInterfaceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5286,7 +5286,7 @@ func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]an
 
 	input := &ec2.CreateNetworkInterfaceInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5349,7 +5349,7 @@ func (cmd *CreatePolicy) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &iam.CreatePolicyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5431,7 +5431,7 @@ func (cmd *CreateQueue) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &sqs.CreateQueueInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in sqs.CreateQueueInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5586,7 +5586,7 @@ func (cmd *CreateRepository) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ecr.CreateRepositoryInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ecr.CreateRepositoryInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5741,7 +5741,7 @@ func (cmd *CreateRoute) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &ec2.CreateRouteInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5785,7 +5785,7 @@ func (cmd *CreateRoute) dryRun(renv env.Running, params map[string]any) (any, er
 
 	input := &ec2.CreateRouteInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5848,7 +5848,7 @@ func (cmd *CreateRoutetable) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ec2.CreateRouteTableInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -5892,7 +5892,7 @@ func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]any) (an
 
 	input := &ec2.CreateRouteTableInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6028,7 +6028,7 @@ func (cmd *CreateScalinggroup) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &autoscaling.CreateAutoScalingGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in autoscaling.CreateAutoScalingGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6110,7 +6110,7 @@ func (cmd *CreateScalingpolicy) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &autoscaling.PutScalingPolicyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in autoscaling.PutScalingPolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6192,7 +6192,7 @@ func (cmd *CreateSecret) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &secretsmanager.CreateSecretInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in secretsmanager.CreateSecretInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6274,7 +6274,7 @@ func (cmd *CreateSecuritygroup) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &ec2.CreateSecurityGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6318,7 +6318,7 @@ func (cmd *CreateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 
 	input := &ec2.CreateSecurityGroupInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6381,7 +6381,7 @@ func (cmd *CreateSnapshot) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &ec2.CreateSnapshotInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6425,7 +6425,7 @@ func (cmd *CreateSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 
 	input := &ec2.CreateSnapshotInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6488,7 +6488,7 @@ func (cmd *CreateSsmparameter) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &ssm.PutParameterInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ssm.PutParameterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6570,7 +6570,7 @@ func (cmd *CreateStack) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &cloudformation.CreateStackInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudformation.CreateStackInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6652,7 +6652,7 @@ func (cmd *CreateSubnet) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.CreateSubnetInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6696,7 +6696,7 @@ func (cmd *CreateSubnet) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.CreateSubnetInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6759,7 +6759,7 @@ func (cmd *CreateSubscription) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &sns.SubscribeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in sns.SubscribeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6910,7 +6910,7 @@ func (cmd *CreateTargetgroup) run(renv env.Running, params map[string]any) (any,
 	}
 
 	input := &elbv2.CreateTargetGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.CreateTargetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -6992,7 +6992,7 @@ func (cmd *CreateTopic) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &sns.CreateTopicInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in sns.CreateTopicInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7074,7 +7074,7 @@ func (cmd *CreateTrail) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &cloudtrail.CreateTrailInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudtrail.CreateTrailInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7156,7 +7156,7 @@ func (cmd *CreateUser) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &iam.CreateUserInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.CreateUserInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7238,7 +7238,7 @@ func (cmd *CreateVolume) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.CreateVolumeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7282,7 +7282,7 @@ func (cmd *CreateVolume) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.CreateVolumeInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7345,7 +7345,7 @@ func (cmd *CreateVpc) run(renv env.Running, params map[string]any) (any, error) 
 	}
 
 	input := &ec2.CreateVpcInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7389,7 +7389,7 @@ func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 
 	input := &ec2.CreateVpcInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7452,7 +7452,7 @@ func (cmd *CreateZone) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &route53.CreateHostedZoneInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in route53.CreateHostedZoneInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7534,7 +7534,7 @@ func (cmd *DeleteAccesskey) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &iam.DeleteAccessKeyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeleteAccessKeyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7616,7 +7616,7 @@ func (cmd *DeleteAlarm) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &cloudwatch.DeleteAlarmsInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudwatch.DeleteAlarmsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7698,7 +7698,7 @@ func (cmd *DeleteApigateway) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &apigatewayv2.DeleteApiInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in apigatewayv2.DeleteApiInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7780,7 +7780,7 @@ func (cmd *DeleteApigatewayroute) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &apigatewayv2.DeleteRouteInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in apigatewayv2.DeleteRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7862,7 +7862,7 @@ func (cmd *DeleteApigatewaystage) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &apigatewayv2.DeleteStageInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in apigatewayv2.DeleteStageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -7944,7 +7944,7 @@ func (cmd *DeleteAppscalingpolicy) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &applicationautoscaling.DeleteScalingPolicyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeleteScalingPolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8026,7 +8026,7 @@ func (cmd *DeleteAppscalingtarget) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &applicationautoscaling.DeregisterScalableTargetInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in applicationautoscaling.DeregisterScalableTargetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8108,7 +8108,7 @@ func (cmd *DeleteBucket) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &s3.DeleteBucketInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in s3.DeleteBucketInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8190,7 +8190,7 @@ func (cmd *DeleteCertificate) run(renv env.Running, params map[string]any) (any,
 	}
 
 	input := &acm.DeleteCertificateInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in acm.DeleteCertificateInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8272,7 +8272,7 @@ func (cmd *DeleteClassicLoadbalancer) run(renv env.Running, params map[string]an
 	}
 
 	input := &elb.DeleteLoadBalancerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elb.DeleteLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8354,7 +8354,7 @@ func (cmd *DeleteContainercluster) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &ecs.DeleteClusterInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ecs.DeleteClusterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8505,7 +8505,7 @@ func (cmd *DeleteDatabase) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &rds.DeleteDBInstanceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in rds.DeleteDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8587,7 +8587,7 @@ func (cmd *DeleteDbsubnetgroup) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &rds.DeleteDBSubnetGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in rds.DeleteDBSubnetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8742,7 +8742,7 @@ func (cmd *DeleteDynamodbtable) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &dynamodb.DeleteTableInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in dynamodb.DeleteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8824,7 +8824,7 @@ func (cmd *DeleteEkscluster) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &eks.DeleteClusterInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in eks.DeleteClusterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8906,7 +8906,7 @@ func (cmd *DeleteEksnodegroup) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &eks.DeleteNodegroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in eks.DeleteNodegroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -8988,7 +8988,7 @@ func (cmd *DeleteElasticip) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &ec2.ReleaseAddressInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9032,7 +9032,7 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]any) (any
 
 	input := &ec2.ReleaseAddressInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ReleaseAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9095,7 +9095,7 @@ func (cmd *DeleteFilesystem) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &efs.DeleteFileSystemInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in efs.DeleteFileSystemInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9177,7 +9177,7 @@ func (cmd *DeleteFunction) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &lambda.DeleteFunctionInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in lambda.DeleteFunctionInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9259,7 +9259,7 @@ func (cmd *DeleteGroup) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &iam.DeleteGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeleteGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9410,7 +9410,7 @@ func (cmd *DeleteInstance) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &ec2.TerminateInstancesInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9454,7 +9454,7 @@ func (cmd *DeleteInstance) dryRun(renv env.Running, params map[string]any) (any,
 
 	input := &ec2.TerminateInstancesInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.TerminateInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9517,7 +9517,7 @@ func (cmd *DeleteInstanceprofile) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &iam.DeleteInstanceProfileInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeleteInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9599,7 +9599,7 @@ func (cmd *DeleteInternetgateway) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &ec2.DeleteInternetGatewayInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9643,7 +9643,7 @@ func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]any
 
 	input := &ec2.DeleteInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9706,7 +9706,7 @@ func (cmd *DeleteKeypair) run(renv env.Running, params map[string]any) (any, err
 	}
 
 	input := &ec2.DeleteKeyPairInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9750,7 +9750,7 @@ func (cmd *DeleteKeypair) dryRun(renv env.Running, params map[string]any) (any, 
 
 	input := &ec2.DeleteKeyPairInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteKeyPairInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9813,7 +9813,7 @@ func (cmd *DeleteLaunchconfiguration) run(renv env.Running, params map[string]an
 	}
 
 	input := &autoscaling.DeleteLaunchConfigurationInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteLaunchConfigurationInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9895,7 +9895,7 @@ func (cmd *DeleteListener) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &elbv2.DeleteListenerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.DeleteListenerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -9977,7 +9977,7 @@ func (cmd *DeleteLoadbalancer) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &elbv2.DeleteLoadBalancerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.DeleteLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10059,7 +10059,7 @@ func (cmd *DeleteLoggroup) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &cloudwatchlogs.DeleteLogGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudwatchlogs.DeleteLogGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10141,7 +10141,7 @@ func (cmd *DeleteLoginprofile) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &iam.DeleteLoginProfileInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeleteLoginProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10223,7 +10223,7 @@ func (cmd *DeleteMfadevice) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &iam.DeleteVirtualMFADeviceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeleteVirtualMFADeviceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10305,7 +10305,7 @@ func (cmd *DeleteNatgateway) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ec2.DeleteNatGatewayInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteNatGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10387,7 +10387,7 @@ func (cmd *DeleteNetworkinterface) run(renv env.Running, params map[string]any) 
 	}
 
 	input := &ec2.DeleteNetworkInterfaceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10431,7 +10431,7 @@ func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]an
 
 	input := &ec2.DeleteNetworkInterfaceInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteNetworkInterfaceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10494,7 +10494,7 @@ func (cmd *DeletePolicy) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &iam.DeletePolicyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeletePolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10576,7 +10576,7 @@ func (cmd *DeleteQueue) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &sqs.DeleteQueueInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in sqs.DeleteQueueInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10731,7 +10731,7 @@ func (cmd *DeleteRepository) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ecr.DeleteRepositoryInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ecr.DeleteRepositoryInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10886,7 +10886,7 @@ func (cmd *DeleteRoute) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &ec2.DeleteRouteInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10930,7 +10930,7 @@ func (cmd *DeleteRoute) dryRun(renv env.Running, params map[string]any) (any, er
 
 	input := &ec2.DeleteRouteInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -10993,7 +10993,7 @@ func (cmd *DeleteRoutetable) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ec2.DeleteRouteTableInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11037,7 +11037,7 @@ func (cmd *DeleteRoutetable) dryRun(renv env.Running, params map[string]any) (an
 
 	input := &ec2.DeleteRouteTableInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11100,7 +11100,7 @@ func (cmd *DeleteS3object) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &s3.DeleteObjectInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in s3.DeleteObjectInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11182,7 +11182,7 @@ func (cmd *DeleteScalinggroup) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &autoscaling.DeleteAutoScalingGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in autoscaling.DeleteAutoScalingGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11264,7 +11264,7 @@ func (cmd *DeleteScalingpolicy) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &autoscaling.DeletePolicyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in autoscaling.DeletePolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11346,7 +11346,7 @@ func (cmd *DeleteSecret) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &secretsmanager.DeleteSecretInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in secretsmanager.DeleteSecretInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11428,7 +11428,7 @@ func (cmd *DeleteSecuritygroup) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &ec2.DeleteSecurityGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11472,7 +11472,7 @@ func (cmd *DeleteSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 
 	input := &ec2.DeleteSecurityGroupInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSecurityGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11535,7 +11535,7 @@ func (cmd *DeleteSnapshot) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &ec2.DeleteSnapshotInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11579,7 +11579,7 @@ func (cmd *DeleteSnapshot) dryRun(renv env.Running, params map[string]any) (any,
 
 	input := &ec2.DeleteSnapshotInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSnapshotInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11642,7 +11642,7 @@ func (cmd *DeleteSsmparameter) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &ssm.DeleteParameterInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ssm.DeleteParameterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11724,7 +11724,7 @@ func (cmd *DeleteStack) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &cloudformation.DeleteStackInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudformation.DeleteStackInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11806,7 +11806,7 @@ func (cmd *DeleteSubnet) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.DeleteSubnetInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11850,7 +11850,7 @@ func (cmd *DeleteSubnet) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.DeleteSubnetInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteSubnetInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -11913,7 +11913,7 @@ func (cmd *DeleteSubscription) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &sns.UnsubscribeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in sns.UnsubscribeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12064,7 +12064,7 @@ func (cmd *DeleteTargetgroup) run(renv env.Running, params map[string]any) (any,
 	}
 
 	input := &elbv2.DeleteTargetGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.DeleteTargetGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12146,7 +12146,7 @@ func (cmd *DeleteTopic) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &sns.DeleteTopicInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in sns.DeleteTopicInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12228,7 +12228,7 @@ func (cmd *DeleteTrail) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &cloudtrail.DeleteTrailInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudtrail.DeleteTrailInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12310,7 +12310,7 @@ func (cmd *DeleteUser) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &iam.DeleteUserInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeleteUserInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12392,7 +12392,7 @@ func (cmd *DeleteVolume) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.DeleteVolumeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12436,7 +12436,7 @@ func (cmd *DeleteVolume) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.DeleteVolumeInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12499,7 +12499,7 @@ func (cmd *DeleteVpc) run(renv env.Running, params map[string]any) (any, error) 
 	}
 
 	input := &ec2.DeleteVpcInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12543,7 +12543,7 @@ func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 
 	input := &ec2.DeleteVpcInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12606,7 +12606,7 @@ func (cmd *DeleteZone) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &route53.DeleteHostedZoneInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in route53.DeleteHostedZoneInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12761,7 +12761,7 @@ func (cmd *DetachClassicLoadbalancer) run(renv env.Running, params map[string]an
 	}
 
 	input := &elb.DeregisterInstancesFromLoadBalancerInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elb.DeregisterInstancesFromLoadBalancerInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12916,7 +12916,7 @@ func (cmd *DetachElasticip) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &ec2.DisassociateAddressInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -12960,7 +12960,7 @@ func (cmd *DetachElasticip) dryRun(renv env.Running, params map[string]any) (any
 
 	input := &ec2.DisassociateAddressInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateAddressInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13023,7 +13023,7 @@ func (cmd *DetachInstance) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &elbv2.DeregisterTargetsInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elbv2.DeregisterTargetsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13178,7 +13178,7 @@ func (cmd *DetachInternetgateway) run(renv env.Running, params map[string]any) (
 	}
 
 	input := &ec2.DetachInternetGatewayInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13222,7 +13222,7 @@ func (cmd *DetachInternetgateway) dryRun(renv env.Running, params map[string]any
 
 	input := &ec2.DetachInternetGatewayInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DetachInternetGatewayInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13285,7 +13285,7 @@ func (cmd *DetachMfadevice) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &iam.DeactivateMFADeviceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.DeactivateMFADeviceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13509,7 +13509,7 @@ func (cmd *DetachRole) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &iam.RemoveRoleFromInstanceProfileInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.RemoveRoleFromInstanceProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13591,7 +13591,7 @@ func (cmd *DetachRoutetable) run(renv env.Running, params map[string]any) (any, 
 	}
 
 	input := &ec2.DisassociateRouteTableInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13635,7 +13635,7 @@ func (cmd *DetachRoutetable) dryRun(renv env.Running, params map[string]any) (an
 
 	input := &ec2.DisassociateRouteTableInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DisassociateRouteTableInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13771,7 +13771,7 @@ func (cmd *DetachUser) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &iam.RemoveUserFromGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.RemoveUserFromGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13853,7 +13853,7 @@ func (cmd *DetachVolume) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.DetachVolumeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13897,7 +13897,7 @@ func (cmd *DetachVolume) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.DetachVolumeInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.DetachVolumeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -13960,7 +13960,7 @@ func (cmd *ImportImage) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &ec2.ImportImageInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14004,7 +14004,7 @@ func (cmd *ImportImage) dryRun(renv env.Running, params map[string]any) (any, er
 
 	input := &ec2.ImportImageInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ImportImageInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14067,7 +14067,7 @@ func (cmd *RestartDatabase) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &rds.RebootDBInstanceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in rds.RebootDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14149,7 +14149,7 @@ func (cmd *RestartInstance) run(renv env.Running, params map[string]any) (any, e
 	}
 
 	input := &ec2.RebootInstancesInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14193,7 +14193,7 @@ func (cmd *RestartInstance) dryRun(renv env.Running, params map[string]any) (any
 
 	input := &ec2.RebootInstancesInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.RebootInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14256,7 +14256,7 @@ func (cmd *StartAlarm) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &cloudwatch.EnableAlarmActionsInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudwatch.EnableAlarmActionsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14411,7 +14411,7 @@ func (cmd *StartDatabase) run(renv env.Running, params map[string]any) (any, err
 	}
 
 	input := &rds.StartDBInstanceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in rds.StartDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14493,7 +14493,7 @@ func (cmd *StartInstance) run(renv env.Running, params map[string]any) (any, err
 	}
 
 	input := &ec2.StartInstancesInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14537,7 +14537,7 @@ func (cmd *StartInstance) dryRun(renv env.Running, params map[string]any) (any, 
 
 	input := &ec2.StartInstancesInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.StartInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14600,7 +14600,7 @@ func (cmd *StartTrail) run(renv env.Running, params map[string]any) (any, error)
 	}
 
 	input := &cloudtrail.StartLoggingInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudtrail.StartLoggingInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14682,7 +14682,7 @@ func (cmd *StopAlarm) run(renv env.Running, params map[string]any) (any, error) 
 	}
 
 	input := &cloudwatch.DisableAlarmActionsInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudwatch.DisableAlarmActionsInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14837,7 +14837,7 @@ func (cmd *StopDatabase) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &rds.StopDBInstanceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in rds.StopDBInstanceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14919,7 +14919,7 @@ func (cmd *StopInstance) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.StopInstancesInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -14963,7 +14963,7 @@ func (cmd *StopInstance) dryRun(renv env.Running, params map[string]any) (any, e
 
 	input := &ec2.StopInstancesInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.StopInstancesInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15026,7 +15026,7 @@ func (cmd *StopTrail) run(renv env.Running, params map[string]any) (any, error) 
 	}
 
 	input := &cloudtrail.StopLoggingInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudtrail.StopLoggingInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15181,7 +15181,7 @@ func (cmd *UpdateClassicLoadbalancer) run(renv env.Running, params map[string]an
 	}
 
 	input := &elb.ConfigureHealthCheckInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in elb.ConfigureHealthCheckInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15263,7 +15263,7 @@ func (cmd *UpdateContainertask) run(renv env.Running, params map[string]any) (an
 	}
 
 	input := &ecs.UpdateServiceInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ecs.UpdateServiceInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15487,7 +15487,7 @@ func (cmd *UpdateInstance) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &ec2.ModifyInstanceAttributeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15531,7 +15531,7 @@ func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]any) (any,
 
 	input := &ec2.ModifyInstanceAttributeInput{}
 	input.DryRun = aws.Bool(true)
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifyInstanceAttributeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15594,7 +15594,7 @@ func (cmd *UpdateLoggroup) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &cloudwatchlogs.PutRetentionPolicyInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudwatchlogs.PutRetentionPolicyInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15676,7 +15676,7 @@ func (cmd *UpdateLoginprofile) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &iam.UpdateLoginProfileInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.UpdateLoginProfileInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15758,7 +15758,7 @@ func (cmd *UpdatePolicy) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &iam.CreatePolicyVersionInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in iam.CreatePolicyVersionInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15913,7 +15913,7 @@ func (cmd *UpdateS3object) run(renv env.Running, params map[string]any) (any, er
 	}
 
 	input := &s3.PutObjectAclInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in s3.PutObjectAclInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -15995,7 +15995,7 @@ func (cmd *UpdateScalinggroup) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &autoscaling.UpdateAutoScalingGroupInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in autoscaling.UpdateAutoScalingGroupInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -16077,7 +16077,7 @@ func (cmd *UpdateSecret) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &secretsmanager.UpdateSecretInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in secretsmanager.UpdateSecretInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -16228,7 +16228,7 @@ func (cmd *UpdateSsmparameter) run(renv env.Running, params map[string]any) (any
 	}
 
 	input := &ssm.PutParameterInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ssm.PutParameterInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -16310,7 +16310,7 @@ func (cmd *UpdateStack) run(renv env.Running, params map[string]any) (any, error
 	}
 
 	input := &cloudformation.UpdateStackInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in cloudformation.UpdateStackInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {
@@ -16392,7 +16392,7 @@ func (cmd *UpdateSubnet) run(renv env.Running, params map[string]any) (any, erro
 	}
 
 	input := &ec2.ModifySubnetAttributeInput{}
-	if err := structInjector(cmd, input, renv.Context()); err != nil {
+	if err := structInjector(cmd, input, renv); err != nil {
 		return nil, fmt.Errorf("cannot inject in ec2.ModifySubnetAttributeInput: %w", err)
 	}
 	if v, ok := implementsInputPostProcessor(cmd); ok {

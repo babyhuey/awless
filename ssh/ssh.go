@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"bytes"
+	"context"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
@@ -34,7 +35,7 @@ type Client struct {
 	logger                  *logger.Logger
 }
 
-func InitClient(keyname string, keyFolders ...string) (*Client, error) {
+func InitClient(ctx context.Context, keyname string, keyFolders ...string) (*Client, error) {
 	var auths []gossh.AuthMethod
 
 	privkey, ok := findPrivateKeyFromName(keyname, keyFolders...)
@@ -44,7 +45,7 @@ func InitClient(keyname string, keyFolders ...string) (*Client, error) {
 		}
 	}
 
-	if a, err := agentAuth(); err == nil {
+	if a, err := agentAuth(ctx); err == nil {
 		auths = append(auths, a)
 	}
 

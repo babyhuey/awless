@@ -17,12 +17,14 @@ limitations under the License.
 package inspectors
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"text/tabwriter"
 
@@ -113,10 +115,13 @@ func (p *Pricer) Print(w io.Writer) {
 }
 
 func fetchPrice(instType, region string) (float64, error) {
-	resp, err := http.PostForm(
-		pricesURL,
-		url.Values{"instance_type": {instType}, "location": {region}},
-	)
+	form := url.Values{"instance_type": {instType}, "location": {region}}
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, pricesURL, strings.NewReader(form.Encode()))
+	if err != nil {
+		return 0, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return 0.0, err
 	}

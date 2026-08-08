@@ -25,6 +25,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"go/parser"
@@ -128,7 +129,7 @@ func runGoimports(path string) error {
 	if err != nil {
 		return fmt.Errorf("goimports not found on PATH; install it with `go install golang.org/x/tools/cmd/goimports@latest`: %w", err)
 	}
-	out, err := exec.Command(bin, "-w", "-local", localPrefix, path).CombinedOutput()
+	out, err := exec.CommandContext(context.Background(), bin, "-w", "-local", localPrefix, path).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%w: %s", err, out)
 	}

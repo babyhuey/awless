@@ -14,6 +14,7 @@ linters:
     - errcheck
     - errorlint
     - nilerr
+    - noctx          # HTTP requests must carry a context
     # Report nothing today, so they cost nothing and guard against regressions.
     - asasalint       # []any passed to a variadic func
     - contextcheck    # a function should inherit its caller's context
