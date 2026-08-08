@@ -2,6 +2,8 @@ module github.com/bootswithdefer/awless
 
 go 1.26.1
 
+toolchain go1.26.5
+
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.5
 	github.com/aws/aws-sdk-go-v2/config v1.32.11

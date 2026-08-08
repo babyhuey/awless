@@ -1011,7 +1011,7 @@ Note `errcheck` (proposed in I9) would have caught this.
 
 ---
 
-### I18: Pin the Go toolchain version — **PARTIALLY DONE**
+### I18: Pin the Go toolchain version — **FIXED**
 
 **Severity:** Low  
 **Files:** `go.mod:3`, `.github/workflows/ci.yml`
