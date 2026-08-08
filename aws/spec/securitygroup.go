@@ -113,7 +113,7 @@ func (cmd *UpdateSecuritygroup) dryRun(renv env.Running, params map[string]any) 
 		return nil, fmt.Errorf("expect either 'inbound' or 'outbound' parameter")
 	}
 
-	err = setFieldWithType(cmd.ID, input, "GroupId", awsstr)
+	err = setFieldWithType(renv.RequestContext(), cmd.ID, input, "GroupId", awsstr)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (cmd *UpdateSecuritygroup) ManualRun(renv env.Running) (any, error) {
 	}
 
 	// Required params
-	err = setFieldWithType(cmd.ID, input, "GroupId", awsstr)
+	err = setFieldWithType(renv.RequestContext(), cmd.ID, input, "GroupId", awsstr)
 	if err != nil {
 		return nil, err
 	}

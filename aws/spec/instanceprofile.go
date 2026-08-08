@@ -139,10 +139,10 @@ func (cmd *AttachInstanceprofile) ManualRun(renv env.Running) (any, error) {
 	}
 
 	input := &ec2.AssociateIamInstanceProfileInput{}
-	if err := setFieldWithType(instanceID, input, "InstanceId", awsstr, renv.Context()); err != nil {
+	if err := setFieldWithType(renv.RequestContext(), instanceID, input, "InstanceId", awsstr, renv.Context()); err != nil {
 		return nil, err
 	}
-	if err := setFieldWithType(profileName, input, "IamInstanceProfile.Name", awsstr, renv.Context()); err != nil {
+	if err := setFieldWithType(renv.RequestContext(), profileName, input, "IamInstanceProfile.Name", awsstr, renv.Context()); err != nil {
 		return nil, err
 	}
 

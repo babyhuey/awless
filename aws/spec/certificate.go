@@ -55,12 +55,12 @@ func (cmd *CreateCertificate) ManualRun(renv env.Running) (any, error) {
 		return nil, fmt.Errorf("'domains' must contain at least one element")
 	}
 	// Required params
-	err := setFieldWithType(domains[0], input, "DomainName", awsstr, renv.Context())
+	err := setFieldWithType(renv.RequestContext(), domains[0], input, "DomainName", awsstr, renv.Context())
 	if err != nil {
 		return nil, err
 	}
 	if len(domains) > 1 {
-		if err = setFieldWithType(domains[1:], input, "SubjectAlternativeNames", awsstringslice, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), domains[1:], input, "SubjectAlternativeNames", awsstringslice, renv.Context()); err != nil {
 			return nil, err
 		}
 	}

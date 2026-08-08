@@ -54,7 +54,7 @@ func (cmd *AuthenticateRegistry) ManualRun(renv env.Running) (any, error) {
 
 	// Extra params
 	if len(cmd.Accounts) > 0 {
-		err = setFieldWithType(cmd.Accounts, input, "RegistryIds", awsstringslice)
+		err = setFieldWithType(renv.RequestContext(), cmd.Accounts, input, "RegistryIds", awsstringslice)
 		if err != nil {
 			return nil, err
 		}

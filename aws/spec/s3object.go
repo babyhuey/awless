@@ -49,7 +49,7 @@ func (cmd *CreateS3object) ParamsSpec() params.Spec {
 	)
 }
 
-func (cmd *CreateS3object) ManualRun(env.Running) (any, error) {
+func (cmd *CreateS3object) ManualRun(renv env.Running) (any, error) {
 	input := &s3.PutObjectInput{}
 
 	f, err := os.Open(StringValue(cmd.File))
@@ -78,12 +78,12 @@ func (cmd *CreateS3object) ManualRun(env.Running) (any, error) {
 		input.ContentType = aws.String(mimeType)
 	}
 
-	if err = setFieldWithType(cmd.Bucket, input, "Bucket", awsstr); err != nil {
+	if err = setFieldWithType(renv.RequestContext(), cmd.Bucket, input, "Bucket", awsstr); err != nil {
 		return nil, err
 	}
 
 	if v := cmd.ACL; v != nil {
-		if err = setFieldWithType(v, input, "ACL", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "ACL", awsstr); err != nil {
 			return nil, err
 		}
 	}

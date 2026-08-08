@@ -118,7 +118,7 @@ func (cmd *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
 	var err error
 
 	if areTargetAttrsModified {
-		if err = setFieldWithType(tgArn, attrsInput, "TargetGroupArn", awsstr, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), tgArn, attrsInput, "TargetGroupArn", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 		start := time.Now()
@@ -132,55 +132,55 @@ func (cmd *UpdateTargetgroup) ManualRun(renv env.Running) (any, error) {
 	var isTargetGroupModified bool
 
 	if v := cmd.Healthcheckinterval; v != nil {
-		if err = setFieldWithType(v, input, "HealthCheckIntervalSeconds", awsint64, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "HealthCheckIntervalSeconds", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
 	if v := cmd.Healthcheckpath; v != nil {
-		if err = setFieldWithType(v, input, "HealthCheckPath", awsstr, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "HealthCheckPath", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
 	if v := cmd.Healthcheckport; v != nil {
-		if err = setFieldWithType(v, input, "HealthCheckPort", awsstr, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "HealthCheckPort", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 	}
 	if v := cmd.Healthcheckprotocol; v != nil {
-		if err = setFieldWithType(v, input, "HealthCheckProtocol", awsstr, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "HealthCheckProtocol", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
 	if v := cmd.Healthchecktimeout; v != nil {
-		if err = setFieldWithType(v, input, "HealthCheckTimeoutSeconds", awsint64, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "HealthCheckTimeoutSeconds", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
 	if v := cmd.Healthythreshold; v != nil {
-		if err = setFieldWithType(v, input, "HealthyThresholdCount", awsint64, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "HealthyThresholdCount", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
 	if v := cmd.Unhealthythreshold; v != nil {
-		if err = setFieldWithType(v, input, "UnhealthyThresholdCount", awsint64, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "UnhealthyThresholdCount", awsint64, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
 	if v := cmd.Matcher; v != nil {
-		if err = setFieldWithType(v, input, "Matcher.HttpCode", awsstr, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), v, input, "Matcher.HttpCode", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 		isTargetGroupModified = true
 	}
 
 	if isTargetGroupModified {
-		if err = setFieldWithType(tgArn, input, "TargetGroupArn", awsstr, renv.Context()); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), tgArn, input, "TargetGroupArn", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 		start := time.Now()

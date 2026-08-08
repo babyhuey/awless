@@ -17,6 +17,7 @@ limitations under the License.
 package awsspec
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"os"
@@ -53,7 +54,7 @@ func TestGoTemplatingInUserdata(t *testing.T) {
 
 	awsparams := &ec2.RunInstancesInput{}
 
-	err = setFieldWithType(f.Name(), awsparams, "UserData", awsuserdatatobase64, map[string]string{"name": "johndoe"})
+	err = setFieldWithType(context.Background(), f.Name(), awsparams, "UserData", awsuserdatatobase64, map[string]string{"name": "johndoe"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,7 +80,7 @@ func TestSetFieldWithTypeAWSFile(t *testing.T) {
 
 	awsparams := &ec2.RunInstancesInput{}
 
-	err = setFieldWithType(f.Name(), awsparams, "UserData", awsuserdatatobase64)
+	err = setFieldWithType(context.Background(), f.Name(), awsparams, "UserData", awsuserdatatobase64)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +91,7 @@ func TestSetFieldWithTypeAWSFile(t *testing.T) {
 
 	functionInput := &lambda.CreateFunctionInput{}
 
-	err = setFieldWithType(f.Name(), functionInput, "Code.ZipFile", awsfiletobyteslice)
+	err = setFieldWithType(context.Background(), f.Name(), functionInput, "Code.ZipFile", awsfiletobyteslice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,7 +102,7 @@ func TestSetFieldWithTypeAWSFile(t *testing.T) {
 
 	stackInput := &cloudformation.CreateStackInput{}
 
-	err = setFieldWithType(f.Name(), stackInput, "TemplateBody", awsfiletostring)
+	err = setFieldWithType(context.Background(), f.Name(), stackInput, "TemplateBody", awsfiletostring)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,19 +115,19 @@ func TestSetFieldWithTypeAWSFile(t *testing.T) {
 func TestSetFieldsOnAwsStruct(t *testing.T) {
 	awsparams := &ec2.RunInstancesInput{}
 
-	err := setFieldWithType("ami", awsparams, "ImageId", awsstr)
+	err := setFieldWithType(context.Background(), "ami", awsparams, "ImageId", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = setFieldWithType("t2.micro", awsparams, "InstanceType", awsstr)
+	err = setFieldWithType(context.Background(), "t2.micro", awsparams, "InstanceType", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = setFieldWithType("5", awsparams, "MaxCount", awsint64)
+	err = setFieldWithType(context.Background(), "5", awsparams, "MaxCount", awsint64)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = setFieldWithType(3, awsparams, "MinCount", awsint64)
+	err = setFieldWithType(context.Background(), 3, awsparams, "MinCount", awsint64)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +179,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		ByteSlice             []byte
 	}{Field: "initial", MapAttribute: map[string]*string{"test": aws.String("1234")}}
 
-	err := setFieldWithType("expected", &subject, "Field", awsstr)
+	err := setFieldWithType(context.Background(), "expected", &subject, "Field", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -186,7 +187,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(5, &subject, "IntField", awsint)
+	err = setFieldWithType(context.Background(), 5, &subject, "IntField", awsint)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +195,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(42.21, &subject, "FloatField", awsfloat)
+	err = setFieldWithType(context.Background(), 42.21, &subject, "FloatField", awsfloat)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +203,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("5", &subject, "IntField", awsint)
+	err = setFieldWithType(context.Background(), "5", &subject, "IntField", awsint)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -210,7 +211,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(nil, &subject, "IntField", awsint)
+	err = setFieldWithType(context.Background(), nil, &subject, "IntField", awsint)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,7 +219,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("first", &subject, "StringArrayField", awsstringslice)
+	err = setFieldWithType(context.Background(), "first", &subject, "StringArrayField", awsstringslice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,7 +230,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType([]string{"one", "two", "three"}, &subject, "StringArrayField", awsstringslice)
+	err = setFieldWithType(context.Background(), []string{"one", "two", "three"}, &subject, "StringArrayField", awsstringslice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,7 +247,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType([]any{"four", "five"}, &subject, "StringArrayField", awsstringslice)
+	err = setFieldWithType(context.Background(), []any{"four", "five"}, &subject, "StringArrayField", awsstringslice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -260,7 +261,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(int64(321), &subject, "Int64ArrayField", awsint64slice)
+	err = setFieldWithType(context.Background(), int64(321), &subject, "Int64ArrayField", awsint64slice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -271,7 +272,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType(567, &subject, "Int64ArrayField", awsint64slice)
+	err = setFieldWithType(context.Background(), 567, &subject, "Int64ArrayField", awsint64slice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -282,26 +283,26 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("any", nil, "IntField", awsint)
+	err = setFieldWithType(context.Background(), "any", nil, "IntField", awsint)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = setFieldWithType("true", &subject, "BooleanValueField", awsboolattribute)
+	err = setFieldWithType(context.Background(), "true", &subject, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := aws.ToBool(subject.BooleanValueField.Value), true; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
-	err = setFieldWithType(nil, &subject, "BooleanValueField", awsboolattribute)
+	err = setFieldWithType(context.Background(), nil, &subject, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := aws.ToBool(subject.BooleanValueField.Value), true; got != want {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
-	err = setFieldWithType(false, &subject, "BooleanValueField", awsboolattribute)
+	err = setFieldWithType(context.Background(), false, &subject, "BooleanValueField", awsboolattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -309,7 +310,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("len: got %t, want %t", got, want)
 	}
 
-	err = setFieldWithType("true", &subject, "BooleanValueField", awsbool)
+	err = setFieldWithType(context.Background(), "true", &subject, "BooleanValueField", awsbool)
 	if err == nil {
 		t.Fatalf("expected error got nil")
 	}
@@ -317,14 +318,14 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType("abcd", &subject, "StringValueField", awsstringattribute)
+	err = setFieldWithType(context.Background(), "abcd", &subject, "StringValueField", awsstringattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := aws.ToString(subject.StringValueField.Value), "abcd"; got != want {
 		t.Fatalf("len: got %s, want %s", got, want)
 	}
-	err = setFieldWithType(nil, &subject, "StringValueField", awsstringattribute)
+	err = setFieldWithType(context.Background(), nil, &subject, "StringValueField", awsstringattribute)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -332,14 +333,14 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("len: got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType(true, &subject, "BoolField", awsbool)
+	err = setFieldWithType(context.Background(), true, &subject, "BoolField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := subject.BoolField, true; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType(false, &subject, "BoolField", awsbool)
+	err = setFieldWithType(context.Background(), false, &subject, "BoolField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -347,14 +348,14 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("true", &subject, "BoolPointerField", awsbool)
+	err = setFieldWithType(context.Background(), "true", &subject, "BoolPointerField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.BoolPointerField, true; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType(false, &subject, "BoolPointerField", awsbool)
+	err = setFieldWithType(context.Background(), false, &subject, "BoolPointerField", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -362,21 +363,21 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("fieldValue", &subject, "StructAttribute.Str", awsstr)
+	err = setFieldWithType(context.Background(), "fieldValue", &subject, "StructAttribute.Str", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.StructAttribute.Str, "fieldValue"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType([]string{"one", "two", "three"}, &subject, "StructAttribute.Str", awsstr)
+	err = setFieldWithType(context.Background(), []string{"one", "two", "three"}, &subject, "StructAttribute.Str", awsstr)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.StructAttribute.Str, "one,two,three"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("true", &subject, "StructAttribute.Bool", awsbool)
+	err = setFieldWithType(context.Background(), "true", &subject, "StructAttribute.Bool", awsbool)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -384,7 +385,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %v, want %v", got, want)
 	}
 
-	err = setFieldWithType("abc", &subject, "MapAttribute[Field1]", awsstringpointermap)
+	err = setFieldWithType(context.Background(), "abc", &subject, "MapAttribute[Field1]", awsstringpointermap)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -394,7 +395,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.MapAttribute["Field1"], "abc"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("def", &subject, "MapAttribute[Field2]", awsstringpointermap)
+	err = setFieldWithType(context.Background(), "def", &subject, "MapAttribute[Field2]", awsstringpointermap)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -407,7 +408,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.MapAttribute["Field2"], "def"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("abcd", &subject, "EmptyMapAttribute[Field1]", awsstringpointermap)
+	err = setFieldWithType(context.Background(), "abcd", &subject, "EmptyMapAttribute[Field1]", awsstringpointermap)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -417,7 +418,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.EmptyMapAttribute["Field1"], "abcd"; got != want {
 		t.Fatalf("got %v, want %v", got, want)
 	}
-	err = setFieldWithType("tata", &subject, "SliceStructPointerAttribute[0]Str1", awsslicestruct)
+	err = setFieldWithType(context.Background(), "tata", &subject, "SliceStructPointerAttribute[0]Str1", awsslicestruct)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -427,7 +428,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.SliceStructPointerAttribute[0].Str1, "tata"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("toto", &subject, "SliceStructPointerAttribute[0]Str2", awsslicestruct)
+	err = setFieldWithType(context.Background(), "toto", &subject, "SliceStructPointerAttribute[0]Str2", awsslicestruct)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -437,7 +438,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.SliceStructPointerAttribute[0].Str2, "toto"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType(10, &subject, "SliceStructPointerAttribute[0]Integer", awsslicestructint64)
+	err = setFieldWithType(context.Background(), 10, &subject, "SliceStructPointerAttribute[0]Integer", awsslicestructint64)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -447,7 +448,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.SliceStructPointerAttribute[0].Integer, int64(10); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	err = setFieldWithType("key:value", &subject, "DimensionSliceField", awsdimensionslice)
+	err = setFieldWithType(context.Background(), "key:value", &subject, "DimensionSliceField", awsdimensionslice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -460,7 +461,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.DimensionSliceField[0].Value, "value"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &subject, "DimensionSliceField", awsdimensionslice)
+	err = setFieldWithType(context.Background(), []string{"key:value", "key1:value1:with:"}, &subject, "DimensionSliceField", awsdimensionslice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -480,7 +481,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &subject, "ParameterList", awsparameterslice)
+	err = setFieldWithType(context.Background(), []string{"key:value", "key1:value1:with:"}, &subject, "ParameterList", awsparameterslice)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -499,7 +500,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.ParameterList[1].ParameterValue, "value1:with:"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType([]string{"key:value", "key1:value1:with:"}, &subject, "KeyValueSliceField", awsecskeyvalue)
+	err = setFieldWithType(context.Background(), []string{"key:value", "key1:value1:with:"}, &subject, "KeyValueSliceField", awsecskeyvalue)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -519,7 +520,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"80:8080", "8082", "1234:8083/udp"}, &subject, "PortMappings", awsportmappings)
+	err = setFieldWithType(context.Background(), []string{"80:8080", "8082", "1234:8083/udp"}, &subject, "PortMappings", awsportmappings)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -545,7 +546,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"subnet-123:eipalloc-123", "subnet-456:eipalloc-456"}, &subject, "SubnetMappings", awssubnetmappings)
+	err = setFieldWithType(context.Background(), []string{"subnet-123:eipalloc-123", "subnet-456:eipalloc-456"}, &subject, "SubnetMappings", awssubnetmappings)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -565,7 +566,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 
-	err = setFieldWithType([]string{"HTTP:80:UDP:8080", "HTTPS:443:TCP:12345"}, &subject, "LoadBalancerListeners", awsclassicloadblisteners)
+	err = setFieldWithType(context.Background(), []string{"HTTP:80:UDP:8080", "HTTPS:443:TCP:12345"}, &subject, "LoadBalancerListeners", awsclassicloadblisteners)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -597,7 +598,7 @@ func TestSetFieldWithMultiType(t *testing.T) {
 		t.Fatalf("got %d, want %d", got, want)
 	}
 
-	err = setFieldWithType([]string{"0:0.25:-1", "0.75:1:+1"}, &subject, "StepAdjustments", awsstepadjustments)
+	err = setFieldWithType(context.Background(), []string{"0:0.25:-1", "0.75:1:+1"}, &subject, "StepAdjustments", awsstepadjustments)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -622,49 +623,49 @@ func TestSetFieldWithMultiType(t *testing.T) {
 	if got, want := *subject.StepAdjustments[1].ScalingAdjustment, int32(+1); got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
-	err = setFieldWithType([]any{"abcdef", "ghijk"}, &subject, "CSVString", awscsvstr)
+	err = setFieldWithType(context.Background(), []any{"abcdef", "ghijk"}, &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.CSVString, "abcdef,ghijk"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType([]string{"abcdef", "ghijk"}, &subject, "CSVString", awscsvstr)
+	err = setFieldWithType(context.Background(), []string{"abcdef", "ghijk"}, &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.CSVString, "abcdef,ghijk"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("abcdef", &subject, "CSVString", awscsvstr)
+	err = setFieldWithType(context.Background(), "abcdef", &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.CSVString, "abcdef"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("abcdef,ghijk", &subject, "CSVString", awscsvstr)
+	err = setFieldWithType(context.Background(), "abcdef,ghijk", &subject, "CSVString", awscsvstr)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.CSVString, "abcdef,ghijk"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("123456", &subject, "SixDigitsString", aws6digitsstring)
+	err = setFieldWithType(context.Background(), "123456", &subject, "SixDigitsString", aws6digitsstring)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.SixDigitsString, "123456"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType("2345", &subject, "SixDigitsString", aws6digitsstring)
+	err = setFieldWithType(context.Background(), "2345", &subject, "SixDigitsString", aws6digitsstring)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := *subject.SixDigitsString, "002345"; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
-	err = setFieldWithType([]byte("hello"), &subject, "ByteSlice", awsbyteslice)
+	err = setFieldWithType(context.Background(), []byte("hello"), &subject, "ByteSlice", awsbyteslice)
 	if err != nil {
 		t.Fatal(err)
 	}

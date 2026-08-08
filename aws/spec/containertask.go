@@ -267,44 +267,44 @@ func (cmd *AttachContainertask) ManualRun(renv env.Running) (any, error) {
 	}
 
 	container := &ecstypes.ContainerDefinition{}
-	if err = setFieldWithType(cmd.ContainerName, container, "Name", awsstr); err != nil {
+	if err = setFieldWithType(renv.RequestContext(), cmd.ContainerName, container, "Name", awsstr); err != nil {
 		return nil, err
 	}
-	if err = setFieldWithType(cmd.Image, container, "Image", awsstr); err != nil {
+	if err = setFieldWithType(renv.RequestContext(), cmd.Image, container, "Image", awsstr); err != nil {
 		return nil, err
 	}
-	if err = setFieldWithType(cmd.MemoryHardLimit, container, "Memory", awsint64); err != nil {
+	if err = setFieldWithType(renv.RequestContext(), cmd.MemoryHardLimit, container, "Memory", awsint64); err != nil {
 		return nil, err
 	}
 	if cmd.Commands != nil {
 		switch len(cmd.Commands) {
 		case 1:
-			if err = setFieldWithType(strings.Split(StringValue(cmd.Commands[0]), " "), container, "Command", awsstringslice); err != nil {
+			if err = setFieldWithType(renv.RequestContext(), strings.Split(StringValue(cmd.Commands[0]), " "), container, "Command", awsstringslice); err != nil {
 				return nil, err
 			}
 		default:
-			if err = setFieldWithType(cmd.Commands, container, "Command", awsstringslice); err != nil {
+			if err = setFieldWithType(renv.RequestContext(), cmd.Commands, container, "Command", awsstringslice); err != nil {
 				return nil, err
 			}
 		}
 	}
 	if len(cmd.Env) > 0 {
-		if err = setFieldWithType(cmd.Env, container, "Environment", awsecskeyvalue); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.Env, container, "Environment", awsecskeyvalue); err != nil {
 			return nil, err
 		}
 	}
 	if BoolValue(cmd.Privileged) {
-		if err = setFieldWithType(true, container, "Privileged", awsbool); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), true, container, "Privileged", awsbool); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.Workdir != nil {
-		if err = setFieldWithType(cmd.Workdir, container, "WorkingDirectory", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.Workdir, container, "WorkingDirectory", awsstr); err != nil {
 			return nil, err
 		}
 	}
 	if len(cmd.Ports) > 0 {
-		if err = setFieldWithType(cmd.Ports, container, "PortMappings", awsportmappings); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.Ports, container, "PortMappings", awsportmappings); err != nil {
 			return nil, err
 		}
 	}

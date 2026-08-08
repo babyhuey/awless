@@ -1,6 +1,7 @@
 package awsspec
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -76,7 +77,7 @@ func TestConvertSliceRejectsUnrelatedTypes(t *testing.T) {
 func TestSetFieldWithTypeConversions(t *testing.T) {
 	t.Run("awsstringslice into an SDK v2 []string", func(t *testing.T) {
 		in := &ec2.CreateTagsInput{}
-		if err := setFieldWithType([]any{"i-1", "i-2"}, in, "Resources", awsstringslice); err != nil {
+		if err := setFieldWithType(context.Background(), []any{"i-1", "i-2"}, in, "Resources", awsstringslice); err != nil {
 			t.Fatal(err)
 		}
 		if want := []string{"i-1", "i-2"}; !reflect.DeepEqual(in.Resources, want) {
@@ -86,7 +87,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 
 	t.Run("awsstr", func(t *testing.T) {
 		in := &ec2.CreateVpcInput{}
-		if err := setFieldWithType("10.0.0.0/16", in, "CidrBlock", awsstr); err != nil {
+		if err := setFieldWithType(context.Background(), "10.0.0.0/16", in, "CidrBlock", awsstr); err != nil {
 			t.Fatal(err)
 		}
 		if got := awssdk.ToString(in.CidrBlock); got != "10.0.0.0/16" {
@@ -96,7 +97,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 
 	t.Run("awsbool", func(t *testing.T) {
 		in := &ec2.RunInstancesInput{}
-		if err := setFieldWithType("true", in, "EbsOptimized", awsbool); err != nil {
+		if err := setFieldWithType(context.Background(), "true", in, "EbsOptimized", awsbool); err != nil {
 			t.Fatal(err)
 		}
 		if !awssdk.ToBool(in.EbsOptimized) {
@@ -106,7 +107,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 
 	t.Run("awscsvstr joins", func(t *testing.T) {
 		in := &ec2.CreateVpcInput{}
-		if err := setFieldWithType([]any{"a", "b", "c"}, in, "CidrBlock", awscsvstr); err != nil {
+		if err := setFieldWithType(context.Background(), []any{"a", "b", "c"}, in, "CidrBlock", awscsvstr); err != nil {
 			t.Fatal(err)
 		}
 		if got := awssdk.ToString(in.CidrBlock); got != "a,b,c" {
@@ -116,7 +117,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 
 	t.Run("awsdimensionslice parses key:value", func(t *testing.T) {
 		in := &cloudwatch.PutMetricAlarmInput{}
-		if err := setFieldWithType([]any{"InstanceId:i-123"}, in, "Dimensions", awsdimensionslice); err != nil {
+		if err := setFieldWithType(context.Background(), []any{"InstanceId:i-123"}, in, "Dimensions", awsdimensionslice); err != nil {
 			t.Fatal(err)
 		}
 		if len(in.Dimensions) != 1 {
@@ -132,7 +133,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 
 	t.Run("awsdimensionslice rejects a malformed entry", func(t *testing.T) {
 		in := &cloudwatch.PutMetricAlarmInput{}
-		if err := setFieldWithType([]any{"no-colon"}, in, "Dimensions", awsdimensionslice); err == nil {
+		if err := setFieldWithType(context.Background(), []any{"no-colon"}, in, "Dimensions", awsdimensionslice); err == nil {
 			t.Error("expected an error for a dimension without a colon")
 		}
 	})
@@ -140,7 +141,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 	// A nil value must be a no-op rather than clearing the field or panicking.
 	t.Run("nil value is a no-op", func(t *testing.T) {
 		in := &ec2.CreateVpcInput{CidrBlock: awssdk.String("keep")}
-		if err := setFieldWithType(nil, in, "CidrBlock", awsstr); err != nil {
+		if err := setFieldWithType(context.Background(), nil, in, "CidrBlock", awsstr); err != nil {
 			t.Fatal(err)
 		}
 		if got := awssdk.ToString(in.CidrBlock); got != "keep" {
@@ -154,7 +155,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 	// behavior is deliberate and a change to it is visible.
 	t.Run("unknown field is ignored, not an error", func(t *testing.T) {
 		in := &ec2.CreateVpcInput{}
-		if err := setFieldWithType("v", in, "NoSuchField", awsstr); err != nil {
+		if err := setFieldWithType(context.Background(), "v", in, "NoSuchField", awsstr); err != nil {
 			t.Errorf("expected a silent no-op, got %s", err)
 		}
 		if in.CidrBlock != nil {
@@ -167,7 +168,7 @@ func TestSetFieldWithTypeConversions(t *testing.T) {
 // reached reflect and failed with a message about types the caller never wrote.
 func TestSetFieldWithTypeRejectsUnknownAwsType(t *testing.T) {
 	in := &ec2.CreateVpcInput{}
-	err := setFieldWithType("10.0.0.0/16", in, "CidrBlock", "awsnosuchtype")
+	err := setFieldWithType(context.Background(), "10.0.0.0/16", in, "CidrBlock", "awsnosuchtype")
 	if err == nil {
 		t.Fatal("expected an unknown awsType to be reported")
 	}

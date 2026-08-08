@@ -114,7 +114,7 @@ func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]an
 	input.DryRun = Bool(true)
 
 	if cmd.Attachment != nil {
-		if err := setFieldWithType(cmd.Attachment, input, "AttachmentId", awsstr, renv.Context()); err != nil {
+		if err := setFieldWithType(renv.RequestContext(), cmd.Attachment, input, "AttachmentId", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 	} else if cmd.Instance != nil && cmd.ID != nil {
@@ -129,7 +129,7 @@ func (cmd *DetachNetworkinterface) dryRun(renv env.Running, params map[string]an
 	}
 
 	if cmd.Force != nil {
-		if err := setFieldWithType(cmd.Force, input, "Force", awsbool, renv.Context()); err != nil {
+		if err := setFieldWithType(renv.RequestContext(), cmd.Force, input, "Force", awsbool, renv.Context()); err != nil {
 			return nil, err
 		}
 	}
@@ -152,7 +152,7 @@ func (cmd *DetachNetworkinterface) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DetachNetworkInterfaceInput{}
 
 	if cmd.Attachment != nil {
-		if err := setFieldWithType(cmd.Attachment, input, "AttachmentId", awsstr, renv.Context()); err != nil {
+		if err := setFieldWithType(renv.RequestContext(), cmd.Attachment, input, "AttachmentId", awsstr, renv.Context()); err != nil {
 			return nil, err
 		}
 	} else if cmd.Instance != nil && cmd.ID != nil {
@@ -167,7 +167,7 @@ func (cmd *DetachNetworkinterface) ManualRun(renv env.Running) (any, error) {
 	}
 
 	if cmd.Force != nil {
-		if err := setFieldWithType(cmd.Force, input, "Force", awsbool, renv.Context()); err != nil {
+		if err := setFieldWithType(renv.RequestContext(), cmd.Force, input, "Force", awsbool, renv.Context()); err != nil {
 			return nil, err
 		}
 	}

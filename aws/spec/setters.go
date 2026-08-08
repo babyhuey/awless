@@ -89,16 +89,18 @@ type setter struct {
 
 // set injects the value into i. Takes a context because a userdata field may fetch
 // a remote script, which should be cancellable along with the request it belongs to.
-//
-// `interfs ...any`, which contextcheck cannot see. Making it an explicit parameter is
-// the right fix and would touch 124 hand-written call sites; tracked as ISSUES.md I22.
-//
-//nolint:contextcheck // setFieldWithType receives the context through its variadic
 func (s setter) set(ctx context.Context, i any) error {
-	return setFieldWithType(s.val, i, s.fieldPath, s.fieldType, ctx)
+	return setFieldWithType(ctx, s.val, i, s.fieldPath, s.fieldType)
 }
 
-func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...any) (err error) {
+// setFieldWithType converts v according to destType and assigns it to the field at
+// fieldPath on i.
+//
+// ctx is explicit rather than smuggled through the variadic because a userdata param
+// may fetch a remote script over HTTP, which has to be cancellable with the request
+// it belongs to. tplData carries the template variables, needed only by the userdata
+// and file-reading conversions.
+func setFieldWithType(ctx context.Context, v, i any, fieldPath string, destType string, tplData ...any) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("set field %s for %T object: %s", fieldPath, i, e)
@@ -288,21 +290,11 @@ func setFieldWithType(v, i any, fieldPath string, destType string, interfs ...an
 		}
 		v = stepAdjustments
 	case awsuserdatatobase64:
-		var tplData any
-		fetchCtx := context.Background()
-		if len(interfs) > 0 {
-			// Callers pass an env.Running, a bare context, or the template data map.
-			switch v := interfs[0].(type) {
-			case env.Running:
-				tplData = v.Context()
-				fetchCtx = v.RequestContext()
-			case context.Context:
-				fetchCtx = v
-			default:
-				tplData = interfs[0]
-			}
+		var data any
+		if len(tplData) > 0 {
+			data = tplData[0]
 		}
-		v, err = userDataContentAsBase64(fetchCtx, v, tplData)
+		v, err = userDataContentAsBase64(ctx, v, data)
 		if err != nil {
 			return err
 		}
@@ -683,7 +675,7 @@ func structSetter(s any, params map[string]any) error {
 					return fmt.Errorf("unknown type in slice %s for parameter %s", field.Type.String(), tplName)
 				}
 			}
-			if err := setFieldWithType(v, s, field.Name, fieldType); err != nil {
+			if err := setFieldWithType(context.Background(), v, s, field.Name, fieldType); err != nil {
 				return fmt.Errorf("%s: %w", tplName, err)
 			}
 		}
@@ -697,6 +689,15 @@ func structSetter(s any, params map[string]any) error {
 // param may fetch a remote script, which needs the request context to be
 // cancellable.
 func structInjector(src, dest any, renv env.Running) error {
+	// Tests inject without an environment, and no field needs one unless it fetches
+	// remote userdata.
+	ctx := context.Background()
+	var tplData map[string]any
+	if renv != nil {
+		ctx = renv.RequestContext()
+		tplData = renv.Context()
+	}
+
 	val := reflect.ValueOf(src).Elem()
 	stru := val.Type()
 
@@ -709,7 +710,7 @@ func structInjector(src, dest any, renv env.Running) error {
 				if dstType, tok := field.Tag.Lookup("awsType"); tok {
 					fieldValue := val.Field(i)
 					if fieldValue.IsValid() && fieldValue.Interface() != nil && !fieldValue.IsNil() {
-						if err := setFieldWithType(fieldValue.Interface(), dest, destName, dstType, renv); err != nil {
+						if err := setFieldWithType(ctx, fieldValue.Interface(), dest, destName, dstType, tplData); err != nil {
 							fieldName := field.Name
 							if tplName, ok := field.Tag.Lookup("templateName"); ok {
 								fieldName = tplName

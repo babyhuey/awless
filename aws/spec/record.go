@@ -56,7 +56,7 @@ func (cmd *CreateRecord) ParamsSpec() params.Spec {
 
 func (cmd *CreateRecord) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
-	output, err := changeResourceRecordSets(cmd.api, String("CREATE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, cmd.Comment, cmd.TTL)
+	output, err := changeResourceRecordSets(renv.RequestContext(), cmd.api, String("CREATE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, cmd.Comment, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
@@ -85,7 +85,7 @@ func (cmd *UpdateRecord) ParamsSpec() params.Spec {
 
 func (cmd *UpdateRecord) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
-	output, err := changeResourceRecordSets(cmd.api, String("UPSERT"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
+	output, err := changeResourceRecordSets(renv.RequestContext(), cmd.api, String("UPSERT"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
@@ -156,7 +156,7 @@ func (cmd *DeleteRecord) ParamsSpec() params.Spec {
 
 func (cmd *DeleteRecord) ManualRun(renv env.Running) (any, error) {
 	start := time.Now()
-	output, err := changeResourceRecordSets(cmd.api, String("DELETE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
+	output, err := changeResourceRecordSets(renv.RequestContext(), cmd.api, String("DELETE"), cmd.Zone, cmd.Name, cmd.Type, cmd.Values, nil, cmd.TTL)
 	cmd.logger.ExtraVerbosef("route53.ChangeResourceRecordSets call took %s", time.Since(start))
 	return output, err
 }
@@ -165,30 +165,30 @@ func (cmd *DeleteRecord) ExtractResult(i any) string {
 	return StringValue(i.(*route53.ChangeResourceRecordSetsOutput).ChangeInfo.Id)
 }
 
-func changeResourceRecordSets(api *route53.Client, action, zone, name, recordType *string, values []*string, comment *string, ttl *int64) (*route53.ChangeResourceRecordSetsOutput, error) {
+func changeResourceRecordSets(ctx context.Context, api *route53.Client, action, zone, name, recordType *string, values []*string, comment *string, ttl *int64) (*route53.ChangeResourceRecordSetsOutput, error) {
 	input := &route53.ChangeResourceRecordSetsInput{}
 	var err error
 	// Required params
-	err = setFieldWithType(zone, input, "HostedZoneId", awsstr)
+	err = setFieldWithType(ctx, zone, input, "HostedZoneId", awsstr)
 	if err != nil {
 		return nil, err
 	}
 	change := &route53types.Change{ResourceRecordSet: &route53types.ResourceRecordSet{}}
-	if err = setFieldWithType(action, change, "Action", awsstr); err != nil {
+	if err = setFieldWithType(ctx, action, change, "Action", awsstr); err != nil {
 		return nil, err
 	}
-	if err = setFieldWithType(name, change, "ResourceRecordSet.Name", awsstr); err != nil {
+	if err = setFieldWithType(ctx, name, change, "ResourceRecordSet.Name", awsstr); err != nil {
 		return nil, err
 	}
-	if err = setFieldWithType(recordType, change, "ResourceRecordSet.Type", awsstr); err != nil {
+	if err = setFieldWithType(ctx, recordType, change, "ResourceRecordSet.Type", awsstr); err != nil {
 		return nil, err
 	}
-	if err = setFieldWithType(ttl, change, "ResourceRecordSet.TTL", awsint64); err != nil {
+	if err = setFieldWithType(ctx, ttl, change, "ResourceRecordSet.TTL", awsint64); err != nil {
 		return nil, err
 	}
 	for _, value := range values {
 		resourceRecord := &route53types.ResourceRecord{}
-		if err = setFieldWithType(value, resourceRecord, "Value", awsstr); err != nil {
+		if err = setFieldWithType(ctx, value, resourceRecord, "Value", awsstr); err != nil {
 			return nil, err
 		}
 		change.ResourceRecordSet.ResourceRecords = append(change.ResourceRecordSet.ResourceRecords, *resourceRecord)
@@ -198,12 +198,12 @@ func changeResourceRecordSets(api *route53.Client, action, zone, name, recordTyp
 
 	// Extra params
 	if comment != nil {
-		if err = setFieldWithType(comment, input, "ChangeBatch.Comment", awsstr); err != nil {
+		if err = setFieldWithType(ctx, comment, input, "ChangeBatch.Comment", awsstr); err != nil {
 			return nil, err
 		}
 	}
 
-	return api.ChangeResourceRecordSets(context.Background(), input)
+	return api.ChangeResourceRecordSets(ctx, input)
 }
 
 func valueToValues(values map[string]any) (map[string]any, error) {

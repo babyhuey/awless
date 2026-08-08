@@ -75,7 +75,7 @@ func (cmd *UpdateBucket) ManualRun(renv env.Running) (any, error) {
 			Bucket: cmd.Name,
 		}
 
-		if err := setFieldWithType(cmd.ACL, input, "ACL", awsstr); err != nil {
+		if err := setFieldWithType(renv.RequestContext(), cmd.ACL, input, "ACL", awsstr); err != nil {
 			return nil, err
 		}
 

@@ -240,11 +240,11 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 		DistributionConfig: distriToUpdate.DistributionConfig,
 	}
 
-	if err = setFieldWithType(cmd.ID, input, "Id", awsstr); err != nil {
+	if err = setFieldWithType(renv.RequestContext(), cmd.ID, input, "Id", awsstr); err != nil {
 		return nil, err
 	}
 	if cmd.Enable != nil && BoolValue(cmd.Enable) != BoolValue(distriToUpdate.DistributionConfig.Enabled) {
-		if err = setFieldWithType(cmd.Enable, input, "DistributionConfig.Enabled", awsbool); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.Enable, input, "DistributionConfig.Enabled", awsbool); err != nil {
 			return nil, err
 		}
 	}
@@ -258,7 +258,7 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 			}
 		}
 		if cmd.OriginDomain != nil {
-			if err = setFieldWithType(cmd.OriginDomain, input, "DistributionConfig.Origins.Items[0].DomainName", awsstr); err != nil {
+			if err = setFieldWithType(renv.RequestContext(), cmd.OriginDomain, input, "DistributionConfig.Origins.Items[0].DomainName", awsstr); err != nil {
 				return nil, err
 			}
 			if domain := aws.ToString(input.DistributionConfig.Origins.Items[0].DomainName); strings.HasSuffix(domain, ".s3.amazonaws.com") || (strings.HasSuffix(domain, ".amazonaws.com") && strings.Contains(domain, ".s3-website-")) {
@@ -267,62 +267,62 @@ func (cmd *UpdateDistribution) ManualRun(renv env.Running) (any, error) {
 		}
 
 		if cmd.OriginPath != nil {
-			if err = setFieldWithType(cmd.OriginPath, input, "DistributionConfig.Origins.Items[0].OriginPath", awsstr); err != nil {
+			if err = setFieldWithType(renv.RequestContext(), cmd.OriginPath, input, "DistributionConfig.Origins.Items[0].OriginPath", awsstr); err != nil {
 				return nil, err
 			}
 		}
 	}
 
 	if cmd.Certificate != nil {
-		if err = setFieldWithType(cmd.Certificate, input, "DistributionConfig.ViewerCertificate.ACMCertificateArn", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.Certificate, input, "DistributionConfig.ViewerCertificate.ACMCertificateArn", awsstr); err != nil {
 			return nil, err
 		}
-		if err = setFieldWithType("sni-only", input, "DistributionConfig.ViewerCertificate.SSLSupportMethod", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), "sni-only", input, "DistributionConfig.ViewerCertificate.SSLSupportMethod", awsstr); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.Comment != nil {
-		if err = setFieldWithType(cmd.Comment, input, "DistributionConfig.Comment", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.Comment, input, "DistributionConfig.Comment", awsstr); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.DefaultFile != nil {
-		if err = setFieldWithType(cmd.DefaultFile, input, "DistributionConfig.DefaultRootObject", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.DefaultFile, input, "DistributionConfig.DefaultRootObject", awsstr); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.DomainAliases != nil {
-		if err = setFieldWithType(cmd.DomainAliases, input, "DistributionConfig.Aliases.Items", awsstringslice); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.DomainAliases, input, "DistributionConfig.Aliases.Items", awsstringslice); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.Enable != nil {
-		if err = setFieldWithType(cmd.Enable, input, "DistributionConfig.Enabled", awsbool); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.Enable, input, "DistributionConfig.Enabled", awsbool); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.ForwardCookies != nil {
-		if err = setFieldWithType(cmd.ForwardCookies, input, "DistributionConfig.DefaultCacheBehavior.ForwardedValues.Cookies.Forward", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.ForwardCookies, input, "DistributionConfig.DefaultCacheBehavior.ForwardedValues.Cookies.Forward", awsstr); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.ForwardQueries != nil {
-		if err = setFieldWithType(cmd.ForwardQueries, input, "DistributionConfig.DefaultCacheBehavior.ForwardedValues.QueryString", awsbool); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.ForwardQueries, input, "DistributionConfig.DefaultCacheBehavior.ForwardedValues.QueryString", awsbool); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.HTTPSBehavior != nil {
-		if err = setFieldWithType(cmd.HTTPSBehavior, input, "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.HTTPSBehavior, input, "DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy", awsstr); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.MinTTL != nil {
-		if err = setFieldWithType(cmd.MinTTL, input, "DistributionConfig.DefaultCacheBehavior.MinTTL", awsint64); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.MinTTL, input, "DistributionConfig.DefaultCacheBehavior.MinTTL", awsint64); err != nil {
 			return nil, err
 		}
 	}
 	if cmd.PriceClass != nil {
-		if err = setFieldWithType(cmd.PriceClass, input, "DistributionConfig.PriceClass", awsstr); err != nil {
+		if err = setFieldWithType(renv.RequestContext(), cmd.PriceClass, input, "DistributionConfig.PriceClass", awsstr); err != nil {
 			return nil, err
 		}
 	}
@@ -401,7 +401,7 @@ func (cmd *DeleteDistribution) ManualRun(renv env.Running) (any, error) {
 
 	input := &cloudfront.DeleteDistributionInput{IfMatch: aws.String(fmt.Sprint(etag))}
 
-	if err := setFieldWithType(cmd.ID, input, "Id", awsstr); err != nil {
+	if err := setFieldWithType(renv.RequestContext(), cmd.ID, input, "Id", awsstr); err != nil {
 		return nil, err
 	}
 

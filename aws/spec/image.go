@@ -215,7 +215,7 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]any) (any, er
 	input := &ec2.DeregisterImageInput{}
 	input.DryRun = Bool(true)
 
-	if err := setFieldWithType(cmd.ID, input, "ImageId", awsstr); err != nil {
+	if err := setFieldWithType(renv.RequestContext(), cmd.ID, input, "ImageId", awsstr); err != nil {
 		return nil, err
 	}
 
@@ -247,7 +247,7 @@ func (cmd *DeleteImage) dryRun(renv env.Running, params map[string]any) (any, er
 func (cmd *DeleteImage) ManualRun(renv env.Running) (any, error) {
 	input := &ec2.DeregisterImageInput{}
 
-	if err := setFieldWithType(cmd.ID, input, "ImageId", awsstr); err != nil {
+	if err := setFieldWithType(renv.RequestContext(), cmd.ID, input, "ImageId", awsstr); err != nil {
 		return nil, err
 	}
 

@@ -1094,7 +1094,7 @@ re-running periodically instead.
 
 ---
 
-### I22: `setFieldWithType` passes its context through a variadic `any`
+### I22: `setFieldWithType` passes its context through a variadic `any` — **FIXED**
 
 **Severity:** Low  
 **File:** `aws/spec/setters.go`
@@ -1104,6 +1104,20 @@ either an `env.Running`, a bare `context.Context`, or the template data map thro
 `interfs`, and type-switches on it. That is why `contextcheck` cannot see the context
 being passed and needs a suppression on `setter.set`.
 
-The fix is to make the context and the template data explicit parameters. It touches
-124 hand-written call sites, none generated, so it is mechanical but not small — kept
-separate from the change that surfaced it.
+**Fixed.** The signature is now
+`setFieldWithType(ctx context.Context, v, i any, fieldPath, destType string, tplData ...any)`.
+The context is explicit, the type switch that recovered it from `interfs` is gone, and
+the `contextcheck` suppression on `setter.set` is removed — there are no
+`nolint:contextcheck` directives left in the tree.
+
+Two helpers needed a context parameter to reach: `changeResourceRecordSets` in
+`record.go`, and `CreateS3object.ManualRun`, which was discarding its `env.Running`
+argument entirely.
+
+`structInjector` tolerates a nil `env.Running`, since tests inject without one and no
+field needs an environment unless it fetches remote userdata.
+
+Enabling the check then found a real gap it had been masking:
+`changeResourceRecordSets` called `api.ChangeResourceRecordSets(context.Background(), ...)`
+while holding a usable context, so `create record` and `delete record` ignored
+cancellation.

@@ -151,7 +151,7 @@ func (cmd *DeleteRole) ManualRun(renv env.Running) (any, error) {
 	}
 
 	input := &iam.DeleteRoleInput{}
-	if err := setFieldWithType(cmd.Name, input, "RoleName", awsstr); err != nil {
+	if err := setFieldWithType(renv.RequestContext(), cmd.Name, input, "RoleName", awsstr); err != nil {
 		return nil, err
 	}
 
