@@ -52,7 +52,15 @@ func (n *NetworkMonitor) DisplayStats(w io.Writer) {
 		return sorted[i].from.Before(sorted[j].from)
 	})
 
-	maxwidth := uint(console.GetTerminalWidth() - maxFunctionNameLength - 11) // 11 = '['+']'+' '+'('+4+'m'+'s'+')'
+	// 11 = '['+']'+' '+'('+4+'m'+'s'+')'. Computed as a signed value first: a narrow
+	// terminal, a long service-call name, or no terminal at all (as under `go test`,
+	// where GetTerminalWidth reports 0) made this negative, and the uint conversion
+	// wrapped it to a huge width that strings.Repeat then tried to allocate.
+	available := console.GetTerminalWidth() - maxFunctionNameLength - 11
+	if available < 0 {
+		available = 0
+	}
+	maxwidth := uint(available)
 	maxDuration := maxVal.Sub(minVal)
 
 	for _, r := range sorted {
@@ -70,9 +78,23 @@ func (n *NetworkMonitor) DisplayStats(w io.Writer) {
 
 func drawRequest(w io.Writer, name string, minVal, from, to time.Time, maxwidth uint, maxduration time.Duration, startChar, stopChar string) {
 	duration := to.Sub(from)
-	width := uint(duration) * maxwidth / uint(maxduration)
-	before := uint(from.Sub(minVal)) * maxwidth / uint(maxduration)
-	after := maxwidth - width - before
+
+	// Every request completing within the same instant gives maxduration == 0, which
+	// divided by zero here. Reachable with a single instantaneous call, so draw a
+	// zero-width bar instead.
+	var width, before uint
+	if maxduration > 0 {
+		width = uint(duration) * maxwidth / uint(maxduration)
+		before = uint(from.Sub(minVal)) * maxwidth / uint(maxduration)
+	}
+
+	// These are unsigned, so an over-long name or a narrow terminal made this
+	// subtraction wrap to a huge value and strings.Repeat tried to allocate it.
+	var after uint
+	if maxwidth > width+before {
+		after = maxwidth - width - before
+	}
+
 	fmt.Fprintf(w, "%s%s%s%s%s %s(%dms)\n", strings.Repeat(" ", int(before)), startChar, strings.Repeat("-", int(width)), stopChar, strings.Repeat(" ", int(after)), name, duration/(1000*1000))
 }
 

@@ -1046,3 +1046,48 @@ Note `errcheck` (proposed in I9) would have caught this.
 **Deliberately not done:** no `toolchain` directive was added to `go.mod`. It would pin local developer builds to an exact patch, but the dev toolchain in use here is a custom build (`go1.26.5-X:nodwarf5`), and a `toolchain` line risks Go fetching a different official toolchain in preference to it. CI is already deterministic without it.
 
 **Remaining (optional):** add `toolchain go1.26.x` if reproducible *release* artifacts become a requirement — most relevant alongside `I11` (GoReleaser), where the build toolchain forms part of an artifact's provenance.
+
+---
+
+### I21: gosec review — **REVIEWED, one crash fixed; not enabled as a gate**
+
+**Severity:** Medium  
+**Files:** `aws/services/network_monitor.go`, `.golangci.yml`
+
+Ran `gosec` over the tree as a security review rather than adding it to `make lint`.
+127 findings, and the breakdown is why it is not a useful gate here:
+
+| Rule | Count | Verdict |
+|---|---|---|
+| G104 unhandled errors | 57 | Duplicates `errcheck`, which is already enabled |
+| G304 file path from variable | 14 | Inherent to a CLI that takes `--template-file` and similar |
+| G306 file permissions | 11 | `0644` writes, already reviewed under `B11` |
+| G115 integer overflow | 11 | **Found a real crash — see below** |
+| G101 hardcoded credentials | 10 | False positives: doc strings and test fixtures |
+| G204 subprocess with variable | 4 | `docker` and `ssh` invocation, inherent |
+| G404 weak RNG | 2 | Reviewed under `B3`; non-security uses |
+| G107 URL from variable | 2 | Fetching a user-supplied template URL is the feature |
+| G106 InsecureIgnoreHostKey | 2 | **Not a bug** — see below |
+
+**G106 is correct as written.** Both sites are gated on `!c.StrictHostKeyChecking`,
+and `ssh.InitClient` sets that field to `true`. Host key checking is only skipped
+when the user passes `--disable-strict-host-key-checking`, which is an explicit
+opt-out with a secure default.
+
+**G115 found two real crashes** in `NetworkMonitor.DisplayStats`, both from unsigned
+arithmetic, and both now fixed with regression tests:
+
+- `maxduration` is `maxVal.Sub(minVal)`, which is zero when every request completes
+  within the same instant — reachable with a single instantaneous call. It was used
+  as a divisor: **integer divide by zero**.
+- `maxwidth` was `uint(GetTerminalWidth() - maxFunctionNameLength - 11)`. A narrow
+  terminal, a long service-call name, or no terminal at all makes that subtraction
+  negative, and the `uint` conversion wrapped it to a huge width that
+  `strings.Repeat` then tried to allocate.
+
+Both are the same shape as the `readWord` bug in triplestore (`D4`): an unbounded
+allocation derived from arithmetic that was assumed non-negative.
+
+Not enabled as a gate: over half the findings duplicate `errcheck` or describe
+inherent properties of a CLI that reads user-specified files and URLs. Worth
+re-running periodically instead.
