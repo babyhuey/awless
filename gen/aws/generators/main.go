@@ -1,4 +1,4 @@
-//go:generate go run $GOFILE properties.go mocks.go fetchers.go services.go commands.go acceptance_mocks.go
+//go:generate go run $GOFILE properties.go mocks.go fetchers.go services.go commands.go acceptance_mocks.go entities.go
 
 //go:generate gofmt -s -w ../../../aws
 //go:generate goimports -w ../../../aws
@@ -48,6 +48,7 @@ var (
 	FETCHERS_DIR         = filepath.Join(ROOT_DIR, "aws", "fetch")
 	SERVICES_DIR         = filepath.Join(ROOT_DIR, "aws", "services")
 	SPEC_DIR             = filepath.Join(ROOT_DIR, "aws", "spec")
+	TEMPLATE_AST_DIR     = filepath.Join(ROOT_DIR, "template", "internal", "ast")
 	AWSAT_DIR            = filepath.Join(ROOT_DIR, "acceptance", "aws")
 	CLOUD_PROPERTIES_DIR = filepath.Join(ROOT_DIR, "cloud", "properties")
 	CLOUD_RDF_DIR        = filepath.Join(ROOT_DIR, "cloud", "rdf")
@@ -71,6 +72,8 @@ func main() {
 	generateAcceptanceFactory()
 
 	// properties
+	generateTemplateEntities()
+
 	generateProperties()
 	generateRDFProperties()
 }

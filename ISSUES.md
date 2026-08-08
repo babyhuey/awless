@@ -527,7 +527,7 @@ No `SIGINT`/`SIGTERM` handling. If a long-running AWS operation (e.g., `create i
 
 ---
 
-### I20: Template entity list is hand-maintained and silently gates new commands
+### I20: Template entity list is hand-maintained and silently gates new commands — **FIXED**
 
 **Severity:** Medium  
 **File:** `template/internal/ast/entities.go`

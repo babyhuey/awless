@@ -2,65 +2,9 @@ package ast
 
 type Entity string
 
-var entities = map[Entity]struct{}{
-	"none": {},
-
-	"accesskey":           {},
-	"alarm":               {},
-	"appscalingtarget":    {},
-	"appscalingpolicy":    {},
-	"scalinggroup":        {},
-	"bucket":              {},
-	"certificate":         {},
-	"classicloadbalancer": {},
-	"container":           {},
-	"containercluster":    {},
-	"containerservice":    {},
-	"containertask":       {},
-	"database":            {},
-	"distribution":        {},
-	"dbsubnetgroup":       {},
-	"elasticip":           {},
-	"function":            {},
-	"group":               {},
-	"instance":            {},
-	"image":               {},
-	"internetgateway":     {},
-	"mfadevice":           {},
-	"natgateway":          {},
-	"networkinterface":    {},
-	"instanceprofile":     {},
-	"keypair":             {},
-	"launchconfiguration": {},
-	"listener":            {},
-	"loadbalancer":        {},
-	"loginprofile":        {},
-	"policy":              {},
-	"queue":               {},
-	"record":              {},
-	"registry":            {},
-	"repository":          {},
-	"role":                {},
-	"route":               {},
-	"routetable":          {},
-	"s3object":            {},
-	"scalingpolicy":       {},
-	"secret":              {},
-	"securitygroup":       {},
-	"snapshot":            {},
-	"ssmparameter":        {},
-	"stack":               {},
-	"subnet":              {},
-	"subscription":        {},
-	"tag":                 {},
-	"targetgroup":         {},
-	"topic":               {},
-	"user":                {},
-	"volume":              {},
-	"vpc":                 {},
-	"zone":                {},
-}
-
+// IsInvalidEntity reports whether s is outside the set the template parser
+// accepts. The set itself is generated into gen_entities.go from the `entity:`
+// struct tags in aws/spec, so it cannot drift from the registered commands.
 func IsInvalidEntity(s string) bool {
 	_, ok := entities[Entity(s)]
 	return !ok
