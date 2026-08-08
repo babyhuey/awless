@@ -71,10 +71,6 @@ func NewAttachAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Atta
 	return cmd
 }
 
-func (cmd *AttachAlarm) SetApi(api *cloudwatch.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -142,10 +138,6 @@ func NewAttachClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachClassicLoadbalancer) SetApi(api *elb.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
@@ -226,10 +218,6 @@ func NewAttachContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *AttachContainertask) SetApi(api *ecs.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -297,10 +285,6 @@ func NewAttachElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachElasticip) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachElasticip) Run(renv env.Running, params map[string]any) (any, error) {
@@ -406,10 +390,6 @@ func NewAttachInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *A
 	return cmd
 }
 
-func (cmd *AttachInstance) SetApi(api *elbv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -488,10 +468,6 @@ func NewAttachInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	return cmd
 }
 
-func (cmd *AttachInstanceprofile) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -555,10 +531,6 @@ func NewAttachInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachInternetgateway) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
@@ -664,10 +636,6 @@ func NewAttachListener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *A
 	return cmd
 }
 
-func (cmd *AttachListener) SetApi(api *elbv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachListener) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -746,10 +714,6 @@ func NewAttachMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	return cmd
 }
 
-func (cmd *AttachMfadevice) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -826,10 +790,6 @@ func NewAttachNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachNetworkinterface) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
@@ -935,10 +895,6 @@ func NewAttachPolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Att
 	return cmd
 }
 
-func (cmd *AttachPolicy) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachPolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -1006,10 +962,6 @@ func NewAttachRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Attac
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachRole) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachRole) Run(renv env.Running, params map[string]any) (any, error) {
@@ -1088,10 +1040,6 @@ func NewAttachRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachRoutetable) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
@@ -1197,10 +1145,6 @@ func NewAttachSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *AttachSecuritygroup) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *AttachSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -1268,10 +1212,6 @@ func NewAttachUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Attac
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachUser) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachUser) Run(renv env.Running, params map[string]any) (any, error) {
@@ -1350,10 +1290,6 @@ func NewAttachVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Att
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *AttachVolume) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *AttachVolume) Run(renv env.Running, params map[string]any) (any, error) {
@@ -1459,10 +1395,6 @@ func NewAuthenticateRegistry(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logg
 	return cmd
 }
 
-func (cmd *AuthenticateRegistry) SetApi(api *ecr.Client) {
-	cmd.api = api
-}
-
 func (cmd *AuthenticateRegistry) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -1530,10 +1462,6 @@ func NewCheckCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CheckCertificate) SetApi(api *acm.Client) {
-	cmd.api = api
 }
 
 func (cmd *CheckCertificate) Run(renv env.Running, params map[string]any) (any, error) {
@@ -1605,10 +1533,6 @@ func NewCheckDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Ch
 	return cmd
 }
 
-func (cmd *CheckDatabase) SetApi(api *rds.Client) {
-	cmd.api = api
-}
-
 func (cmd *CheckDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -1676,10 +1600,6 @@ func NewCheckDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CheckDistribution) SetApi(api *cloudfront.Client) {
-	cmd.api = api
 }
 
 func (cmd *CheckDistribution) Run(renv env.Running, params map[string]any) (any, error) {
@@ -1751,10 +1671,6 @@ func NewCheckInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Ch
 	return cmd
 }
 
-func (cmd *CheckInstance) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CheckInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -1822,10 +1738,6 @@ func NewCheckLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CheckLoadbalancer) SetApi(api *elbv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CheckLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
@@ -1897,10 +1809,6 @@ func NewCheckNatgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	return cmd
 }
 
-func (cmd *CheckNatgateway) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CheckNatgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -1968,10 +1876,6 @@ func NewCheckNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CheckNetworkinterface) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CheckNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
@@ -2043,10 +1947,6 @@ func NewCheckScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	return cmd
 }
 
-func (cmd *CheckScalinggroup) SetApi(api *autoscaling.Client) {
-	cmd.api = api
-}
-
 func (cmd *CheckScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -2114,10 +2014,6 @@ func NewCheckSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CheckSecuritygroup) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CheckSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -2189,10 +2085,6 @@ func NewCheckVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Chec
 	return cmd
 }
 
-func (cmd *CheckVolume) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CheckVolume) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -2260,10 +2152,6 @@ func NewCopyImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CopyIm
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CopyImage) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CopyImage) Run(renv env.Running, params map[string]any) (any, error) {
@@ -2369,10 +2257,6 @@ func NewCopySnapshot(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cop
 	return cmd
 }
 
-func (cmd *CopySnapshot) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CopySnapshot) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -2476,10 +2360,6 @@ func NewCreateAccesskey(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	return cmd
 }
 
-func (cmd *CreateAccesskey) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateAccesskey) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -2556,10 +2436,6 @@ func NewCreateAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateAlarm) SetApi(api *cloudwatch.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateAlarm) Run(renv env.Running, params map[string]any) (any, error) {
@@ -2640,10 +2516,6 @@ func NewCreateApigateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *CreateApigateway) SetApi(api *apigatewayv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateApigateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -2720,10 +2592,6 @@ func NewCreateApigatewayroute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateApigatewayroute) SetApi(api *apigatewayv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateApigatewayroute) Run(renv env.Running, params map[string]any) (any, error) {
@@ -2804,10 +2672,6 @@ func NewCreateApigatewaystage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	return cmd
 }
 
-func (cmd *CreateApigatewaystage) SetApi(api *apigatewayv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateApigatewaystage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -2884,10 +2748,6 @@ func NewCreateAppscalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateAppscalingpolicy) SetApi(api *applicationautoscaling.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateAppscalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
@@ -2968,10 +2828,6 @@ func NewCreateAppscalingtarget(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	return cmd
 }
 
-func (cmd *CreateAppscalingtarget) SetApi(api *applicationautoscaling.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateAppscalingtarget) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -3048,10 +2904,6 @@ func NewCreateBucket(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cre
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateBucket) SetApi(api *s3.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateBucket) Run(renv env.Running, params map[string]any) (any, error) {
@@ -3132,10 +2984,6 @@ func NewCreateCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	return cmd
 }
 
-func (cmd *CreateCertificate) SetApi(api *acm.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateCertificate) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -3203,10 +3051,6 @@ func NewCreateClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateClassicLoadbalancer) SetApi(api *elb.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
@@ -3287,10 +3131,6 @@ func NewCreateContainercluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	return cmd
 }
 
-func (cmd *CreateContainercluster) SetApi(api *ecs.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateContainercluster) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -3369,10 +3209,6 @@ func NewCreateDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *C
 	return cmd
 }
 
-func (cmd *CreateDatabase) SetApi(api *rds.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -3440,10 +3276,6 @@ func NewCreateDbsubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateDbsubnetgroup) SetApi(api *rds.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateDbsubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -3524,10 +3356,6 @@ func NewCreateDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *CreateDistribution) SetApi(api *cloudfront.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateDistribution) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -3595,10 +3423,6 @@ func NewCreateDynamodbtable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateDynamodbtable) SetApi(api *dynamodb.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateDynamodbtable) Run(renv env.Running, params map[string]any) (any, error) {
@@ -3670,10 +3494,6 @@ func NewCreateEkscluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *CreateEkscluster) SetApi(api *eks.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateEkscluster) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -3743,10 +3563,6 @@ func NewCreateEksnodegroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *CreateEksnodegroup) SetApi(api *eks.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateEksnodegroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -3814,10 +3630,6 @@ func NewCreateElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateElasticip) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateElasticip) Run(renv env.Running, params map[string]any) (any, error) {
@@ -3923,10 +3735,6 @@ func NewCreateFilesystem(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *CreateFilesystem) SetApi(api *efs.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateFilesystem) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -4003,10 +3811,6 @@ func NewCreateFunction(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *C
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateFunction) SetApi(api *lambda.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateFunction) Run(renv env.Running, params map[string]any) (any, error) {
@@ -4087,10 +3891,6 @@ func NewCreateGroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	return cmd
 }
 
-func (cmd *CreateGroup) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateGroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -4167,10 +3967,6 @@ func NewCreateImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateImage) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateImage) Run(renv env.Running, params map[string]any) (any, error) {
@@ -4276,10 +4072,6 @@ func NewCreateInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *C
 	return cmd
 }
 
-func (cmd *CreateInstance) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -4383,10 +4175,6 @@ func NewCreateInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	return cmd
 }
 
-func (cmd *CreateInstanceprofile) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -4463,10 +4251,6 @@ func NewCreateInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateInternetgateway) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
@@ -4572,10 +4356,6 @@ func NewCreateKeypair(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cr
 	return cmd
 }
 
-func (cmd *CreateKeypair) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateKeypair) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -4652,10 +4432,6 @@ func NewCreateLaunchconfiguration(cfg aws.Config, g cloud.GraphAPI, l ...*logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateLaunchconfiguration) SetApi(api *autoscaling.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateLaunchconfiguration) Run(renv env.Running, params map[string]any) (any, error) {
@@ -4736,10 +4512,6 @@ func NewCreateListener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *C
 	return cmd
 }
 
-func (cmd *CreateListener) SetApi(api *elbv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateListener) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -4816,10 +4588,6 @@ func NewCreateLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateLoadbalancer) SetApi(api *elbv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
@@ -4900,10 +4668,6 @@ func NewCreateLoggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *C
 	return cmd
 }
 
-func (cmd *CreateLoggroup) SetApi(api *cloudwatchlogs.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateLoggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -4980,10 +4744,6 @@ func NewCreateLoginprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateLoginprofile) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateLoginprofile) Run(renv env.Running, params map[string]any) (any, error) {
@@ -5064,10 +4824,6 @@ func NewCreateMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	return cmd
 }
 
-func (cmd *CreateMfadevice) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -5135,10 +4891,6 @@ func NewCreateNatgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateNatgateway) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateNatgateway) Run(renv env.Running, params map[string]any) (any, error) {
@@ -5217,10 +4969,6 @@ func NewCreateNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateNetworkinterface) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
@@ -5326,10 +5074,6 @@ func NewCreatePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cre
 	return cmd
 }
 
-func (cmd *CreatePolicy) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreatePolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -5406,10 +5150,6 @@ func NewCreateQueue(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateQueue) SetApi(api *sqs.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateQueue) Run(renv env.Running, params map[string]any) (any, error) {
@@ -5490,10 +5230,6 @@ func NewCreateRecord(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cre
 	return cmd
 }
 
-func (cmd *CreateRecord) SetApi(api *route53.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateRecord) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -5561,10 +5297,6 @@ func NewCreateRepository(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateRepository) SetApi(api *ecr.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateRepository) Run(renv env.Running, params map[string]any) (any, error) {
@@ -5645,10 +5377,6 @@ func NewCreateRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Creat
 	return cmd
 }
 
-func (cmd *CreateRole) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateRole) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -5716,10 +5444,6 @@ func NewCreateRoute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateRoute) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateRoute) Run(renv env.Running, params map[string]any) (any, error) {
@@ -5825,10 +5549,6 @@ func NewCreateRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *CreateRoutetable) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -5932,10 +5652,6 @@ func NewCreateS3object(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *C
 	return cmd
 }
 
-func (cmd *CreateS3object) SetApi(api *s3.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateS3object) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6003,10 +5719,6 @@ func NewCreateScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateScalinggroup) SetApi(api *autoscaling.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -6087,10 +5799,6 @@ func NewCreateScalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *CreateScalingpolicy) SetApi(api *autoscaling.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateScalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6169,10 +5877,6 @@ func NewCreateSecret(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cre
 	return cmd
 }
 
-func (cmd *CreateSecret) SetApi(api *secretsmanager.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateSecret) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6249,10 +5953,6 @@ func NewCreateSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateSecuritygroup) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -6358,10 +6058,6 @@ func NewCreateSnapshot(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *C
 	return cmd
 }
 
-func (cmd *CreateSnapshot) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateSnapshot) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6465,10 +6161,6 @@ func NewCreateSsmparameter(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *CreateSsmparameter) SetApi(api *ssm.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateSsmparameter) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6547,10 +6239,6 @@ func NewCreateStack(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	return cmd
 }
 
-func (cmd *CreateStack) SetApi(api *cloudformation.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateStack) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6627,10 +6315,6 @@ func NewCreateSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cre
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateSubnet) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateSubnet) Run(renv env.Running, params map[string]any) (any, error) {
@@ -6736,10 +6420,6 @@ func NewCreateSubscription(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *CreateSubscription) SetApi(api *sns.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateSubscription) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6818,10 +6498,6 @@ func NewCreateTag(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Create
 	return cmd
 }
 
-func (cmd *CreateTag) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateTag) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -6885,10 +6561,6 @@ func NewCreateTargetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateTargetgroup) SetApi(api *elbv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateTargetgroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -6969,10 +6641,6 @@ func NewCreateTopic(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	return cmd
 }
 
-func (cmd *CreateTopic) SetApi(api *sns.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateTopic) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -7049,10 +6717,6 @@ func NewCreateTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Crea
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateTrail) SetApi(api *cloudtrail.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateTrail) Run(renv env.Running, params map[string]any) (any, error) {
@@ -7133,10 +6797,6 @@ func NewCreateUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Creat
 	return cmd
 }
 
-func (cmd *CreateUser) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateUser) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -7213,10 +6873,6 @@ func NewCreateVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Cre
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *CreateVolume) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *CreateVolume) Run(renv env.Running, params map[string]any) (any, error) {
@@ -7322,10 +6978,6 @@ func NewCreateVpc(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Create
 	return cmd
 }
 
-func (cmd *CreateVpc) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateVpc) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -7429,10 +7081,6 @@ func NewCreateZone(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Creat
 	return cmd
 }
 
-func (cmd *CreateZone) SetApi(api *route53.Client) {
-	cmd.api = api
-}
-
 func (cmd *CreateZone) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -7509,10 +7157,6 @@ func NewDeleteAccesskey(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteAccesskey) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteAccesskey) Run(renv env.Running, params map[string]any) (any, error) {
@@ -7593,10 +7237,6 @@ func NewDeleteAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	return cmd
 }
 
-func (cmd *DeleteAlarm) SetApi(api *cloudwatch.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -7673,10 +7313,6 @@ func NewDeleteApigateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteApigateway) SetApi(api *apigatewayv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteApigateway) Run(renv env.Running, params map[string]any) (any, error) {
@@ -7757,10 +7393,6 @@ func NewDeleteApigatewayroute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	return cmd
 }
 
-func (cmd *DeleteApigatewayroute) SetApi(api *apigatewayv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteApigatewayroute) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -7837,10 +7469,6 @@ func NewDeleteApigatewaystage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteApigatewaystage) SetApi(api *apigatewayv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteApigatewaystage) Run(renv env.Running, params map[string]any) (any, error) {
@@ -7921,10 +7549,6 @@ func NewDeleteAppscalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	return cmd
 }
 
-func (cmd *DeleteAppscalingpolicy) SetApi(api *applicationautoscaling.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteAppscalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8001,10 +7625,6 @@ func NewDeleteAppscalingtarget(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteAppscalingtarget) SetApi(api *applicationautoscaling.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteAppscalingtarget) Run(renv env.Running, params map[string]any) (any, error) {
@@ -8085,10 +7705,6 @@ func NewDeleteBucket(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Del
 	return cmd
 }
 
-func (cmd *DeleteBucket) SetApi(api *s3.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteBucket) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8165,10 +7781,6 @@ func NewDeleteCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteCertificate) SetApi(api *acm.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteCertificate) Run(renv env.Running, params map[string]any) (any, error) {
@@ -8249,10 +7861,6 @@ func NewDeleteClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger
 	return cmd
 }
 
-func (cmd *DeleteClassicLoadbalancer) SetApi(api *elb.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8329,10 +7937,6 @@ func NewDeleteContainercluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteContainercluster) SetApi(api *ecs.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteContainercluster) Run(renv env.Running, params map[string]any) (any, error) {
@@ -8413,10 +8017,6 @@ func NewDeleteContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *DeleteContainertask) SetApi(api *ecs.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8480,10 +8080,6 @@ func NewDeleteDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteDatabase) SetApi(api *rds.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteDatabase) Run(renv env.Running, params map[string]any) (any, error) {
@@ -8564,10 +8160,6 @@ func NewDeleteDbsubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *DeleteDbsubnetgroup) SetApi(api *rds.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteDbsubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8646,10 +8238,6 @@ func NewDeleteDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *DeleteDistribution) SetApi(api *cloudfront.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteDistribution) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8717,10 +8305,6 @@ func NewDeleteDynamodbtable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteDynamodbtable) SetApi(api *dynamodb.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteDynamodbtable) Run(renv env.Running, params map[string]any) (any, error) {
@@ -8801,10 +8385,6 @@ func NewDeleteEkscluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *DeleteEkscluster) SetApi(api *eks.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteEkscluster) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8883,10 +8463,6 @@ func NewDeleteEksnodegroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *DeleteEksnodegroup) SetApi(api *eks.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteEksnodegroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -8963,10 +8539,6 @@ func NewDeleteElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteElasticip) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteElasticip) Run(renv env.Running, params map[string]any) (any, error) {
@@ -9072,10 +8644,6 @@ func NewDeleteFilesystem(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *DeleteFilesystem) SetApi(api *efs.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteFilesystem) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -9152,10 +8720,6 @@ func NewDeleteFunction(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteFunction) SetApi(api *lambda.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteFunction) Run(renv env.Running, params map[string]any) (any, error) {
@@ -9236,10 +8800,6 @@ func NewDeleteGroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	return cmd
 }
 
-func (cmd *DeleteGroup) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteGroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -9318,10 +8878,6 @@ func NewDeleteImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	return cmd
 }
 
-func (cmd *DeleteImage) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -9385,10 +8941,6 @@ func NewDeleteInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteInstance) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteInstance) Run(renv env.Running, params map[string]any) (any, error) {
@@ -9494,10 +9046,6 @@ func NewDeleteInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	return cmd
 }
 
-func (cmd *DeleteInstanceprofile) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -9574,10 +9122,6 @@ func NewDeleteInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteInternetgateway) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
@@ -9683,10 +9227,6 @@ func NewDeleteKeypair(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *De
 	return cmd
 }
 
-func (cmd *DeleteKeypair) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteKeypair) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -9790,10 +9330,6 @@ func NewDeleteLaunchconfiguration(cfg aws.Config, g cloud.GraphAPI, l ...*logger
 	return cmd
 }
 
-func (cmd *DeleteLaunchconfiguration) SetApi(api *autoscaling.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteLaunchconfiguration) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -9870,10 +9406,6 @@ func NewDeleteListener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteListener) SetApi(api *elbv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteListener) Run(renv env.Running, params map[string]any) (any, error) {
@@ -9954,10 +9486,6 @@ func NewDeleteLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *DeleteLoadbalancer) SetApi(api *elbv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -10034,10 +9562,6 @@ func NewDeleteLoggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteLoggroup) SetApi(api *cloudwatchlogs.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteLoggroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -10118,10 +9642,6 @@ func NewDeleteLoginprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *DeleteLoginprofile) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteLoginprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -10198,10 +9718,6 @@ func NewDeleteMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteMfadevice) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
@@ -10282,10 +9798,6 @@ func NewDeleteNatgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *DeleteNatgateway) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteNatgateway) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -10362,10 +9874,6 @@ func NewDeleteNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteNetworkinterface) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
@@ -10471,10 +9979,6 @@ func NewDeletePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Del
 	return cmd
 }
 
-func (cmd *DeletePolicy) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeletePolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -10551,10 +10055,6 @@ func NewDeleteQueue(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteQueue) SetApi(api *sqs.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteQueue) Run(renv env.Running, params map[string]any) (any, error) {
@@ -10635,10 +10135,6 @@ func NewDeleteRecord(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Del
 	return cmd
 }
 
-func (cmd *DeleteRecord) SetApi(api *route53.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteRecord) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -10706,10 +10202,6 @@ func NewDeleteRepository(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteRepository) SetApi(api *ecr.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteRepository) Run(renv env.Running, params map[string]any) (any, error) {
@@ -10790,10 +10282,6 @@ func NewDeleteRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Delet
 	return cmd
 }
 
-func (cmd *DeleteRole) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteRole) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -10861,10 +10349,6 @@ func NewDeleteRoute(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteRoute) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteRoute) Run(renv env.Running, params map[string]any) (any, error) {
@@ -10970,10 +10454,6 @@ func NewDeleteRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	return cmd
 }
 
-func (cmd *DeleteRoutetable) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11077,10 +10557,6 @@ func NewDeleteS3object(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	return cmd
 }
 
-func (cmd *DeleteS3object) SetApi(api *s3.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteS3object) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11157,10 +10633,6 @@ func NewDeleteScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteScalinggroup) SetApi(api *autoscaling.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -11241,10 +10713,6 @@ func NewDeleteScalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *DeleteScalingpolicy) SetApi(api *autoscaling.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteScalingpolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11323,10 +10791,6 @@ func NewDeleteSecret(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Del
 	return cmd
 }
 
-func (cmd *DeleteSecret) SetApi(api *secretsmanager.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteSecret) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11403,10 +10867,6 @@ func NewDeleteSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteSecuritygroup) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -11512,10 +10972,6 @@ func NewDeleteSnapshot(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	return cmd
 }
 
-func (cmd *DeleteSnapshot) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteSnapshot) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11619,10 +11075,6 @@ func NewDeleteSsmparameter(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *DeleteSsmparameter) SetApi(api *ssm.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteSsmparameter) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11701,10 +11153,6 @@ func NewDeleteStack(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	return cmd
 }
 
-func (cmd *DeleteStack) SetApi(api *cloudformation.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteStack) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11781,10 +11229,6 @@ func NewDeleteSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Del
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteSubnet) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteSubnet) Run(renv env.Running, params map[string]any) (any, error) {
@@ -11890,10 +11334,6 @@ func NewDeleteSubscription(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *DeleteSubscription) SetApi(api *sns.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteSubscription) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -11972,10 +11412,6 @@ func NewDeleteTag(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Delete
 	return cmd
 }
 
-func (cmd *DeleteTag) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteTag) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -12039,10 +11475,6 @@ func NewDeleteTargetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteTargetgroup) SetApi(api *elbv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteTargetgroup) Run(renv env.Running, params map[string]any) (any, error) {
@@ -12123,10 +11555,6 @@ func NewDeleteTopic(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	return cmd
 }
 
-func (cmd *DeleteTopic) SetApi(api *sns.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteTopic) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -12203,10 +11631,6 @@ func NewDeleteTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Dele
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteTrail) SetApi(api *cloudtrail.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteTrail) Run(renv env.Running, params map[string]any) (any, error) {
@@ -12287,10 +11711,6 @@ func NewDeleteUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Delet
 	return cmd
 }
 
-func (cmd *DeleteUser) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteUser) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -12367,10 +11787,6 @@ func NewDeleteVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Del
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DeleteVolume) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DeleteVolume) Run(renv env.Running, params map[string]any) (any, error) {
@@ -12476,10 +11892,6 @@ func NewDeleteVpc(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Delete
 	return cmd
 }
 
-func (cmd *DeleteVpc) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteVpc) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -12583,10 +11995,6 @@ func NewDeleteZone(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Delet
 	return cmd
 }
 
-func (cmd *DeleteZone) SetApi(api *route53.Client) {
-	cmd.api = api
-}
-
 func (cmd *DeleteZone) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -12665,10 +12073,6 @@ func NewDetachAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Deta
 	return cmd
 }
 
-func (cmd *DetachAlarm) SetApi(api *cloudwatch.Client) {
-	cmd.api = api
-}
-
 func (cmd *DetachAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -12736,10 +12140,6 @@ func NewDetachClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachClassicLoadbalancer) SetApi(api *elb.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
@@ -12820,10 +12220,6 @@ func NewDetachContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *DetachContainertask) SetApi(api *ecs.Client) {
-	cmd.api = api
-}
-
 func (cmd *DetachContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -12891,10 +12287,6 @@ func NewDetachElasticip(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachElasticip) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachElasticip) Run(renv env.Running, params map[string]any) (any, error) {
@@ -13000,10 +12392,6 @@ func NewDetachInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *D
 	return cmd
 }
 
-func (cmd *DetachInstance) SetApi(api *elbv2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DetachInstance) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -13082,10 +12470,6 @@ func NewDetachInstanceprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	return cmd
 }
 
-func (cmd *DetachInstanceprofile) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DetachInstanceprofile) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -13153,10 +12537,6 @@ func NewDetachInternetgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Log
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachInternetgateway) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachInternetgateway) Run(renv env.Running, params map[string]any) (any, error) {
@@ -13262,10 +12642,6 @@ func NewDetachMfadevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	return cmd
 }
 
-func (cmd *DetachMfadevice) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *DetachMfadevice) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -13344,10 +12720,6 @@ func NewDetachNetworkinterface(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Lo
 	return cmd
 }
 
-func (cmd *DetachNetworkinterface) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DetachNetworkinterface) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -13411,10 +12783,6 @@ func NewDetachPolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Det
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachPolicy) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachPolicy) Run(renv env.Running, params map[string]any) (any, error) {
@@ -13484,10 +12852,6 @@ func NewDetachRole(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Detac
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachRole) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachRole) Run(renv env.Running, params map[string]any) (any, error) {
@@ -13566,10 +12930,6 @@ func NewDetachRoutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) 
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachRoutetable) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachRoutetable) Run(renv env.Running, params map[string]any) (any, error) {
@@ -13675,10 +13035,6 @@ func NewDetachSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *DetachSecuritygroup) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *DetachSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -13746,10 +13102,6 @@ func NewDetachUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Detac
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachUser) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachUser) Run(renv env.Running, params map[string]any) (any, error) {
@@ -13828,10 +13180,6 @@ func NewDetachVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Det
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *DetachVolume) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *DetachVolume) Run(renv env.Running, params map[string]any) (any, error) {
@@ -13937,10 +13285,6 @@ func NewImportImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Impo
 	return cmd
 }
 
-func (cmd *ImportImage) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *ImportImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -14044,10 +13388,6 @@ func NewRestartDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	return cmd
 }
 
-func (cmd *RestartDatabase) SetApi(api *rds.Client) {
-	cmd.api = api
-}
-
 func (cmd *RestartDatabase) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -14124,10 +13464,6 @@ func NewRestartInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *RestartInstance) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *RestartInstance) Run(renv env.Running, params map[string]any) (any, error) {
@@ -14233,10 +13569,6 @@ func NewStartAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Start
 	return cmd
 }
 
-func (cmd *StartAlarm) SetApi(api *cloudwatch.Client) {
-	cmd.api = api
-}
-
 func (cmd *StartAlarm) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -14315,10 +13647,6 @@ func NewStartContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *StartContainertask) SetApi(api *ecs.Client) {
-	cmd.api = api
-}
-
 func (cmd *StartContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -14386,10 +13714,6 @@ func NewStartDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *St
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *StartDatabase) SetApi(api *rds.Client) {
-	cmd.api = api
 }
 
 func (cmd *StartDatabase) Run(renv env.Running, params map[string]any) (any, error) {
@@ -14468,10 +13792,6 @@ func NewStartInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *St
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *StartInstance) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *StartInstance) Run(renv env.Running, params map[string]any) (any, error) {
@@ -14577,10 +13897,6 @@ func NewStartTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Start
 	return cmd
 }
 
-func (cmd *StartTrail) SetApi(api *cloudtrail.Client) {
-	cmd.api = api
-}
-
 func (cmd *StartTrail) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -14657,10 +13973,6 @@ func NewStopAlarm(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopAl
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *StopAlarm) SetApi(api *cloudwatch.Client) {
-	cmd.api = api
 }
 
 func (cmd *StopAlarm) Run(renv env.Running, params map[string]any) (any, error) {
@@ -14741,10 +14053,6 @@ func NewStopContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	return cmd
 }
 
-func (cmd *StopContainertask) SetApi(api *ecs.Client) {
-	cmd.api = api
-}
-
 func (cmd *StopContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -14812,10 +14120,6 @@ func NewStopDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Sto
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *StopDatabase) SetApi(api *rds.Client) {
-	cmd.api = api
 }
 
 func (cmd *StopDatabase) Run(renv env.Running, params map[string]any) (any, error) {
@@ -14894,10 +14198,6 @@ func NewStopInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Sto
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *StopInstance) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *StopInstance) Run(renv env.Running, params map[string]any) (any, error) {
@@ -15003,10 +14303,6 @@ func NewStopTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopTr
 	return cmd
 }
 
-func (cmd *StopTrail) SetApi(api *cloudtrail.Client) {
-	cmd.api = api
-}
-
 func (cmd *StopTrail) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15085,10 +14381,6 @@ func NewUpdateBucket(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Upd
 	return cmd
 }
 
-func (cmd *UpdateBucket) SetApi(api *s3.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateBucket) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15156,10 +14448,6 @@ func NewUpdateClassicLoadbalancer(cfg aws.Config, g cloud.GraphAPI, l ...*logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *UpdateClassicLoadbalancer) SetApi(api *elb.Client) {
-	cmd.api = api
 }
 
 func (cmd *UpdateClassicLoadbalancer) Run(renv env.Running, params map[string]any) (any, error) {
@@ -15240,10 +14528,6 @@ func NewUpdateContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *UpdateContainertask) SetApi(api *ecs.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateContainertask) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15322,10 +14606,6 @@ func NewUpdateDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *UpdateDistribution) SetApi(api *cloudfront.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateDistribution) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15395,10 +14675,6 @@ func NewUpdateImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Upda
 	return cmd
 }
 
-func (cmd *UpdateImage) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateImage) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15462,10 +14738,6 @@ func NewUpdateInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *U
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *UpdateInstance) SetApi(api *ec2.Client) {
-	cmd.api = api
 }
 
 func (cmd *UpdateInstance) Run(renv env.Running, params map[string]any) (any, error) {
@@ -15571,10 +14843,6 @@ func NewUpdateLoggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *U
 	return cmd
 }
 
-func (cmd *UpdateLoggroup) SetApi(api *cloudwatchlogs.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateLoggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15651,10 +14919,6 @@ func NewUpdateLoginprofile(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *UpdateLoginprofile) SetApi(api *iam.Client) {
-	cmd.api = api
 }
 
 func (cmd *UpdateLoginprofile) Run(renv env.Running, params map[string]any) (any, error) {
@@ -15735,10 +14999,6 @@ func NewUpdatePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Upd
 	return cmd
 }
 
-func (cmd *UpdatePolicy) SetApi(api *iam.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdatePolicy) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15817,10 +15077,6 @@ func NewUpdateRecord(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Upd
 	return cmd
 }
 
-func (cmd *UpdateRecord) SetApi(api *route53.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateRecord) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -15888,10 +15144,6 @@ func NewUpdateS3object(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *U
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *UpdateS3object) SetApi(api *s3.Client) {
-	cmd.api = api
 }
 
 func (cmd *UpdateS3object) Run(renv env.Running, params map[string]any) (any, error) {
@@ -15972,10 +15224,6 @@ func NewUpdateScalinggroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	return cmd
 }
 
-func (cmd *UpdateScalinggroup) SetApi(api *autoscaling.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateScalinggroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -16052,10 +15300,6 @@ func NewUpdateSecret(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Upd
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *UpdateSecret) SetApi(api *secretsmanager.Client) {
-	cmd.api = api
 }
 
 func (cmd *UpdateSecret) Run(renv env.Running, params map[string]any) (any, error) {
@@ -16136,10 +15380,6 @@ func NewUpdateSecuritygroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logge
 	return cmd
 }
 
-func (cmd *UpdateSecuritygroup) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateSecuritygroup) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -16203,10 +15443,6 @@ func NewUpdateSsmparameter(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *UpdateSsmparameter) SetApi(api *ssm.Client) {
-	cmd.api = api
 }
 
 func (cmd *UpdateSsmparameter) Run(renv env.Running, params map[string]any) (any, error) {
@@ -16287,10 +15523,6 @@ func NewUpdateStack(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Upda
 	return cmd
 }
 
-func (cmd *UpdateStack) SetApi(api *cloudformation.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateStack) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -16369,10 +15601,6 @@ func NewUpdateSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *Upd
 	return cmd
 }
 
-func (cmd *UpdateSubnet) SetApi(api *ec2.Client) {
-	cmd.api = api
-}
-
 func (cmd *UpdateSubnet) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
@@ -16449,10 +15677,6 @@ func NewUpdateTargetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger)
 	}
 	cmd.graph = g
 	return cmd
-}
-
-func (cmd *UpdateTargetgroup) SetApi(api *elbv2.Client) {
-	cmd.api = api
 }
 
 func (cmd *UpdateTargetgroup) Run(renv env.Running, params map[string]any) (any, error) {

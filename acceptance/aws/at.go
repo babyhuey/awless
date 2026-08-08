@@ -21,6 +21,7 @@ type ATBuilder struct {
 	fillers      map[string]string
 	expectRevert string
 	mock         *Mock
+	dryRun       bool
 	graph        *graph.Graph
 }
 
@@ -58,6 +59,13 @@ func (b *ATBuilder) IgnoreInput(calls ...string) *ATBuilder {
 
 func (b *ATBuilder) Graph(g *graph.Graph) *ATBuilder {
 	b.graph = g
+	return b
+}
+
+// DryRun runs the template with dry run set, which routes each command through its
+// generated dryRun path rather than run.
+func (b *ATBuilder) DryRun() *ATBuilder {
+	b.dryRun = true
 	return b
 }
 
@@ -120,7 +128,15 @@ func (b *ATBuilder) run(t *testing.T, l ...*logger.Logger) error {
 		return fmt.Errorf("compiling: %w", err)
 	}
 
-	ran, err := compiled.Run(template.NewRunEnv(cenv))
+	renv := template.NewRunEnv(cenv)
+	if b.dryRun {
+		renv.SetDryRun(true)
+		// AWS rejects a DryRun request with this code, and the generated dryRun path
+		// treats it as the call having been validated.
+		b.mock.OnDryRun()
+	}
+
+	ran, err := compiled.Run(renv)
 	if err != nil {
 		return fmt.Errorf("running: %w", err)
 	}

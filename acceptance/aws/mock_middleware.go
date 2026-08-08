@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
 )
 
@@ -24,10 +25,11 @@ import (
 type Mock struct {
 	basicMock
 
-	mu      sync.Mutex
-	outputs map[string]any
-	errs    map[string]error
-	inputs  map[string]any
+	mu        sync.Mutex
+	outputs   map[string]any
+	errs      map[string]error
+	inputs    map[string]any
+	dryRunAll bool
 }
 
 // NewMock builds an empty mock. Register expectations with On and OnError.
@@ -53,6 +55,23 @@ func (m *Mock) OnError(operation string, err error) *Mock {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.errs[operation] = err
+	return m
+}
+
+// OnAPIError makes the named operation fail with an AWS API error carrying code.
+//
+// Needed for the dry-run path: a command run with DryRun set expects the API to
+// reject the call with DryRunOperation, and treats that as success.
+func (m *Mock) OnAPIError(operation, code, message string) *Mock {
+	return m.OnError(operation, &smithy.GenericAPIError{Code: code, Message: message})
+}
+
+// OnDryRun makes every operation fail with DryRunOperation, which is what AWS does
+// for a request with DryRun set and what the generated dryRun path expects.
+func (m *Mock) OnDryRun() *Mock {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.dryRunAll = true
 	return m
 }
 
@@ -96,6 +115,7 @@ func (m *Mock) handle(ctx context.Context, in middleware.InitializeInput, _ midd
 	m.inputs[op] = in.Parameters
 	err, hasErr := m.errs[op]
 	out, hasOut := m.outputs[op]
+	dryRunAll := m.dryRunAll
 	m.mu.Unlock()
 
 	m.addCall(op)
@@ -103,6 +123,12 @@ func (m *Mock) handle(ctx context.Context, in middleware.InitializeInput, _ midd
 
 	if hasErr {
 		return middleware.InitializeOutput{}, middleware.Metadata{}, err
+	}
+	if dryRunAll {
+		return middleware.InitializeOutput{}, middleware.Metadata{}, &smithy.GenericAPIError{
+			Code:    "DryRunOperation",
+			Message: "Request would have succeeded, but DryRun flag is set",
+		}
 	}
 	if !hasOut {
 		// Returning the zero output would silently produce nil-dereference panics

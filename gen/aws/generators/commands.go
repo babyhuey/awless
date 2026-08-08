@@ -272,10 +272,6 @@ func New{{ $cmdName }}(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *{
 	return cmd
 }
 
-func (cmd *{{ $cmdName }}) SetApi(api *{{$tag.API}}.Client) {
-	cmd.api = api
-}
-
 func (cmd *{{ $cmdName }}) Run(renv env.Running, params map[string]any) (any, error) {
 	if renv.IsDryRun() {
 		return cmd.dryRun(renv, params)
