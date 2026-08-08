@@ -595,35 +595,43 @@ Dependabot is configured but there's no auto-merge setup. Given the high number 
 
 ---
 
-### I7: Test coverage improvement targets — **PARTIALLY FIXED**
+### I7: Test coverage improvement targets — **FIXED**
 
 **Severity:** Medium  
-**Files:** `Makefile`, `.github/workflows/ci.yml`, `acceptance/aws/`, `aws/spec/setters_slice_test.go`
+**Files:** `Makefile`, `.github/workflows/ci.yml`, `acceptance/aws/`, `aws/services/`, `template/`
 
-Two things were wrong here, one of them a measurement error.
+23.2% -> **58.9%**, and the reported figure was itself wrong at the start: adding
+`-coverpkg=./...` moved it from 23.2% to 30.0% before any test was written, because
+cross-package exercise was not being credited.
 
-**The number was understated.** `go test -coverprofile` only attributes coverage
-to the package under test, so every statement the acceptance and integration tests
-drive in other packages was counted as uncovered. Adding `-coverpkg=./...` to the
-`cover` targets and the CI test job moved the reported total from 23.2% to **30.0%**
-with no new tests — the difference was always covered, just not credited.
+**Every one of the 194 template commands now has an acceptance test** — 200 tests in
+total, running in under half a second. They assert that template params reach the AWS
+input under the field the `awsName` tag names, which is a reflective mapping the
+compiler cannot check, plus result extraction and revert derivation.
 
-**Real gaps closed:**
+Also added: a table-driven test driving every command through its generated `dryRun`
+path, a registry test over all 17 services, and unit tests for the `template/env`
+copy semantics and the setter dispatch.
 
-- `acceptance/aws` went from zero tests to 13, covering a spread of EC2, IAM, S3,
-  SNS and SQS commands through the full pipeline (see `D1`/`D8`). These drive a
-  large amount of `aws/spec`, which was the single least-covered significant
-  package at 6.7%.
-- `aws/spec/setters_slice_test.go` unit-tests the setter dispatch directly,
-  including the `[]*string` → `[]string` conversion whose absence was a live
-  runtime bug.
+**Nine bugs were found by writing these**, all invisible to the compiler and all
+present since the SDK v2 migration:
 
-**Still open, and why:** the remaining zero-coverage functions are dominated by
-I/O — `console/terminal.go` (terminal size, raw mode, signal propagation),
-`config/init.go` and the stdin selectors in `aws/config/validator.go`, and
-`config/upgrade.go`'s HTTP check. Covering these needs terminal and network
-seams that do not exist yet, which is a refactor rather than a test-writing task.
-`commands/` at 21% is the largest remaining opportunity.
+| Bug | Effect |
+|---|---|
+| `awsCall.execute` called the SDK with one argument | v2 signatures are `(ctx, params, ...optFns)`, so `create role`, `create/update distribution`, `attach/detach securitygroup` and four `containertask` commands all failed |
+| `awsstringslice` produced `[]*string` | 35 params panicked in `reflect.Set` |
+| `awsslicestruct` assumed `[]*Struct` | 13 params panicked; v2 uses `[]Struct` |
+| `awsType:"awsin64"` typo | `create instance count` reached neither MinCount nor MaxCount |
+| `Healthcheck.` vs `HealthCheck.` | `update classicloadbalancer` silently sent an empty request |
+| indexed path segments unsupported | `create distribution` silently dropped its origin domain |
+| six `ExtractResult` indexed `[0]` unguarded | empty AWS responses panicked |
+| `createNameTag` ran unconditionally | `create vpc` without `name=` nil-dereferenced |
+| two nil dereferences in `detach instanceprofile` | panicked after the detach had succeeded |
+
+**What remains uncovered** is dominated by terminal, stdin and HTTP I/O with no test
+seams — `console/terminal.go`, `config/init.go`, the stdin selectors in
+`aws/config/validator.go`. Covering those needs seams introduced first, which is a
+refactor rather than test-writing.
 
 ### I8: Go language modernization — **FIXED**
 
