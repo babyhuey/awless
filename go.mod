@@ -70,6 +70,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/elasticache v1.56.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk v1.37.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/eventbridge v1.48.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/glue v1.152.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.13 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.19 // indirect

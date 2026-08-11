@@ -847,6 +847,35 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// Glue
+	cloud.GlueDatabase: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+		properties.LocationURI: {name: "LocationUri", transform: extractValueFn},
+		properties.Created:     {name: "CreateTime", transform: extractTimeFn},
+	},
+	cloud.GlueTable: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.Database:    {name: "DatabaseName", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+		properties.Type:        {name: "TableType", transform: extractValueFn},
+		properties.Created:     {name: "CreateTime", transform: extractTimeFn},
+	},
+	cloud.Crawler: {
+		properties.Name:     {name: "Name", transform: extractValueFn},
+		properties.State:    {name: "State", transform: extractValueFn},
+		properties.Role:     {name: "Role", transform: extractValueFn},
+		properties.Database: {name: "DatabaseName", transform: extractValueFn},
+		properties.Created:  {name: "CreationTime", transform: extractTimeFn},
+	},
+	cloud.Job: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.Role:        {name: "Role", transform: extractValueFn},
+		properties.GlueVersion: {name: "GlueVersion", transform: extractValueFn},
+		properties.WorkerType:  {name: "WorkerType", transform: extractValueFn},
+		properties.NodeCount:   {name: "NumberOfWorkers", transform: extractValueFn},
+		properties.Created:     {name: "CreatedOn", transform: extractTimeFn},
+	},
 	// CodeDeploy
 	cloud.DeployApplication: {
 		properties.Name:            {name: "ApplicationName", transform: extractValueFn},

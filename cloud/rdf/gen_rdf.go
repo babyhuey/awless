@@ -87,6 +87,7 @@ const (
 	CopyTagsToSnapshot                = "cloud:copyTagsToSnapshot"
 	Country                           = "cloud:country"
 	Created                           = "cloud:created"
+	Database                          = "cloud:database"
 	DBName                            = "cloud:dbName"
 	DBSecurityGroups                  = "cloud:dbSecurityGroups"
 	DBSubnetGroup                     = "cloud:dbSubnetGroup"
@@ -114,6 +115,7 @@ const (
 	Fingerprint                       = "cloud:fingerprint"
 	Frequency                         = "cloud:frequency"
 	GlobalID                          = "cloud:globalID"
+	GlueVersion                       = "cloud:glueVersion"
 	GranteeType                       = "cloud:granteeType"
 	Grants                            = "cloud:grants"
 	Handler                           = "cloud:handler"
@@ -150,6 +152,7 @@ const (
 	Lifecycle                         = "cloud:lifecycle"
 	LoadBalancer                      = "cloud:loadBalancer"
 	Location                          = "cloud:location"
+	LocationURI                       = "cloud:locationUri"
 	MACAddress                        = "cloud:macAddress"
 	Main                              = "cloud:main"
 	ManagedBy                         = "cloud:managedBy"
@@ -267,6 +270,7 @@ const (
 	Vpcs                              = "cloud:vpcs"
 	WebACL                            = "cloud:webACL"
 	Weight                            = "cloud:weight"
+	WorkerType                        = "cloud:workerType"
 	Zone                              = "cloud:zone"
 	PlatformVersion                   = "cloud:platformVersion"
 	KubernetesVersion                 = "cloud:kubernetesVersion"
@@ -380,6 +384,7 @@ func init() {
 		properties.CopyTagsToSnapshot:                CopyTagsToSnapshot,
 		properties.Country:                           Country,
 		properties.Created:                           Created,
+		properties.Database:                          Database,
 		properties.DBName:                            DBName,
 		properties.DBSecurityGroups:                  DBSecurityGroups,
 		properties.DBSubnetGroup:                     DBSubnetGroup,
@@ -407,6 +412,7 @@ func init() {
 		properties.Fingerprint:                       Fingerprint,
 		properties.Frequency:                         Frequency,
 		properties.GlobalID:                          GlobalID,
+		properties.GlueVersion:                       GlueVersion,
 		properties.GranteeType:                       GranteeType,
 		properties.Grants:                            Grants,
 		properties.Handler:                           Handler,
@@ -443,6 +449,7 @@ func init() {
 		properties.Lifecycle:                         Lifecycle,
 		properties.LoadBalancer:                      LoadBalancer,
 		properties.Location:                          Location,
+		properties.LocationURI:                       LocationURI,
 		properties.MACAddress:                        MACAddress,
 		properties.Main:                              Main,
 		properties.ManagedBy:                         ManagedBy,
@@ -560,6 +567,7 @@ func init() {
 		properties.Vpcs:                              Vpcs,
 		properties.WebACL:                            WebACL,
 		properties.Weight:                            Weight,
+		properties.WorkerType:                        WorkerType,
 		properties.Zone:                              Zone,
 		properties.PlatformVersion:                   PlatformVersion,
 		properties.KubernetesVersion:                 KubernetesVersion,
@@ -673,6 +681,7 @@ var Properties = RDFProperties{
 	CopyTagsToSnapshot:                {ID: CopyTagsToSnapshot, RdfType: "rdf:Property", RdfsLabel: "CopyTagsToSnapshot", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Country:                           {ID: Country, RdfType: "rdf:Property", RdfsLabel: "Country", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Created:                           {ID: Created, RdfType: "rdf:Property", RdfsLabel: "Created", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
+	Database:                          {ID: Database, RdfType: "rdf:Property", RdfsLabel: "Database", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DBName:                            {ID: DBName, RdfType: "rdf:Property", RdfsLabel: "DBName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DBSecurityGroups:                  {ID: DBSecurityGroups, RdfType: "rdf:Property", RdfsLabel: "DBSecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	DBSubnetGroup:                     {ID: DBSubnetGroup, RdfType: "rdf:Property", RdfsLabel: "DBSubnetGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -700,6 +709,7 @@ var Properties = RDFProperties{
 	Fingerprint:                       {ID: Fingerprint, RdfType: "rdf:Property", RdfsLabel: "Fingerprint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Frequency:                         {ID: Frequency, RdfType: "rdf:Property", RdfsLabel: "Frequency", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	GlobalID:                          {ID: GlobalID, RdfType: "rdf:Property", RdfsLabel: "GlobalID", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	GlueVersion:                       {ID: GlueVersion, RdfType: "rdf:Property", RdfsLabel: "GlueVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	GranteeType:                       {ID: GranteeType, RdfType: "rdf:Property", RdfsLabel: "GranteeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Grants:                            {ID: Grants, RdfType: "rdf:Property", RdfsLabel: "Grants", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:Grant"},
 	Handler:                           {ID: Handler, RdfType: "rdf:Property", RdfsLabel: "Handler", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -736,6 +746,7 @@ var Properties = RDFProperties{
 	Lifecycle:                         {ID: Lifecycle, RdfType: "rdf:Property", RdfsLabel: "Lifecycle", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	LoadBalancer:                      {ID: LoadBalancer, RdfType: "rdf:Property", RdfsLabel: "LoadBalancer", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	Location:                          {ID: Location, RdfType: "rdf:Property", RdfsLabel: "Location", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	LocationURI:                       {ID: LocationURI, RdfType: "rdf:Property", RdfsLabel: "LocationURI", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MACAddress:                        {ID: MACAddress, RdfType: "rdf:Property", RdfsLabel: "MACAddress", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Main:                              {ID: Main, RdfType: "rdf:Property", RdfsLabel: "Main", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	ManagedBy:                         {ID: ManagedBy, RdfType: "rdf:Property", RdfsLabel: "ManagedBy", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -853,6 +864,7 @@ var Properties = RDFProperties{
 	Vpcs:                              {ID: Vpcs, RdfType: "rdf:Property", RdfsLabel: "Vpcs", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	WebACL:                            {ID: WebACL, RdfType: "rdf:Property", RdfsLabel: "WebACL", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Weight:                            {ID: Weight, RdfType: "rdf:Property", RdfsLabel: "Weight", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	WorkerType:                        {ID: WorkerType, RdfType: "rdf:Property", RdfsLabel: "WorkerType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Zone:                              {ID: Zone, RdfType: "rdf:Property", RdfsLabel: "Zone", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	PlatformVersion:                   {ID: PlatformVersion, RdfType: "rdf:Property", RdfsLabel: "PlatformVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	KubernetesVersion:                 {ID: KubernetesVersion, RdfType: "rdf:Property", RdfsLabel: "KubernetesVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},

@@ -55,6 +55,7 @@ import (
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
+	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
@@ -281,6 +282,15 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// Glue
+	case gluetypes.Database:
+		res = graph.InitResource(cloud.GlueDatabase, awssdk.ToString(ss.Name))
+	case gluetypes.Table:
+		res = graph.InitResource(cloud.GlueTable, awssdk.ToString(ss.Name))
+	case gluetypes.Crawler:
+		res = graph.InitResource(cloud.Crawler, awssdk.ToString(ss.Name))
+	case gluetypes.Job:
+		res = graph.InitResource(cloud.Job, awssdk.ToString(ss.Name))
 	// CodeDeploy
 	case codedeploytypes.ApplicationInfo:
 		res = graph.InitResource(cloud.DeployApplication, awssdk.ToString(ss.ApplicationName))

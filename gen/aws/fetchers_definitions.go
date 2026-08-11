@@ -344,6 +344,18 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "glue",
+		API:  []string{"glue"},
+		Fetchers: []fetcher{
+			{API: "glue", ResourceType: cloud.GlueDatabase, AWSType: "gluetypes.Database", APIMethod: "GetDatabases", Input: "glue.GetDatabasesInput{}", Output: "glue.GetDatabasesOutput", OutputsExtractor: "DatabaseList", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "glue", ResourceType: cloud.Crawler, AWSType: "gluetypes.Crawler", APIMethod: "GetCrawlers", Input: "glue.GetCrawlersInput{}", Output: "glue.GetCrawlersOutput", OutputsExtractor: "Crawlers", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "glue", ResourceType: cloud.Job, AWSType: "gluetypes.Job", APIMethod: "GetJobs", Input: "glue.GetJobsInput{}", Output: "glue.GetJobsOutput", OutputsExtractor: "Jobs", Multipage: true, NextPageMarker: "NextToken"},
+			// GetTables needs a database, so tables are walked per database. Databases
+			// are few, which is what makes that fan-out acceptable.
+			{API: "glue", ResourceType: cloud.GlueTable, AWSType: "gluetypes.Table", ManualFetcher: true},
+		},
+	},
+	{
 		Name: "codedeploy",
 		API:  []string{"codedeploy"},
 		Fetchers: []fetcher{

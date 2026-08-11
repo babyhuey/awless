@@ -27,6 +27,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
+	"github.com/aws/aws-sdk-go-v2/service/glue"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
@@ -85,6 +86,7 @@ type AWSAPI struct {
 	Codepipeline           *codepipeline.Client
 	Codebuild              *codebuild.Client
 	Codedeploy             *codedeploy.Client
+	Glue                   *glue.Client
 	Elasticbeanstalk       *elasticbeanstalk.Client
 }
 

@@ -85,6 +85,8 @@ github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.54.8 h1:xUwbqWhKA
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.54.8/go.mod h1:sQoz/dTooY3kCkNNGxVLTS7EacLA0qXUaK4BkpMjGOc=
 github.com/aws/aws-sdk-go-v2/service/eventbridge v1.48.5 h1:pr74r7rrAlxzbNZ3M62sZPkkfVaZv4y0zJAc+zJZdQo=
 github.com/aws/aws-sdk-go-v2/service/eventbridge v1.48.5/go.mod h1:KEHNsKgUKn1+HYQDwk/C/yMbu+pR6nyLDZedJJc3lSU=
+github.com/aws/aws-sdk-go-v2/service/glue v1.152.1 h1:IcuGebaNEH4br8ori89JHWdwW9Pf/8UKDC11blXnJMk=
+github.com/aws/aws-sdk-go-v2/service/glue v1.152.1/go.mod h1:gCCX39QKs/+0xqqBmF0NomCa98xKqYXAm4YOhRvJrp0=
 github.com/aws/aws-sdk-go-v2/service/iam v1.53.5 h1:J8qtztl/SJ6lhk/Rke/F6PgpZ7V6UYq0my0Zc8hdLuc=
 github.com/aws/aws-sdk-go-v2/service/iam v1.53.5/go.mod h1:seDE466zJ4haVuAVcRk+yIH4DWb3s6cqt3Od8GxnGAA=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.7 h1:5EniKhLZe4xzL7a+fU3C2tfUN4nWIqlLesfrjkuPFTY=

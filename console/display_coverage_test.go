@@ -75,5 +75,6 @@ func allResourceTypes() []string {
 		cloud.BuildProject, cloud.Application, cloud.Environment,
 		cloud.TransitGateway, cloud.TransitGatewayAttachment, cloud.TransitGatewayRouteTable,
 		cloud.VpcEndpoint, cloud.DeployApplication, cloud.DeploymentGroup,
+		cloud.GlueDatabase, cloud.GlueTable, cloud.Crawler, cloud.Job,
 	}
 }

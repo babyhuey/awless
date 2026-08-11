@@ -146,6 +146,12 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//glue. Qualified because "database" belongs to RDS and a bare "table" would not
+	//say which catalog it is in.
+	GlueDatabase string = "gluedatabase"
+	GlueTable    string = "gluetable"
+	Crawler      string = "crawler"
+	Job          string = "job"
 	//codedeploy. "deployapplication" rather than "application", which Elastic
 	//Beanstalk already owns.
 	DeployApplication string = "deployapplication"

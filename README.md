@@ -126,6 +126,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **Elastic Beanstalk** | applications, environments |
 | **Transit Gateway** | transit gateways, VPC attachments, route tables |
 | **CodeDeploy** | applications, deployment groups, deployments |
+| **Glue** | catalog databases, tables, crawlers, jobs |
 | **VPC Endpoints** | gateway and interface endpoints |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
@@ -171,6 +172,9 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls vpcendpoints
       $ awless ls deployapplications
       $ awless ls deploymentgroups
+      $ awless ls gluedatabases
+      $ awless ls crawlers
+      $ awless ls jobs
       $ ...
       (see awless ls -h)
 

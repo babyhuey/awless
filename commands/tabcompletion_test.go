@@ -236,7 +236,7 @@ func TestGuessEntityType(t *testing.T) {
 		{hole: "subnet.cidr.any", types: []string{"subnet"}},
 		{hole: "vpc.instance", types: []string{"instance"}},
 		{hole: "route.gateway", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
-		{hole: "route.table", types: []string{"transitgatewayroutetable", "routetable", "dynamodbtable"}},
+		{hole: "route.table", types: []string{"transitgatewayroutetable", "routetable", "dynamodbtable", "gluetable"}},
 
 		{hole: "zone.1", types: []string{"zone"}, prop: "1"},
 		{hole: "availabilityzone.1", types: []string{"availabilityzone"}, prop: "1"},

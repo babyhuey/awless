@@ -135,6 +135,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateConfigrule(f.Cfg, f.Graph, f.Log) }
 	case "createcontainercluster":
 		return func() any { return NewCreateContainercluster(f.Cfg, f.Graph, f.Log) }
+	case "createcrawler":
+		return func() any { return NewCreateCrawler(f.Cfg, f.Graph, f.Log) }
 	case "createdatabase":
 		return func() any { return NewCreateDatabase(f.Cfg, f.Graph, f.Log) }
 	case "createdbsubnetgroup":
@@ -165,6 +167,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateFilesystem(f.Cfg, f.Graph, f.Log) }
 	case "createfunction":
 		return func() any { return NewCreateFunction(f.Cfg, f.Graph, f.Log) }
+	case "creategluedatabase":
+		return func() any { return NewCreateGluedatabase(f.Cfg, f.Graph, f.Log) }
 	case "creategroup":
 		return func() any { return NewCreateGroup(f.Cfg, f.Graph, f.Log) }
 	case "createimage":
@@ -177,6 +181,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateInternetgateway(f.Cfg, f.Graph, f.Log) }
 	case "createipset":
 		return func() any { return NewCreateIpset(f.Cfg, f.Graph, f.Log) }
+	case "createjob":
+		return func() any { return NewCreateJob(f.Cfg, f.Graph, f.Log) }
 	case "createkeypair":
 		return func() any { return NewCreateKeypair(f.Cfg, f.Graph, f.Log) }
 	case "createlaunchconfiguration":
@@ -303,6 +309,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteContainercluster(f.Cfg, f.Graph, f.Log) }
 	case "deletecontainertask":
 		return func() any { return NewDeleteContainertask(f.Cfg, f.Graph, f.Log) }
+	case "deletecrawler":
+		return func() any { return NewDeleteCrawler(f.Cfg, f.Graph, f.Log) }
 	case "deletedatabase":
 		return func() any { return NewDeleteDatabase(f.Cfg, f.Graph, f.Log) }
 	case "deletedbsubnetgroup":
@@ -331,6 +339,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteFilesystem(f.Cfg, f.Graph, f.Log) }
 	case "deletefunction":
 		return func() any { return NewDeleteFunction(f.Cfg, f.Graph, f.Log) }
+	case "deletegluedatabase":
+		return func() any { return NewDeleteGluedatabase(f.Cfg, f.Graph, f.Log) }
 	case "deletegroup":
 		return func() any { return NewDeleteGroup(f.Cfg, f.Graph, f.Log) }
 	case "deleteimage":
@@ -343,6 +353,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteInternetgateway(f.Cfg, f.Graph, f.Log) }
 	case "deleteipset":
 		return func() any { return NewDeleteIpset(f.Cfg, f.Graph, f.Log) }
+	case "deletejob":
+		return func() any { return NewDeleteJob(f.Cfg, f.Graph, f.Log) }
 	case "deletekeypair":
 		return func() any { return NewDeleteKeypair(f.Cfg, f.Graph, f.Log) }
 	case "deletelaunchconfiguration":
@@ -479,6 +491,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartBuildproject(f.Cfg, f.Graph, f.Log) }
 	case "startcontainertask":
 		return func() any { return NewStartContainertask(f.Cfg, f.Graph, f.Log) }
+	case "startcrawler":
+		return func() any { return NewStartCrawler(f.Cfg, f.Graph, f.Log) }
 	case "startdatabase":
 		return func() any { return NewStartDatabase(f.Cfg, f.Graph, f.Log) }
 	case "starteventrule":
@@ -487,6 +501,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartExecution(f.Cfg, f.Graph, f.Log) }
 	case "startinstance":
 		return func() any { return NewStartInstance(f.Cfg, f.Graph, f.Log) }
+	case "startjob":
+		return func() any { return NewStartJob(f.Cfg, f.Graph, f.Log) }
 	case "startpipeline":
 		return func() any { return NewStartPipeline(f.Cfg, f.Graph, f.Log) }
 	case "starttrail":
@@ -497,6 +513,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopBuildproject(f.Cfg, f.Graph, f.Log) }
 	case "stopcontainertask":
 		return func() any { return NewStopContainertask(f.Cfg, f.Graph, f.Log) }
+	case "stopcrawler":
+		return func() any { return NewStopCrawler(f.Cfg, f.Graph, f.Log) }
 	case "stopdatabase":
 		return func() any { return NewStopDatabase(f.Cfg, f.Graph, f.Log) }
 	case "stopdeployment":
@@ -620,6 +638,7 @@ var (
 	_ command = &CreateClassicLoadbalancer{}
 	_ command = &CreateConfigrule{}
 	_ command = &CreateContainercluster{}
+	_ command = &CreateCrawler{}
 	_ command = &CreateDatabase{}
 	_ command = &CreateDbsubnetgroup{}
 	_ command = &CreateDeployapplication{}
@@ -635,12 +654,14 @@ var (
 	_ command = &CreateEventrule{}
 	_ command = &CreateFilesystem{}
 	_ command = &CreateFunction{}
+	_ command = &CreateGluedatabase{}
 	_ command = &CreateGroup{}
 	_ command = &CreateImage{}
 	_ command = &CreateInstance{}
 	_ command = &CreateInstanceprofile{}
 	_ command = &CreateInternetgateway{}
 	_ command = &CreateIpset{}
+	_ command = &CreateJob{}
 	_ command = &CreateKeypair{}
 	_ command = &CreateLaunchconfiguration{}
 	_ command = &CreateListener{}
@@ -704,6 +725,7 @@ var (
 	_ command = &DeleteConfigrule{}
 	_ command = &DeleteContainercluster{}
 	_ command = &DeleteContainertask{}
+	_ command = &DeleteCrawler{}
 	_ command = &DeleteDatabase{}
 	_ command = &DeleteDbsubnetgroup{}
 	_ command = &DeleteDeployapplication{}
@@ -718,12 +740,14 @@ var (
 	_ command = &DeleteEventrule{}
 	_ command = &DeleteFilesystem{}
 	_ command = &DeleteFunction{}
+	_ command = &DeleteGluedatabase{}
 	_ command = &DeleteGroup{}
 	_ command = &DeleteImage{}
 	_ command = &DeleteInstance{}
 	_ command = &DeleteInstanceprofile{}
 	_ command = &DeleteInternetgateway{}
 	_ command = &DeleteIpset{}
+	_ command = &DeleteJob{}
 	_ command = &DeleteKeypair{}
 	_ command = &DeleteLaunchconfiguration{}
 	_ command = &DeleteListener{}
@@ -792,15 +816,18 @@ var (
 	_ command = &StartAlarm{}
 	_ command = &StartBuildproject{}
 	_ command = &StartContainertask{}
+	_ command = &StartCrawler{}
 	_ command = &StartDatabase{}
 	_ command = &StartEventrule{}
 	_ command = &StartExecution{}
 	_ command = &StartInstance{}
+	_ command = &StartJob{}
 	_ command = &StartPipeline{}
 	_ command = &StartTrail{}
 	_ command = &StopAlarm{}
 	_ command = &StopBuildproject{}
 	_ command = &StopContainertask{}
+	_ command = &StopCrawler{}
 	_ command = &StopDatabase{}
 	_ command = &StopDeployment{}
 	_ command = &StopEventrule{}

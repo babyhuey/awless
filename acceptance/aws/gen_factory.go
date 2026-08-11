@@ -239,6 +239,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateContainercluster(f.config(), f.Graph, f.Logger)
 		}
+	case "createcrawler":
+		return func() any {
+			return awsspec.NewCreateCrawler(f.config(), f.Graph, f.Logger)
+		}
 	case "createdatabase":
 		return func() any {
 			return awsspec.NewCreateDatabase(f.config(), f.Graph, f.Logger)
@@ -299,6 +303,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateFunction(f.config(), f.Graph, f.Logger)
 		}
+	case "creategluedatabase":
+		return func() any {
+			return awsspec.NewCreateGluedatabase(f.config(), f.Graph, f.Logger)
+		}
 	case "creategroup":
 		return func() any {
 			return awsspec.NewCreateGroup(f.config(), f.Graph, f.Logger)
@@ -322,6 +330,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createipset":
 		return func() any {
 			return awsspec.NewCreateIpset(f.config(), f.Graph, f.Logger)
+		}
+	case "createjob":
+		return func() any {
+			return awsspec.NewCreateJob(f.config(), f.Graph, f.Logger)
 		}
 	case "createkeypair":
 		return func() any {
@@ -575,6 +587,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteContainertask(f.config(), f.Graph, f.Logger)
 		}
+	case "deletecrawler":
+		return func() any {
+			return awsspec.NewDeleteCrawler(f.config(), f.Graph, f.Logger)
+		}
 	case "deletedatabase":
 		return func() any {
 			return awsspec.NewDeleteDatabase(f.config(), f.Graph, f.Logger)
@@ -631,6 +647,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteFunction(f.config(), f.Graph, f.Logger)
 		}
+	case "deletegluedatabase":
+		return func() any {
+			return awsspec.NewDeleteGluedatabase(f.config(), f.Graph, f.Logger)
+		}
 	case "deletegroup":
 		return func() any {
 			return awsspec.NewDeleteGroup(f.config(), f.Graph, f.Logger)
@@ -654,6 +674,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteipset":
 		return func() any {
 			return awsspec.NewDeleteIpset(f.config(), f.Graph, f.Logger)
+		}
+	case "deletejob":
+		return func() any {
+			return awsspec.NewDeleteJob(f.config(), f.Graph, f.Logger)
 		}
 	case "deletekeypair":
 		return func() any {
@@ -927,6 +951,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStartContainertask(f.config(), f.Graph, f.Logger)
 		}
+	case "startcrawler":
+		return func() any {
+			return awsspec.NewStartCrawler(f.config(), f.Graph, f.Logger)
+		}
 	case "startdatabase":
 		return func() any {
 			return awsspec.NewStartDatabase(f.config(), f.Graph, f.Logger)
@@ -942,6 +970,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "startinstance":
 		return func() any {
 			return awsspec.NewStartInstance(f.config(), f.Graph, f.Logger)
+		}
+	case "startjob":
+		return func() any {
+			return awsspec.NewStartJob(f.config(), f.Graph, f.Logger)
 		}
 	case "startpipeline":
 		return func() any {
@@ -962,6 +994,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "stopcontainertask":
 		return func() any {
 			return awsspec.NewStopContainertask(f.config(), f.Graph, f.Logger)
+		}
+	case "stopcrawler":
+		return func() any {
+			return awsspec.NewStopCrawler(f.config(), f.Graph, f.Logger)
 		}
 	case "stopdatabase":
 		return func() any {

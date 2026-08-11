@@ -48,6 +48,7 @@ import (
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
+	glue "github.com/aws/aws-sdk-go-v2/service/glue"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
@@ -3674,6 +3675,84 @@ func (cmd *CreateContainercluster) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateCrawler(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateCrawler {
+	cmd := new(CreateCrawler)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateCrawler) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateCrawler) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.CreateCrawlerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.CreateCrawlerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateCrawler(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.CreateCrawler call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create crawler: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create crawler '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create crawler done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateCrawler) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("crawler"), nil
+}
+
+func (cmd *CreateCrawler) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDatabase {
 	cmd := new(CreateDatabase)
 	if len(l) > 0 {
@@ -4824,6 +4903,84 @@ func (cmd *CreateFunction) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateGluedatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateGluedatabase {
+	cmd := new(CreateGluedatabase)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateGluedatabase) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateGluedatabase) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.CreateDatabaseInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.CreateDatabaseInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateDatabase(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.CreateDatabase call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create gluedatabase: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create gluedatabase '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create gluedatabase done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateGluedatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("gluedatabase"), nil
+}
+
+func (cmd *CreateGluedatabase) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateGroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateGroup {
 	cmd := new(CreateGroup)
 	if len(l) > 0 {
@@ -5355,6 +5512,84 @@ func (cmd *CreateIpset) dryRun(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *CreateIpset) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateJob(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateJob {
+	cmd := new(CreateJob)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateJob) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateJob) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.CreateJobInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.CreateJobInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateJob(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.CreateJob call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create job: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create job '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create job done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateJob) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("job"), nil
+}
+
+func (cmd *CreateJob) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10510,6 +10745,84 @@ func (cmd *DeleteContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteCrawler(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCrawler {
+	cmd := new(DeleteCrawler)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteCrawler) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteCrawler) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.DeleteCrawlerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.DeleteCrawlerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteCrawler(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.DeleteCrawler call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete crawler: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete crawler '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete crawler done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteCrawler) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("crawler"), nil
+}
+
+func (cmd *DeleteCrawler) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDatabase {
 	cmd := new(DeleteDatabase)
 	if len(l) > 0 {
@@ -11618,6 +11931,84 @@ func (cmd *DeleteFunction) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteGluedatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteGluedatabase {
+	cmd := new(DeleteGluedatabase)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteGluedatabase) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteGluedatabase) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.DeleteDatabaseInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.DeleteDatabaseInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteDatabase(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.DeleteDatabase call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete gluedatabase: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete gluedatabase '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete gluedatabase done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteGluedatabase) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("gluedatabase"), nil
+}
+
+func (cmd *DeleteGluedatabase) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteGroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteGroup {
 	cmd := new(DeleteGroup)
 	if len(l) > 0 {
@@ -12111,6 +12502,84 @@ func (cmd *DeleteIpset) dryRun(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteIpset) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteJob(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteJob {
+	cmd := new(DeleteJob)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteJob) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteJob) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.DeleteJobInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.DeleteJobInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteJob(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.DeleteJob call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete job: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete job '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete job done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteJob) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("job"), nil
+}
+
+func (cmd *DeleteJob) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -17777,6 +18246,84 @@ func (cmd *StartContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewStartCrawler(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartCrawler {
+	cmd := new(StartCrawler)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartCrawler) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartCrawler) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.StartCrawlerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.StartCrawlerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StartCrawler(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.StartCrawler call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start crawler: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start crawler '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start crawler done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartCrawler) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("crawler"), nil
+}
+
+func (cmd *StartCrawler) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewStartDatabase(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartDatabase {
 	cmd := new(StartDatabase)
 	if len(l) > 0 {
@@ -18111,6 +18658,84 @@ func (cmd *StartInstance) dryRun(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *StartInstance) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStartJob(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartJob {
+	cmd := new(StartJob)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartJob) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartJob) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.StartJobRunInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.StartJobRunInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StartJobRun(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.StartJobRun call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start job: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start job '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start job done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartJob) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("job"), nil
+}
+
+func (cmd *StartJob) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -18492,6 +19117,84 @@ func (cmd *StopContainertask) dryRun(renv env.Running, params map[string]any) (a
 }
 
 func (cmd *StopContainertask) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStopCrawler(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopCrawler {
+	cmd := new(StopCrawler)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = glue.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StopCrawler) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StopCrawler) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &glue.StopCrawlerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in glue.StopCrawlerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StopCrawler(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("glue.StopCrawler call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("stop crawler: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("stop crawler '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("stop crawler done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StopCrawler) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("crawler"), nil
+}
+
+func (cmd *StopCrawler) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

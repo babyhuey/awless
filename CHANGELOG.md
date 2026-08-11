@@ -10,6 +10,10 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Glue.** Catalog databases, tables, crawlers and jobs, with create/delete and
+  `start`/`stop` on a crawler and `start` on a job. The entities are `gluedatabase` and
+  `gluetable`, since `database` belongs to RDS and a bare `table` would not say which
+  catalog it means.
 - **CodeDeploy.** Applications and deployment groups, plus creating and stopping a
   deployment. The entity is `deployapplication`, because Elastic Beanstalk already owns
   `application` and the template language has one flat namespace.

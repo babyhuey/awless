@@ -109,6 +109,10 @@ var ColumnsInListing = map[string][]string{
 	cloud.VpcEndpoint:              {properties.ID, properties.ServiceName, properties.Type, properties.State, properties.Vpc},
 	cloud.DeployApplication:        {properties.Name, properties.ComputePlatform, properties.Created},
 	cloud.DeploymentGroup:          {properties.Name, properties.Application, properties.DeploymentConfig, properties.ComputePlatform},
+	cloud.GlueDatabase:             {properties.Name, properties.Description, properties.LocationURI},
+	cloud.GlueTable:                {properties.Name, properties.Database, properties.Type, properties.Created},
+	cloud.Crawler:                  {properties.Name, properties.State, properties.Database, properties.Role},
+	cloud.Job:                      {properties.Name, properties.GlueVersion, properties.WorkerType, properties.NodeCount},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -830,5 +834,33 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.DeploymentConfig, Friendly: "Config"},
 		StringColumnDefinition{Prop: properties.ComputePlatform, Friendly: "Platform"},
 		StringColumnDefinition{Prop: properties.Role},
+	}, // Glue
+	cloud.GlueDatabase: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Description},
+		StringColumnDefinition{Prop: properties.LocationURI, Friendly: "Location"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.GlueTable: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Database},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.Crawler: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Database},
+		StringColumnDefinition{Prop: properties.Role},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.Job: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.GlueVersion, Friendly: "Glue"},
+		StringColumnDefinition{Prop: properties.WorkerType, Friendly: "Worker"},
+		StringColumnDefinition{Prop: properties.NodeCount, Friendly: "Workers"},
+		StringColumnDefinition{Prop: properties.Role},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

@@ -19,6 +19,8 @@ import (
 	elasticbeanstalktypes "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk/types"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
+	"github.com/aws/aws-sdk-go-v2/service/glue"
+	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	"github.com/aws/aws-sdk-go-v2/service/wafv2"
 	wafv2types "github.com/aws/aws-sdk-go-v2/service/wafv2/types"
 
@@ -1575,6 +1577,47 @@ func addManualCodedeployFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 					return resources, objects, err
 				}
 				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+}
+
+func addManualGlueFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["gluetable"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []gluetypes.Table
+		var resources []*graph.Resource
+
+		// Tables live in a database and cannot be listed across all of them, so this is
+		// one pass per database.
+		var databases []string
+		dbPager := glue.NewGetDatabasesPaginator(conf.APIs.Glue, &glue.GetDatabasesInput{})
+		for dbPager.HasMorePages() {
+			out, err := dbPager.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, db := range out.DatabaseList {
+				databases = append(databases, awssdk.ToString(db.Name))
+			}
+		}
+
+		for _, db := range databases {
+			pager := glue.NewGetTablesPaginator(conf.APIs.Glue, &glue.GetTablesInput{DatabaseName: awssdk.String(db)})
+			for pager.HasMorePages() {
+				out, err := pager.NextPage(ctx)
+				if err != nil {
+					return resources, objects, err
+				}
+				for _, table := range out.TableList {
+					objects = append(objects, table)
+					res, err := awsconv.NewResource(table)
+					if err != nil {
+						return resources, objects, err
+					}
+					resources = append(resources, res)
+				}
 			}
 		}
 

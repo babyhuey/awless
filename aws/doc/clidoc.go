@@ -245,6 +245,22 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.gluedatabase": {"awless create gluedatabase name=analytics description=\"Analytics catalog\""},
+	"delete.gluedatabase": {"awless delete gluedatabase name=analytics"},
+	"create.crawler": {
+		"awless create crawler name=events-crawler role=AWSGlueServiceRole database=analytics targets-file=/home/jsmith/targets.json",
+	},
+	"delete.crawler": {"awless delete crawler name=events-crawler"},
+	"start.crawler":  {"awless start crawler name=events-crawler"},
+	"stop.crawler":   {"awless stop crawler name=events-crawler"},
+	"create.job": {
+		"awless create job name=etl-events role=AWSGlueServiceRole command=glueetl script=s3://scripts/etl.py glue-version=4.0 worker-type=G.1X workers=2",
+	},
+	"delete.job": {"awless delete job name=etl-events"},
+	"start.job": {
+		"awless start job name=etl-events",
+		"awless start job name=etl-events workers=10 worker-type=G.2X",
+	},
 	"create.deployapplication": {
 		"awless create deployapplication name=web-api platform=Server",
 	},

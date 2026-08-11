@@ -73,6 +73,8 @@ import (
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
+	glue "github.com/aws/aws-sdk-go-v2/service/glue"
+	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
@@ -139,6 +141,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"glue",
 	"codedeploy",
 	"codebuild",
 	"beanstalk",
@@ -225,6 +228,10 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"gluedatabase",
+	"crawler",
+	"job",
+	"gluetable",
 	"deployapplication",
 	"deploymentgroup",
 	"buildproject",
@@ -269,6 +276,7 @@ var ServicePerAPI = map[string]string{
 	"kinesis":                "kinesis",
 	"redshift":               "redshift",
 	"codepipeline":           "codepipeline",
+	"glue":                   "glue",
 	"codedeploy":             "codedeploy",
 	"codebuild":              "codebuild",
 	"elasticbeanstalk":       "beanstalk",
@@ -355,6 +363,10 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"gluedatabase":             "glue",
+	"crawler":                  "glue",
+	"job":                      "glue",
+	"gluetable":                "glue",
 	"deployapplication":        "codedeploy",
 	"deploymentgroup":          "codedeploy",
 	"buildproject":             "codebuild",
@@ -443,6 +455,10 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"gluedatabase":             "glue",
+	"crawler":                  "glue",
+	"job":                      "glue",
+	"gluetable":                "glue",
 	"deployapplication":        "codedeploy",
 	"deploymentgroup":          "codedeploy",
 	"buildproject":             "codebuild",
@@ -4957,6 +4973,203 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Glue struct {
+	fetcher         fetch.Fetcher
+	region, profile string
+	config          map[string]any
+	log             *logger.Logger
+	GlueClient      *glue.Client
+}
+
+func NewGlue(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	glueClient := glue.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		glueClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Glue{
+		GlueClient: glueClient,
+		fetcher:    fetch.NewFetcher(awsfetch.BuildGlueFetchFuncs(fetchConfig)),
+		config:     extraConf,
+		region:     region,
+		profile:    profile,
+		log:        log,
+	}
+}
+
+func (s *Glue) Name() string {
+	return "glue"
+}
+
+func (s *Glue) Region() string {
+	return s.region
+}
+
+func (s *Glue) Profile() string {
+	return s.profile
+}
+
+func (s *Glue) ResourceTypes() []string {
+	return []string{
+		"gluedatabase",
+		"crawler",
+		"job",
+		"gluetable",
+	}
+}
+
+func (s *Glue) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.glue.gluedatabase.sync", true) {
+		list, err := s.fetcher.Get("gluedatabase_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]gluetypes.Database); !ok {
+			return gph, errors.New("cannot cast to '[]gluetypes.Database' type from fetch context")
+		}
+		for _, r := range list.([]gluetypes.Database) {
+			for _, fn := range addParentsFns["gluedatabase"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *gluetypes.Database) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.glue.crawler.sync", true) {
+		list, err := s.fetcher.Get("crawler_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]gluetypes.Crawler); !ok {
+			return gph, errors.New("cannot cast to '[]gluetypes.Crawler' type from fetch context")
+		}
+		for _, r := range list.([]gluetypes.Crawler) {
+			for _, fn := range addParentsFns["crawler"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *gluetypes.Crawler) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.glue.job.sync", true) {
+		list, err := s.fetcher.Get("job_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]gluetypes.Job); !ok {
+			return gph, errors.New("cannot cast to '[]gluetypes.Job' type from fetch context")
+		}
+		for _, r := range list.([]gluetypes.Job) {
+			for _, fn := range addParentsFns["job"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *gluetypes.Job) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.glue.gluetable.sync", true) {
+		list, err := s.fetcher.Get("gluetable_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]gluetypes.Table); !ok {
+			return gph, errors.New("cannot cast to '[]gluetypes.Table' type from fetch context")
+		}
+		for _, r := range list.([]gluetypes.Table) {
+			for _, fn := range addParentsFns["gluetable"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *gluetypes.Table) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Glue) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Glue) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.glue.sync", true)
 }
 
 type Codedeploy struct {

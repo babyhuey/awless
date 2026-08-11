@@ -117,6 +117,10 @@ type eventbridgeMock struct {
 	basicMock
 }
 
+type glueMock struct {
+	basicMock
+}
+
 type iamMock struct {
 	basicMock
 }
