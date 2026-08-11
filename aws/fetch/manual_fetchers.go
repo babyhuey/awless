@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/configservice"
+	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	"github.com/aws/aws-sdk-go-v2/service/wafv2"
@@ -1351,6 +1353,53 @@ func addManualWafFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 					break
 				}
 				next = out.NextMarker
+			}
+		}
+
+		return resources, objects, nil
+	}
+}
+
+func addManualConfigserviceFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["configrule"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []configservicetypes.ConfigRule
+		var resources []*graph.Resource
+
+		// Compliance first, so every rule can be annotated as it is built. Keyed by
+		// rule name, which is what both APIs agree on.
+		compliance := make(map[string]string)
+		compPager := configservice.NewDescribeComplianceByConfigRulePaginator(conf.APIs.Configservice, &configservice.DescribeComplianceByConfigRuleInput{})
+		for compPager.HasMorePages() {
+			out, err := compPager.NextPage(ctx)
+			if err != nil {
+				// Compliance is an enrichment; a rule list without it is still
+				// useful, so this does not fail the fetch.
+				conf.Log.Verbosef("sync: cannot read Config rule compliance: %s", err)
+				break
+			}
+			for _, c := range out.ComplianceByConfigRules {
+				if c.Compliance != nil {
+					compliance[awssdk.ToString(c.ConfigRuleName)] = string(c.Compliance.ComplianceType)
+				}
+			}
+		}
+
+		pager := configservice.NewDescribeConfigRulesPaginator(conf.APIs.Configservice, &configservice.DescribeConfigRulesInput{})
+		for pager.HasMorePages() {
+			out, err := pager.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, rule := range out.ConfigRules {
+				objects = append(objects, rule)
+				res, err := awsconv.NewResource(rule)
+				if err != nil {
+					return resources, objects, err
+				}
+				if c, ok := compliance[awssdk.ToString(rule.ConfigRuleName)]; ok {
+					res.Properties()[properties.Compliance] = c
+				}
+				resources = append(resources, res)
 			}
 		}
 

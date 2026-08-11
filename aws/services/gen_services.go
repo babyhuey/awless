@@ -43,6 +43,8 @@ import (
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
+	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -121,6 +123,7 @@ var ServiceNames = []string{
 	"eventbridge",
 	"stepfunctions",
 	"waf",
+	"configservice",
 }
 
 var ResourceTypes = []string{
@@ -195,6 +198,7 @@ var ResourceTypes = []string{
 	"webacl",
 	"ipset",
 	"rulegroup",
+	"configrule",
 }
 
 var ServicePerAPI = map[string]string{
@@ -230,6 +234,7 @@ var ServicePerAPI = map[string]string{
 	"eventbridge":            "eventbridge",
 	"sfn":                    "stepfunctions",
 	"wafv2":                  "waf",
+	"configservice":          "configservice",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -304,6 +309,7 @@ var ServicePerResourceType = map[string]string{
 	"webacl":              "waf",
 	"ipset":               "waf",
 	"rulegroup":           "waf",
+	"configrule":          "configservice",
 }
 
 var APIPerResourceType = map[string]string{
@@ -378,6 +384,7 @@ var APIPerResourceType = map[string]string{
 	"webacl":              "wafv2",
 	"ipset":               "wafv2",
 	"rulegroup":           "wafv2",
+	"configrule":          "configservice",
 }
 
 type Infra struct {
@@ -4260,4 +4267,132 @@ func (s *Waf) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error)
 
 func (s *Waf) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.waf.sync", true)
+}
+
+type Configservice struct {
+	fetcher             fetch.Fetcher
+	region, profile     string
+	config              map[string]any
+	log                 *logger.Logger
+	ConfigserviceClient *configservice.Client
+}
+
+func NewConfigservice(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	configserviceClient := configservice.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		configserviceClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Configservice{
+		ConfigserviceClient: configserviceClient,
+		fetcher:             fetch.NewFetcher(awsfetch.BuildConfigserviceFetchFuncs(fetchConfig)),
+		config:              extraConf,
+		region:              region,
+		profile:             profile,
+		log:                 log,
+	}
+}
+
+func (s *Configservice) Name() string {
+	return "configservice"
+}
+
+func (s *Configservice) Region() string {
+	return s.region
+}
+
+func (s *Configservice) Profile() string {
+	return s.profile
+}
+
+func (s *Configservice) ResourceTypes() []string {
+	return []string{
+		"configrule",
+	}
+}
+
+func (s *Configservice) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.configservice.configrule.sync", true) {
+		list, err := s.fetcher.Get("configrule_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]configservicetypes.ConfigRule); !ok {
+			return gph, errors.New("cannot cast to '[]configservicetypes.ConfigRule' type from fetch context")
+		}
+		for _, r := range list.([]configservicetypes.ConfigRule) {
+			for _, fn := range addParentsFns["configrule"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *configservicetypes.ConfigRule) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Configservice) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Configservice) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.configservice.sync", true)
 }

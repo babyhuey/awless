@@ -33,6 +33,7 @@ import (
 	cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
 	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
@@ -3352,6 +3353,84 @@ func (cmd *CreateClassicLoadbalancer) dryRun(renv env.Running, params map[string
 }
 
 func (cmd *CreateClassicLoadbalancer) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateConfigrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateConfigrule {
+	cmd := new(CreateConfigrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = configservice.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateConfigrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateConfigrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &configservice.PutConfigRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in configservice.PutConfigRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutConfigRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("configservice.PutConfigRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create configrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create configrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create configrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateConfigrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("configrule"), nil
+}
+
+func (cmd *CreateConfigrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8697,6 +8776,84 @@ func (cmd *DeleteClassicLoadbalancer) dryRun(renv env.Running, params map[string
 }
 
 func (cmd *DeleteClassicLoadbalancer) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteConfigrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteConfigrule {
+	cmd := new(DeleteConfigrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = configservice.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteConfigrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteConfigrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &configservice.DeleteConfigRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in configservice.DeleteConfigRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteConfigRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("configservice.DeleteConfigRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete configrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete configrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete configrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteConfigrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("configrule"), nil
+}
+
+func (cmd *DeleteConfigrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -16213,6 +16370,84 @@ func (cmd *UpdateClassicLoadbalancer) dryRun(renv env.Running, params map[string
 }
 
 func (cmd *UpdateClassicLoadbalancer) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateConfigrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateConfigrule {
+	cmd := new(UpdateConfigrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = configservice.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateConfigrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateConfigrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &configservice.PutConfigRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in configservice.PutConfigRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutConfigRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("configservice.PutConfigRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update configrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update configrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update configrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateConfigrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("configrule"), nil
+}
+
+func (cmd *UpdateConfigrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

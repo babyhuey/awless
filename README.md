@@ -118,6 +118,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **EventBridge** | event buses, rules, rule targets |
 | **Step Functions** | state machines, executions |
 | **WAF v2** | web ACLs, IP sets, rule groups |
+| **AWS Config** | config rules, with compliance status |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
 just listing — see [Changes in this fork](#changes-in-this-fork).
@@ -151,6 +152,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls statemachines
       $ awless ls ipsets
       $ awless ls webacls
+      $ awless ls configrules
       $ ...
       (see awless ls -h)
 

@@ -95,6 +95,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.WebACL:              {properties.Name, properties.Scope, properties.ID, properties.Description},
 	cloud.IPSet:               {properties.Name, properties.Scope, properties.ID, properties.Description},
 	cloud.RuleGroup:           {properties.Name, properties.Scope, properties.ID, properties.Description},
+	cloud.ConfigRule:          {properties.Name, properties.Compliance, properties.State, properties.SourceIdentifier},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -705,5 +706,15 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.ID},
 		StringColumnDefinition{Prop: properties.Description},
 		StringColumnDefinition{Prop: properties.Arn},
+	},
+	// AWS Config
+	cloud.ConfigRule: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Compliance},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Owner},
+		StringColumnDefinition{Prop: properties.SourceIdentifier, Friendly: "Rule"},
+		StringColumnDefinition{Prop: properties.Frequency},
+		StringColumnDefinition{Prop: properties.Description},
 	},
 }

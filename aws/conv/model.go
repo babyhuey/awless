@@ -750,4 +750,16 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Arn:         {name: "ARN", transform: extractValueFn},
 		properties.Description: {name: "Description", transform: extractValueFn},
 	},
+	// AWS Config. Compliance is not on the rule and is merged in by the fetcher.
+	cloud.ConfigRule: {
+		properties.Name:             {name: "ConfigRuleName", transform: extractValueFn},
+		properties.ID:               {name: "ConfigRuleId", transform: extractValueFn},
+		properties.Arn:              {name: "ConfigRuleArn", transform: extractValueFn},
+		properties.State:            {name: "ConfigRuleState", transform: extractValueFn},
+		properties.Description:      {name: "Description", transform: extractValueFn},
+		properties.Frequency:        {name: "MaximumExecutionFrequency", transform: extractValueFn},
+		properties.InputParameters:  {name: "InputParameters", transform: extractValueFn},
+		properties.Owner:            {name: "Source.Owner", transform: extractValueFn},
+		properties.SourceIdentifier: {name: "Source.SourceIdentifier", transform: extractValueFn},
+	},
 }

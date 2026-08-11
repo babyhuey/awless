@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudtrail"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ecr"
@@ -72,6 +73,7 @@ type AWSAPI struct {
 	Eventbridge            *eventbridge.Client
 	Sfn                    *sfn.Client
 	Wafv2                  *wafv2.Client
+	Configservice          *configservice.Client
 }
 
 type Config struct {

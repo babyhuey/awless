@@ -305,6 +305,16 @@ var FetchersDefs = []fetchersDef{
 			{API: "wafv2", ResourceType: cloud.RuleGroup, AWSType: "wafv2types.RuleGroupSummary", ManualFetcher: true},
 		},
 	},
+	{
+		Name: "configservice",
+		API:  []string{"configservice"},
+		Fetchers: []fetcher{
+			// Manual so compliance can be merged in. Whether a rule is passing is the
+			// reason to look at Config at all, and it comes from a second API; both
+			// calls paginate over all rules rather than one call per rule.
+			{API: "configservice", ResourceType: cloud.ConfigRule, AWSType: "configservicetypes.ConfigRule", ManualFetcher: true},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

@@ -127,6 +127,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateCertificate(f.Cfg, f.Graph, f.Log) }
 	case "createclassicloadbalancer":
 		return func() any { return NewCreateClassicLoadbalancer(f.Cfg, f.Graph, f.Log) }
+	case "createconfigrule":
+		return func() any { return NewCreateConfigrule(f.Cfg, f.Graph, f.Log) }
 	case "createcontainercluster":
 		return func() any { return NewCreateContainercluster(f.Cfg, f.Graph, f.Log) }
 	case "createdatabase":
@@ -259,6 +261,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteCertificate(f.Cfg, f.Graph, f.Log) }
 	case "deleteclassicloadbalancer":
 		return func() any { return NewDeleteClassicLoadbalancer(f.Cfg, f.Graph, f.Log) }
+	case "deleteconfigrule":
+		return func() any { return NewDeleteConfigrule(f.Cfg, f.Graph, f.Log) }
 	case "deletecontainercluster":
 		return func() any { return NewDeleteContainercluster(f.Cfg, f.Graph, f.Log) }
 	case "deletecontainertask":
@@ -443,6 +447,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateCachesubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "updateclassicloadbalancer":
 		return func() any { return NewUpdateClassicLoadbalancer(f.Cfg, f.Graph, f.Log) }
+	case "updateconfigrule":
+		return func() any { return NewUpdateConfigrule(f.Cfg, f.Graph, f.Log) }
 	case "updatecontainertask":
 		return func() any { return NewUpdateContainertask(f.Cfg, f.Graph, f.Log) }
 	case "updatedistribution":
@@ -528,6 +534,7 @@ var (
 	_ command = &CreateCachesubnetgroup{}
 	_ command = &CreateCertificate{}
 	_ command = &CreateClassicLoadbalancer{}
+	_ command = &CreateConfigrule{}
 	_ command = &CreateContainercluster{}
 	_ command = &CreateDatabase{}
 	_ command = &CreateDbsubnetgroup{}
@@ -594,6 +601,7 @@ var (
 	_ command = &DeleteCachesubnetgroup{}
 	_ command = &DeleteCertificate{}
 	_ command = &DeleteClassicLoadbalancer{}
+	_ command = &DeleteConfigrule{}
 	_ command = &DeleteContainercluster{}
 	_ command = &DeleteContainertask{}
 	_ command = &DeleteDatabase{}
@@ -686,6 +694,7 @@ var (
 	_ command = &UpdateCachecluster{}
 	_ command = &UpdateCachesubnetgroup{}
 	_ command = &UpdateClassicLoadbalancer{}
+	_ command = &UpdateConfigrule{}
 	_ command = &UpdateContainertask{}
 	_ command = &UpdateDistribution{}
 	_ command = &UpdateEventrule{}

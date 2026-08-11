@@ -73,6 +73,7 @@ const (
 	Cluster                           = "cloud:cluster"
 	ClusterEnabled                    = "cloud:clusterEnabled"
 	Comment                           = "rdfs:comment"
+	Compliance                        = "cloud:compliance"
 	Config                            = "cloud:config"
 	ContainerInstance                 = "cloud:containerInstance"
 	ContainersImages                  = "cloud:containersImages"
@@ -104,6 +105,7 @@ const (
 	ExitCode                          = "cloud:exitCode"
 	Failover                          = "cloud:failover"
 	Fingerprint                       = "cloud:fingerprint"
+	Frequency                         = "cloud:frequency"
 	GlobalID                          = "cloud:globalID"
 	GranteeType                       = "cloud:granteeType"
 	Grants                            = "cloud:grants"
@@ -120,6 +122,7 @@ const (
 	Image                             = "cloud:image"
 	InboundRules                      = "net:inboundRules"
 	InlinePolicies                    = "cloud:inlinePolicies"
+	InputParameters                   = "cloud:inputParameters"
 	Instance                          = "cloud:instance"
 	InstanceOwner                     = "cloud:instanceOwner"
 	Instances                         = "cloud:instances"
@@ -212,6 +215,7 @@ const (
 	Set                               = "cloud:set"
 	Size                              = "cloud:size"
 	Source                            = "cloud:source"
+	SourceIdentifier                  = "cloud:sourceIdentifier"
 	SpotInstanceRequestId             = "cloud:spotInstanceRequestId"
 	SpotPrice                         = "cloud:spotPrice"
 	SSLSupportMethod                  = "cloud:sslSupportMethod"
@@ -345,6 +349,7 @@ func init() {
 		properties.Cluster:                           Cluster,
 		properties.ClusterEnabled:                    ClusterEnabled,
 		properties.Comment:                           Comment,
+		properties.Compliance:                        Compliance,
 		properties.Config:                            Config,
 		properties.ContainerInstance:                 ContainerInstance,
 		properties.ContainersImages:                  ContainersImages,
@@ -376,6 +381,7 @@ func init() {
 		properties.ExitCode:                          ExitCode,
 		properties.Failover:                          Failover,
 		properties.Fingerprint:                       Fingerprint,
+		properties.Frequency:                         Frequency,
 		properties.GlobalID:                          GlobalID,
 		properties.GranteeType:                       GranteeType,
 		properties.Grants:                            Grants,
@@ -392,6 +398,7 @@ func init() {
 		properties.Image:                             Image,
 		properties.InboundRules:                      InboundRules,
 		properties.InlinePolicies:                    InlinePolicies,
+		properties.InputParameters:                   InputParameters,
 		properties.Instance:                          Instance,
 		properties.InstanceOwner:                     InstanceOwner,
 		properties.Instances:                         Instances,
@@ -484,6 +491,7 @@ func init() {
 		properties.Set:                               Set,
 		properties.Size:                              Size,
 		properties.Source:                            Source,
+		properties.SourceIdentifier:                  SourceIdentifier,
 		properties.SpotInstanceRequestId:             SpotInstanceRequestId,
 		properties.SpotPrice:                         SpotPrice,
 		properties.SSLSupportMethod:                  SSLSupportMethod,
@@ -617,6 +625,7 @@ var Properties = RDFProperties{
 	Cluster:                           {ID: Cluster, RdfType: "rdf:Property", RdfsLabel: "Cluster", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ClusterEnabled:                    {ID: ClusterEnabled, RdfType: "rdf:Property", RdfsLabel: "ClusterEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	Comment:                           {ID: Comment, RdfType: "rdf:Property", RdfsLabel: "Comment", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Compliance:                        {ID: Compliance, RdfType: "rdf:Property", RdfsLabel: "Compliance", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Config:                            {ID: Config, RdfType: "rdf:Property", RdfsLabel: "Config", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ContainerInstance:                 {ID: ContainerInstance, RdfType: "rdf:Property", RdfsLabel: "ContainerInstance", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	ContainersImages:                  {ID: ContainersImages, RdfType: "rdf:Property", RdfsLabel: "ContainersImages", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
@@ -648,6 +657,7 @@ var Properties = RDFProperties{
 	ExitCode:                          {ID: ExitCode, RdfType: "rdf:Property", RdfsLabel: "ExitCode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Failover:                          {ID: Failover, RdfType: "rdf:Property", RdfsLabel: "Failover", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Fingerprint:                       {ID: Fingerprint, RdfType: "rdf:Property", RdfsLabel: "Fingerprint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Frequency:                         {ID: Frequency, RdfType: "rdf:Property", RdfsLabel: "Frequency", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	GlobalID:                          {ID: GlobalID, RdfType: "rdf:Property", RdfsLabel: "GlobalID", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	GranteeType:                       {ID: GranteeType, RdfType: "rdf:Property", RdfsLabel: "GranteeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Grants:                            {ID: Grants, RdfType: "rdf:Property", RdfsLabel: "Grants", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:Grant"},
@@ -664,6 +674,7 @@ var Properties = RDFProperties{
 	Image:                             {ID: Image, RdfType: "rdf:Property", RdfsLabel: "Image", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	InboundRules:                      {ID: InboundRules, RdfType: "rdf:Property", RdfsLabel: "InboundRules", RdfsDefinedBy: "rdfs:list", RdfsDataType: "net-owl:FirewallRule"},
 	InlinePolicies:                    {ID: InlinePolicies, RdfType: "rdf:Property", RdfsLabel: "InlinePolicies", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
+	InputParameters:                   {ID: InputParameters, RdfType: "rdf:Property", RdfsLabel: "InputParameters", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Instance:                          {ID: Instance, RdfType: "rdf:Property", RdfsLabel: "Instance", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	InstanceOwner:                     {ID: InstanceOwner, RdfType: "rdf:Property", RdfsLabel: "InstanceOwner", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Instances:                         {ID: Instances, RdfType: "rdf:Property", RdfsLabel: "Instances", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
@@ -756,6 +767,7 @@ var Properties = RDFProperties{
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Size:                              {ID: Size, RdfType: "rdf:Property", RdfsLabel: "Size", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Source:                            {ID: Source, RdfType: "rdf:Property", RdfsLabel: "Source", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	SourceIdentifier:                  {ID: SourceIdentifier, RdfType: "rdf:Property", RdfsLabel: "SourceIdentifier", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SpotInstanceRequestId:             {ID: SpotInstanceRequestId, RdfType: "rdf:Property", RdfsLabel: "SpotInstanceRequestId", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SpotPrice:                         {ID: SpotPrice, RdfType: "rdf:Property", RdfsLabel: "SpotPrice", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SSLSupportMethod:                  {ID: SSLSupportMethod, RdfType: "rdf:Property", RdfsLabel: "SSLSupportMethod", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},

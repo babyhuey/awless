@@ -223,6 +223,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateClassicLoadbalancer(f.config(), f.Graph, f.Logger)
 		}
+	case "createconfigrule":
+		return func() any {
+			return awsspec.NewCreateConfigrule(f.config(), f.Graph, f.Logger)
+		}
 	case "createcontainercluster":
 		return func() any {
 			return awsspec.NewCreateContainercluster(f.config(), f.Graph, f.Logger)
@@ -486,6 +490,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteclassicloadbalancer":
 		return func() any {
 			return awsspec.NewDeleteClassicLoadbalancer(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteconfigrule":
+		return func() any {
+			return awsspec.NewDeleteConfigrule(f.config(), f.Graph, f.Logger)
 		}
 	case "deletecontainercluster":
 		return func() any {
@@ -854,6 +862,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updateclassicloadbalancer":
 		return func() any {
 			return awsspec.NewUpdateClassicLoadbalancer(f.config(), f.Graph, f.Logger)
+		}
+	case "updateconfigrule":
+		return func() any {
+			return awsspec.NewUpdateConfigrule(f.config(), f.Graph, f.Logger)
 		}
 	case "updatecontainertask":
 		return func() any {

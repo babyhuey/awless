@@ -1403,3 +1403,9 @@ func BuildWafFetchFuncs(conf *Config) fetch.Funcs {
 	addManualWafFetchFuncs(conf, funcs)
 	return funcs
 }
+func BuildConfigserviceFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualConfigserviceFetchFuncs(conf, funcs)
+	return funcs
+}

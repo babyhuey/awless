@@ -10,6 +10,10 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **AWS Config.** Config rules, with create/update/delete, and each rule annotated with its
+  compliance status — which is the reason to look at Config at all and comes from a second
+  API. `awless ls configrules` shows COMPLIANT or NON_COMPLIANT per rule;
+  `awless create configrule name=s3-versioning source=S3_BUCKET_VERSIONING_ENABLED`.
 - **WAF v2.** Web ACLs, IP sets and rule groups are listed and synced across both scopes,
   and IP sets have full create/update/delete. `awless create ipset name=blocklist
   addresses=203.0.113.0/24`. The address family is inferred from the addresses, and delete

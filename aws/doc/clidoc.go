@@ -256,6 +256,14 @@ var cliExamplesDoc = map[string][]string{
 	"update.ipset": {
 		"awless update ipset name=blocklist addresses=203.0.113.0/24,198.51.100.7/32,192.0.2.0/24",
 	},
+	"create.configrule": {
+		"awless create configrule name=s3-versioning source=S3_BUCKET_VERSIONING_ENABLED",
+		"awless create configrule name=ebs-encrypted source=ENCRYPTED_VOLUMES resource-types=AWS::EC2::Volume description=\"Volumes must be encrypted\"",
+	},
+	"update.configrule": {
+		"awless update configrule name=s3-versioning source=S3_BUCKET_VERSIONING_ENABLED frequency=TwentyFour_Hours",
+	},
+	"delete.configrule": {"awless delete configrule name=s3-versioning"},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",

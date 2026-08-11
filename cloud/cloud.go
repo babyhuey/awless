@@ -132,6 +132,8 @@ const (
 	WebACL    string = "webacl"
 	IPSet     string = "ipset"
 	RuleGroup string = "rulegroup"
+	//configservice
+	ConfigRule string = "configrule"
 )
 
 type Service interface {

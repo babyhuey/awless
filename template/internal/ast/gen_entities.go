@@ -34,6 +34,7 @@ var entities = map[Entity]struct{}{
 	"cachesubnetgroup":    {},
 	"certificate":         {},
 	"classicloadbalancer": {},
+	"configrule":          {},
 	"container":           {},
 	"containercluster":    {},
 	"containerservice":    {},

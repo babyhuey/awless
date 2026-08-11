@@ -40,6 +40,7 @@ import (
 	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
@@ -248,6 +249,9 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.IPSet, awssdk.ToString(ss.Name))
 	case wafv2types.RuleGroupSummary:
 		res = graph.InitResource(cloud.RuleGroup, awssdk.ToString(ss.Name))
+	// AWS Config
+	case configservicetypes.ConfigRule:
+		res = graph.InitResource(cloud.ConfigRule, awssdk.ToString(ss.ConfigRuleName))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}
