@@ -7,7 +7,7 @@
   <a href="https://pkg.go.dev/github.com/bootswithdefer/awless"><img src="https://pkg.go.dev/badge/github.com/bootswithdefer/awless.svg" alt="Go Reference"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/bootswithdefer/awless" alt="License"></a>
   <img src="https://img.shields.io/github/go-mod/go-version/bootswithdefer/awless" alt="Go version">
-  <img src="https://img.shields.io/badge/coverage-59%25-yellow" alt="Coverage">
+  <img src="https://img.shields.io/badge/coverage-58%25-yellow" alt="Coverage">
   <img src="https://img.shields.io/badge/AWS%20SDK-v2-orange" alt="AWS SDK v2">
 </p>
 

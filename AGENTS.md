@@ -48,6 +48,14 @@ failing lint through.
 package under test, and the large amount of `aws/spec` driven by the acceptance tests
 is reported as uncovered — that alone understated the total by about seven points.
 
+The total is around 58%. It moved *down* slightly when the thirteen services were added,
+which is arithmetic rather than a regression: each service contributes generated fetchers and
+service constructors, and the acceptance tests exercise its commands rather than its fetch
+path. Raising the number by testing generated constructors would buy a percentage and no
+confidence, so the fetch tests that exist target the two hand-written patterns instead —
+continuation-token loops for services that publish no paginator, and per-parent fan-out. Both
+fail silently by returning a short list, and `aws/fetch/pagination_test.go` covers both.
+
 `make generate` requires `goimports` on PATH (`make tools` installs it): the
 generators shell out to it to prune the unused imports their templates emit.
 Output is deterministic, and CI enforces that committed generated files match

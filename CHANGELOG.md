@@ -1,5 +1,12 @@
 ## Unreleased
 
+### Added
+
+- **Tests for the two hand-written fetch patterns.** Services that publish no paginator carry a
+  continuation-token loop, and resources AWS will not list globally are fetched per parent.
+  Both fail by returning a short list with no error, which is the worst shape of bug for a tool
+  whose job is showing you what you have. Verified by backing each pattern out.
+
 ### Fixed
 
 - **Profiles requiring MFA could not be used at all.** Any profile with `mfa_serial` failed
