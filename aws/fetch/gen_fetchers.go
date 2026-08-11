@@ -1397,3 +1397,9 @@ func BuildStepfunctionsFetchFuncs(conf *Config) fetch.Funcs {
 	}
 	return funcs
 }
+func BuildWafFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualWafFetchFuncs(conf, funcs)
+	return funcs
+}

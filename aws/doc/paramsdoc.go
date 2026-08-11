@@ -458,6 +458,23 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.ipset": {
+		"name":        "Name for the IP set",
+		"addresses":   "CIDR ranges to include; a set holds either IPv4 or IPv6, not both",
+		"scope":       "REGIONAL for ALB and API Gateway, or CLOUDFRONT (us-east-1 only); defaults to REGIONAL",
+		"description": "Description of the IP set",
+		"ip-version":  "IPV4 or IPV6; inferred from the addresses when omitted",
+	},
+	"delete.ipset": {
+		"name":  "Name of the IP set to delete",
+		"scope": "Scope the IP set lives in; defaults to REGIONAL",
+	},
+	"update.ipset": {
+		"name":        "Name of the IP set to update",
+		"addresses":   "Replacement CIDR ranges; the existing list is overwritten, not merged",
+		"scope":       "Scope the IP set lives in; defaults to REGIONAL",
+		"description": "New description of the IP set",
+	},
 	"create.apigateway": {
 		"name":        "Name of the API",
 		"protocol":    "Protocol of the API",

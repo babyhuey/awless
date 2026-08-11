@@ -11,6 +11,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
+	"github.com/aws/aws-sdk-go-v2/service/wafv2"
+	wafv2types "github.com/aws/aws-sdk-go-v2/service/wafv2/types"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
@@ -1250,4 +1252,108 @@ func addManualEventbridgeFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualStepfunctionsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}
+
+// wafScopes returns the scopes worth querying from the configured region. CLOUDFRONT
+// resources live in a global namespace that only us-east-1 can see; asking for them
+// anywhere else fails the whole fetch, so they are only requested where they exist.
+func wafScopes(region string) []wafv2types.Scope {
+	if region == "us-east-1" {
+		return []wafv2types.Scope{wafv2types.ScopeRegional, wafv2types.ScopeCloudfront}
+	}
+	return []wafv2types.Scope{wafv2types.ScopeRegional}
+}
+
+func addManualWafFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["webacl"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []wafv2types.WebACLSummary
+		var resources []*graph.Resource
+
+		for _, scope := range wafScopes(conf.APIs.Wafv2.Options().Region) {
+			var next *string
+			for {
+				out, err := conf.APIs.Wafv2.ListWebACLs(ctx, &wafv2.ListWebACLsInput{Scope: scope, NextMarker: next})
+				if err != nil {
+					return resources, objects, err
+				}
+				for _, acl := range out.WebACLs {
+					objects = append(objects, acl)
+					res, err := awsconv.NewResource(acl)
+					if err != nil {
+						return resources, objects, err
+					}
+					// The summary carries no scope, but it is the only thing
+					// distinguishing two ACLs that may share a name.
+					res.Properties()[properties.Scope] = string(scope)
+					resources = append(resources, res)
+				}
+				if out.NextMarker == nil || awssdk.ToString(out.NextMarker) == "" {
+					break
+				}
+				next = out.NextMarker
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["ipset"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []wafv2types.IPSetSummary
+		var resources []*graph.Resource
+
+		for _, scope := range wafScopes(conf.APIs.Wafv2.Options().Region) {
+			var next *string
+			for {
+				out, err := conf.APIs.Wafv2.ListIPSets(ctx, &wafv2.ListIPSetsInput{Scope: scope, NextMarker: next})
+				if err != nil {
+					return resources, objects, err
+				}
+				for _, set := range out.IPSets {
+					objects = append(objects, set)
+					res, err := awsconv.NewResource(set)
+					if err != nil {
+						return resources, objects, err
+					}
+					res.Properties()[properties.Scope] = string(scope)
+					resources = append(resources, res)
+				}
+				if out.NextMarker == nil || awssdk.ToString(out.NextMarker) == "" {
+					break
+				}
+				next = out.NextMarker
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["rulegroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []wafv2types.RuleGroupSummary
+		var resources []*graph.Resource
+
+		for _, scope := range wafScopes(conf.APIs.Wafv2.Options().Region) {
+			var next *string
+			for {
+				out, err := conf.APIs.Wafv2.ListRuleGroups(ctx, &wafv2.ListRuleGroupsInput{Scope: scope, NextMarker: next})
+				if err != nil {
+					return resources, objects, err
+				}
+				for _, group := range out.RuleGroups {
+					objects = append(objects, group)
+					res, err := awsconv.NewResource(group)
+					if err != nil {
+						return resources, objects, err
+					}
+					res.Properties()[properties.Scope] = string(scope)
+					resources = append(resources, res)
+				}
+				if out.NextMarker == nil || awssdk.ToString(out.NextMarker) == "" {
+					break
+				}
+				next = out.NextMarker
+			}
+		}
+
+		return resources, objects, nil
+	}
 }

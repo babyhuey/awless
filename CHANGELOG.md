@@ -10,6 +10,13 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **WAF v2.** Web ACLs, IP sets and rule groups are listed and synced across both scopes,
+  and IP sets have full create/update/delete. `awless create ipset name=blocklist
+  addresses=203.0.113.0/24`. The address family is inferred from the addresses, and delete
+  and update look up WAF's LockToken themselves rather than asking for it.
+
+  Web ACL and rule group creation is not included: both need nested action and visibility
+  structures that the reflective setter has no shape for yet. Listing and deletion work.
 - **Step Functions.** State machines, with `list` and create/update/delete, plus
   `start`/`stop` on an execution. The state machine definition is passed as a file:
   `awless create statemachine name=order-flow role=<role-arn> definition-file=flow.json`.

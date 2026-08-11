@@ -34,6 +34,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/aws-sdk-go-v2/service/wafv2"
 
 	"github.com/bootswithdefer/awless/logger"
 )
@@ -70,6 +71,7 @@ type AWSAPI struct {
 	Elasticache            *elasticache.Client
 	Eventbridge            *eventbridge.Client
 	Sfn                    *sfn.Client
+	Wafv2                  *wafv2.Client
 }
 
 type Config struct {

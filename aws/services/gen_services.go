@@ -85,6 +85,8 @@ import (
 	ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 	sts "github.com/aws/aws-sdk-go-v2/service/sts"
+	wafv2 "github.com/aws/aws-sdk-go-v2/service/wafv2"
+	wafv2types "github.com/aws/aws-sdk-go-v2/service/wafv2/types"
 	"github.com/aws/smithy-go"
 	tstore "github.com/bootswithdefer/triplestore"
 
@@ -118,6 +120,7 @@ var ServiceNames = []string{
 	"elasticache",
 	"eventbridge",
 	"stepfunctions",
+	"waf",
 }
 
 var ResourceTypes = []string{
@@ -189,6 +192,9 @@ var ResourceTypes = []string{
 	"eventbus",
 	"eventrule",
 	"statemachine",
+	"webacl",
+	"ipset",
+	"rulegroup",
 }
 
 var ServicePerAPI = map[string]string{
@@ -223,6 +229,7 @@ var ServicePerAPI = map[string]string{
 	"elasticache":            "elasticache",
 	"eventbridge":            "eventbridge",
 	"sfn":                    "stepfunctions",
+	"wafv2":                  "waf",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -294,6 +301,9 @@ var ServicePerResourceType = map[string]string{
 	"eventbus":            "eventbridge",
 	"eventrule":           "eventbridge",
 	"statemachine":        "stepfunctions",
+	"webacl":              "waf",
+	"ipset":               "waf",
+	"rulegroup":           "waf",
 }
 
 var APIPerResourceType = map[string]string{
@@ -365,6 +375,9 @@ var APIPerResourceType = map[string]string{
 	"eventbus":            "eventbridge",
 	"eventrule":           "eventbridge",
 	"statemachine":        "sfn",
+	"webacl":              "wafv2",
+	"ipset":               "wafv2",
+	"rulegroup":           "wafv2",
 }
 
 type Infra struct {
@@ -4073,4 +4086,178 @@ func (s *Stepfunctions) FetchByType(ctx context.Context, t string) (cloud.GraphA
 
 func (s *Stepfunctions) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.stepfunctions.sync", true)
+}
+
+type Waf struct {
+	fetcher         fetch.Fetcher
+	region, profile string
+	config          map[string]any
+	log             *logger.Logger
+	Wafv2Client     *wafv2.Client
+}
+
+func NewWaf(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	wafv2Client := wafv2.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		wafv2Client,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Waf{
+		Wafv2Client: wafv2Client,
+		fetcher:     fetch.NewFetcher(awsfetch.BuildWafFetchFuncs(fetchConfig)),
+		config:      extraConf,
+		region:      region,
+		profile:     profile,
+		log:         log,
+	}
+}
+
+func (s *Waf) Name() string {
+	return "waf"
+}
+
+func (s *Waf) Region() string {
+	return s.region
+}
+
+func (s *Waf) Profile() string {
+	return s.profile
+}
+
+func (s *Waf) ResourceTypes() []string {
+	return []string{
+		"webacl",
+		"ipset",
+		"rulegroup",
+	}
+}
+
+func (s *Waf) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.waf.webacl.sync", true) {
+		list, err := s.fetcher.Get("webacl_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]wafv2types.WebACLSummary); !ok {
+			return gph, errors.New("cannot cast to '[]wafv2types.WebACLSummary' type from fetch context")
+		}
+		for _, r := range list.([]wafv2types.WebACLSummary) {
+			for _, fn := range addParentsFns["webacl"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *wafv2types.WebACLSummary) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.waf.ipset.sync", true) {
+		list, err := s.fetcher.Get("ipset_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]wafv2types.IPSetSummary); !ok {
+			return gph, errors.New("cannot cast to '[]wafv2types.IPSetSummary' type from fetch context")
+		}
+		for _, r := range list.([]wafv2types.IPSetSummary) {
+			for _, fn := range addParentsFns["ipset"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *wafv2types.IPSetSummary) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.waf.rulegroup.sync", true) {
+		list, err := s.fetcher.Get("rulegroup_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]wafv2types.RuleGroupSummary); !ok {
+			return gph, errors.New("cannot cast to '[]wafv2types.RuleGroupSummary' type from fetch context")
+		}
+		for _, r := range list.([]wafv2types.RuleGroupSummary) {
+			for _, fn := range addParentsFns["rulegroup"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *wafv2types.RuleGroupSummary) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Waf) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Waf) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.waf.sync", true)
 }

@@ -25,6 +25,7 @@ const (
 	Actions                           = "cloud:actions"
 	ActionsEnabled                    = "cloud:actionsEnabled"
 	ActiveServicesCount               = "cloud:activeServicesCount"
+	Addresses                         = "cloud:addresses"
 	AdjustmentType                    = "cloud:adjustmentType"
 	Affinity                          = "cloud:affinity"
 	AgentConnected                    = "cloud:agentConnected"
@@ -53,6 +54,7 @@ const (
 	CacheNodeType                     = "cloud:cacheNodeType"
 	CallerReference                   = "cloud:callerReference"
 	Capabilities                      = "cloud:capabilities"
+	Capacity                          = "cloud:capacity"
 	Certificate                       = "cloud:certificate"
 	CertificateAuthority              = "cloud:certificateAuthority"
 	Certificates                      = "cloud:certificates"
@@ -204,6 +206,7 @@ const (
 	ScalingGroupName                  = "cloud:scalingGroupName"
 	ScheduleExpression                = "cloud:scheduleExpression"
 	Scheme                            = "net:scheme"
+	Scope                             = "cloud:scope"
 	SecondaryAvailabilityZone         = "cloud:secondaryAvailabilityZone"
 	SecurityGroups                    = "cloud:securityGroups"
 	Set                               = "cloud:set"
@@ -294,6 +297,7 @@ func init() {
 		properties.Actions:                           Actions,
 		properties.ActionsEnabled:                    ActionsEnabled,
 		properties.ActiveServicesCount:               ActiveServicesCount,
+		properties.Addresses:                         Addresses,
 		properties.AdjustmentType:                    AdjustmentType,
 		properties.Affinity:                          Affinity,
 		properties.AgentConnected:                    AgentConnected,
@@ -322,6 +326,7 @@ func init() {
 		properties.CacheNodeType:                     CacheNodeType,
 		properties.CallerReference:                   CallerReference,
 		properties.Capabilities:                      Capabilities,
+		properties.Capacity:                          Capacity,
 		properties.Certificate:                       Certificate,
 		properties.CertificateAuthority:              CertificateAuthority,
 		properties.Certificates:                      Certificates,
@@ -473,6 +478,7 @@ func init() {
 		properties.ScalingGroupName:                  ScalingGroupName,
 		properties.ScheduleExpression:                ScheduleExpression,
 		properties.Scheme:                            Scheme,
+		properties.Scope:                             Scope,
 		properties.SecondaryAvailabilityZone:         SecondaryAvailabilityZone,
 		properties.SecurityGroups:                    SecurityGroups,
 		properties.Set:                               Set,
@@ -563,6 +569,7 @@ var Properties = RDFProperties{
 	Actions:                           {ID: Actions, RdfType: "rdf:Property", RdfsLabel: "Actions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	ActionsEnabled:                    {ID: ActionsEnabled, RdfType: "rdf:Property", RdfsLabel: "ActionsEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	ActiveServicesCount:               {ID: ActiveServicesCount, RdfType: "rdf:Property", RdfsLabel: "ActiveServicesCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	Addresses:                         {ID: Addresses, RdfType: "rdf:Property", RdfsLabel: "Addresses", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	AdjustmentType:                    {ID: AdjustmentType, RdfType: "rdf:Property", RdfsLabel: "AdjustmentType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Affinity:                          {ID: Affinity, RdfType: "rdf:Property", RdfsLabel: "Affinity", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	AgentConnected:                    {ID: AgentConnected, RdfType: "rdf:Property", RdfsLabel: "AgentConnected", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
@@ -591,6 +598,7 @@ var Properties = RDFProperties{
 	CacheNodeType:                     {ID: CacheNodeType, RdfType: "rdf:Property", RdfsLabel: "CacheNodeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	CallerReference:                   {ID: CallerReference, RdfType: "rdf:Property", RdfsLabel: "CallerReference", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Capabilities:                      {ID: Capabilities, RdfType: "rdf:Property", RdfsLabel: "Capabilities", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
+	Capacity:                          {ID: Capacity, RdfType: "rdf:Property", RdfsLabel: "Capacity", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Certificate:                       {ID: Certificate, RdfType: "rdf:Property", RdfsLabel: "Certificate", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	CertificateAuthority:              {ID: CertificateAuthority, RdfType: "rdf:Property", RdfsLabel: "CertificateAuthority", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Certificates:                      {ID: Certificates, RdfType: "rdf:Property", RdfsLabel: "Certificates", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
@@ -742,6 +750,7 @@ var Properties = RDFProperties{
 	ScalingGroupName:                  {ID: ScalingGroupName, RdfType: "rdf:Property", RdfsLabel: "ScalingGroupName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ScheduleExpression:                {ID: ScheduleExpression, RdfType: "rdf:Property", RdfsLabel: "ScheduleExpression", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Scheme:                            {ID: Scheme, RdfType: "rdf:Property", RdfsLabel: "Scheme", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Scope:                             {ID: Scope, RdfType: "rdf:Property", RdfsLabel: "Scope", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecondaryAvailabilityZone:         {ID: SecondaryAvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "SecondaryAvailabilityZone", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecurityGroups:                    {ID: SecurityGroups, RdfType: "rdf:Property", RdfsLabel: "SecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},

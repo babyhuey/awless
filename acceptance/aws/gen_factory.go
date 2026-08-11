@@ -291,6 +291,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateInternetgateway(f.config(), f.Graph, f.Logger)
 		}
+	case "createipset":
+		return func() any {
+			return awsspec.NewCreateIpset(f.config(), f.Graph, f.Logger)
+		}
 	case "createkeypair":
 		return func() any {
 			return awsspec.NewCreateKeypair(f.config(), f.Graph, f.Logger)
@@ -554,6 +558,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteinternetgateway":
 		return func() any {
 			return awsspec.NewDeleteInternetgateway(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteipset":
+		return func() any {
+			return awsspec.NewDeleteIpset(f.config(), f.Graph, f.Logger)
 		}
 	case "deletekeypair":
 		return func() any {
@@ -866,6 +874,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updateinstance":
 		return func() any {
 			return awsspec.NewUpdateInstance(f.config(), f.Graph, f.Logger)
+		}
+	case "updateipset":
+		return func() any {
+			return awsspec.NewUpdateIpset(f.config(), f.Graph, f.Logger)
 		}
 	case "updateloggroup":
 		return func() any {

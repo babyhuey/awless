@@ -60,6 +60,7 @@ import (
 	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
+	wafv2types "github.com/aws/aws-sdk-go-v2/service/wafv2/types"
 
 	"github.com/bootswithdefer/awless/cloud"
 	"github.com/bootswithdefer/awless/cloud/properties"
@@ -239,6 +240,14 @@ func InitResource(source any) (*graph.Resource, error) {
 	// Step Functions
 	case sfntypes.StateMachineListItem:
 		res = graph.InitResource(cloud.StateMachine, awssdk.ToString(ss.Name))
+	// WAF v2. Keyed on the name rather than the id, because the name is what every
+	// wafv2 call takes and what a user has to hand.
+	case wafv2types.WebACLSummary:
+		res = graph.InitResource(cloud.WebACL, awssdk.ToString(ss.Name))
+	case wafv2types.IPSetSummary:
+		res = graph.InitResource(cloud.IPSet, awssdk.ToString(ss.Name))
+	case wafv2types.RuleGroupSummary:
+		res = graph.InitResource(cloud.RuleGroup, awssdk.ToString(ss.Name))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

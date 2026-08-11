@@ -53,6 +53,7 @@ import (
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
 	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 	ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
+	wafv2 "github.com/aws/aws-sdk-go-v2/service/wafv2"
 	"github.com/aws/smithy-go"
 
 	"github.com/bootswithdefer/awless/cloud"
@@ -4732,6 +4733,75 @@ func (cmd *CreateInternetgateway) dryRun(renv env.Running, params map[string]any
 }
 
 func (cmd *CreateInternetgateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateIpset(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateIpset {
+	cmd := new(CreateIpset)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = wafv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateIpset) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateIpset) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create ipset: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create ipset '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create ipset done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateIpset) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("ipset"), nil
+}
+
+func (cmd *CreateIpset) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10071,6 +10141,75 @@ func (cmd *DeleteInternetgateway) dryRun(renv env.Running, params map[string]any
 }
 
 func (cmd *DeleteInternetgateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteIpset(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteIpset {
+	cmd := new(DeleteIpset)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = wafv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteIpset) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteIpset) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete ipset: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete ipset '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete ipset done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteIpset) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("ipset"), nil
+}
+
+func (cmd *DeleteIpset) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -16467,6 +16606,75 @@ func (cmd *UpdateInstance) dryRun(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *UpdateInstance) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateIpset(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateIpset {
+	cmd := new(UpdateIpset)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = wafv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateIpset) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateIpset) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update ipset: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update ipset '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update ipset done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateIpset) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("ipset"), nil
+}
+
+func (cmd *UpdateIpset) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

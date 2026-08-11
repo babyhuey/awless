@@ -292,6 +292,19 @@ var FetchersDefs = []fetchersDef{
 			{API: "sfn", ResourceType: cloud.StateMachine, AWSType: "sfntypes.StateMachineListItem", APIMethod: "ListStateMachines", Input: "sfn.ListStateMachinesInput{}", Output: "sfn.ListStateMachinesOutput", OutputsExtractor: "StateMachines", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
+	{
+		Name: "waf",
+		API:  []string{"wafv2"},
+		Fetchers: []fetcher{
+			// WAF v2 publishes no paginators, and every call is scoped: REGIONAL
+			// resources are visible from their own region, CLOUDFRONT ones only from
+			// us-east-1. Both scopes are walked manually so neither is silently
+			// missing from a sync.
+			{API: "wafv2", ResourceType: cloud.WebACL, AWSType: "wafv2types.WebACLSummary", ManualFetcher: true},
+			{API: "wafv2", ResourceType: cloud.IPSet, AWSType: "wafv2types.IPSetSummary", ManualFetcher: true},
+			{API: "wafv2", ResourceType: cloud.RuleGroup, AWSType: "wafv2types.RuleGroupSummary", ManualFetcher: true},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

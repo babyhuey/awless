@@ -245,6 +245,17 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.ipset": {
+		"awless create ipset name=blocklist addresses=203.0.113.0/24,198.51.100.7/32",
+		"awless create ipset name=cdn-blocklist addresses=203.0.113.0/24 scope=CLOUDFRONT description=\"Blocked at the edge\"",
+	},
+	"delete.ipset": {
+		"awless delete ipset name=blocklist",
+		"awless delete ipset name=cdn-blocklist scope=CLOUDFRONT",
+	},
+	"update.ipset": {
+		"awless update ipset name=blocklist addresses=203.0.113.0/24,198.51.100.7/32,192.0.2.0/24",
+	},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",

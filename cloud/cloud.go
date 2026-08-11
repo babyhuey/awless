@@ -128,6 +128,10 @@ const (
 	EventRule string = "eventrule"
 	//stepfunctions
 	StateMachine string = "statemachine"
+	//wafv2
+	WebACL    string = "webacl"
+	IPSet     string = "ipset"
+	RuleGroup string = "rulegroup"
 )
 
 type Service interface {

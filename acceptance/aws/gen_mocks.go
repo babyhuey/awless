@@ -136,3 +136,7 @@ type sqsMock struct {
 type ssmMock struct {
 	basicMock
 }
+
+type wafv2Mock struct {
+	basicMock
+}

@@ -161,6 +161,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateInstanceprofile(f.Cfg, f.Graph, f.Log) }
 	case "createinternetgateway":
 		return func() any { return NewCreateInternetgateway(f.Cfg, f.Graph, f.Log) }
+	case "createipset":
+		return func() any { return NewCreateIpset(f.Cfg, f.Graph, f.Log) }
 	case "createkeypair":
 		return func() any { return NewCreateKeypair(f.Cfg, f.Graph, f.Log) }
 	case "createlaunchconfiguration":
@@ -293,6 +295,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteInstanceprofile(f.Cfg, f.Graph, f.Log) }
 	case "deleteinternetgateway":
 		return func() any { return NewDeleteInternetgateway(f.Cfg, f.Graph, f.Log) }
+	case "deleteipset":
+		return func() any { return NewDeleteIpset(f.Cfg, f.Graph, f.Log) }
 	case "deletekeypair":
 		return func() any { return NewDeleteKeypair(f.Cfg, f.Graph, f.Log) }
 	case "deletelaunchconfiguration":
@@ -449,6 +453,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateImage(f.Cfg, f.Graph, f.Log) }
 	case "updateinstance":
 		return func() any { return NewUpdateInstance(f.Cfg, f.Graph, f.Log) }
+	case "updateipset":
+		return func() any { return NewUpdateIpset(f.Cfg, f.Graph, f.Log) }
 	case "updateloggroup":
 		return func() any { return NewUpdateLoggroup(f.Cfg, f.Graph, f.Log) }
 	case "updateloginprofile":
@@ -539,6 +545,7 @@ var (
 	_ command = &CreateInstance{}
 	_ command = &CreateInstanceprofile{}
 	_ command = &CreateInternetgateway{}
+	_ command = &CreateIpset{}
 	_ command = &CreateKeypair{}
 	_ command = &CreateLaunchconfiguration{}
 	_ command = &CreateListener{}
@@ -605,6 +612,7 @@ var (
 	_ command = &DeleteInstance{}
 	_ command = &DeleteInstanceprofile{}
 	_ command = &DeleteInternetgateway{}
+	_ command = &DeleteIpset{}
 	_ command = &DeleteKeypair{}
 	_ command = &DeleteLaunchconfiguration{}
 	_ command = &DeleteListener{}
@@ -683,6 +691,7 @@ var (
 	_ command = &UpdateEventrule{}
 	_ command = &UpdateImage{}
 	_ command = &UpdateInstance{}
+	_ command = &UpdateIpset{}
 	_ command = &UpdateLoggroup{}
 	_ command = &UpdateLoginprofile{}
 	_ command = &UpdatePolicy{}

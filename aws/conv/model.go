@@ -731,4 +731,23 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Type:    {name: "Type", transform: extractValueFn},
 		properties.Created: {name: "CreationDate", transform: extractTimeFn},
 	},
+	// WAF v2. The scope is not on the summary and is set by the fetcher.
+	cloud.WebACL: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.ID:          {name: "Id", transform: extractValueFn},
+		properties.Arn:         {name: "ARN", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+	},
+	cloud.IPSet: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.ID:          {name: "Id", transform: extractValueFn},
+		properties.Arn:         {name: "ARN", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+	},
+	cloud.RuleGroup: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.ID:          {name: "Id", transform: extractValueFn},
+		properties.Arn:         {name: "ARN", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+	},
 }

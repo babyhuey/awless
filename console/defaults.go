@@ -92,6 +92,9 @@ var ColumnsInListing = map[string][]string{
 	cloud.EventBus:            {properties.Name, properties.Arn, properties.Description},
 	cloud.EventRule:           {properties.Name, properties.State, properties.EventBus, properties.ScheduleExpression},
 	cloud.StateMachine:        {properties.Name, properties.Type, properties.Arn, properties.Created},
+	cloud.WebACL:              {properties.Name, properties.Scope, properties.ID, properties.Description},
+	cloud.IPSet:               {properties.Name, properties.Scope, properties.ID, properties.Description},
+	cloud.RuleGroup:           {properties.Name, properties.Scope, properties.ID, properties.Description},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -680,5 +683,27 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Type},
 		StringColumnDefinition{Prop: properties.Arn},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	// WAF v2
+	cloud.WebACL: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Scope},
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Description},
+		StringColumnDefinition{Prop: properties.Arn},
+	},
+	cloud.IPSet: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Scope},
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Description},
+		StringColumnDefinition{Prop: properties.Arn},
+	},
+	cloud.RuleGroup: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Scope},
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Description},
+		StringColumnDefinition{Prop: properties.Arn},
 	},
 }

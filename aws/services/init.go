@@ -29,7 +29,7 @@ import (
 var (
 	AccessService, InfraService, StorageService, MessagingService, DNSService, LambdaService, MonitoringService, CdnService, CloudformationService cloud.Service
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService        cloud.Service
-	ElasticacheService, EventbridgeService, StepfunctionsService                                                                                   cloud.Service
+	ElasticacheService, EventbridgeService, StepfunctionsService, WafService                                                                       cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]any, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -65,6 +65,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	ElasticacheService = NewElasticache(cfg, profile, extraConf, log)
 	EventbridgeService = NewEventbridge(cfg, profile, extraConf, log)
 	StepfunctionsService = NewStepfunctions(cfg, profile, extraConf, log)
+	WafService = NewWaf(cfg, profile, extraConf, log)
 
 	cloud.ServiceRegistry[InfraService.Name()] = InfraService
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
@@ -86,6 +87,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	cloud.ServiceRegistry[ElasticacheService.Name()] = ElasticacheService
 	cloud.ServiceRegistry[EventbridgeService.Name()] = EventbridgeService
 	cloud.ServiceRegistry[StepfunctionsService.Name()] = StepfunctionsService
+	cloud.ServiceRegistry[WafService.Name()] = WafService
 
 	awsspec.CommandFactory = &awsspec.AWSFactory{
 		Log: log,
