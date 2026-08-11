@@ -57,6 +57,7 @@ import (
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	sesv2 "github.com/aws/aws-sdk-go-v2/service/sesv2"
 	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
 	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -3597,6 +3598,84 @@ func (cmd *CreateConfigrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateConfigurationset(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateConfigurationset {
+	cmd := new(CreateConfigurationset)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sesv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateConfigurationset) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateConfigurationset) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sesv2.CreateConfigurationSetInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sesv2.CreateConfigurationSetInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateConfigurationSet(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sesv2.CreateConfigurationSet call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create configurationset: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create configurationset '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create configurationset done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateConfigurationset) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("configurationset"), nil
+}
+
+func (cmd *CreateConfigurationset) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateContainercluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateContainercluster {
 	cmd := new(CreateContainercluster)
 	if len(l) > 0 {
@@ -4510,6 +4589,84 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateEmailidentity(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateEmailidentity {
+	cmd := new(CreateEmailidentity)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sesv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateEmailidentity) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateEmailidentity) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sesv2.CreateEmailIdentityInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sesv2.CreateEmailIdentityInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateEmailIdentity(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sesv2.CreateEmailIdentity call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create emailidentity: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create emailidentity '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create emailidentity done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateEmailidentity) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("emailidentity"), nil
+}
+
+func (cmd *CreateEmailidentity) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10602,6 +10759,84 @@ func (cmd *DeleteConfigrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteConfigurationset(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteConfigurationset {
+	cmd := new(DeleteConfigurationset)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sesv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteConfigurationset) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteConfigurationset) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sesv2.DeleteConfigurationSetInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sesv2.DeleteConfigurationSetInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteConfigurationSet(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sesv2.DeleteConfigurationSet call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete configurationset: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete configurationset '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete configurationset done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteConfigurationset) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("configurationset"), nil
+}
+
+func (cmd *DeleteConfigurationset) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteContainercluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteContainercluster {
 	cmd := new(DeleteContainercluster)
 	if len(l) > 0 {
@@ -11538,6 +11773,84 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteEmailidentity(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteEmailidentity {
+	cmd := new(DeleteEmailidentity)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sesv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteEmailidentity) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteEmailidentity) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sesv2.DeleteEmailIdentityInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sesv2.DeleteEmailIdentityInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteEmailIdentity(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sesv2.DeleteEmailIdentity call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete emailidentity: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete emailidentity '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete emailidentity done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteEmailidentity) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("emailidentity"), nil
+}
+
+func (cmd *DeleteEmailidentity) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

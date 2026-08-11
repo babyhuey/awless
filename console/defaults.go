@@ -113,6 +113,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.GlueTable:                {properties.Name, properties.Database, properties.Type, properties.Created},
 	cloud.Crawler:                  {properties.Name, properties.State, properties.Database, properties.Role},
 	cloud.Job:                      {properties.Name, properties.GlueVersion, properties.WorkerType, properties.NodeCount},
+	cloud.EmailIdentity:            {properties.Name, properties.Type, properties.VerificationStatus, properties.SendingEnabled},
+	cloud.ConfigurationSet:         {properties.Name},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -862,5 +864,14 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.NodeCount, Friendly: "Workers"},
 		StringColumnDefinition{Prop: properties.Role},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	}, // SES v2
+	cloud.EmailIdentity: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.VerificationStatus, Friendly: "Verification"},
+		StringColumnDefinition{Prop: properties.SendingEnabled, Friendly: "Sending"},
+	},
+	cloud.ConfigurationSet: {
+		StringColumnDefinition{Prop: properties.Name},
 	},
 }

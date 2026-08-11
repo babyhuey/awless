@@ -65,6 +65,7 @@ import (
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sesv2types "github.com/aws/aws-sdk-go-v2/service/sesv2/types"
 	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
@@ -282,6 +283,9 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// SES v2
+	case sesv2types.IdentityInfo:
+		res = graph.InitResource(cloud.EmailIdentity, awssdk.ToString(ss.IdentityName))
 	// Glue
 	case gluetypes.Database:
 		res = graph.InitResource(cloud.GlueDatabase, awssdk.ToString(ss.Name))

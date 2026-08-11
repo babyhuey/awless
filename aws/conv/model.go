@@ -847,6 +847,13 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// SES v2. Configuration sets come back as names only and are built by the fetcher.
+	cloud.EmailIdentity: {
+		properties.Name:               {name: "IdentityName", transform: extractValueFn},
+		properties.Type:               {name: "IdentityType", transform: extractValueFn},
+		properties.VerificationStatus: {name: "VerificationStatus", transform: extractValueFn},
+		properties.SendingEnabled:     {name: "SendingEnabled", transform: extractValueFn},
+	},
 	// Glue
 	cloud.GlueDatabase: {
 		properties.Name:        {name: "Name", transform: extractValueFn},

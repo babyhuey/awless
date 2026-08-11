@@ -69,6 +69,8 @@ import (
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sesv2 "github.com/aws/aws-sdk-go-v2/service/sesv2"
+	sesv2types "github.com/aws/aws-sdk-go-v2/service/sesv2/types"
 	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
 	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
@@ -1647,6 +1649,40 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.Pipelines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildSesFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualSesFetchFuncs(conf, funcs)
+
+	funcs["emailidentity"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []sesv2types.IdentityInfo
+
+		if !conf.getBoolDefaultTrue("aws.ses.emailidentity.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource ses[emailidentity]")
+			return resources, objects, nil
+		}
+		paginator := sesv2.NewListEmailIdentitiesPaginator(conf.APIs.Sesv2, &sesv2.ListEmailIdentitiesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.EmailIdentities {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

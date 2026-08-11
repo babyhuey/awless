@@ -21,6 +21,7 @@ import (
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	"github.com/aws/aws-sdk-go-v2/service/glue"
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/aws/aws-sdk-go-v2/service/wafv2"
 	wafv2types "github.com/aws/aws-sdk-go-v2/service/wafv2/types"
 
@@ -1618,6 +1619,31 @@ func addManualGlueFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 					}
 					resources = append(resources, res)
 				}
+			}
+		}
+
+		return resources, objects, nil
+	}
+}
+
+func addManualSesFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["configurationset"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []string
+		var resources []*graph.Resource
+
+		// The API returns names only, so the resources are built directly rather than
+		// going through awsconv, which converts typed AWS objects.
+		pager := sesv2.NewListConfigurationSetsPaginator(conf.APIs.Sesv2, &sesv2.ListConfigurationSetsInput{})
+		for pager.HasMorePages() {
+			out, err := pager.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, name := range out.ConfigurationSets {
+				objects = append(objects, name)
+				res := graph.InitResource(cloud.ConfigurationSet, name)
+				res.Properties()[properties.Name] = name
+				resources = append(resources, res)
 			}
 		}
 

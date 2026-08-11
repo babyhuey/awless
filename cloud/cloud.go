@@ -146,6 +146,9 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//sesv2
+	EmailIdentity    string = "emailidentity"
+	ConfigurationSet string = "configurationset"
 	//glue. Qualified because "database" belongs to RDS and a bare "table" would not
 	//say which catalog it is in.
 	GlueDatabase string = "gluedatabase"

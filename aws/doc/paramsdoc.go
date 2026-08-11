@@ -458,6 +458,19 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.emailidentity": {
+		"name":              "Domain or email address to send from; creating it starts verification rather than completing it",
+		"configuration-set": "Configuration set to attach, which is the only way to have it apply to the identity's first sends",
+	},
+	"delete.emailidentity": {"name": "Domain or email address to remove"},
+	"create.configurationset": {
+		"name":             "Name for the configuration set",
+		"sending-file":     "Path to the sending options in JSON, e.g. whether sending is enabled",
+		"delivery-file":    "Path to the delivery options in JSON, e.g. the TLS policy and dedicated IP pool",
+		"reputation-file":  "Path to the reputation options in JSON, e.g. whether reputation metrics are tracked",
+		"suppression-file": "Path to the suppression options in JSON, choosing which bounces and complaints suppress an address",
+	},
+	"delete.configurationset": {"name": "Name of the configuration set to delete"},
 	"create.gluedatabase": {
 		"name":        "Name for the Glue catalog database",
 		"description": "Description of the database",

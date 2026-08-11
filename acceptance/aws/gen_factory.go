@@ -235,6 +235,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateConfigrule(f.config(), f.Graph, f.Logger)
 		}
+	case "createconfigurationset":
+		return func() any {
+			return awsspec.NewCreateConfigurationset(f.config(), f.Graph, f.Logger)
+		}
 	case "createcontainercluster":
 		return func() any {
 			return awsspec.NewCreateContainercluster(f.config(), f.Graph, f.Logger)
@@ -282,6 +286,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createelasticip":
 		return func() any {
 			return awsspec.NewCreateElasticip(f.config(), f.Graph, f.Logger)
+		}
+	case "createemailidentity":
+		return func() any {
+			return awsspec.NewCreateEmailidentity(f.config(), f.Graph, f.Logger)
 		}
 	case "createenvironment":
 		return func() any {
@@ -579,6 +587,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteConfigrule(f.config(), f.Graph, f.Logger)
 		}
+	case "deleteconfigurationset":
+		return func() any {
+			return awsspec.NewDeleteConfigurationset(f.config(), f.Graph, f.Logger)
+		}
 	case "deletecontainercluster":
 		return func() any {
 			return awsspec.NewDeleteContainercluster(f.config(), f.Graph, f.Logger)
@@ -626,6 +638,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteelasticip":
 		return func() any {
 			return awsspec.NewDeleteElasticip(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteemailidentity":
+		return func() any {
+			return awsspec.NewDeleteEmailidentity(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteenvironment":
 		return func() any {

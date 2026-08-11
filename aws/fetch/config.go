@@ -37,6 +37,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/aws/aws-sdk-go-v2/service/sfn"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -87,6 +88,7 @@ type AWSAPI struct {
 	Codebuild              *codebuild.Client
 	Codedeploy             *codedeploy.Client
 	Glue                   *glue.Client
+	Sesv2                  *sesv2.Client
 	Elasticbeanstalk       *elasticbeanstalk.Client
 }
 

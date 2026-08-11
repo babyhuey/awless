@@ -226,6 +226,7 @@ const (
 	Scope                             = "cloud:scope"
 	SecondaryAvailabilityZone         = "cloud:secondaryAvailabilityZone"
 	SecurityGroups                    = "cloud:securityGroups"
+	SendingEnabled                    = "cloud:sendingEnabled"
 	ServiceName                       = "cloud:serviceName"
 	Set                               = "cloud:set"
 	ShardCount                        = "cloud:shardCount"
@@ -262,6 +263,7 @@ const (
 	UserData                          = "cloud:userData"
 	Username                          = "cloud:username"
 	Value                             = "cloud:value"
+	VerificationStatus                = "cloud:verificationStatus"
 	Version                           = "cloud:version"
 	VersionLabel                      = "cloud:versionLabel"
 	Virtualization                    = "cloud:virtualization"
@@ -523,6 +525,7 @@ func init() {
 		properties.Scope:                             Scope,
 		properties.SecondaryAvailabilityZone:         SecondaryAvailabilityZone,
 		properties.SecurityGroups:                    SecurityGroups,
+		properties.SendingEnabled:                    SendingEnabled,
 		properties.ServiceName:                       ServiceName,
 		properties.Set:                               Set,
 		properties.ShardCount:                        ShardCount,
@@ -559,6 +562,7 @@ func init() {
 		properties.UserData:                          UserData,
 		properties.Username:                          Username,
 		properties.Value:                             Value,
+		properties.VerificationStatus:                VerificationStatus,
 		properties.Version:                           Version,
 		properties.VersionLabel:                      VersionLabel,
 		properties.Virtualization:                    Virtualization,
@@ -820,6 +824,7 @@ var Properties = RDFProperties{
 	Scope:                             {ID: Scope, RdfType: "rdf:Property", RdfsLabel: "Scope", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecondaryAvailabilityZone:         {ID: SecondaryAvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "SecondaryAvailabilityZone", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecurityGroups:                    {ID: SecurityGroups, RdfType: "rdf:Property", RdfsLabel: "SecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
+	SendingEnabled:                    {ID: SendingEnabled, RdfType: "rdf:Property", RdfsLabel: "SendingEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	ServiceName:                       {ID: ServiceName, RdfType: "rdf:Property", RdfsLabel: "ServiceName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ShardCount:                        {ID: ShardCount, RdfType: "rdf:Property", RdfsLabel: "ShardCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
@@ -856,6 +861,7 @@ var Properties = RDFProperties{
 	UserData:                          {ID: UserData, RdfType: "rdf:Property", RdfsLabel: "UserData", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Username:                          {ID: Username, RdfType: "rdf:Property", RdfsLabel: "Username", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Value:                             {ID: Value, RdfType: "rdf:Property", RdfsLabel: "Value", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	VerificationStatus:                {ID: VerificationStatus, RdfType: "rdf:Property", RdfsLabel: "VerificationStatus", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Version:                           {ID: Version, RdfType: "rdf:Property", RdfsLabel: "Version", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	VersionLabel:                      {ID: VersionLabel, RdfType: "rdf:Property", RdfsLabel: "VersionLabel", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Virtualization:                    {ID: Virtualization, RdfType: "rdf:Property", RdfsLabel: "Virtualization", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},

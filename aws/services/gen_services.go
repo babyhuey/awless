@@ -93,6 +93,8 @@ import (
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sesv2 "github.com/aws/aws-sdk-go-v2/service/sesv2"
+	sesv2types "github.com/aws/aws-sdk-go-v2/service/sesv2/types"
 	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
 	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
@@ -141,6 +143,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"ses",
 	"glue",
 	"codedeploy",
 	"codebuild",
@@ -228,6 +231,8 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"emailidentity",
+	"configurationset",
 	"gluedatabase",
 	"crawler",
 	"job",
@@ -276,6 +281,7 @@ var ServicePerAPI = map[string]string{
 	"kinesis":                "kinesis",
 	"redshift":               "redshift",
 	"codepipeline":           "codepipeline",
+	"sesv2":                  "ses",
 	"glue":                   "glue",
 	"codedeploy":             "codedeploy",
 	"codebuild":              "codebuild",
@@ -363,6 +369,8 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"emailidentity":            "ses",
+	"configurationset":         "ses",
 	"gluedatabase":             "glue",
 	"crawler":                  "glue",
 	"job":                      "glue",
@@ -455,6 +463,8 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"emailidentity":            "sesv2",
+	"configurationset":         "sesv2",
 	"gluedatabase":             "glue",
 	"crawler":                  "glue",
 	"job":                      "glue",
@@ -4973,6 +4983,157 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Ses struct {
+	fetcher         fetch.Fetcher
+	region, profile string
+	config          map[string]any
+	log             *logger.Logger
+	Sesv2Client     *sesv2.Client
+}
+
+func NewSes(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	sesv2Client := sesv2.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		sesv2Client,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Ses{
+		Sesv2Client: sesv2Client,
+		fetcher:     fetch.NewFetcher(awsfetch.BuildSesFetchFuncs(fetchConfig)),
+		config:      extraConf,
+		region:      region,
+		profile:     profile,
+		log:         log,
+	}
+}
+
+func (s *Ses) Name() string {
+	return "ses"
+}
+
+func (s *Ses) Region() string {
+	return s.region
+}
+
+func (s *Ses) Profile() string {
+	return s.profile
+}
+
+func (s *Ses) ResourceTypes() []string {
+	return []string{
+		"emailidentity",
+		"configurationset",
+	}
+}
+
+func (s *Ses) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.ses.emailidentity.sync", true) {
+		list, err := s.fetcher.Get("emailidentity_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]sesv2types.IdentityInfo); !ok {
+			return gph, errors.New("cannot cast to '[]sesv2types.IdentityInfo' type from fetch context")
+		}
+		for _, r := range list.([]sesv2types.IdentityInfo) {
+			for _, fn := range addParentsFns["emailidentity"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *sesv2types.IdentityInfo) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.ses.configurationset.sync", true) {
+		list, err := s.fetcher.Get("configurationset_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]string); !ok {
+			return gph, errors.New("cannot cast to '[]string' type from fetch context")
+		}
+		for _, r := range list.([]string) {
+			for _, fn := range addParentsFns["configurationset"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *string) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Ses) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Ses) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.ses.sync", true)
 }
 
 type Glue struct {

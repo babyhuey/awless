@@ -133,6 +133,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateClassicLoadbalancer(f.Cfg, f.Graph, f.Log) }
 	case "createconfigrule":
 		return func() any { return NewCreateConfigrule(f.Cfg, f.Graph, f.Log) }
+	case "createconfigurationset":
+		return func() any { return NewCreateConfigurationset(f.Cfg, f.Graph, f.Log) }
 	case "createcontainercluster":
 		return func() any { return NewCreateContainercluster(f.Cfg, f.Graph, f.Log) }
 	case "createcrawler":
@@ -157,6 +159,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "createelasticip":
 		return func() any { return NewCreateElasticip(f.Cfg, f.Graph, f.Log) }
+	case "createemailidentity":
+		return func() any { return NewCreateEmailidentity(f.Cfg, f.Graph, f.Log) }
 	case "createenvironment":
 		return func() any { return NewCreateEnvironment(f.Cfg, f.Graph, f.Log) }
 	case "createeventbus":
@@ -305,6 +309,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteClassicLoadbalancer(f.Cfg, f.Graph, f.Log) }
 	case "deleteconfigrule":
 		return func() any { return NewDeleteConfigrule(f.Cfg, f.Graph, f.Log) }
+	case "deleteconfigurationset":
+		return func() any { return NewDeleteConfigurationset(f.Cfg, f.Graph, f.Log) }
 	case "deletecontainercluster":
 		return func() any { return NewDeleteContainercluster(f.Cfg, f.Graph, f.Log) }
 	case "deletecontainertask":
@@ -329,6 +335,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "deleteelasticip":
 		return func() any { return NewDeleteElasticip(f.Cfg, f.Graph, f.Log) }
+	case "deleteemailidentity":
+		return func() any { return NewDeleteEmailidentity(f.Cfg, f.Graph, f.Log) }
 	case "deleteenvironment":
 		return func() any { return NewDeleteEnvironment(f.Cfg, f.Graph, f.Log) }
 	case "deleteeventbus":
@@ -637,6 +645,7 @@ var (
 	_ command = &CreateCertificate{}
 	_ command = &CreateClassicLoadbalancer{}
 	_ command = &CreateConfigrule{}
+	_ command = &CreateConfigurationset{}
 	_ command = &CreateContainercluster{}
 	_ command = &CreateCrawler{}
 	_ command = &CreateDatabase{}
@@ -649,6 +658,7 @@ var (
 	_ command = &CreateEkscluster{}
 	_ command = &CreateEksnodegroup{}
 	_ command = &CreateElasticip{}
+	_ command = &CreateEmailidentity{}
 	_ command = &CreateEnvironment{}
 	_ command = &CreateEventbus{}
 	_ command = &CreateEventrule{}
@@ -723,6 +733,7 @@ var (
 	_ command = &DeleteCertificate{}
 	_ command = &DeleteClassicLoadbalancer{}
 	_ command = &DeleteConfigrule{}
+	_ command = &DeleteConfigurationset{}
 	_ command = &DeleteContainercluster{}
 	_ command = &DeleteContainertask{}
 	_ command = &DeleteCrawler{}
@@ -735,6 +746,7 @@ var (
 	_ command = &DeleteEkscluster{}
 	_ command = &DeleteEksnodegroup{}
 	_ command = &DeleteElasticip{}
+	_ command = &DeleteEmailidentity{}
 	_ command = &DeleteEnvironment{}
 	_ command = &DeleteEventbus{}
 	_ command = &DeleteEventrule{}

@@ -127,6 +127,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **Transit Gateway** | transit gateways, VPC attachments, route tables |
 | **CodeDeploy** | applications, deployment groups, deployments |
 | **Glue** | catalog databases, tables, crawlers, jobs |
+| **SES v2** | email identities, configuration sets |
 | **VPC Endpoints** | gateway and interface endpoints |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
@@ -175,6 +176,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls gluedatabases
       $ awless ls crawlers
       $ awless ls jobs
+      $ awless ls emailidentities
       $ ...
       (see awless ls -h)
 

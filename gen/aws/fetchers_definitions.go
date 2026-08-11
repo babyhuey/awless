@@ -344,6 +344,16 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "ses",
+		API:  []string{"sesv2"},
+		Fetchers: []fetcher{
+			{API: "sesv2", ResourceType: cloud.EmailIdentity, AWSType: "sesv2types.IdentityInfo", APIMethod: "ListEmailIdentities", Input: "sesv2.ListEmailIdentitiesInput{}", Output: "sesv2.ListEmailIdentitiesOutput", OutputsExtractor: "EmailIdentities", Multipage: true, NextPageMarker: "NextToken"},
+			// ListConfigurationSets returns bare names rather than objects, so there is
+			// nothing for the type-driven converter to work from.
+			{API: "sesv2", ResourceType: cloud.ConfigurationSet, AWSType: "string", ManualFetcher: true},
+		},
+	},
+	{
 		Name: "glue",
 		API:  []string{"glue"},
 		Fetchers: []fetcher{

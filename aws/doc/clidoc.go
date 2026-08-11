@@ -245,8 +245,15 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
-	"create.gluedatabase": {"awless create gluedatabase name=analytics description=\"Analytics catalog\""},
-	"delete.gluedatabase": {"awless delete gluedatabase name=analytics"},
+	"create.emailidentity": {
+		"awless create emailidentity name=mail.example.com",
+		"awless create emailidentity name=noreply@example.com configuration-set=transactional",
+	},
+	"delete.emailidentity":    {"awless delete emailidentity name=mail.example.com"},
+	"create.configurationset": {"awless create configurationset name=transactional"},
+	"delete.configurationset": {"awless delete configurationset name=transactional"},
+	"create.gluedatabase":     {"awless create gluedatabase name=analytics description=\"Analytics catalog\""},
+	"delete.gluedatabase":     {"awless delete gluedatabase name=analytics"},
 	"create.crawler": {
 		"awless create crawler name=events-crawler role=AWSGlueServiceRole database=analytics targets-file=/home/jsmith/targets.json",
 	},

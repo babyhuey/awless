@@ -10,6 +10,9 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **SES v2.** Email identities and configuration sets, with create and delete. Creating an
+  identity starts verification rather than completing it: a domain still needs DNS records
+  published and an address still needs a link clicked.
 - **Glue.** Catalog databases, tables, crawlers and jobs, with create/delete and
   `start`/`stop` on a crawler and `start` on a job. The entities are `gluedatabase` and
   `gluetable`, since `database` belongs to RDS and a bare `table` would not say which

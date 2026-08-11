@@ -153,6 +153,10 @@ type secretsmanagerMock struct {
 	basicMock
 }
 
+type sesv2Mock struct {
+	basicMock
+}
+
 type sfnMock struct {
 	basicMock
 }
