@@ -146,6 +146,9 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//cognito. Two APIs: user pools on cognito-idp, identity pools on cognito-identity.
+	UserPool     string = "userpool"
+	IdentityPool string = "identitypool"
 	//sesv2
 	EmailIdentity    string = "emailidentity"
 	ConfigurationSet string = "configurationset"

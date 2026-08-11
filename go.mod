@@ -66,6 +66,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/codebuild v1.72.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codedeploy v1.38.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codepipeline v1.49.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/cognitoidentity v1.36.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.67.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/configservice v1.68.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/elasticache v1.56.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk v1.37.5 // indirect

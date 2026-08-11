@@ -245,6 +245,14 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.userpool": {
+		"awless create userpool name=customers deletion-protection=ACTIVE auto-verified=email",
+	},
+	"delete.userpool": {"awless delete userpool id=us-west-2_abcDEF123"},
+	"create.identitypool": {
+		"awless create identitypool name=customers-identities allow-unauthenticated=false",
+	},
+	"delete.identitypool": {"awless delete identitypool id='us-west-2:11111111-2222-3333-4444-555555555555'"},
 	"create.emailidentity": {
 		"awless create emailidentity name=mail.example.com",
 		"awless create emailidentity name=noreply@example.com configuration-set=transactional",

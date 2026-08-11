@@ -36,6 +36,8 @@ import (
 	codebuild "github.com/aws/aws-sdk-go-v2/service/codebuild"
 	codedeploy "github.com/aws/aws-sdk-go-v2/service/codedeploy"
 	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
+	cognitoidentity "github.com/aws/aws-sdk-go-v2/service/cognitoidentity"
+	cognitoidentityprovider "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -5216,6 +5218,84 @@ func (cmd *CreateGroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateIdentitypool(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateIdentitypool {
+	cmd := new(CreateIdentitypool)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cognitoidentity.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateIdentitypool) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateIdentitypool) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cognitoidentity.CreateIdentityPoolInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in cognitoidentity.CreateIdentityPoolInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateIdentityPool(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cognitoidentity.CreateIdentityPool call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create identitypool: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create identitypool '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create identitypool done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateIdentitypool) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("identitypool"), nil
+}
+
+func (cmd *CreateIdentitypool) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateImage(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateImage {
 	cmd := new(CreateImage)
 	if len(l) > 0 {
@@ -9124,6 +9204,84 @@ func (cmd *CreateUser) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateUserpool(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateUserpool {
+	cmd := new(CreateUserpool)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cognitoidentityprovider.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateUserpool) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateUserpool) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cognitoidentityprovider.CreateUserPoolInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in cognitoidentityprovider.CreateUserPoolInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateUserPool(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cognitoidentityprovider.CreateUserPool call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create userpool: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create userpool '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create userpool done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateUserpool) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("userpool"), nil
+}
+
+func (cmd *CreateUserpool) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateVolume(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateVolume {
 	cmd := new(CreateVolume)
 	if len(l) > 0 {
@@ -12397,6 +12555,84 @@ func (cmd *DeleteGroup) dryRun(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *DeleteGroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteIdentitypool(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteIdentitypool {
+	cmd := new(DeleteIdentitypool)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cognitoidentity.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteIdentitypool) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteIdentitypool) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cognitoidentity.DeleteIdentityPoolInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in cognitoidentity.DeleteIdentityPoolInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteIdentityPool(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cognitoidentity.DeleteIdentityPool call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete identitypool: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete identitypool '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete identitypool done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteIdentitypool) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("identitypool"), nil
+}
+
+func (cmd *DeleteIdentitypool) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -16301,6 +16537,84 @@ func (cmd *DeleteUser) dryRun(renv env.Running, params map[string]any) (any, err
 }
 
 func (cmd *DeleteUser) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteUserpool(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteUserpool {
+	cmd := new(DeleteUserpool)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = cognitoidentityprovider.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteUserpool) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteUserpool) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &cognitoidentityprovider.DeleteUserPoolInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in cognitoidentityprovider.DeleteUserPoolInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteUserPool(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("cognitoidentityprovider.DeleteUserPool call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete userpool: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete userpool '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete userpool done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteUserpool) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("userpool"), nil
+}
+
+func (cmd *DeleteUserpool) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

@@ -49,6 +49,10 @@ import (
 	codedeploytypes "github.com/aws/aws-sdk-go-v2/service/codedeploy/types"
 	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
+	cognitoidentity "github.com/aws/aws-sdk-go-v2/service/cognitoidentity"
+	cognitoidentitytypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentity/types"
+	cognitoidentityprovider "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	cognitoidentityprovidertypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -143,6 +147,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"cognito",
 	"ses",
 	"glue",
 	"codedeploy",
@@ -231,6 +236,8 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"userpool",
+	"identitypool",
 	"emailidentity",
 	"configurationset",
 	"gluedatabase",
@@ -245,47 +252,49 @@ var ResourceTypes = []string{
 }
 
 var ServicePerAPI = map[string]string{
-	"ec2":                    "infra",
-	"elbv2":                  "infra",
-	"elb":                    "infra",
-	"rds":                    "infra",
-	"autoscaling":            "infra",
-	"ecr":                    "infra",
-	"ecs":                    "infra",
-	"applicationautoscaling": "infra",
-	"acm":                    "infra",
-	"iam":                    "access",
-	"sts":                    "access",
-	"s3":                     "storage",
-	"sns":                    "messaging",
-	"sqs":                    "messaging",
-	"route53":                "dns",
-	"lambda":                 "lambda",
-	"cloudwatch":             "monitoring",
-	"cloudfront":             "cdn",
-	"cloudformation":         "cloudformation",
-	"eks":                    "eks",
-	"dynamodb":               "dynamodb",
-	"secretsmanager":         "secretsmanager",
-	"kms":                    "secretsmanager",
-	"apigatewayv2":           "apigateway",
-	"ssm":                    "ssm",
-	"efs":                    "efs",
-	"cloudtrail":             "cloudtrail",
-	"cloudwatchlogs":         "cloudwatchlogs",
-	"elasticache":            "elasticache",
-	"eventbridge":            "eventbridge",
-	"sfn":                    "stepfunctions",
-	"wafv2":                  "waf",
-	"configservice":          "configservice",
-	"kinesis":                "kinesis",
-	"redshift":               "redshift",
-	"codepipeline":           "codepipeline",
-	"sesv2":                  "ses",
-	"glue":                   "glue",
-	"codedeploy":             "codedeploy",
-	"codebuild":              "codebuild",
-	"elasticbeanstalk":       "beanstalk",
+	"ec2":                     "infra",
+	"elbv2":                   "infra",
+	"elb":                     "infra",
+	"rds":                     "infra",
+	"autoscaling":             "infra",
+	"ecr":                     "infra",
+	"ecs":                     "infra",
+	"applicationautoscaling":  "infra",
+	"acm":                     "infra",
+	"iam":                     "access",
+	"sts":                     "access",
+	"s3":                      "storage",
+	"sns":                     "messaging",
+	"sqs":                     "messaging",
+	"route53":                 "dns",
+	"lambda":                  "lambda",
+	"cloudwatch":              "monitoring",
+	"cloudfront":              "cdn",
+	"cloudformation":          "cloudformation",
+	"eks":                     "eks",
+	"dynamodb":                "dynamodb",
+	"secretsmanager":          "secretsmanager",
+	"kms":                     "secretsmanager",
+	"apigatewayv2":            "apigateway",
+	"ssm":                     "ssm",
+	"efs":                     "efs",
+	"cloudtrail":              "cloudtrail",
+	"cloudwatchlogs":          "cloudwatchlogs",
+	"elasticache":             "elasticache",
+	"eventbridge":             "eventbridge",
+	"sfn":                     "stepfunctions",
+	"wafv2":                   "waf",
+	"configservice":           "configservice",
+	"kinesis":                 "kinesis",
+	"redshift":                "redshift",
+	"codepipeline":            "codepipeline",
+	"cognitoidentityprovider": "cognito",
+	"cognitoidentity":         "cognito",
+	"sesv2":                   "ses",
+	"glue":                    "glue",
+	"codedeploy":              "codedeploy",
+	"codebuild":               "codebuild",
+	"elasticbeanstalk":        "beanstalk",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -369,6 +378,8 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"userpool":                 "cognito",
+	"identitypool":             "cognito",
 	"emailidentity":            "ses",
 	"configurationset":         "ses",
 	"gluedatabase":             "glue",
@@ -463,6 +474,8 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"userpool":                 "cognitoidentityprovider",
+	"identitypool":             "cognitoidentity",
 	"emailidentity":            "sesv2",
 	"configurationset":         "sesv2",
 	"gluedatabase":             "glue",
@@ -4983,6 +4996,161 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Cognito struct {
+	fetcher                       fetch.Fetcher
+	region, profile               string
+	config                        map[string]any
+	log                           *logger.Logger
+	CognitoidentityproviderClient *cognitoidentityprovider.Client
+	CognitoidentityClient         *cognitoidentity.Client
+}
+
+func NewCognito(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	cognitoidentityproviderClient := cognitoidentityprovider.NewFromConfig(cfg)
+	cognitoidentityClient := cognitoidentity.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		cognitoidentityproviderClient,
+		cognitoidentityClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Cognito{
+		CognitoidentityproviderClient: cognitoidentityproviderClient,
+		CognitoidentityClient:         cognitoidentityClient,
+		fetcher:                       fetch.NewFetcher(awsfetch.BuildCognitoFetchFuncs(fetchConfig)),
+		config:                        extraConf,
+		region:                        region,
+		profile:                       profile,
+		log:                           log,
+	}
+}
+
+func (s *Cognito) Name() string {
+	return "cognito"
+}
+
+func (s *Cognito) Region() string {
+	return s.region
+}
+
+func (s *Cognito) Profile() string {
+	return s.profile
+}
+
+func (s *Cognito) ResourceTypes() []string {
+	return []string{
+		"userpool",
+		"identitypool",
+	}
+}
+
+func (s *Cognito) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.cognito.userpool.sync", true) {
+		list, err := s.fetcher.Get("userpool_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]cognitoidentityprovidertypes.UserPoolDescriptionType); !ok {
+			return gph, errors.New("cannot cast to '[]cognitoidentityprovidertypes.UserPoolDescriptionType' type from fetch context")
+		}
+		for _, r := range list.([]cognitoidentityprovidertypes.UserPoolDescriptionType) {
+			for _, fn := range addParentsFns["userpool"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *cognitoidentityprovidertypes.UserPoolDescriptionType) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.cognito.identitypool.sync", true) {
+		list, err := s.fetcher.Get("identitypool_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]cognitoidentitytypes.IdentityPoolShortDescription); !ok {
+			return gph, errors.New("cannot cast to '[]cognitoidentitytypes.IdentityPoolShortDescription' type from fetch context")
+		}
+		for _, r := range list.([]cognitoidentitytypes.IdentityPoolShortDescription) {
+			for _, fn := range addParentsFns["identitypool"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *cognitoidentitytypes.IdentityPoolShortDescription) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Cognito) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Cognito) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.cognito.sync", true)
 }
 
 type Ses struct {

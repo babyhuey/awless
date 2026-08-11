@@ -10,6 +10,9 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Cognito.** User pools and identity pools, with create and delete. These are two
+  different APIs that are easy to confuse: a user pool is a directory of users, an identity
+  pool hands AWS credentials to them.
 - **SES v2.** Email identities and configuration sets, with create and delete. Creating an
   identity starts verification rather than completing it: a domain still needs DNS records
   published and an address still needs a link clicked.

@@ -77,5 +77,6 @@ func allResourceTypes() []string {
 		cloud.VpcEndpoint, cloud.DeployApplication, cloud.DeploymentGroup,
 		cloud.GlueDatabase, cloud.GlueTable, cloud.Crawler, cloud.Job,
 		cloud.EmailIdentity, cloud.ConfigurationSet,
+		cloud.UserPool, cloud.IdentityPool,
 	}
 }

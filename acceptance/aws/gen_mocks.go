@@ -69,6 +69,14 @@ type codepipelineMock struct {
 	basicMock
 }
 
+type cognitoidentityMock struct {
+	basicMock
+}
+
+type cognitoidentityproviderMock struct {
+	basicMock
+}
+
 type configserviceMock struct {
 	basicMock
 }

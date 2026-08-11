@@ -847,6 +847,18 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// Cognito
+	cloud.UserPool: {
+		properties.ID:       {name: "Id", transform: extractValueFn},
+		properties.Name:     {name: "Name", transform: extractValueFn},
+		properties.State:    {name: "Status", transform: extractValueFn},
+		properties.Created:  {name: "CreationDate", transform: extractTimeFn},
+		properties.Modified: {name: "LastModifiedDate", transform: extractTimeFn},
+	},
+	cloud.IdentityPool: {
+		properties.ID:   {name: "IdentityPoolId", transform: extractValueFn},
+		properties.Name: {name: "IdentityPoolName", transform: extractValueFn},
+	},
 	// SES v2. Configuration sets come back as names only and are built by the fetcher.
 	cloud.EmailIdentity: {
 		properties.Name:               {name: "IdentityName", transform: extractValueFn},

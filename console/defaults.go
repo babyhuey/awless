@@ -115,6 +115,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.Job:                      {properties.Name, properties.GlueVersion, properties.WorkerType, properties.NodeCount},
 	cloud.EmailIdentity:            {properties.Name, properties.Type, properties.VerificationStatus, properties.SendingEnabled},
 	cloud.ConfigurationSet:         {properties.Name},
+	cloud.UserPool:                 {properties.ID, properties.Name, properties.State, properties.Created},
+	cloud.IdentityPool:             {properties.ID, properties.Name},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -872,6 +874,17 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.SendingEnabled, Friendly: "Sending"},
 	},
 	cloud.ConfigurationSet: {
+		StringColumnDefinition{Prop: properties.Name},
+	}, // Cognito
+	cloud.UserPool: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Modified}},
+	},
+	cloud.IdentityPool: {
+		StringColumnDefinition{Prop: properties.ID},
 		StringColumnDefinition{Prop: properties.Name},
 	},
 }

@@ -344,6 +344,15 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "cognito",
+		API:  []string{"cognitoidentityprovider", "cognitoidentity"},
+		Fetchers: []fetcher{
+			// ListUserPools requires a MaxResults, so the input is not the zero value.
+			{API: "cognitoidentityprovider", ResourceType: cloud.UserPool, AWSType: "cognitoidentityprovidertypes.UserPoolDescriptionType", APIMethod: "ListUserPools", Input: "cognitoidentityprovider.ListUserPoolsInput{MaxResults: maxResults(60)}", Output: "cognitoidentityprovider.ListUserPoolsOutput", OutputsExtractor: "UserPools", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "cognitoidentity", ResourceType: cloud.IdentityPool, AWSType: "cognitoidentitytypes.IdentityPoolShortDescription", APIMethod: "ListIdentityPools", Input: "cognitoidentity.ListIdentityPoolsInput{MaxResults: maxResults(60)}", Output: "cognitoidentity.ListIdentityPoolsOutput", OutputsExtractor: "IdentityPools", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
+	{
 		Name: "ses",
 		API:  []string{"sesv2"},
 		Fetchers: []fetcher{

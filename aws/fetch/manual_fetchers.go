@@ -1650,3 +1650,6 @@ func addManualSesFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 }
+
+func addManualCognitoFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

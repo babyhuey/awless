@@ -39,6 +39,10 @@ import (
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
+	cognitoidentity "github.com/aws/aws-sdk-go-v2/service/cognitoidentity"
+	cognitoidentitytypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentity/types"
+	cognitoidentityprovider "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	cognitoidentityprovidertypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
@@ -1649,6 +1653,68 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.Pipelines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildCognitoFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualCognitoFetchFuncs(conf, funcs)
+
+	funcs["userpool"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []cognitoidentityprovidertypes.UserPoolDescriptionType
+
+		if !conf.getBoolDefaultTrue("aws.cognito.userpool.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource cognito[userpool]")
+			return resources, objects, nil
+		}
+		paginator := cognitoidentityprovider.NewListUserPoolsPaginator(conf.APIs.Cognitoidentityprovider, &cognitoidentityprovider.ListUserPoolsInput{MaxResults: maxResults(60)})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.UserPools {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["identitypool"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []cognitoidentitytypes.IdentityPoolShortDescription
+
+		if !conf.getBoolDefaultTrue("aws.cognito.identitypool.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource cognito[identitypool]")
+			return resources, objects, nil
+		}
+		paginator := cognitoidentity.NewListIdentityPoolsPaginator(conf.APIs.Cognitoidentity, &cognitoidentity.ListIdentityPoolsInput{MaxResults: maxResults(60)})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.IdentityPools {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

@@ -458,6 +458,22 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.userpool": {
+		"name":                "Name for the user pool",
+		"deletion-protection": "ACTIVE or INACTIVE; a user pool holds credentials that cannot be recreated, and the API defaults this off",
+		"auto-verified":       "Attributes verified automatically, e.g. email or phone_number",
+		"alias-attributes":    "Attributes usable in place of the username at sign-in",
+		"policies-file":       "Path to the password policy in JSON",
+		"recovery-file":       "Path to the account recovery settings in JSON",
+	},
+	"delete.userpool": {"id": "Identifier of the user pool to delete; pool names are not unique so the API takes the id"},
+	"create.identitypool": {
+		"name":                  "Name for the identity pool",
+		"allow-unauthenticated": "Whether unauthenticated identities may obtain AWS credentials; required, because there is no safe default",
+		"developer-provider":    "Name of a developer provider for authenticating with your own backend",
+		"allow-classic-flow":    "Allow the classic basic authentication flow as well as the enhanced flow",
+	},
+	"delete.identitypool": {"id": "Identifier of the identity pool to delete"},
 	"create.emailidentity": {
 		"name":              "Domain or email address to send from; creating it starts verification rather than completing it",
 		"configuration-set": "Configuration set to attach, which is the only way to have it apply to the identity's first sends",

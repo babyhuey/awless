@@ -15,6 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/codebuild"
 	"github.com/aws/aws-sdk-go-v2/service/codedeploy"
 	"github.com/aws/aws-sdk-go-v2/service/codepipeline"
+	"github.com/aws/aws-sdk-go-v2/service/cognitoidentity"
+	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -49,47 +51,49 @@ import (
 )
 
 type AWSAPI struct {
-	IAM                    *iam.Client
-	Ec2                    *ec2.Client
-	Elbv2                  *elasticloadbalancingv2.Client
-	Elb                    *elasticloadbalancing.Client
-	RDS                    *rds.Client
-	Autoscaling            *autoscaling.Client
-	ECR                    *ecr.Client
-	ECS                    *ecs.Client
-	Applicationautoscaling *applicationautoscaling.Client
-	STS                    *sts.Client
-	S3                     *s3.Client
-	SNS                    *sns.Client
-	SQS                    *sqs.Client
-	Route53                *route53.Client
-	Lambda                 *lambda.Client
-	Cloudwatch             *cloudwatch.Client
-	Cloudfront             *cloudfront.Client
-	Cloudformation         *cloudformation.Client
-	ACM                    *acm.Client
-	EKS                    *eks.Client
-	Dynamodb               *dynamodb.Client
-	Secretsmanager         *secretsmanager.Client
-	KMS                    *kms.Client
-	Apigatewayv2           *apigatewayv2.Client
-	SSM                    *ssm.Client
-	EFS                    *efs.Client
-	Cloudtrail             *cloudtrail.Client
-	Cloudwatchlogs         *cloudwatchlogs.Client
-	Elasticache            *elasticache.Client
-	Eventbridge            *eventbridge.Client
-	Sfn                    *sfn.Client
-	Wafv2                  *wafv2.Client
-	Configservice          *configservice.Client
-	Kinesis                *kinesis.Client
-	Redshift               *redshift.Client
-	Codepipeline           *codepipeline.Client
-	Codebuild              *codebuild.Client
-	Codedeploy             *codedeploy.Client
-	Glue                   *glue.Client
-	Sesv2                  *sesv2.Client
-	Elasticbeanstalk       *elasticbeanstalk.Client
+	IAM                     *iam.Client
+	Ec2                     *ec2.Client
+	Elbv2                   *elasticloadbalancingv2.Client
+	Elb                     *elasticloadbalancing.Client
+	RDS                     *rds.Client
+	Autoscaling             *autoscaling.Client
+	ECR                     *ecr.Client
+	ECS                     *ecs.Client
+	Applicationautoscaling  *applicationautoscaling.Client
+	STS                     *sts.Client
+	S3                      *s3.Client
+	SNS                     *sns.Client
+	SQS                     *sqs.Client
+	Route53                 *route53.Client
+	Lambda                  *lambda.Client
+	Cloudwatch              *cloudwatch.Client
+	Cloudfront              *cloudfront.Client
+	Cloudformation          *cloudformation.Client
+	ACM                     *acm.Client
+	EKS                     *eks.Client
+	Dynamodb                *dynamodb.Client
+	Secretsmanager          *secretsmanager.Client
+	KMS                     *kms.Client
+	Apigatewayv2            *apigatewayv2.Client
+	SSM                     *ssm.Client
+	EFS                     *efs.Client
+	Cloudtrail              *cloudtrail.Client
+	Cloudwatchlogs          *cloudwatchlogs.Client
+	Elasticache             *elasticache.Client
+	Eventbridge             *eventbridge.Client
+	Sfn                     *sfn.Client
+	Wafv2                   *wafv2.Client
+	Configservice           *configservice.Client
+	Kinesis                 *kinesis.Client
+	Redshift                *redshift.Client
+	Codepipeline            *codepipeline.Client
+	Codebuild               *codebuild.Client
+	Codedeploy              *codedeploy.Client
+	Glue                    *glue.Client
+	Sesv2                   *sesv2.Client
+	Cognitoidentityprovider *cognitoidentityprovider.Client
+	Cognitoidentity         *cognitoidentity.Client
+	Elasticbeanstalk        *elasticbeanstalk.Client
 }
 
 type Config struct {
@@ -138,4 +142,11 @@ func assignAPIs(c *Config, apis ...any) {
 			}
 		}
 	}
+}
+
+// maxResults is a pointer helper for fetcher inputs that require a page size. The
+// generated fetchers file imports only the service packages, so an expression there
+// cannot reach aws.Int32; this lives in the same package and can.
+func maxResults(v int32) *int32 {
+	return &v
 }

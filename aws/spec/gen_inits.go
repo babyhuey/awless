@@ -175,6 +175,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateGluedatabase(f.Cfg, f.Graph, f.Log) }
 	case "creategroup":
 		return func() any { return NewCreateGroup(f.Cfg, f.Graph, f.Log) }
+	case "createidentitypool":
+		return func() any { return NewCreateIdentitypool(f.Cfg, f.Graph, f.Log) }
 	case "createimage":
 		return func() any { return NewCreateImage(f.Cfg, f.Graph, f.Log) }
 	case "createinstance":
@@ -269,6 +271,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateTransitgatewayroutetable(f.Cfg, f.Graph, f.Log) }
 	case "createuser":
 		return func() any { return NewCreateUser(f.Cfg, f.Graph, f.Log) }
+	case "createuserpool":
+		return func() any { return NewCreateUserpool(f.Cfg, f.Graph, f.Log) }
 	case "createvolume":
 		return func() any { return NewCreateVolume(f.Cfg, f.Graph, f.Log) }
 	case "createvpc":
@@ -351,6 +355,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteGluedatabase(f.Cfg, f.Graph, f.Log) }
 	case "deletegroup":
 		return func() any { return NewDeleteGroup(f.Cfg, f.Graph, f.Log) }
+	case "deleteidentitypool":
+		return func() any { return NewDeleteIdentitypool(f.Cfg, f.Graph, f.Log) }
 	case "deleteimage":
 		return func() any { return NewDeleteImage(f.Cfg, f.Graph, f.Log) }
 	case "deleteinstance":
@@ -445,6 +451,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteTransitgatewayroutetable(f.Cfg, f.Graph, f.Log) }
 	case "deleteuser":
 		return func() any { return NewDeleteUser(f.Cfg, f.Graph, f.Log) }
+	case "deleteuserpool":
+		return func() any { return NewDeleteUserpool(f.Cfg, f.Graph, f.Log) }
 	case "deletevolume":
 		return func() any { return NewDeleteVolume(f.Cfg, f.Graph, f.Log) }
 	case "deletevpc":
@@ -666,6 +674,7 @@ var (
 	_ command = &CreateFunction{}
 	_ command = &CreateGluedatabase{}
 	_ command = &CreateGroup{}
+	_ command = &CreateIdentitypool{}
 	_ command = &CreateImage{}
 	_ command = &CreateInstance{}
 	_ command = &CreateInstanceprofile{}
@@ -713,6 +722,7 @@ var (
 	_ command = &CreateTransitgatewayattachment{}
 	_ command = &CreateTransitgatewayroutetable{}
 	_ command = &CreateUser{}
+	_ command = &CreateUserpool{}
 	_ command = &CreateVolume{}
 	_ command = &CreateVpc{}
 	_ command = &CreateVpcendpoint{}
@@ -754,6 +764,7 @@ var (
 	_ command = &DeleteFunction{}
 	_ command = &DeleteGluedatabase{}
 	_ command = &DeleteGroup{}
+	_ command = &DeleteIdentitypool{}
 	_ command = &DeleteImage{}
 	_ command = &DeleteInstance{}
 	_ command = &DeleteInstanceprofile{}
@@ -801,6 +812,7 @@ var (
 	_ command = &DeleteTransitgatewayattachment{}
 	_ command = &DeleteTransitgatewayroutetable{}
 	_ command = &DeleteUser{}
+	_ command = &DeleteUserpool{}
 	_ command = &DeleteVolume{}
 	_ command = &DeleteVpc{}
 	_ command = &DeleteVpcendpoint{}

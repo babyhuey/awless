@@ -43,6 +43,8 @@ import (
 	codebuildtypes "github.com/aws/aws-sdk-go-v2/service/codebuild/types"
 	codedeploytypes "github.com/aws/aws-sdk-go-v2/service/codedeploy/types"
 	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
+	cognitoidentitytypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentity/types"
+	cognitoidentityprovidertypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -283,6 +285,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// Cognito
+	case cognitoidentityprovidertypes.UserPoolDescriptionType:
+		res = graph.InitResource(cloud.UserPool, awssdk.ToString(ss.Id))
+	case cognitoidentitytypes.IdentityPoolShortDescription:
+		res = graph.InitResource(cloud.IdentityPool, awssdk.ToString(ss.IdentityPoolId))
 	// SES v2
 	case sesv2types.IdentityInfo:
 		res = graph.InitResource(cloud.EmailIdentity, awssdk.ToString(ss.IdentityName))

@@ -319,6 +319,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateGroup(f.config(), f.Graph, f.Logger)
 		}
+	case "createidentitypool":
+		return func() any {
+			return awsspec.NewCreateIdentitypool(f.config(), f.Graph, f.Logger)
+		}
 	case "createimage":
 		return func() any {
 			return awsspec.NewCreateImage(f.config(), f.Graph, f.Logger)
@@ -507,6 +511,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateUser(f.config(), f.Graph, f.Logger)
 		}
+	case "createuserpool":
+		return func() any {
+			return awsspec.NewCreateUserpool(f.config(), f.Graph, f.Logger)
+		}
 	case "createvolume":
 		return func() any {
 			return awsspec.NewCreateVolume(f.config(), f.Graph, f.Logger)
@@ -670,6 +678,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletegroup":
 		return func() any {
 			return awsspec.NewDeleteGroup(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteidentitypool":
+		return func() any {
+			return awsspec.NewDeleteIdentitypool(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteimage":
 		return func() any {
@@ -858,6 +870,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteuser":
 		return func() any {
 			return awsspec.NewDeleteUser(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteuserpool":
+		return func() any {
+			return awsspec.NewDeleteUserpool(f.config(), f.Graph, f.Logger)
 		}
 	case "deletevolume":
 		return func() any {
