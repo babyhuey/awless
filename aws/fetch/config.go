@@ -24,6 +24,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/kinesis"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
@@ -74,6 +75,7 @@ type AWSAPI struct {
 	Sfn                    *sfn.Client
 	Wafv2                  *wafv2.Client
 	Configservice          *configservice.Client
+	Kinesis                *kinesis.Client
 }
 
 type Config struct {

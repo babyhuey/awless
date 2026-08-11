@@ -213,6 +213,7 @@ const (
 	SecondaryAvailabilityZone         = "cloud:secondaryAvailabilityZone"
 	SecurityGroups                    = "cloud:securityGroups"
 	Set                               = "cloud:set"
+	ShardCount                        = "cloud:shardCount"
 	Size                              = "cloud:size"
 	Source                            = "cloud:source"
 	SourceIdentifier                  = "cloud:sourceIdentifier"
@@ -224,6 +225,7 @@ const (
 	Stopped                           = "cloud:stopped"
 	Storage                           = "cloud:storage"
 	StorageType                       = "cloud:storageType"
+	StreamMode                        = "cloud:streamMode"
 	Subnet                            = "cloud:subnet"
 	SubnetGroup                       = "cloud:subnetGroup"
 	Subnets                           = "cloud:subnets"
@@ -489,6 +491,7 @@ func init() {
 		properties.SecondaryAvailabilityZone:         SecondaryAvailabilityZone,
 		properties.SecurityGroups:                    SecurityGroups,
 		properties.Set:                               Set,
+		properties.ShardCount:                        ShardCount,
 		properties.Size:                              Size,
 		properties.Source:                            Source,
 		properties.SourceIdentifier:                  SourceIdentifier,
@@ -500,6 +503,7 @@ func init() {
 		properties.Stopped:                           Stopped,
 		properties.Storage:                           Storage,
 		properties.StorageType:                       StorageType,
+		properties.StreamMode:                        StreamMode,
 		properties.Subnet:                            Subnet,
 		properties.SubnetGroup:                       SubnetGroup,
 		properties.Subnets:                           Subnets,
@@ -765,6 +769,7 @@ var Properties = RDFProperties{
 	SecondaryAvailabilityZone:         {ID: SecondaryAvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "SecondaryAvailabilityZone", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecurityGroups:                    {ID: SecurityGroups, RdfType: "rdf:Property", RdfsLabel: "SecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ShardCount:                        {ID: ShardCount, RdfType: "rdf:Property", RdfsLabel: "ShardCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Size:                              {ID: Size, RdfType: "rdf:Property", RdfsLabel: "Size", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Source:                            {ID: Source, RdfType: "rdf:Property", RdfsLabel: "Source", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SourceIdentifier:                  {ID: SourceIdentifier, RdfType: "rdf:Property", RdfsLabel: "SourceIdentifier", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -776,6 +781,7 @@ var Properties = RDFProperties{
 	Stopped:                           {ID: Stopped, RdfType: "rdf:Property", RdfsLabel: "Stopped", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	Storage:                           {ID: Storage, RdfType: "rdf:Property", RdfsLabel: "Storage", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	StorageType:                       {ID: StorageType, RdfType: "rdf:Property", RdfsLabel: "StorageType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	StreamMode:                        {ID: StreamMode, RdfType: "rdf:Property", RdfsLabel: "StreamMode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Subnet:                            {ID: Subnet, RdfType: "rdf:Property", RdfsLabel: "Subnet", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	SubnetGroup:                       {ID: SubnetGroup, RdfType: "rdf:Property", RdfsLabel: "SubnetGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Subnets:                           {ID: Subnets, RdfType: "rdf:Property", RdfsLabel: "Subnets", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},

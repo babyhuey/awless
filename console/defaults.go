@@ -96,6 +96,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.IPSet:               {properties.Name, properties.Scope, properties.ID, properties.Description},
 	cloud.RuleGroup:           {properties.Name, properties.Scope, properties.ID, properties.Description},
 	cloud.ConfigRule:          {properties.Name, properties.Compliance, properties.State, properties.SourceIdentifier},
+	cloud.Stream:              {properties.Name, properties.State, properties.StreamMode, properties.Created},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -716,5 +717,13 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.SourceIdentifier, Friendly: "Rule"},
 		StringColumnDefinition{Prop: properties.Frequency},
 		StringColumnDefinition{Prop: properties.Description},
+	},
+	// Kinesis
+	cloud.Stream: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.StreamMode, Friendly: "Mode"},
+		StringColumnDefinition{Prop: properties.Arn},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

@@ -494,6 +494,20 @@ var paramsDoc = map[string]map[string]string{
 		"resource-types":   "Resource types to evaluate; evaluates everything in scope when omitted",
 	},
 	"delete.configrule": {"name": "Name of the Config rule to delete"},
+	"create.stream": {
+		"name":   "Name for the Kinesis data stream",
+		"shards": "Number of shards; applies to a PROVISIONED stream and is rejected for ON_DEMAND",
+		"mode":   "PROVISIONED to size the stream yourself, or ON_DEMAND to let AWS scale it",
+	},
+	"delete.stream": {
+		"name":  "Name of the stream to delete",
+		"force": "Delete the stream even though consumers are still registered against it",
+	},
+	"update.stream": {
+		"name":         "Name of the stream to reshard",
+		"shards":       "New number of shards; at most double or half the current count per call",
+		"scaling-type": "Only UNIFORM_SCALING is accepted, and it is applied by default",
+	},
 	"create.apigateway": {
 		"name":        "Name of the API",
 		"protocol":    "Protocol of the API",

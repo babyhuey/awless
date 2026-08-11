@@ -134,6 +134,8 @@ const (
 	RuleGroup string = "rulegroup"
 	//configservice
 	ConfigRule string = "configrule"
+	//kinesis
+	Stream string = "stream"
 )
 
 type Service interface {

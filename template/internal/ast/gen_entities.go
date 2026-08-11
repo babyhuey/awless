@@ -86,6 +86,7 @@ var entities = map[Entity]struct{}{
 	"ssmparameter":        {},
 	"stack":               {},
 	"statemachine":        {},
+	"stream":              {},
 	"subnet":              {},
 	"subscription":        {},
 	"tag":                 {},

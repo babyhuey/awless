@@ -403,6 +403,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateStatemachine(f.config(), f.Graph, f.Logger)
 		}
+	case "createstream":
+		return func() any {
+			return awsspec.NewCreateStream(f.config(), f.Graph, f.Logger)
+		}
 	case "createsubnet":
 		return func() any {
 			return awsspec.NewCreateSubnet(f.config(), f.Graph, f.Logger)
@@ -675,6 +679,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteStatemachine(f.config(), f.Graph, f.Logger)
 		}
+	case "deletestream":
+		return func() any {
+			return awsspec.NewDeleteStream(f.config(), f.Graph, f.Logger)
+		}
 	case "deletesubnet":
 		return func() any {
 			return awsspec.NewDeleteSubnet(f.config(), f.Graph, f.Logger)
@@ -934,6 +942,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updatestatemachine":
 		return func() any {
 			return awsspec.NewUpdateStatemachine(f.config(), f.Graph, f.Logger)
+		}
+	case "updatestream":
+		return func() any {
+			return awsspec.NewUpdateStream(f.config(), f.Graph, f.Logger)
 		}
 	case "updatesubnet":
 		return func() any {

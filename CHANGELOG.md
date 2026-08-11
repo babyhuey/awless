@@ -10,6 +10,8 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Kinesis.** Data streams, with create/delete and resharding via `update stream`.
+  `awless create stream name=clickstream mode=ON_DEMAND`.
 - **AWS Config.** Config rules, with create/update/delete, and each rule annotated with its
   compliance status — which is the reason to look at Config at all and comes from a second
   API. `awless ls configrules` shows COMPLIANT or NON_COMPLIANT per rule;

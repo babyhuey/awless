@@ -130,7 +130,7 @@ func (s *Template) Revert() (*Template, error) {
 				// produced a revert that failed validation with "unexpected param id".
 				// Taken from the create's own param rather than from the command result,
 				// which is not populated for every one of them.
-				case "cachesubnetgroup", "dynamodbtable", "ekscluster", "configrule", "eventbus", "eventrule", "ipset", "loggroup", "ssmparameter", "trail":
+				case "cachesubnetgroup", "dynamodbtable", "ekscluster", "configrule", "eventbus", "eventrule", "ipset", "loggroup", "ssmparameter", "stream", "trail":
 					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
 				case "eksnodegroup":
 					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))

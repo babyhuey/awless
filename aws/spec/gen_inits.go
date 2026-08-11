@@ -217,6 +217,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateStack(f.Cfg, f.Graph, f.Log) }
 	case "createstatemachine":
 		return func() any { return NewCreateStatemachine(f.Cfg, f.Graph, f.Log) }
+	case "createstream":
+		return func() any { return NewCreateStream(f.Cfg, f.Graph, f.Log) }
 	case "createsubnet":
 		return func() any { return NewCreateSubnet(f.Cfg, f.Graph, f.Log) }
 	case "createsubscription":
@@ -353,6 +355,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteStack(f.Cfg, f.Graph, f.Log) }
 	case "deletestatemachine":
 		return func() any { return NewDeleteStatemachine(f.Cfg, f.Graph, f.Log) }
+	case "deletestream":
+		return func() any { return NewDeleteStream(f.Cfg, f.Graph, f.Log) }
 	case "deletesubnet":
 		return func() any { return NewDeleteSubnet(f.Cfg, f.Graph, f.Log) }
 	case "deletesubscription":
@@ -483,6 +487,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateStack(f.Cfg, f.Graph, f.Log) }
 	case "updatestatemachine":
 		return func() any { return NewUpdateStatemachine(f.Cfg, f.Graph, f.Log) }
+	case "updatestream":
+		return func() any { return NewUpdateStream(f.Cfg, f.Graph, f.Log) }
 	case "updatesubnet":
 		return func() any { return NewUpdateSubnet(f.Cfg, f.Graph, f.Log) }
 	case "updatetargetgroup":
@@ -579,6 +585,7 @@ var (
 	_ command = &CreateSsmparameter{}
 	_ command = &CreateStack{}
 	_ command = &CreateStatemachine{}
+	_ command = &CreateStream{}
 	_ command = &CreateSubnet{}
 	_ command = &CreateSubscription{}
 	_ command = &CreateTag{}
@@ -647,6 +654,7 @@ var (
 	_ command = &DeleteSsmparameter{}
 	_ command = &DeleteStack{}
 	_ command = &DeleteStatemachine{}
+	_ command = &DeleteStream{}
 	_ command = &DeleteSubnet{}
 	_ command = &DeleteSubscription{}
 	_ command = &DeleteTag{}
@@ -712,6 +720,7 @@ var (
 	_ command = &UpdateSsmparameter{}
 	_ command = &UpdateStack{}
 	_ command = &UpdateStatemachine{}
+	_ command = &UpdateStream{}
 	_ command = &UpdateSubnet{}
 	_ command = &UpdateTargetgroup{}
 )

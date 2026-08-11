@@ -1406,3 +1406,6 @@ func addManualConfigserviceFetchFuncs(conf *Config, funcs map[string]fetch.Func)
 		return resources, objects, nil
 	}
 }
+
+func addManualKinesisFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

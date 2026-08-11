@@ -45,6 +45,7 @@ import (
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
+	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
@@ -7001,6 +7002,84 @@ func (cmd *CreateStatemachine) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateStream(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateStream {
+	cmd := new(CreateStream)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = kinesis.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateStream) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateStream) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &kinesis.CreateStreamInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in kinesis.CreateStreamInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateStream(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("kinesis.CreateStream call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create stream: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create stream '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create stream done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateStream) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("stream"), nil
+}
+
+func (cmd *CreateStream) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSubnet {
 	cmd := new(CreateSubnet)
 	if len(l) > 0 {
@@ -12530,6 +12609,84 @@ func (cmd *DeleteStatemachine) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteStream(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteStream {
+	cmd := new(DeleteStream)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = kinesis.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteStream) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteStream) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &kinesis.DeleteStreamInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in kinesis.DeleteStreamInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteStream(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("kinesis.DeleteStream call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete stream: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete stream '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete stream done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteStream) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("stream"), nil
+}
+
+func (cmd *DeleteStream) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSubnet {
 	cmd := new(DeleteSubnet)
 	if len(l) > 0 {
@@ -17746,6 +17903,84 @@ func (cmd *UpdateStatemachine) dryRun(renv env.Running, params map[string]any) (
 }
 
 func (cmd *UpdateStatemachine) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateStream(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateStream {
+	cmd := new(UpdateStream)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = kinesis.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateStream) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateStream) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &kinesis.UpdateShardCountInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in kinesis.UpdateShardCountInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.UpdateShardCount(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("kinesis.UpdateShardCount call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update stream: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update stream '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update stream done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateStream) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("stream"), nil
+}
+
+func (cmd *UpdateStream) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

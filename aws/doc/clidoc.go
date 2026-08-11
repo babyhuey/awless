@@ -264,6 +264,17 @@ var cliExamplesDoc = map[string][]string{
 		"awless update configrule name=s3-versioning source=S3_BUCKET_VERSIONING_ENABLED frequency=TwentyFour_Hours",
 	},
 	"delete.configrule": {"awless delete configrule name=s3-versioning"},
+	"create.stream": {
+		"awless create stream name=clickstream mode=ON_DEMAND",
+		"awless create stream name=clickstream mode=PROVISIONED shards=4",
+	},
+	"delete.stream": {
+		"awless delete stream name=clickstream",
+		"awless delete stream name=clickstream force=true",
+	},
+	"update.stream": {
+		"awless update stream name=clickstream shards=8",
+	},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",

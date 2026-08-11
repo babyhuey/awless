@@ -105,6 +105,7 @@ var APIPerTemplateDefName = map[string]string{
 	"createssmparameter":        "ssm",
 	"createstack":               "cloudformation",
 	"createstatemachine":        "sfn",
+	"createstream":              "kinesis",
 	"createsubnet":              "ec2",
 	"createsubscription":        "sns",
 	"createtag":                 "ec2",
@@ -173,6 +174,7 @@ var APIPerTemplateDefName = map[string]string{
 	"deletessmparameter":        "ssm",
 	"deletestack":               "cloudformation",
 	"deletestatemachine":        "sfn",
+	"deletestream":              "kinesis",
 	"deletesubnet":              "ec2",
 	"deletesubscription":        "sns",
 	"deletetag":                 "ec2",
@@ -238,6 +240,7 @@ var APIPerTemplateDefName = map[string]string{
 	"updatessmparameter":        "ssm",
 	"updatestack":               "cloudformation",
 	"updatestatemachine":        "sfn",
+	"updatestream":              "kinesis",
 	"updatesubnet":              "ec2",
 	"updatetargetgroup":         "elbv2",
 }
@@ -765,6 +768,12 @@ var AWSTemplatesDefinitions = map[string]Definition{
 		API:    "sfn",
 		Params: new(CreateStatemachine).ParamsSpec().Rule(),
 	},
+	"createstream": Definition{
+		Action: "create",
+		Entity: "stream",
+		API:    "kinesis",
+		Params: new(CreateStream).ParamsSpec().Rule(),
+	},
 	"createsubnet": Definition{
 		Action: "create",
 		Entity: "subnet",
@@ -1173,6 +1182,12 @@ var AWSTemplatesDefinitions = map[string]Definition{
 		API:    "sfn",
 		Params: new(DeleteStatemachine).ParamsSpec().Rule(),
 	},
+	"deletestream": Definition{
+		Action: "delete",
+		Entity: "stream",
+		API:    "kinesis",
+		Params: new(DeleteStream).ParamsSpec().Rule(),
+	},
 	"deletesubnet": Definition{
 		Action: "delete",
 		Entity: "subnet",
@@ -1563,6 +1578,12 @@ var AWSTemplatesDefinitions = map[string]Definition{
 		API:    "sfn",
 		Params: new(UpdateStatemachine).ParamsSpec().Rule(),
 	},
+	"updatestream": Definition{
+		Action: "update",
+		Entity: "stream",
+		API:    "kinesis",
+		Params: new(UpdateStream).ParamsSpec().Rule(),
+	},
 	"updatesubnet": Definition{
 		Action: "update",
 		Entity: "subnet",
@@ -1582,12 +1603,12 @@ var DriverSupportedActions = map[string][]string{
 	"authenticate": []string{"registry"},
 	"check":        []string{"certificate", "database", "distribution", "instance", "loadbalancer", "natgateway", "networkinterface", "scalinggroup", "securitygroup", "volume"},
 	"copy":         []string{"image", "snapshot"},
-	"create":       []string{"accesskey", "alarm", "apigateway", "apigatewayroute", "apigatewaystage", "appscalingpolicy", "appscalingtarget", "bucket", "cachecluster", "cachesubnetgroup", "certificate", "classicloadbalancer", "configrule", "containercluster", "database", "dbsubnetgroup", "distribution", "dynamodbtable", "ekscluster", "eksnodegroup", "elasticip", "eventbus", "eventrule", "filesystem", "function", "group", "image", "instance", "instanceprofile", "internetgateway", "ipset", "keypair", "launchconfiguration", "listener", "loadbalancer", "loggroup", "loginprofile", "mfadevice", "natgateway", "networkinterface", "policy", "queue", "record", "replicationgroup", "repository", "role", "route", "routetable", "s3object", "scalinggroup", "scalingpolicy", "secret", "securitygroup", "snapshot", "ssmparameter", "stack", "statemachine", "subnet", "subscription", "tag", "targetgroup", "topic", "trail", "user", "volume", "vpc", "zone"},
-	"delete":       []string{"accesskey", "alarm", "apigateway", "apigatewayroute", "apigatewaystage", "appscalingpolicy", "appscalingtarget", "bucket", "cachecluster", "cachesubnetgroup", "certificate", "classicloadbalancer", "configrule", "containercluster", "containertask", "database", "dbsubnetgroup", "distribution", "dynamodbtable", "ekscluster", "eksnodegroup", "elasticip", "eventbus", "eventrule", "filesystem", "function", "group", "image", "instance", "instanceprofile", "internetgateway", "ipset", "keypair", "launchconfiguration", "listener", "loadbalancer", "loggroup", "loginprofile", "mfadevice", "natgateway", "networkinterface", "policy", "queue", "record", "replicationgroup", "repository", "role", "route", "routetable", "s3object", "scalinggroup", "scalingpolicy", "secret", "securitygroup", "snapshot", "ssmparameter", "stack", "statemachine", "subnet", "subscription", "tag", "targetgroup", "topic", "trail", "user", "volume", "vpc", "zone"},
+	"create":       []string{"accesskey", "alarm", "apigateway", "apigatewayroute", "apigatewaystage", "appscalingpolicy", "appscalingtarget", "bucket", "cachecluster", "cachesubnetgroup", "certificate", "classicloadbalancer", "configrule", "containercluster", "database", "dbsubnetgroup", "distribution", "dynamodbtable", "ekscluster", "eksnodegroup", "elasticip", "eventbus", "eventrule", "filesystem", "function", "group", "image", "instance", "instanceprofile", "internetgateway", "ipset", "keypair", "launchconfiguration", "listener", "loadbalancer", "loggroup", "loginprofile", "mfadevice", "natgateway", "networkinterface", "policy", "queue", "record", "replicationgroup", "repository", "role", "route", "routetable", "s3object", "scalinggroup", "scalingpolicy", "secret", "securitygroup", "snapshot", "ssmparameter", "stack", "statemachine", "stream", "subnet", "subscription", "tag", "targetgroup", "topic", "trail", "user", "volume", "vpc", "zone"},
+	"delete":       []string{"accesskey", "alarm", "apigateway", "apigatewayroute", "apigatewaystage", "appscalingpolicy", "appscalingtarget", "bucket", "cachecluster", "cachesubnetgroup", "certificate", "classicloadbalancer", "configrule", "containercluster", "containertask", "database", "dbsubnetgroup", "distribution", "dynamodbtable", "ekscluster", "eksnodegroup", "elasticip", "eventbus", "eventrule", "filesystem", "function", "group", "image", "instance", "instanceprofile", "internetgateway", "ipset", "keypair", "launchconfiguration", "listener", "loadbalancer", "loggroup", "loginprofile", "mfadevice", "natgateway", "networkinterface", "policy", "queue", "record", "replicationgroup", "repository", "role", "route", "routetable", "s3object", "scalinggroup", "scalingpolicy", "secret", "securitygroup", "snapshot", "ssmparameter", "stack", "statemachine", "stream", "subnet", "subscription", "tag", "targetgroup", "topic", "trail", "user", "volume", "vpc", "zone"},
 	"detach":       []string{"alarm", "classicloadbalancer", "containertask", "elasticip", "eventtarget", "instance", "instanceprofile", "internetgateway", "mfadevice", "networkinterface", "policy", "role", "routetable", "securitygroup", "user", "volume"},
 	"import":       []string{"image"},
 	"restart":      []string{"database", "instance"},
 	"start":        []string{"alarm", "containertask", "database", "eventrule", "execution", "instance", "trail"},
 	"stop":         []string{"alarm", "containertask", "database", "eventrule", "execution", "instance", "trail"},
-	"update":       []string{"bucket", "cachecluster", "cachesubnetgroup", "classicloadbalancer", "configrule", "containertask", "distribution", "eventrule", "image", "instance", "ipset", "loggroup", "loginprofile", "policy", "record", "s3object", "scalinggroup", "secret", "securitygroup", "ssmparameter", "stack", "statemachine", "subnet", "targetgroup"},
+	"update":       []string{"bucket", "cachecluster", "cachesubnetgroup", "classicloadbalancer", "configrule", "containertask", "distribution", "eventrule", "image", "instance", "ipset", "loggroup", "loginprofile", "policy", "record", "s3object", "scalinggroup", "secret", "securitygroup", "ssmparameter", "stack", "statemachine", "stream", "subnet", "targetgroup"},
 }

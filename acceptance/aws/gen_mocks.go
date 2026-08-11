@@ -105,6 +105,10 @@ type iamMock struct {
 	basicMock
 }
 
+type kinesisMock struct {
+	basicMock
+}
+
 type lambdaMock struct {
 	basicMock
 }

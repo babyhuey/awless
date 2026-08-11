@@ -51,6 +51,8 @@ import (
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
+	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
@@ -1407,5 +1409,39 @@ func BuildConfigserviceFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
 	addManualConfigserviceFetchFuncs(conf, funcs)
+	return funcs
+}
+func BuildKinesisFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualKinesisFetchFuncs(conf, funcs)
+
+	funcs["stream"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []kinesistypes.StreamSummary
+
+		if !conf.getBoolDefaultTrue("aws.kinesis.stream.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource kinesis[stream]")
+			return resources, objects, nil
+		}
+		paginator := kinesis.NewListStreamsPaginator(conf.APIs.Kinesis, &kinesis.ListStreamsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.StreamSummaries {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
 	return funcs
 }

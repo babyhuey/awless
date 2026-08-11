@@ -762,4 +762,12 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Owner:            {name: "Source.Owner", transform: extractValueFn},
 		properties.SourceIdentifier: {name: "Source.SourceIdentifier", transform: extractValueFn},
 	},
+	// Kinesis
+	cloud.Stream: {
+		properties.Name:       {name: "StreamName", transform: extractValueFn},
+		properties.Arn:        {name: "StreamARN", transform: extractValueFn},
+		properties.State:      {name: "StreamStatus", transform: extractValueFn},
+		properties.StreamMode: {name: "StreamModeDetails.StreamMode", transform: extractValueFn},
+		properties.Created:    {name: "StreamCreationTimestamp", transform: extractTimeFn},
+	},
 }

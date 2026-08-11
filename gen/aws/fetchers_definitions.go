@@ -315,6 +315,13 @@ var FetchersDefs = []fetchersDef{
 			{API: "configservice", ResourceType: cloud.ConfigRule, AWSType: "configservicetypes.ConfigRule", ManualFetcher: true},
 		},
 	},
+	{
+		Name: "kinesis",
+		API:  []string{"kinesis"},
+		Fetchers: []fetcher{
+			{API: "kinesis", ResourceType: cloud.Stream, AWSType: "kinesistypes.StreamSummary", APIMethod: "ListStreams", Input: "kinesis.ListStreamsInput{}", Output: "kinesis.ListStreamsOutput", OutputsExtractor: "StreamSummaries", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

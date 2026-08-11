@@ -52,6 +52,7 @@ import (
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
@@ -252,6 +253,9 @@ func InitResource(source any) (*graph.Resource, error) {
 	// AWS Config
 	case configservicetypes.ConfigRule:
 		res = graph.InitResource(cloud.ConfigRule, awssdk.ToString(ss.ConfigRuleName))
+	// Kinesis
+	case kinesistypes.StreamSummary:
+		res = graph.InitResource(cloud.Stream, awssdk.ToString(ss.StreamName))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}
