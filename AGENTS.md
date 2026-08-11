@@ -119,7 +119,7 @@ renders SDK type names and apigatewayv2's type is `Api`.
 
 ## Adding a New AWS Service
 
-See `SERVICES_TODO.md` for ranked candidates. Every step below is load-bearing; the ones
+Every step below is load-bearing; the ones
 that fail *silently* are called out, because those are the ones that cost time.
 
 ```sh
@@ -420,6 +420,25 @@ module and `aws/spec/classicloadbalancer.go`.
 `golangci-lint-action`. The action is faster, but pinning the exact version (v2.12.2) in the
 Makefile is what keeps CI and local runs from disagreeing — an unpinned `@latest` is what
 broke the lint job once already.
+
+**Some AWS resources are deliberately not covered.** Every service that was on the
+candidate list has been added; these specific resources within them were left out, and the
+reason matters because each looks like an omission:
+
+| Resource | Why |
+|---|---|
+| Step Functions and CodePipeline executions, CodeDeploy deployment history | Run history rather than infrastructure, and listing costs one call per parent |
+| Global Accelerator endpoint groups | A third level down, behind a listener, with a document-shaped configuration |
+| FSx volumes | Only exist for two of the four file system types, and list per file system |
+| MSK and Amazon MQ configurations | Versioned blobs of engine properties rather than infrastructure |
+| Cloud Map instances | Registered by whatever runs the workload, usually ECS, rather than by hand |
+| AWS Backup recovery points | The backups themselves; a delete command here exists only to destroy data |
+| VPC endpoint services | The provider side of PrivateLink, a different job from consuming an endpoint |
+| WAF web ACL and rule group associations | Attaching an ACL to a load balancer is a separate API from managing the ACL |
+
+The general rule these follow: awless syncs a graph of infrastructure, so a resource whose
+population scales with *activity* rather than with what you have built does not belong in it.
+Adding any of them is a normal service addition — the procedure above covers it.
 
 **Five functions are deliberately untested.** `InteractiveTerminal`, `propagateSignals`,
 `NewClientWithProxy`, `Connect` and `workaroundExeCVEThroughScript` need a live SSH
