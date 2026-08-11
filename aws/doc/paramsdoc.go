@@ -458,6 +458,14 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.vpcpeering": {
+		"vpc":         "Identifier of the requesting VPC",
+		"peer-vpc":    "Identifier of the VPC to peer with; the connection stays pending until that side accepts",
+		"peer-owner":  "Account id owning the other VPC, when it is in a different account",
+		"peer-region": "Region of the other VPC, when it is in a different region",
+	},
+	"delete.vpcpeering": {"id": "Identifier of the peering connection to delete"},
+	"start.vpcpeering":  {"id": "Identifier of the pending peering connection to accept"},
 	"create.accelerator": {
 		"name":    "Name for the accelerator",
 		"enabled": "Whether the accelerator starts enabled",

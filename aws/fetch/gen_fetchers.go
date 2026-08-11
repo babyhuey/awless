@@ -100,6 +100,34 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualInfraFetchFuncs(conf, funcs)
 
+	funcs["vpcpeering"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []ec2types.VpcPeeringConnection
+
+		if !conf.getBoolDefaultTrue("aws.infra.vpcpeering.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource infra[vpcpeering]")
+			return resources, objects, nil
+		}
+		paginator := ec2.NewDescribeVpcPeeringConnectionsPaginator(conf.APIs.Ec2, &ec2.DescribeVpcPeeringConnectionsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.VpcPeeringConnections {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
 	funcs["transitgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.TransitGateway

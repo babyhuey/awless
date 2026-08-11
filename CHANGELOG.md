@@ -10,6 +10,8 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **VPC Peering.** Peering connections with create/delete, plus `start vpcpeering` to accept
+  a pending request — creating one leaves it pending until the other side accepts.
 - **Global Accelerator.** Accelerators with create/update/delete and their listeners with
   create/delete. The required idempotency token is generated rather than asked for.
 - **FSx.** File systems and backups, with create and delete. The entity is

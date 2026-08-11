@@ -245,6 +245,12 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.vpcpeering": {
+		"awless create vpcpeering vpc=vpc-1234 peer-vpc=vpc-5678",
+		"awless create vpcpeering vpc=vpc-1234 peer-vpc=vpc-5678 peer-owner=210987654321 peer-region=eu-west-1",
+	},
+	"delete.vpcpeering":  {"awless delete vpcpeering id=pcx-1234abcd"},
+	"start.vpcpeering":   {"awless start vpcpeering id=pcx-1234abcd"},
 	"create.accelerator": {"awless create accelerator name=global-api enabled=true"},
 	"delete.accelerator": {"awless delete accelerator arn=arn:aws:globalaccelerator::123456789012:accelerator/abcd"},
 	"update.accelerator": {

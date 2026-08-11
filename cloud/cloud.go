@@ -172,6 +172,8 @@ const (
 	//Beanstalk already owns.
 	DeployApplication string = "deployapplication"
 	DeploymentGroup   string = "deploymentgroup"
+	//vpc peering (on the EC2 API)
+	VpcPeering string = "vpcpeering"
 	//transit gateway and vpc endpoints (both on the EC2 API)
 	TransitGateway           string = "transitgateway"
 	TransitGatewayAttachment string = "transitgatewayattachment"

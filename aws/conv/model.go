@@ -815,6 +815,16 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Created:     {name: "Created", transform: extractTimeFn},
 		properties.Modified:    {name: "LastModified", transform: extractTimeFn},
 	},
+	// VPC peering. The state lives one level down and the two sides of the connection
+	// each carry their own vpc, owner and region.
+	cloud.VpcPeering: {
+		properties.ID:         {name: "VpcPeeringConnectionId", transform: extractValueFn},
+		properties.State:      {name: "Status.Code", transform: extractValueFn},
+		properties.Vpc:        {name: "RequesterVpcInfo.VpcId", transform: extractValueFn},
+		properties.PeerVpc:    {name: "AccepterVpcInfo.VpcId", transform: extractValueFn},
+		properties.PeerOwner:  {name: "AccepterVpcInfo.OwnerId", transform: extractValueFn},
+		properties.PeerRegion: {name: "AccepterVpcInfo.Region", transform: extractValueFn},
+	},
 	// Transit gateway and VPC endpoints
 	cloud.TransitGateway: {
 		properties.ID:          {name: "TransitGatewayId", transform: extractValueFn},

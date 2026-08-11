@@ -10063,6 +10063,109 @@ func (cmd *CreateVpcendpoint) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateVpcpeering(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateVpcpeering {
+	cmd := new(CreateVpcpeering)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateVpcpeering) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateVpcpeering) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.CreateVpcPeeringConnectionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcPeeringConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateVpcPeeringConnection(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.CreateVpcPeeringConnection call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create vpcpeering: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create vpcpeering '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create vpcpeering done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateVpcpeering) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.CreateVpcPeeringConnectionInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcPeeringConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.CreateVpcPeeringConnection(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.CreateVpcPeeringConnection call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: create vpcpeering ok")
+			return fakeDryRunID("vpcpeering"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *CreateVpcpeering) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateWebacl(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateWebacl {
 	cmd := new(CreateWebacl)
 	if len(l) > 0 {
@@ -17867,6 +17970,109 @@ func (cmd *DeleteVpcendpoint) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteVpcpeering(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteVpcpeering {
+	cmd := new(DeleteVpcpeering)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteVpcpeering) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteVpcpeering) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.DeleteVpcPeeringConnectionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcPeeringConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteVpcPeeringConnection(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.DeleteVpcPeeringConnection call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete vpcpeering: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete vpcpeering '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete vpcpeering done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteVpcpeering) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.DeleteVpcPeeringConnectionInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcPeeringConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.DeleteVpcPeeringConnection(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.DeleteVpcPeeringConnection call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: delete vpcpeering ok")
+			return fakeDryRunID("vpcpeering"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *DeleteVpcpeering) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteWebacl(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteWebacl {
 	cmd := new(DeleteWebacl)
 	if len(l) > 0 {
@@ -20459,6 +20665,109 @@ func (cmd *StartTrail) dryRun(renv env.Running, params map[string]any) (any, err
 }
 
 func (cmd *StartTrail) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStartVpcpeering(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartVpcpeering {
+	cmd := new(StartVpcpeering)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartVpcpeering) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartVpcpeering) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.AcceptVpcPeeringConnectionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.AcceptVpcPeeringConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.AcceptVpcPeeringConnection(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.AcceptVpcPeeringConnection call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start vpcpeering: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start vpcpeering '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start vpcpeering done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartVpcpeering) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.AcceptVpcPeeringConnectionInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.AcceptVpcPeeringConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.AcceptVpcPeeringConnection(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.AcceptVpcPeeringConnection call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: start vpcpeering ok")
+			return fakeDryRunID("vpcpeering"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *StartVpcpeering) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

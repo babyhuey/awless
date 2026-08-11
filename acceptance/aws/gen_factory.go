@@ -551,6 +551,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateVpcendpoint(f.config(), f.Graph, f.Logger)
 		}
+	case "createvpcpeering":
+		return func() any {
+			return awsspec.NewCreateVpcpeering(f.config(), f.Graph, f.Logger)
+		}
 	case "createwebacl":
 		return func() any {
 			return awsspec.NewCreateWebacl(f.config(), f.Graph, f.Logger)
@@ -935,6 +939,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteVpcendpoint(f.config(), f.Graph, f.Logger)
 		}
+	case "deletevpcpeering":
+		return func() any {
+			return awsspec.NewDeleteVpcpeering(f.config(), f.Graph, f.Logger)
+		}
 	case "deletewebacl":
 		return func() any {
 			return awsspec.NewDeleteWebacl(f.config(), f.Graph, f.Logger)
@@ -1062,6 +1070,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "starttrail":
 		return func() any {
 			return awsspec.NewStartTrail(f.config(), f.Graph, f.Logger)
+		}
+	case "startvpcpeering":
+		return func() any {
+			return awsspec.NewStartVpcpeering(f.config(), f.Graph, f.Logger)
 		}
 	case "stopalarm":
 		return func() any {

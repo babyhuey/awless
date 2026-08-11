@@ -123,6 +123,7 @@ var entities = map[Entity]struct{}{
 	"volume":                   {},
 	"vpc":                      {},
 	"vpcendpoint":              {},
+	"vpcpeering":               {},
 	"webacl":                   {},
 	"zone":                     {},
 }

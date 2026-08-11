@@ -195,6 +195,9 @@ const (
 	Path                              = "cloud:path"
 	PathPrefix                        = "cloud:pathPrefix"
 	Pattern                           = "cloud:pattern"
+	PeerOwner                         = "cloud:peerOwner"
+	PeerRegion                        = "cloud:peerRegion"
+	PeerVpc                           = "cloud:peerVpc"
 	PendingTasksCount                 = "cloud:pendingTasksCount"
 	PipelineType                      = "cloud:pipelineType"
 	PlacementGroup                    = "cloud:placementGroup"
@@ -504,6 +507,9 @@ func init() {
 		properties.Path:                              Path,
 		properties.PathPrefix:                        PathPrefix,
 		properties.Pattern:                           Pattern,
+		properties.PeerOwner:                         PeerOwner,
+		properties.PeerRegion:                        PeerRegion,
+		properties.PeerVpc:                           PeerVpc,
 		properties.PendingTasksCount:                 PendingTasksCount,
 		properties.PipelineType:                      PipelineType,
 		properties.PlacementGroup:                    PlacementGroup,
@@ -813,6 +819,9 @@ var Properties = RDFProperties{
 	Path:                              {ID: Path, RdfType: "rdf:Property", RdfsLabel: "Path", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PathPrefix:                        {ID: PathPrefix, RdfType: "rdf:Property", RdfsLabel: "PathPrefix", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Pattern:                           {ID: Pattern, RdfType: "rdf:Property", RdfsLabel: "Pattern", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	PeerOwner:                         {ID: PeerOwner, RdfType: "rdf:Property", RdfsLabel: "PeerOwner", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	PeerRegion:                        {ID: PeerRegion, RdfType: "rdf:Property", RdfsLabel: "PeerRegion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	PeerVpc:                           {ID: PeerVpc, RdfType: "rdf:Property", RdfsLabel: "PeerVpc", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PendingTasksCount:                 {ID: PendingTasksCount, RdfType: "rdf:Property", RdfsLabel: "PendingTasksCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	PipelineType:                      {ID: PipelineType, RdfType: "rdf:Property", RdfsLabel: "PipelineType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PlacementGroup:                    {ID: PlacementGroup, RdfType: "rdf:Property", RdfsLabel: "PlacementGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},

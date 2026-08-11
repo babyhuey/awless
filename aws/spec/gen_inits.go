@@ -291,6 +291,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateVpc(f.Cfg, f.Graph, f.Log) }
 	case "createvpcendpoint":
 		return func() any { return NewCreateVpcendpoint(f.Cfg, f.Graph, f.Log) }
+	case "createvpcpeering":
+		return func() any { return NewCreateVpcpeering(f.Cfg, f.Graph, f.Log) }
 	case "createwebacl":
 		return func() any { return NewCreateWebacl(f.Cfg, f.Graph, f.Log) }
 	case "createzone":
@@ -483,6 +485,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteVpc(f.Cfg, f.Graph, f.Log) }
 	case "deletevpcendpoint":
 		return func() any { return NewDeleteVpcendpoint(f.Cfg, f.Graph, f.Log) }
+	case "deletevpcpeering":
+		return func() any { return NewDeleteVpcpeering(f.Cfg, f.Graph, f.Log) }
 	case "deletewebacl":
 		return func() any { return NewDeleteWebacl(f.Cfg, f.Graph, f.Log) }
 	case "deletezone":
@@ -547,6 +551,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartPipeline(f.Cfg, f.Graph, f.Log) }
 	case "starttrail":
 		return func() any { return NewStartTrail(f.Cfg, f.Graph, f.Log) }
+	case "startvpcpeering":
+		return func() any { return NewStartVpcpeering(f.Cfg, f.Graph, f.Log) }
 	case "stopalarm":
 		return func() any { return NewStopAlarm(f.Cfg, f.Graph, f.Log) }
 	case "stopbuildproject":
@@ -758,6 +764,7 @@ var (
 	_ command = &CreateVolume{}
 	_ command = &CreateVpc{}
 	_ command = &CreateVpcendpoint{}
+	_ command = &CreateVpcpeering{}
 	_ command = &CreateWebacl{}
 	_ command = &CreateZone{}
 	_ command = &DeleteAccelerator{}
@@ -854,6 +861,7 @@ var (
 	_ command = &DeleteVolume{}
 	_ command = &DeleteVpc{}
 	_ command = &DeleteVpcendpoint{}
+	_ command = &DeleteVpcpeering{}
 	_ command = &DeleteWebacl{}
 	_ command = &DeleteZone{}
 	_ command = &DetachAlarm{}
@@ -886,6 +894,7 @@ var (
 	_ command = &StartJob{}
 	_ command = &StartPipeline{}
 	_ command = &StartTrail{}
+	_ command = &StartVpcpeering{}
 	_ command = &StopAlarm{}
 	_ command = &StopBuildproject{}
 	_ command = &StopContainertask{}

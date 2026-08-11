@@ -98,6 +98,7 @@ var FetchersDefs = []fetchersDef{
 		Name: "infra",
 		API:  []string{"ec2", "elbv2", "elb", "rds", "autoscaling", "ecr", "ecs", "applicationautoscaling", "acm"},
 		Fetchers: []fetcher{
+			{API: "ec2", ResourceType: cloud.VpcPeering, AWSType: "ec2types.VpcPeeringConnection", APIMethod: "DescribeVpcPeeringConnections", Input: "ec2.DescribeVpcPeeringConnectionsInput{}", Output: "ec2.DescribeVpcPeeringConnectionsOutput", OutputsExtractor: "VpcPeeringConnections", Multipage: true, NextPageMarker: "NextToken"},
 			// Transit gateways and VPC endpoints ride the EC2 client that the rest of
 			// infra already uses, so they need no service of their own.
 			{API: "ec2", ResourceType: cloud.TransitGateway, AWSType: "ec2types.TransitGateway", APIMethod: "DescribeTransitGateways", Input: "ec2.DescribeTransitGatewaysInput{}", Output: "ec2.DescribeTransitGatewaysOutput", OutputsExtractor: "TransitGateways", Multipage: true, NextPageMarker: "NextToken"},

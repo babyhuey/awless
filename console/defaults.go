@@ -123,6 +123,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.FSxBackup:                {properties.ID, properties.Type, properties.Lifecycle, properties.Created},
 	cloud.Accelerator:              {properties.Name, properties.State, properties.Enabled, properties.DNSName},
 	cloud.AcceleratorListener:      {properties.Arn, properties.Protocol, properties.ClientAffinity},
+	cloud.VpcPeering:               {properties.ID, properties.State, properties.Vpc, properties.PeerVpc},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -938,5 +939,13 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Protocol},
 		StringColumnDefinition{Prop: properties.ClientAffinity, Friendly: "Affinity"},
 		StringColumnDefinition{Prop: properties.Accelerator},
+	}, // VPC peering
+	cloud.VpcPeering: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Vpc, Friendly: "Requester VPC"},
+		StringColumnDefinition{Prop: properties.PeerVpc, Friendly: "Accepter VPC"},
+		StringColumnDefinition{Prop: properties.PeerOwner, Friendly: "Peer Account"},
+		StringColumnDefinition{Prop: properties.PeerRegion, Friendly: "Peer Region"},
 	},
 }

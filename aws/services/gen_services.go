@@ -168,6 +168,7 @@ var ServiceNames = []string{
 }
 
 var ResourceTypes = []string{
+	"vpcpeering",
 	"transitgateway",
 	"transitgatewayattachment",
 	"transitgatewayroutetable",
@@ -320,6 +321,7 @@ var ServicePerAPI = map[string]string{
 }
 
 var ServicePerResourceType = map[string]string{
+	"vpcpeering":               "infra",
 	"transitgateway":           "infra",
 	"transitgatewayattachment": "infra",
 	"transitgatewayroutetable": "infra",
@@ -422,6 +424,7 @@ var ServicePerResourceType = map[string]string{
 }
 
 var APIPerResourceType = map[string]string{
+	"vpcpeering":               "ec2",
 	"transitgateway":           "ec2",
 	"transitgatewayattachment": "ec2",
 	"transitgatewayroutetable": "ec2",
@@ -597,6 +600,7 @@ func (s *Infra) Profile() string {
 
 func (s *Infra) ResourceTypes() []string {
 	return []string{
+		"vpcpeering",
 		"transitgateway",
 		"transitgatewayattachment",
 		"transitgatewayroutetable",
@@ -666,6 +670,28 @@ func (s *Infra) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 
 	errc := make(chan error)
 	var wg sync.WaitGroup
+	if getBool(s.config, "aws.infra.vpcpeering.sync", true) {
+		list, err := s.fetcher.Get("vpcpeering_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]ec2types.VpcPeeringConnection); !ok {
+			return gph, errors.New("cannot cast to '[]ec2types.VpcPeeringConnection' type from fetch context")
+		}
+		for _, r := range list.([]ec2types.VpcPeeringConnection) {
+			for _, fn := range addParentsFns["vpcpeering"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *ec2types.VpcPeeringConnection) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
 	if getBool(s.config, "aws.infra.transitgateway.sync", true) {
 		list, err := s.fetcher.Get("transitgateway_objects")
 		if err != nil {

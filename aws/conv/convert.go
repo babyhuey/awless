@@ -280,6 +280,9 @@ func InitResource(source any) (*graph.Resource, error) {
 	// CodeBuild
 	case codebuildtypes.Project:
 		res = graph.InitResource(cloud.BuildProject, awssdk.ToString(ss.Name))
+	// VPC peering
+	case ec2types.VpcPeeringConnection:
+		res = graph.InitResource(cloud.VpcPeering, awssdk.ToString(ss.VpcPeeringConnectionId))
 	// Transit gateway and VPC endpoints
 	case ec2types.TransitGateway:
 		res = graph.InitResource(cloud.TransitGateway, awssdk.ToString(ss.TransitGatewayId))
