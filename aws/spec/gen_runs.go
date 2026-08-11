@@ -52,6 +52,7 @@ import (
 	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	glue "github.com/aws/aws-sdk-go-v2/service/glue"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
+	kafka "github.com/aws/aws-sdk-go-v2/service/kafka"
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
@@ -5827,6 +5828,84 @@ func (cmd *CreateJob) dryRun(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *CreateJob) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateKafkacluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateKafkacluster {
+	cmd := new(CreateKafkacluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = kafka.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateKafkacluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateKafkacluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &kafka.CreateClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in kafka.CreateClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("kafka.CreateCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create kafkacluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create kafkacluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create kafkacluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateKafkacluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("kafkacluster"), nil
+}
+
+func (cmd *CreateKafkacluster) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13129,6 +13208,84 @@ func (cmd *DeleteJob) dryRun(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DeleteJob) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteKafkacluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteKafkacluster {
+	cmd := new(DeleteKafkacluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = kafka.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteKafkacluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteKafkacluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &kafka.DeleteClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in kafka.DeleteClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("kafka.DeleteCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete kafkacluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete kafkacluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete kafkacluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteKafkacluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("kafkacluster"), nil
+}
+
+func (cmd *DeleteKafkacluster) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

@@ -133,6 +133,10 @@ type iamMock struct {
 	basicMock
 }
 
+type kafkaMock struct {
+	basicMock
+}
+
 type kinesisMock struct {
 	basicMock
 }

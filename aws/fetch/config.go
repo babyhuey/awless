@@ -31,6 +31,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	"github.com/aws/aws-sdk-go-v2/service/glue"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/kafka"
 	"github.com/aws/aws-sdk-go-v2/service/kinesis"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
@@ -93,6 +94,7 @@ type AWSAPI struct {
 	Sesv2                   *sesv2.Client
 	Cognitoidentityprovider *cognitoidentityprovider.Client
 	Cognitoidentity         *cognitoidentity.Client
+	Kafka                   *kafka.Client
 	Elasticbeanstalk        *elasticbeanstalk.Client
 }
 

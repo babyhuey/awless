@@ -189,6 +189,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateIpset(f.Cfg, f.Graph, f.Log) }
 	case "createjob":
 		return func() any { return NewCreateJob(f.Cfg, f.Graph, f.Log) }
+	case "createkafkacluster":
+		return func() any { return NewCreateKafkacluster(f.Cfg, f.Graph, f.Log) }
 	case "createkeypair":
 		return func() any { return NewCreateKeypair(f.Cfg, f.Graph, f.Log) }
 	case "createlaunchconfiguration":
@@ -369,6 +371,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteIpset(f.Cfg, f.Graph, f.Log) }
 	case "deletejob":
 		return func() any { return NewDeleteJob(f.Cfg, f.Graph, f.Log) }
+	case "deletekafkacluster":
+		return func() any { return NewDeleteKafkacluster(f.Cfg, f.Graph, f.Log) }
 	case "deletekeypair":
 		return func() any { return NewDeleteKeypair(f.Cfg, f.Graph, f.Log) }
 	case "deletelaunchconfiguration":
@@ -681,6 +685,7 @@ var (
 	_ command = &CreateInternetgateway{}
 	_ command = &CreateIpset{}
 	_ command = &CreateJob{}
+	_ command = &CreateKafkacluster{}
 	_ command = &CreateKeypair{}
 	_ command = &CreateLaunchconfiguration{}
 	_ command = &CreateListener{}
@@ -771,6 +776,7 @@ var (
 	_ command = &DeleteInternetgateway{}
 	_ command = &DeleteIpset{}
 	_ command = &DeleteJob{}
+	_ command = &DeleteKafkacluster{}
 	_ command = &DeleteKeypair{}
 	_ command = &DeleteLaunchconfiguration{}
 	_ command = &DeleteListener{}

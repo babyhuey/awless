@@ -347,6 +347,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateJob(f.config(), f.Graph, f.Logger)
 		}
+	case "createkafkacluster":
+		return func() any {
+			return awsspec.NewCreateKafkacluster(f.config(), f.Graph, f.Logger)
+		}
 	case "createkeypair":
 		return func() any {
 			return awsspec.NewCreateKeypair(f.config(), f.Graph, f.Logger)
@@ -706,6 +710,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletejob":
 		return func() any {
 			return awsspec.NewDeleteJob(f.config(), f.Graph, f.Logger)
+		}
+	case "deletekafkacluster":
+		return func() any {
+			return awsspec.NewDeleteKafkacluster(f.config(), f.Graph, f.Logger)
 		}
 	case "deletekeypair":
 		return func() any {

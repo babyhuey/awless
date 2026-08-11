@@ -847,6 +847,16 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// MSK. The V2 Cluster wraps the provisioned detail, hence the nested paths.
+	cloud.KafkaCluster: {
+		properties.Name:         {name: "ClusterName", transform: extractValueFn},
+		properties.Arn:          {name: "ClusterArn", transform: extractValueFn},
+		properties.State:        {name: "State", transform: extractValueFn},
+		properties.Type:         {name: "ClusterType", transform: extractValueFn},
+		properties.KafkaVersion: {name: "Provisioned.CurrentBrokerSoftwareInfo.KafkaVersion", transform: extractValueFn},
+		properties.BrokerCount:  {name: "Provisioned.NumberOfBrokerNodes", transform: extractValueFn},
+		properties.Created:      {name: "CreationTime", transform: extractTimeFn},
+	},
 	// Cognito
 	cloud.UserPool: {
 		properties.ID:       {name: "Id", transform: extractValueFn},

@@ -78,6 +78,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.19 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.21 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.21 // indirect
+	github.com/aws/aws-sdk-go-v2/service/kafka v1.58.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.46.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/redshift v1.65.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.66.5 // indirect

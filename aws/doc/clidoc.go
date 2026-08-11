@@ -245,6 +245,12 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.kafkacluster": {
+		"awless create kafkacluster name=events version=3.6.0 brokers=3 subnets=subnet-1,subnet-2,subnet-3 type=kafka.m5.large storage=100",
+	},
+	"delete.kafkacluster": {
+		"awless delete kafkacluster arn=arn:aws:kafka:us-west-2:123456789012:cluster/events/abcd",
+	},
 	"create.userpool": {
 		"awless create userpool name=customers deletion-protection=ACTIVE auto-verified=email",
 	},

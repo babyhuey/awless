@@ -344,6 +344,15 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "msk",
+		API:  []string{"kafka"},
+		Fetchers: []fetcher{
+			// ListClusters is the v1 call and only returns provisioned clusters; V2 also
+			// covers serverless, which is why it is the one used here.
+			{API: "kafka", ResourceType: cloud.KafkaCluster, AWSType: "kafkatypes.Cluster", APIMethod: "ListClustersV2", Input: "kafka.ListClustersV2Input{}", Output: "kafka.ListClustersV2Output", OutputsExtractor: "ClusterInfoList", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
+	{
 		Name: "cognito",
 		API:  []string{"cognitoidentityprovider", "cognitoidentity"},
 		Fetchers: []fetcher{

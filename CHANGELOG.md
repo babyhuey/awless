@@ -10,6 +10,8 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **MSK.** Kafka clusters, with create and delete. The entity is `kafkacluster`, since ECS,
+  EKS and Redshift already have clusters of their own.
 - **Cognito.** User pools and identity pools, with create and delete. These are two
   different APIs that are easy to confuse: a user pool is a directory of users, an identity
   pool hands AWS credentials to them.

@@ -51,6 +51,7 @@ const (
 	AvailabilityZone                  = "cloud:availabilityZone"
 	AvailabilityZones                 = "cloud:availabilityZones"
 	BackupRetentionPeriod             = "cloud:backupRetentionPeriod"
+	BrokerCount                       = "cloud:brokerCount"
 	Bucket                            = "cloud:bucketName"
 	CacheNodeType                     = "cloud:cacheNodeType"
 	CallerReference                   = "cloud:callerReference"
@@ -141,6 +142,7 @@ const (
 	IPType                            = "net:ipType"
 	IPv6Addresses                     = "cloud:ipv6Addresses"
 	IPv6Enabled                       = "cloud:ipv6Enabled"
+	KafkaVersion                      = "cloud:kafkaVersion"
 	Key                               = "cloud:key"
 	KeyName                           = "cloud:keyName"
 	KeyPair                           = "cloud:keyPair"
@@ -350,6 +352,7 @@ func init() {
 		properties.AvailabilityZone:                  AvailabilityZone,
 		properties.AvailabilityZones:                 AvailabilityZones,
 		properties.BackupRetentionPeriod:             BackupRetentionPeriod,
+		properties.BrokerCount:                       BrokerCount,
 		properties.Bucket:                            Bucket,
 		properties.CacheNodeType:                     CacheNodeType,
 		properties.CallerReference:                   CallerReference,
@@ -440,6 +443,7 @@ func init() {
 		properties.IPType:                            IPType,
 		properties.IPv6Addresses:                     IPv6Addresses,
 		properties.IPv6Enabled:                       IPv6Enabled,
+		properties.KafkaVersion:                      KafkaVersion,
 		properties.Key:                               Key,
 		properties.KeyName:                           KeyName,
 		properties.KeyPair:                           KeyPair,
@@ -649,6 +653,7 @@ var Properties = RDFProperties{
 	AvailabilityZone:                  {ID: AvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "AvailabilityZone", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	AvailabilityZones:                 {ID: AvailabilityZones, RdfType: "rdf:Property", RdfsLabel: "AvailabilityZones", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	BackupRetentionPeriod:             {ID: BackupRetentionPeriod, RdfType: "rdf:Property", RdfsLabel: "BackupRetentionPeriod", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
+	BrokerCount:                       {ID: BrokerCount, RdfType: "rdf:Property", RdfsLabel: "BrokerCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Bucket:                            {ID: Bucket, RdfType: "rdf:Property", RdfsLabel: "Bucket", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	CacheNodeType:                     {ID: CacheNodeType, RdfType: "rdf:Property", RdfsLabel: "CacheNodeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	CallerReference:                   {ID: CallerReference, RdfType: "rdf:Property", RdfsLabel: "CallerReference", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -739,6 +744,7 @@ var Properties = RDFProperties{
 	IPType:                            {ID: IPType, RdfType: "rdf:Property", RdfsLabel: "IPType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	IPv6Addresses:                     {ID: IPv6Addresses, RdfType: "rdf:Property", RdfsLabel: "IPv6Addresses", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	IPv6Enabled:                       {ID: IPv6Enabled, RdfType: "rdf:Property", RdfsLabel: "IPv6Enabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+	KafkaVersion:                      {ID: KafkaVersion, RdfType: "rdf:Property", RdfsLabel: "KafkaVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Key:                               {ID: Key, RdfType: "rdf:Property", RdfsLabel: "Key", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	KeyName:                           {ID: KeyName, RdfType: "rdf:Property", RdfsLabel: "KeyName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	KeyPair:                           {ID: KeyPair, RdfType: "rdf:Property", RdfsLabel: "KeyPair", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},

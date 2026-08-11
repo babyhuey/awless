@@ -61,6 +61,8 @@ import (
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	kafka "github.com/aws/aws-sdk-go-v2/service/kafka"
+	kafkatypes "github.com/aws/aws-sdk-go-v2/service/kafka/types"
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
@@ -1653,6 +1655,40 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.Pipelines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildMskFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualMskFetchFuncs(conf, funcs)
+
+	funcs["kafkacluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []kafkatypes.Cluster
+
+		if !conf.getBoolDefaultTrue("aws.msk.kafkacluster.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource msk[kafkacluster]")
+			return resources, objects, nil
+		}
+		paginator := kafka.NewListClustersV2Paginator(conf.APIs.Kafka, &kafka.ListClustersV2Input{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.ClusterInfoList {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

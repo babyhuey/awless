@@ -70,6 +70,7 @@ var entities = map[Entity]struct{}{
 	"internetgateway":          {},
 	"ipset":                    {},
 	"job":                      {},
+	"kafkacluster":             {},
 	"keypair":                  {},
 	"launchconfiguration":      {},
 	"listener":                 {},

@@ -458,6 +458,18 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.kafkacluster": {
+		"name":            "Name for the MSK cluster",
+		"version":         "Apache Kafka version to run",
+		"brokers":         "Number of broker nodes; must be a multiple of the number of subnets",
+		"subnets":         "Client subnets the brokers are placed in, one per availability zone",
+		"type":            "Broker instance type, e.g. kafka.m5.large",
+		"securitygroups":  "Security groups for the broker network interfaces",
+		"storage":         "EBS volume size per broker, in GiB",
+		"encryption-file": "Path to the encryption settings in JSON, covering at-rest and in-transit",
+		"auth-file":       "Path to the client authentication settings in JSON: IAM, SASL/SCRAM or TLS",
+	},
+	"delete.kafkacluster": {"arn": "ARN of the MSK cluster to delete; the API does not accept the name"},
 	"create.userpool": {
 		"name":                "Name for the user pool",
 		"deletion-protection": "ACTIVE or INACTIVE; a user pool holds credentials that cannot be recreated, and the API defaults this off",

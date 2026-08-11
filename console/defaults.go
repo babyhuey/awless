@@ -117,6 +117,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.ConfigurationSet:         {properties.Name},
 	cloud.UserPool:                 {properties.ID, properties.Name, properties.State, properties.Created},
 	cloud.IdentityPool:             {properties.ID, properties.Name},
+	cloud.KafkaCluster:             {properties.Name, properties.State, properties.KafkaVersion, properties.BrokerCount},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -886,5 +887,13 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 	cloud.IdentityPool: {
 		StringColumnDefinition{Prop: properties.ID},
 		StringColumnDefinition{Prop: properties.Name},
+	}, // MSK
+	cloud.KafkaCluster: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.KafkaVersion, Friendly: "Kafka"},
+		StringColumnDefinition{Prop: properties.BrokerCount, Friendly: "Brokers"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

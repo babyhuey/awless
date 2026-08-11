@@ -59,6 +59,7 @@ import (
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	kafkatypes "github.com/aws/aws-sdk-go-v2/service/kafka/types"
 	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
@@ -285,6 +286,9 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// MSK
+	case kafkatypes.Cluster:
+		res = graph.InitResource(cloud.KafkaCluster, awssdk.ToString(ss.ClusterName))
 	// Cognito
 	case cognitoidentityprovidertypes.UserPoolDescriptionType:
 		res = graph.InitResource(cloud.UserPool, awssdk.ToString(ss.Id))

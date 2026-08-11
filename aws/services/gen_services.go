@@ -81,6 +81,8 @@ import (
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
+	kafka "github.com/aws/aws-sdk-go-v2/service/kafka"
+	kafkatypes "github.com/aws/aws-sdk-go-v2/service/kafka/types"
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	kms "github.com/aws/aws-sdk-go-v2/service/kms"
@@ -147,6 +149,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"msk",
 	"cognito",
 	"ses",
 	"glue",
@@ -236,6 +239,7 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"kafkacluster",
 	"userpool",
 	"identitypool",
 	"emailidentity",
@@ -288,6 +292,7 @@ var ServicePerAPI = map[string]string{
 	"kinesis":                 "kinesis",
 	"redshift":                "redshift",
 	"codepipeline":            "codepipeline",
+	"kafka":                   "msk",
 	"cognitoidentityprovider": "cognito",
 	"cognitoidentity":         "cognito",
 	"sesv2":                   "ses",
@@ -378,6 +383,7 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"kafkacluster":             "msk",
 	"userpool":                 "cognito",
 	"identitypool":             "cognito",
 	"emailidentity":            "ses",
@@ -474,6 +480,7 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"kafkacluster":             "kafka",
 	"userpool":                 "cognitoidentityprovider",
 	"identitypool":             "cognitoidentity",
 	"emailidentity":            "sesv2",
@@ -4996,6 +5003,134 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Msk struct {
+	fetcher         fetch.Fetcher
+	region, profile string
+	config          map[string]any
+	log             *logger.Logger
+	KafkaClient     *kafka.Client
+}
+
+func NewMsk(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	kafkaClient := kafka.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		kafkaClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Msk{
+		KafkaClient: kafkaClient,
+		fetcher:     fetch.NewFetcher(awsfetch.BuildMskFetchFuncs(fetchConfig)),
+		config:      extraConf,
+		region:      region,
+		profile:     profile,
+		log:         log,
+	}
+}
+
+func (s *Msk) Name() string {
+	return "msk"
+}
+
+func (s *Msk) Region() string {
+	return s.region
+}
+
+func (s *Msk) Profile() string {
+	return s.profile
+}
+
+func (s *Msk) ResourceTypes() []string {
+	return []string{
+		"kafkacluster",
+	}
+}
+
+func (s *Msk) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.msk.kafkacluster.sync", true) {
+		list, err := s.fetcher.Get("kafkacluster_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]kafkatypes.Cluster); !ok {
+			return gph, errors.New("cannot cast to '[]kafkatypes.Cluster' type from fetch context")
+		}
+		for _, r := range list.([]kafkatypes.Cluster) {
+			for _, fn := range addParentsFns["kafkacluster"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *kafkatypes.Cluster) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Msk) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Msk) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.msk.sync", true)
 }
 
 type Cognito struct {
