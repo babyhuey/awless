@@ -31,7 +31,7 @@ const AwlessASCIILogo = `
 `
 
 var (
-	Version  = "v1.1.1"
+	Version  = "v1.1.2"
 	BuildFor string
 
 	buildSha, buildDate, buildArch, buildOS string

@@ -1,3 +1,24 @@
+## v1.1.2
+
+### Fixed
+
+- **Runtime errors printed the entire usage block before the error.** An expired AWS
+  credential produced 28 lines of flag documentation ahead of the one line explaining what
+  went wrong:
+
+  ```
+  $ awless -p some-profile list instances
+  USAGE:
+    awless list instances [flags]
+  ... 25 lines of flags ...
+  [error]  failed to refresh cached credentials, ... ExpiredToken
+  ```
+
+  Cobra prints a command's usage for any error returned from `RunE` unless `SilenceUsage`
+  is set, and it was not. Usage is now suppressed once flags and arguments have been
+  parsed, so a genuine usage mistake such as an unknown flag still prints it while a
+  runtime failure does not.
+
 ## v1.1.1
 
 ### Added
