@@ -311,6 +311,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateFilesystem(f.config(), f.Graph, f.Logger)
 		}
+	case "createfsxbackup":
+		return func() any {
+			return awsspec.NewCreateFsxbackup(f.config(), f.Graph, f.Logger)
+		}
+	case "createfsxfilesystem":
+		return func() any {
+			return awsspec.NewCreateFsxfilesystem(f.config(), f.Graph, f.Logger)
+		}
 	case "createfunction":
 		return func() any {
 			return awsspec.NewCreateFunction(f.config(), f.Graph, f.Logger)
@@ -678,6 +686,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletefilesystem":
 		return func() any {
 			return awsspec.NewDeleteFilesystem(f.config(), f.Graph, f.Logger)
+		}
+	case "deletefsxbackup":
+		return func() any {
+			return awsspec.NewDeleteFsxbackup(f.config(), f.Graph, f.Logger)
+		}
+	case "deletefsxfilesystem":
+		return func() any {
+			return awsspec.NewDeleteFsxfilesystem(f.config(), f.Graph, f.Logger)
 		}
 	case "deletefunction":
 		return func() any {

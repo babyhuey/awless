@@ -146,6 +146,9 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//fsx. "fsxfilesystem" because EFS already owns "filesystem".
+	FSxFileSystem string = "fsxfilesystem"
+	FSxBackup     string = "fsxbackup"
 	//amazon mq
 	Broker string = "broker"
 	//msk

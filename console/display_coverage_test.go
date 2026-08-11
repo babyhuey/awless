@@ -79,5 +79,6 @@ func allResourceTypes() []string {
 		cloud.EmailIdentity, cloud.ConfigurationSet,
 		cloud.UserPool, cloud.IdentityPool,
 		cloud.KafkaCluster, cloud.Broker,
+		cloud.FSxFileSystem, cloud.FSxBackup,
 	}
 }

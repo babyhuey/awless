@@ -171,6 +171,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateEventrule(f.Cfg, f.Graph, f.Log) }
 	case "createfilesystem":
 		return func() any { return NewCreateFilesystem(f.Cfg, f.Graph, f.Log) }
+	case "createfsxbackup":
+		return func() any { return NewCreateFsxbackup(f.Cfg, f.Graph, f.Log) }
+	case "createfsxfilesystem":
+		return func() any { return NewCreateFsxfilesystem(f.Cfg, f.Graph, f.Log) }
 	case "createfunction":
 		return func() any { return NewCreateFunction(f.Cfg, f.Graph, f.Log) }
 	case "creategluedatabase":
@@ -355,6 +359,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteEventrule(f.Cfg, f.Graph, f.Log) }
 	case "deletefilesystem":
 		return func() any { return NewDeleteFilesystem(f.Cfg, f.Graph, f.Log) }
+	case "deletefsxbackup":
+		return func() any { return NewDeleteFsxbackup(f.Cfg, f.Graph, f.Log) }
+	case "deletefsxfilesystem":
+		return func() any { return NewDeleteFsxfilesystem(f.Cfg, f.Graph, f.Log) }
 	case "deletefunction":
 		return func() any { return NewDeleteFunction(f.Cfg, f.Graph, f.Log) }
 	case "deletegluedatabase":
@@ -680,6 +688,8 @@ var (
 	_ command = &CreateEventbus{}
 	_ command = &CreateEventrule{}
 	_ command = &CreateFilesystem{}
+	_ command = &CreateFsxbackup{}
+	_ command = &CreateFsxfilesystem{}
 	_ command = &CreateFunction{}
 	_ command = &CreateGluedatabase{}
 	_ command = &CreateGroup{}
@@ -772,6 +782,8 @@ var (
 	_ command = &DeleteEventbus{}
 	_ command = &DeleteEventrule{}
 	_ command = &DeleteFilesystem{}
+	_ command = &DeleteFsxbackup{}
+	_ command = &DeleteFsxfilesystem{}
 	_ command = &DeleteFunction{}
 	_ command = &DeleteGluedatabase{}
 	_ command = &DeleteGroup{}

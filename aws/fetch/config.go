@@ -29,6 +29,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
+	"github.com/aws/aws-sdk-go-v2/service/fsx"
 	"github.com/aws/aws-sdk-go-v2/service/glue"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/kafka"
@@ -97,6 +98,7 @@ type AWSAPI struct {
 	Cognitoidentity         *cognitoidentity.Client
 	Kafka                   *kafka.Client
 	Mq                      *mq.Client
+	Fsx                     *fsx.Client
 	Elasticbeanstalk        *elasticbeanstalk.Client
 }
 

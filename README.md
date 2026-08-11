@@ -131,6 +131,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **Cognito** | user pools, identity pools |
 | **MSK** | Kafka clusters |
 | **Amazon MQ** | brokers |
+| **FSx** | file systems, backups |
 | **VPC Endpoints** | gateway and interface endpoints |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
@@ -183,6 +184,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls userpools
       $ awless ls kafkaclusters
       $ awless ls brokers
+      $ awless ls fsxfilesystems
       $ ...
       (see awless ls -h)
 

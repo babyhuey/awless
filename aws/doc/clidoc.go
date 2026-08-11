@@ -245,6 +245,15 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.fsxfilesystem": {
+		"awless create fsxfilesystem type=LUSTRE capacity=1200 subnets=subnet-1 lustre-file=/home/jsmith/lustre.json",
+		"awless create fsxfilesystem type=WINDOWS capacity=32 subnets=subnet-1,subnet-2 windows-file=/home/jsmith/windows.json",
+	},
+	"delete.fsxfilesystem": {"awless delete fsxfilesystem id=fs-1234abcd"},
+	"create.fsxbackup": {
+		"awless create fsxbackup filesystem=fs-1234abcd",
+	},
+	"delete.fsxbackup": {"awless delete fsxbackup id=backup-1234abcd"},
 	"create.broker": {
 		"awless create broker name=orders engine=RABBITMQ type=mq.m5.large mode=SINGLE_INSTANCE public=false users-file=/home/jsmith/users.json",
 	},

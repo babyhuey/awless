@@ -103,6 +103,7 @@ const (
 	DesiredCapacity                   = "cloud:desiredCapacity"
 	Dimensions                        = "cloud:dimensions"
 	DisableRollback                   = "cloud:disableRollback"
+	DNSName                           = "cloud:dnsName"
 	DockerVersion                     = "cloud:dockerVersion"
 	Document                          = "cloud:document"
 	Enabled                           = "cloud:enabled"
@@ -246,6 +247,7 @@ const (
 	StateMessage                      = "cloud:stateMessage"
 	Stopped                           = "cloud:stopped"
 	Storage                           = "cloud:storage"
+	StorageCapacity                   = "cloud:storageCapacity"
 	StorageType                       = "cloud:storageType"
 	StreamMode                        = "cloud:streamMode"
 	Subnet                            = "cloud:subnet"
@@ -407,6 +409,7 @@ func init() {
 		properties.DesiredCapacity:                   DesiredCapacity,
 		properties.Dimensions:                        Dimensions,
 		properties.DisableRollback:                   DisableRollback,
+		properties.DNSName:                           DNSName,
 		properties.DockerVersion:                     DockerVersion,
 		properties.Document:                          Document,
 		properties.Enabled:                           Enabled,
@@ -550,6 +553,7 @@ func init() {
 		properties.StateMessage:                      StateMessage,
 		properties.Stopped:                           Stopped,
 		properties.Storage:                           Storage,
+		properties.StorageCapacity:                   StorageCapacity,
 		properties.StorageType:                       StorageType,
 		properties.StreamMode:                        StreamMode,
 		properties.Subnet:                            Subnet,
@@ -711,6 +715,7 @@ var Properties = RDFProperties{
 	DesiredCapacity:                   {ID: DesiredCapacity, RdfType: "rdf:Property", RdfsLabel: "DesiredCapacity", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Dimensions:                        {ID: Dimensions, RdfType: "rdf:Property", RdfsLabel: "Dimensions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
 	DisableRollback:                   {ID: DisableRollback, RdfType: "rdf:Property", RdfsLabel: "DisableRollback", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+	DNSName:                           {ID: DNSName, RdfType: "rdf:Property", RdfsLabel: "DNSName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DockerVersion:                     {ID: DockerVersion, RdfType: "rdf:Property", RdfsLabel: "DockerVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Document:                          {ID: Document, RdfType: "rdf:Property", RdfsLabel: "Document", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Enabled:                           {ID: Enabled, RdfType: "rdf:Property", RdfsLabel: "Enabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
@@ -854,6 +859,7 @@ var Properties = RDFProperties{
 	StateMessage:                      {ID: StateMessage, RdfType: "rdf:Property", RdfsLabel: "StateMessage", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Stopped:                           {ID: Stopped, RdfType: "rdf:Property", RdfsLabel: "Stopped", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	Storage:                           {ID: Storage, RdfType: "rdf:Property", RdfsLabel: "Storage", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	StorageCapacity:                   {ID: StorageCapacity, RdfType: "rdf:Property", RdfsLabel: "StorageCapacity", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	StorageType:                       {ID: StorageType, RdfType: "rdf:Property", RdfsLabel: "StorageType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	StreamMode:                        {ID: StreamMode, RdfType: "rdf:Property", RdfsLabel: "StreamMode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Subnet:                            {ID: Subnet, RdfType: "rdf:Property", RdfsLabel: "Subnet", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},

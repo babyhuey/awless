@@ -75,6 +75,10 @@ linters:
         - inline # noisy suggestions to inline constants; go vet does not run it
     misspell:
       locale: US
+      # Lustre is the file system's actual name, and AWS ships FSx for Lustre. The US
+      # locale otherwise "corrects" it to Luster.
+      ignore-rules:
+        - lustre
     exhaustive:
       # Every switch flagged here handles a few interesting cases and falls back to
       # a default — enumerating all 26 reflect.Kind values would be worse code, not

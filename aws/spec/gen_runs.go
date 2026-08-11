@@ -50,6 +50,7 @@ import (
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
+	fsx "github.com/aws/aws-sdk-go-v2/service/fsx"
 	glue "github.com/aws/aws-sdk-go-v2/service/glue"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	kafka "github.com/aws/aws-sdk-go-v2/service/kafka"
@@ -5061,6 +5062,162 @@ func (cmd *CreateFilesystem) dryRun(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *CreateFilesystem) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateFsxbackup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateFsxbackup {
+	cmd := new(CreateFsxbackup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = fsx.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateFsxbackup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateFsxbackup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &fsx.CreateBackupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in fsx.CreateBackupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateBackup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("fsx.CreateBackup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create fsxbackup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create fsxbackup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create fsxbackup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateFsxbackup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("fsxbackup"), nil
+}
+
+func (cmd *CreateFsxbackup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateFsxfilesystem(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateFsxfilesystem {
+	cmd := new(CreateFsxfilesystem)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = fsx.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateFsxfilesystem) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateFsxfilesystem) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &fsx.CreateFileSystemInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in fsx.CreateFileSystemInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateFileSystem(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("fsx.CreateFileSystem call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create fsxfilesystem: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create fsxfilesystem '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create fsxfilesystem done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateFsxfilesystem) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("fsxfilesystem"), nil
+}
+
+func (cmd *CreateFsxfilesystem) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12557,6 +12714,162 @@ func (cmd *DeleteFilesystem) dryRun(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *DeleteFilesystem) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteFsxbackup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteFsxbackup {
+	cmd := new(DeleteFsxbackup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = fsx.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteFsxbackup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteFsxbackup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &fsx.DeleteBackupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in fsx.DeleteBackupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteBackup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("fsx.DeleteBackup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete fsxbackup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete fsxbackup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete fsxbackup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteFsxbackup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("fsxbackup"), nil
+}
+
+func (cmd *DeleteFsxbackup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteFsxfilesystem(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteFsxfilesystem {
+	cmd := new(DeleteFsxfilesystem)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = fsx.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteFsxfilesystem) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteFsxfilesystem) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &fsx.DeleteFileSystemInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in fsx.DeleteFileSystemInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteFileSystem(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("fsx.DeleteFileSystem call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete fsxfilesystem: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete fsxfilesystem '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete fsxfilesystem done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteFsxfilesystem) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("fsxfilesystem"), nil
+}
+
+func (cmd *DeleteFsxfilesystem) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

@@ -847,6 +847,23 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// FSx
+	cloud.FSxFileSystem: {
+		properties.ID:              {name: "FileSystemId", transform: extractValueFn},
+		properties.Type:            {name: "FileSystemType", transform: extractValueFn},
+		properties.Lifecycle:       {name: "Lifecycle", transform: extractValueFn},
+		properties.StorageCapacity: {name: "StorageCapacity", transform: extractValueFn},
+		properties.DNSName:         {name: "DNSName", transform: extractValueFn},
+		properties.Vpc:             {name: "VpcId", transform: extractValueFn},
+		properties.Subnets:         {name: "SubnetIds", transform: extractValueFn},
+		properties.Created:         {name: "CreationTime", transform: extractTimeFn},
+	},
+	cloud.FSxBackup: {
+		properties.ID:        {name: "BackupId", transform: extractValueFn},
+		properties.Type:      {name: "Type", transform: extractValueFn},
+		properties.Lifecycle: {name: "Lifecycle", transform: extractValueFn},
+		properties.Created:   {name: "CreationTime", transform: extractTimeFn},
+	},
 	// Amazon MQ
 	cloud.Broker: {
 		properties.ID:               {name: "BrokerId", transform: extractValueFn},

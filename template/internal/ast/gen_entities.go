@@ -61,6 +61,8 @@ var entities = map[Entity]struct{}{
 	"eventtarget":              {},
 	"execution":                {},
 	"filesystem":               {},
+	"fsxbackup":                {},
+	"fsxfilesystem":            {},
 	"function":                 {},
 	"gluedatabase":             {},
 	"group":                    {},

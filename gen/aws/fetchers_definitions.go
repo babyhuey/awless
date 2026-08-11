@@ -344,6 +344,14 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "fsx",
+		API:  []string{"fsx"},
+		Fetchers: []fetcher{
+			{API: "fsx", ResourceType: cloud.FSxFileSystem, AWSType: "fsxtypes.FileSystem", APIMethod: "DescribeFileSystems", Input: "fsx.DescribeFileSystemsInput{}", Output: "fsx.DescribeFileSystemsOutput", OutputsExtractor: "FileSystems", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "fsx", ResourceType: cloud.FSxBackup, AWSType: "fsxtypes.Backup", APIMethod: "DescribeBackups", Input: "fsx.DescribeBackupsInput{}", Output: "fsx.DescribeBackupsOutput", OutputsExtractor: "Backups", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
+	{
 		Name: "mq",
 		API:  []string{"mq"},
 		Fetchers: []fetcher{

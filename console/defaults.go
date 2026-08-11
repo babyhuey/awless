@@ -119,6 +119,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.IdentityPool:             {properties.ID, properties.Name},
 	cloud.KafkaCluster:             {properties.Name, properties.State, properties.KafkaVersion, properties.BrokerCount},
 	cloud.Broker:                   {properties.ID, properties.Name, properties.State, properties.EngineType, properties.DeploymentMode},
+	cloud.FSxFileSystem:            {properties.ID, properties.Type, properties.Lifecycle, properties.StorageCapacity, properties.DNSName},
+	cloud.FSxBackup:                {properties.ID, properties.Type, properties.Lifecycle, properties.Created},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -904,6 +906,21 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.EngineType, Friendly: "Engine"},
 		StringColumnDefinition{Prop: properties.DeploymentMode, Friendly: "Mode"},
 		StringColumnDefinition{Prop: properties.HostInstanceType, Friendly: "Instance"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	}, // FSx
+	cloud.FSxFileSystem: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.Lifecycle},
+		StringColumnDefinition{Prop: properties.StorageCapacity, Friendly: "Capacity (GiB)"},
+		StringColumnDefinition{Prop: properties.DNSName, Friendly: "DNS"},
+		StringColumnDefinition{Prop: properties.Vpc},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.FSxBackup: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.Lifecycle},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

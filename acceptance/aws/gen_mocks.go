@@ -125,6 +125,10 @@ type eventbridgeMock struct {
 	basicMock
 }
 
+type fsxMock struct {
+	basicMock
+}
+
 type glueMock struct {
 	basicMock
 }

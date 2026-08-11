@@ -10,6 +10,8 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **FSx.** File systems and backups, with create and delete. The entity is
+  `fsxfilesystem`, since EFS already owns `filesystem` and the two are different products.
 - **Amazon MQ.** Brokers, with create and delete. The initial user credentials are passed as
   a file rather than on the command line, so a password does not end up in shell history or
   the template log.

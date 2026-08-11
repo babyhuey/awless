@@ -57,6 +57,7 @@ import (
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
+	fsxtypes "github.com/aws/aws-sdk-go-v2/service/fsx/types"
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	kafkatypes "github.com/aws/aws-sdk-go-v2/service/kafka/types"
@@ -287,6 +288,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// FSx
+	case fsxtypes.FileSystem:
+		res = graph.InitResource(cloud.FSxFileSystem, awssdk.ToString(ss.FileSystemId))
+	case fsxtypes.Backup:
+		res = graph.InitResource(cloud.FSxBackup, awssdk.ToString(ss.BackupId))
 	// Amazon MQ
 	case mqtypes.BrokerSummary:
 		res = graph.InitResource(cloud.Broker, awssdk.ToString(ss.BrokerId))
