@@ -12,7 +12,7 @@ Guide for AI agents working in this repository.
 - **CLI framework:** `github.com/spf13/cobra`
 - **Graph storage:** `github.com/bootswithdefer/triplestore` v1.0.0 (RDF triples)
 - **Local DB:** bbolt (`go.etcd.io/bbolt`)
-- **Version:** `v1.2.0` in `config/version.go`; release builds inject it from the git tag via GoReleaser. See [Releasing](#releasing).
+- **Version:** `v1.2.1` in `config/version.go`; release builds inject it from the git tag via GoReleaser. See [Releasing](#releasing).
 
 ## Build & Test
 
