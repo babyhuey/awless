@@ -57,6 +57,10 @@ type cloudwatchlogsMock struct {
 	basicMock
 }
 
+type codepipelineMock struct {
+	basicMock
+}
+
 type configserviceMock struct {
 	basicMock
 }

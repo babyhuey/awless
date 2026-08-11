@@ -330,6 +330,13 @@ var FetchersDefs = []fetchersDef{
 			{API: "redshift", ResourceType: cloud.RedshiftSubnetGroup, AWSType: "redshifttypes.ClusterSubnetGroup", APIMethod: "DescribeClusterSubnetGroups", Input: "redshift.DescribeClusterSubnetGroupsInput{}", Output: "redshift.DescribeClusterSubnetGroupsOutput", OutputsExtractor: "ClusterSubnetGroups", Multipage: true, NextPageMarker: "Marker"},
 		},
 	},
+	{
+		Name: "codepipeline",
+		API:  []string{"codepipeline"},
+		Fetchers: []fetcher{
+			{API: "codepipeline", ResourceType: cloud.Pipeline, AWSType: "codepipelinetypes.PipelineSummary", APIMethod: "ListPipelines", Input: "codepipeline.ListPipelinesInput{}", Output: "codepipeline.ListPipelinesOutput", OutputsExtractor: "Pipelines", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

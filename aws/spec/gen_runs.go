@@ -33,6 +33,7 @@ import (
 	cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
 	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -11358,6 +11359,84 @@ func (cmd *DeleteNetworkinterface) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeletePipeline(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeletePipeline {
+	cmd := new(DeletePipeline)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codepipeline.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeletePipeline) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeletePipeline) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codepipeline.DeletePipelineInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codepipeline.DeletePipelineInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeletePipeline(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codepipeline.DeletePipeline call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete pipeline: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete pipeline '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete pipeline done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeletePipeline) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("pipeline"), nil
+}
+
+func (cmd *DeletePipeline) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeletePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeletePolicy {
 	cmd := new(DeletePolicy)
 	if len(l) > 0 {
@@ -15900,6 +15979,84 @@ func (cmd *StartInstance) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewStartPipeline(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartPipeline {
+	cmd := new(StartPipeline)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codepipeline.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartPipeline) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartPipeline) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codepipeline.StartPipelineExecutionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codepipeline.StartPipelineExecutionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StartPipelineExecution(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codepipeline.StartPipelineExecution call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start pipeline: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start pipeline '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start pipeline done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartPipeline) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("pipeline"), nil
+}
+
+func (cmd *StartPipeline) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewStartTrail(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartTrail {
 	cmd := new(StartTrail)
 	if len(l) > 0 {
@@ -16459,6 +16616,84 @@ func (cmd *StopInstance) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *StopInstance) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStopPipeline(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopPipeline {
+	cmd := new(StopPipeline)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codepipeline.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StopPipeline) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StopPipeline) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codepipeline.StopPipelineExecutionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codepipeline.StopPipelineExecutionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StopPipelineExecution(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codepipeline.StopPipelineExecution call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("stop pipeline: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("stop pipeline '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("stop pipeline done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StopPipeline) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("pipeline"), nil
+}
+
+func (cmd *StopPipeline) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

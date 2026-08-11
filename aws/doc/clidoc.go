@@ -290,6 +290,11 @@ var cliExamplesDoc = map[string][]string{
 		"awless create redshiftsubnetgroup name=warehouse-private description=\"Private warehouse subnets\" subnets=subnet-1234,subnet-5678",
 	},
 	"delete.redshiftsubnetgroup": {"awless delete redshiftsubnetgroup name=warehouse-private"},
+	"delete.pipeline":            {"awless delete pipeline name=build-and-deploy"},
+	"start.pipeline":             {"awless start pipeline name=build-and-deploy"},
+	"stop.pipeline": {
+		"awless stop pipeline name=build-and-deploy execution='12345678-1234-1234-1234-123456789012' reason=\"Superseded by a newer commit\"",
+	},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",

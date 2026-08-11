@@ -68,6 +68,7 @@ var entities = map[Entity]struct{}{
 	"natgateway":          {},
 	"networkinterface":    {},
 	"none":                {},
+	"pipeline":            {},
 	"policy":              {},
 	"queue":               {},
 	"record":              {},

@@ -43,6 +43,8 @@ import (
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
+	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -130,6 +132,7 @@ var ServiceNames = []string{
 	"configservice",
 	"kinesis",
 	"redshift",
+	"codepipeline",
 }
 
 var ResourceTypes = []string{
@@ -208,6 +211,7 @@ var ResourceTypes = []string{
 	"stream",
 	"redshiftcluster",
 	"redshiftsubnetgroup",
+	"pipeline",
 }
 
 var ServicePerAPI = map[string]string{
@@ -246,6 +250,7 @@ var ServicePerAPI = map[string]string{
 	"configservice":          "configservice",
 	"kinesis":                "kinesis",
 	"redshift":               "redshift",
+	"codepipeline":           "codepipeline",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -324,6 +329,7 @@ var ServicePerResourceType = map[string]string{
 	"stream":              "kinesis",
 	"redshiftcluster":     "redshift",
 	"redshiftsubnetgroup": "redshift",
+	"pipeline":            "codepipeline",
 }
 
 var APIPerResourceType = map[string]string{
@@ -402,6 +408,7 @@ var APIPerResourceType = map[string]string{
 	"stream":              "kinesis",
 	"redshiftcluster":     "redshift",
 	"redshiftsubnetgroup": "redshift",
+	"pipeline":            "codepipeline",
 }
 
 type Infra struct {
@@ -4691,4 +4698,132 @@ func (s *Redshift) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, e
 
 func (s *Redshift) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.redshift.sync", true)
+}
+
+type Codepipeline struct {
+	fetcher            fetch.Fetcher
+	region, profile    string
+	config             map[string]any
+	log                *logger.Logger
+	CodepipelineClient *codepipeline.Client
+}
+
+func NewCodepipeline(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	codepipelineClient := codepipeline.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		codepipelineClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Codepipeline{
+		CodepipelineClient: codepipelineClient,
+		fetcher:            fetch.NewFetcher(awsfetch.BuildCodepipelineFetchFuncs(fetchConfig)),
+		config:             extraConf,
+		region:             region,
+		profile:            profile,
+		log:                log,
+	}
+}
+
+func (s *Codepipeline) Name() string {
+	return "codepipeline"
+}
+
+func (s *Codepipeline) Region() string {
+	return s.region
+}
+
+func (s *Codepipeline) Profile() string {
+	return s.profile
+}
+
+func (s *Codepipeline) ResourceTypes() []string {
+	return []string{
+		"pipeline",
+	}
+}
+
+func (s *Codepipeline) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.codepipeline.pipeline.sync", true) {
+		list, err := s.fetcher.Get("pipeline_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]codepipelinetypes.PipelineSummary); !ok {
+			return gph, errors.New("cannot cast to '[]codepipelinetypes.PipelineSummary' type from fetch context")
+		}
+		for _, r := range list.([]codepipelinetypes.PipelineSummary) {
+			for _, fn := range addParentsFns["pipeline"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *codepipelinetypes.PipelineSummary) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Codepipeline) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.codepipeline.sync", true)
 }

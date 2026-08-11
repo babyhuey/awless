@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudtrail"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -78,6 +79,7 @@ type AWSAPI struct {
 	Configservice          *configservice.Client
 	Kinesis                *kinesis.Client
 	Redshift               *redshift.Client
+	Codepipeline           *codepipeline.Client
 }
 
 type Config struct {

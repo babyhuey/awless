@@ -99,6 +99,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.Stream:              {properties.Name, properties.State, properties.StreamMode, properties.Created},
 	cloud.RedshiftCluster:     {properties.ID, properties.State, properties.NodeType, properties.NodeCount, properties.Endpoint},
 	cloud.RedshiftSubnetGroup: {properties.Name, properties.State, properties.Vpc, properties.Description},
+	cloud.Pipeline:            {properties.Name, properties.PipelineType, properties.Version, properties.Updated},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -746,5 +747,14 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Vpc},
 		StringColumnDefinition{Prop: properties.Subnets},
 		StringColumnDefinition{Prop: properties.Description},
+	},
+	// CodePipeline
+	cloud.Pipeline: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.PipelineType, Friendly: "Type"},
+		StringColumnDefinition{Prop: properties.ExecutionMode, Friendly: "Mode"},
+		StringColumnDefinition{Prop: properties.Version},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Updated}},
 	},
 }

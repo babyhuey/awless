@@ -544,6 +544,14 @@ var paramsDoc = map[string]map[string]string{
 		"subnets":     "Identifiers of the subnets to include",
 	},
 	"delete.redshiftsubnetgroup": {"name": "Name of the cluster subnet group to delete"},
+	"delete.pipeline":            {"name": "Name of the pipeline to delete"},
+	"start.pipeline":             {"name": "Name of the pipeline to start an execution of"},
+	"stop.pipeline": {
+		"name":      "Name of the pipeline whose execution should stop",
+		"execution": "Identifier of the execution to stop, as returned by start pipeline; quote it, because an all-numeric hyphenated value such as a UUID is not accepted bare",
+		"abandon":   "Stop tracking the execution at once rather than waiting for in-flight actions, which can leave a deploy half applied",
+		"reason":    "Reason recorded against the stopped execution",
+	},
 	"create.apigateway": {
 		"name":        "Name of the API",
 		"protocol":    "Protocol of the API",

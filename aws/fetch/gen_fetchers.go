@@ -37,6 +37,8 @@ import (
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
+	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
@@ -1495,6 +1497,40 @@ func BuildRedshiftFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.ClusterSubnetGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualCodepipelineFetchFuncs(conf, funcs)
+
+	funcs["pipeline"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []codepipelinetypes.PipelineSummary
+
+		if !conf.getBoolDefaultTrue("aws.codepipeline.pipeline.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource codepipeline[pipeline]")
+			return resources, objects, nil
+		}
+		paginator := codepipeline.NewListPipelinesPaginator(conf.APIs.Codepipeline, &codepipeline.ListPipelinesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Pipelines {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

@@ -325,6 +325,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteNatgateway(f.Cfg, f.Graph, f.Log) }
 	case "deletenetworkinterface":
 		return func() any { return NewDeleteNetworkinterface(f.Cfg, f.Graph, f.Log) }
+	case "deletepipeline":
+		return func() any { return NewDeletePipeline(f.Cfg, f.Graph, f.Log) }
 	case "deletepolicy":
 		return func() any { return NewDeletePolicy(f.Cfg, f.Graph, f.Log) }
 	case "deletequeue":
@@ -435,6 +437,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartExecution(f.Cfg, f.Graph, f.Log) }
 	case "startinstance":
 		return func() any { return NewStartInstance(f.Cfg, f.Graph, f.Log) }
+	case "startpipeline":
+		return func() any { return NewStartPipeline(f.Cfg, f.Graph, f.Log) }
 	case "starttrail":
 		return func() any { return NewStartTrail(f.Cfg, f.Graph, f.Log) }
 	case "stopalarm":
@@ -449,6 +453,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopExecution(f.Cfg, f.Graph, f.Log) }
 	case "stopinstance":
 		return func() any { return NewStopInstance(f.Cfg, f.Graph, f.Log) }
+	case "stoppipeline":
+		return func() any { return NewStopPipeline(f.Cfg, f.Graph, f.Log) }
 	case "stoptrail":
 		return func() any { return NewStopTrail(f.Cfg, f.Graph, f.Log) }
 	case "updatebucket":
@@ -649,6 +655,7 @@ var (
 	_ command = &DeleteMfadevice{}
 	_ command = &DeleteNatgateway{}
 	_ command = &DeleteNetworkinterface{}
+	_ command = &DeletePipeline{}
 	_ command = &DeletePolicy{}
 	_ command = &DeleteQueue{}
 	_ command = &DeleteRecord{}
@@ -704,6 +711,7 @@ var (
 	_ command = &StartEventrule{}
 	_ command = &StartExecution{}
 	_ command = &StartInstance{}
+	_ command = &StartPipeline{}
 	_ command = &StartTrail{}
 	_ command = &StopAlarm{}
 	_ command = &StopContainertask{}
@@ -711,6 +719,7 @@ var (
 	_ command = &StopEventrule{}
 	_ command = &StopExecution{}
 	_ command = &StopInstance{}
+	_ command = &StopPipeline{}
 	_ command = &StopTrail{}
 	_ command = &UpdateBucket{}
 	_ command = &UpdateCachecluster{}

@@ -463,4 +463,11 @@ Two test details that are easy to lose:
 - **Template PEG regeneration** requires the `peg` tool
   (`go install github.com/pointlander/peg@latest`). Edit the `.peg` file, never the
   `.peg.go`.
+- **A bare UUID is not a valid param value.** The grammar accepts `name=build-and-deploy`
+  and `execution=abcd-1234`, but rejects `execution=12345678-1234-1234-1234-123456789012` —
+  an all-numeric hyphenated value appears to parse as an expression. Quote it, and say so in
+  the param documentation for any command that takes one.
+- **Inline JSON must be single-quoted.** There is no escape for a double quote inside a
+  double-quoted value, so `pattern='{"source":["aws.ec2"]}'` is the only form that works.
+  For anything longer than a line, take a file instead — see `create statemachine`.
 - **The scheduler is gone.** `--run-in` and `--revert-in` were removed in v1.1.0.

@@ -40,6 +40,7 @@ import (
 	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -262,6 +263,9 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.RedshiftCluster, awssdk.ToString(ss.ClusterIdentifier))
 	case redshifttypes.ClusterSubnetGroup:
 		res = graph.InitResource(cloud.RedshiftSubnetGroup, awssdk.ToString(ss.ClusterSubnetGroupName))
+	// CodePipeline
+	case codepipelinetypes.PipelineSummary:
+		res = graph.InitResource(cloud.Pipeline, awssdk.ToString(ss.Name))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

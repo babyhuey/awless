@@ -121,6 +121,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **AWS Config** | config rules, with compliance status |
 | **Kinesis** | data streams |
 | **Redshift** | clusters, cluster subnet groups |
+| **CodePipeline** | pipelines |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
 just listing — see [Changes in this fork](#changes-in-this-fork).
@@ -157,6 +158,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls configrules
       $ awless ls streams
       $ awless ls redshiftclusters
+      $ awless ls pipelines
       $ ...
       (see awless ls -h)
 

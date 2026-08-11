@@ -793,4 +793,13 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Vpc:         {name: "VpcId", transform: extractValueFn},
 		properties.Subnets:     {name: "Subnets", transform: extractStringSliceValues("SubnetIdentifier")},
 	},
+	// CodePipeline
+	cloud.Pipeline: {
+		properties.Name:          {name: "Name", transform: extractValueFn},
+		properties.Version:       {name: "Version", transform: extractValueFn},
+		properties.PipelineType:  {name: "PipelineType", transform: extractValueFn},
+		properties.ExecutionMode: {name: "ExecutionMode", transform: extractValueFn},
+		properties.Created:       {name: "Created", transform: extractTimeFn},
+		properties.Updated:       {name: "Updated", transform: extractTimeFn},
+	},
 }

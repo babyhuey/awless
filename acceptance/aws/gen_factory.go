@@ -619,6 +619,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteNetworkinterface(f.config(), f.Graph, f.Logger)
 		}
+	case "deletepipeline":
+		return func() any {
+			return awsspec.NewDeletePipeline(f.config(), f.Graph, f.Logger)
+		}
 	case "deletepolicy":
 		return func() any {
 			return awsspec.NewDeletePolicy(f.config(), f.Graph, f.Logger)
@@ -839,6 +843,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStartInstance(f.config(), f.Graph, f.Logger)
 		}
+	case "startpipeline":
+		return func() any {
+			return awsspec.NewStartPipeline(f.config(), f.Graph, f.Logger)
+		}
 	case "starttrail":
 		return func() any {
 			return awsspec.NewStartTrail(f.config(), f.Graph, f.Logger)
@@ -866,6 +874,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "stopinstance":
 		return func() any {
 			return awsspec.NewStopInstance(f.config(), f.Graph, f.Logger)
+		}
+	case "stoppipeline":
+		return func() any {
+			return awsspec.NewStopPipeline(f.config(), f.Graph, f.Logger)
 		}
 	case "stoptrail":
 		return func() any {

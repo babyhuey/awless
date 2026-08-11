@@ -103,6 +103,7 @@ const (
 	Engine                            = "cloud:engine"
 	EngineVersion                     = "cloud:engineVersion"
 	EventBus                          = "cloud:eventBus"
+	ExecutionMode                     = "cloud:executionMode"
 	ExitCode                          = "cloud:exitCode"
 	Failover                          = "cloud:failover"
 	Fingerprint                       = "cloud:fingerprint"
@@ -177,6 +178,7 @@ const (
 	PathPrefix                        = "cloud:pathPrefix"
 	Pattern                           = "cloud:pattern"
 	PendingTasksCount                 = "cloud:pendingTasksCount"
+	PipelineType                      = "cloud:pipelineType"
 	PlacementGroup                    = "cloud:placementGroup"
 	PlatformDetails                   = "cloud:platformDetails"
 	Policy                            = "cloud:policy"
@@ -384,6 +386,7 @@ func init() {
 		properties.Engine:                            Engine,
 		properties.EngineVersion:                     EngineVersion,
 		properties.EventBus:                          EventBus,
+		properties.ExecutionMode:                     ExecutionMode,
 		properties.ExitCode:                          ExitCode,
 		properties.Failover:                          Failover,
 		properties.Fingerprint:                       Fingerprint,
@@ -458,6 +461,7 @@ func init() {
 		properties.PathPrefix:                        PathPrefix,
 		properties.Pattern:                           Pattern,
 		properties.PendingTasksCount:                 PendingTasksCount,
+		properties.PipelineType:                      PipelineType,
 		properties.PlacementGroup:                    PlacementGroup,
 		properties.PlatformDetails:                   PlatformDetails,
 		properties.Policy:                            Policy,
@@ -665,6 +669,7 @@ var Properties = RDFProperties{
 	Engine:                            {ID: Engine, RdfType: "rdf:Property", RdfsLabel: "Engine", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	EngineVersion:                     {ID: EngineVersion, RdfType: "rdf:Property", RdfsLabel: "EngineVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	EventBus:                          {ID: EventBus, RdfType: "rdf:Property", RdfsLabel: "EventBus", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ExecutionMode:                     {ID: ExecutionMode, RdfType: "rdf:Property", RdfsLabel: "ExecutionMode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ExitCode:                          {ID: ExitCode, RdfType: "rdf:Property", RdfsLabel: "ExitCode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Failover:                          {ID: Failover, RdfType: "rdf:Property", RdfsLabel: "Failover", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Fingerprint:                       {ID: Fingerprint, RdfType: "rdf:Property", RdfsLabel: "Fingerprint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -739,6 +744,7 @@ var Properties = RDFProperties{
 	PathPrefix:                        {ID: PathPrefix, RdfType: "rdf:Property", RdfsLabel: "PathPrefix", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Pattern:                           {ID: Pattern, RdfType: "rdf:Property", RdfsLabel: "Pattern", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PendingTasksCount:                 {ID: PendingTasksCount, RdfType: "rdf:Property", RdfsLabel: "PendingTasksCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	PipelineType:                      {ID: PipelineType, RdfType: "rdf:Property", RdfsLabel: "PipelineType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PlacementGroup:                    {ID: PlacementGroup, RdfType: "rdf:Property", RdfsLabel: "PlacementGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PlatformDetails:                   {ID: PlatformDetails, RdfType: "rdf:Property", RdfsLabel: "PlatformDetails", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Policy:                            {ID: Policy, RdfType: "rdf:Property", RdfsLabel: "Policy", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
