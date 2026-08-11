@@ -125,6 +125,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **CodeBuild** | build projects |
 | **Elastic Beanstalk** | applications, environments |
 | **Transit Gateway** | transit gateways, VPC attachments, route tables |
+| **CodeDeploy** | applications, deployment groups, deployments |
 | **VPC Endpoints** | gateway and interface endpoints |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
@@ -168,6 +169,8 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls environments
       $ awless ls transitgateways
       $ awless ls vpcendpoints
+      $ awless ls deployapplications
+      $ awless ls deploymentgroups
       $ ...
       (see awless ls -h)
 

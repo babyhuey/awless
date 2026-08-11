@@ -1659,6 +1659,12 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 	}
 	return funcs
 }
+func BuildCodedeployFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualCodedeployFetchFuncs(conf, funcs)
+	return funcs
+}
 func BuildCodebuildFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 

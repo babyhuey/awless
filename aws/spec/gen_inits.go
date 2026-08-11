@@ -139,6 +139,12 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateDatabase(f.Cfg, f.Graph, f.Log) }
 	case "createdbsubnetgroup":
 		return func() any { return NewCreateDbsubnetgroup(f.Cfg, f.Graph, f.Log) }
+	case "createdeployapplication":
+		return func() any { return NewCreateDeployapplication(f.Cfg, f.Graph, f.Log) }
+	case "createdeployment":
+		return func() any { return NewCreateDeployment(f.Cfg, f.Graph, f.Log) }
+	case "createdeploymentgroup":
+		return func() any { return NewCreateDeploymentgroup(f.Cfg, f.Graph, f.Log) }
 	case "createdistribution":
 		return func() any { return NewCreateDistribution(f.Cfg, f.Graph, f.Log) }
 	case "createdynamodbtable":
@@ -301,6 +307,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteDatabase(f.Cfg, f.Graph, f.Log) }
 	case "deletedbsubnetgroup":
 		return func() any { return NewDeleteDbsubnetgroup(f.Cfg, f.Graph, f.Log) }
+	case "deletedeployapplication":
+		return func() any { return NewDeleteDeployapplication(f.Cfg, f.Graph, f.Log) }
+	case "deletedeploymentgroup":
+		return func() any { return NewDeleteDeploymentgroup(f.Cfg, f.Graph, f.Log) }
 	case "deletedistribution":
 		return func() any { return NewDeleteDistribution(f.Cfg, f.Graph, f.Log) }
 	case "deletedynamodbtable":
@@ -489,6 +499,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopContainertask(f.Cfg, f.Graph, f.Log) }
 	case "stopdatabase":
 		return func() any { return NewStopDatabase(f.Cfg, f.Graph, f.Log) }
+	case "stopdeployment":
+		return func() any { return NewStopDeployment(f.Cfg, f.Graph, f.Log) }
 	case "stopeventrule":
 		return func() any { return NewStopEventrule(f.Cfg, f.Graph, f.Log) }
 	case "stopexecution":
@@ -610,6 +622,9 @@ var (
 	_ command = &CreateContainercluster{}
 	_ command = &CreateDatabase{}
 	_ command = &CreateDbsubnetgroup{}
+	_ command = &CreateDeployapplication{}
+	_ command = &CreateDeployment{}
+	_ command = &CreateDeploymentgroup{}
 	_ command = &CreateDistribution{}
 	_ command = &CreateDynamodbtable{}
 	_ command = &CreateEkscluster{}
@@ -691,6 +706,8 @@ var (
 	_ command = &DeleteContainertask{}
 	_ command = &DeleteDatabase{}
 	_ command = &DeleteDbsubnetgroup{}
+	_ command = &DeleteDeployapplication{}
+	_ command = &DeleteDeploymentgroup{}
 	_ command = &DeleteDistribution{}
 	_ command = &DeleteDynamodbtable{}
 	_ command = &DeleteEkscluster{}
@@ -785,6 +802,7 @@ var (
 	_ command = &StopBuildproject{}
 	_ command = &StopContainertask{}
 	_ command = &StopDatabase{}
+	_ command = &StopDeployment{}
 	_ command = &StopEventrule{}
 	_ command = &StopExecution{}
 	_ command = &StopInstance{}

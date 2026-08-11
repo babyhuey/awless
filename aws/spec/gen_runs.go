@@ -34,6 +34,7 @@ import (
 	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	codebuild "github.com/aws/aws-sdk-go-v2/service/codebuild"
+	codedeploy "github.com/aws/aws-sdk-go-v2/service/codedeploy"
 	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -3817,6 +3818,240 @@ func (cmd *CreateDbsubnetgroup) dryRun(renv env.Running, params map[string]any) 
 }
 
 func (cmd *CreateDbsubnetgroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateDeployapplication(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDeployapplication {
+	cmd := new(CreateDeployapplication)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codedeploy.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateDeployapplication) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateDeployapplication) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codedeploy.CreateApplicationInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codedeploy.CreateApplicationInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateApplication(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codedeploy.CreateApplication call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create deployapplication: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create deployapplication '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create deployapplication done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateDeployapplication) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("deployapplication"), nil
+}
+
+func (cmd *CreateDeployapplication) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateDeployment(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDeployment {
+	cmd := new(CreateDeployment)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codedeploy.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateDeployment) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateDeployment) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codedeploy.CreateDeploymentInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codedeploy.CreateDeploymentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateDeployment(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codedeploy.CreateDeployment call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create deployment: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create deployment '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create deployment done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateDeployment) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("deployment"), nil
+}
+
+func (cmd *CreateDeployment) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateDeploymentgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDeploymentgroup {
+	cmd := new(CreateDeploymentgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codedeploy.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateDeploymentgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateDeploymentgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codedeploy.CreateDeploymentGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codedeploy.CreateDeploymentGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateDeploymentGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codedeploy.CreateDeploymentGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create deploymentgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create deploymentgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create deploymentgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateDeploymentgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("deploymentgroup"), nil
+}
+
+func (cmd *CreateDeploymentgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10428,6 +10663,162 @@ func (cmd *DeleteDbsubnetgroup) dryRun(renv env.Running, params map[string]any) 
 }
 
 func (cmd *DeleteDbsubnetgroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteDeployapplication(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDeployapplication {
+	cmd := new(DeleteDeployapplication)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codedeploy.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteDeployapplication) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteDeployapplication) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codedeploy.DeleteApplicationInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codedeploy.DeleteApplicationInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteApplication(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codedeploy.DeleteApplication call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete deployapplication: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete deployapplication '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete deployapplication done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteDeployapplication) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("deployapplication"), nil
+}
+
+func (cmd *DeleteDeployapplication) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteDeploymentgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDeploymentgroup {
+	cmd := new(DeleteDeploymentgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codedeploy.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteDeploymentgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteDeploymentgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codedeploy.DeleteDeploymentGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codedeploy.DeleteDeploymentGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteDeploymentGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codedeploy.DeleteDeploymentGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete deploymentgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete deploymentgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete deploymentgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteDeploymentgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("deploymentgroup"), nil
+}
+
+func (cmd *DeleteDeploymentgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -18179,6 +18570,84 @@ func (cmd *StopDatabase) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *StopDatabase) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStopDeployment(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopDeployment {
+	cmd := new(StopDeployment)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codedeploy.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StopDeployment) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StopDeployment) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codedeploy.StopDeploymentInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codedeploy.StopDeploymentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StopDeployment(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codedeploy.StopDeployment call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("stop deployment: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("stop deployment '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("stop deployment done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StopDeployment) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("deployment"), nil
+}
+
+func (cmd *StopDeployment) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

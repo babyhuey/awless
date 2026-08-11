@@ -73,5 +73,7 @@ func allResourceTypes() []string {
 		cloud.WebACL, cloud.IPSet, cloud.RuleGroup, cloud.ConfigRule, cloud.Stream,
 		cloud.RedshiftCluster, cloud.RedshiftSubnetGroup, cloud.Pipeline,
 		cloud.BuildProject, cloud.Application, cloud.Environment,
+		cloud.TransitGateway, cloud.TransitGatewayAttachment, cloud.TransitGatewayRouteTable,
+		cloud.VpcEndpoint, cloud.DeployApplication, cloud.DeploymentGroup,
 	}
 }

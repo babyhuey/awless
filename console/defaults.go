@@ -107,6 +107,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.TransitGatewayAttachment: {properties.ID, properties.TransitGateway, properties.Vpc, properties.State},
 	cloud.TransitGatewayRouteTable: {properties.ID, properties.TransitGateway, properties.State},
 	cloud.VpcEndpoint:              {properties.ID, properties.ServiceName, properties.Type, properties.State, properties.Vpc},
+	cloud.DeployApplication:        {properties.Name, properties.ComputePlatform, properties.Created},
+	cloud.DeploymentGroup:          {properties.Name, properties.Application, properties.DeploymentConfig, properties.ComputePlatform},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -816,5 +818,17 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.State},
 		StringColumnDefinition{Prop: properties.Vpc},
 		StringColumnDefinition{Prop: properties.Subnets},
+	}, // CodeDeploy
+	cloud.DeployApplication: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.ComputePlatform, Friendly: "Platform"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.DeploymentGroup: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Application},
+		StringColumnDefinition{Prop: properties.DeploymentConfig, Friendly: "Config"},
+		StringColumnDefinition{Prop: properties.ComputePlatform, Friendly: "Platform"},
+		StringColumnDefinition{Prop: properties.Role},
 	},
 }

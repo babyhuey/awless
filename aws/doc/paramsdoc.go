@@ -458,6 +458,36 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.deployapplication": {
+		"name":     "Name for the CodeDeploy application",
+		"platform": "Server, Lambda or ECS; fixed at creation",
+	},
+	"delete.deployapplication": {"name": "Name of the CodeDeploy application to delete"},
+	"create.deploymentgroup": {
+		"name":             "Name for the deployment group",
+		"application":      "Name of the CodeDeploy application the group belongs to",
+		"role":             "ARN of the IAM role CodeDeploy assumes to reach your instances",
+		"config":           "Deployment configuration controlling the rollout rate, e.g. CodeDeployDefault.OneAtATime",
+		"scalinggroups":    "Auto Scaling group names whose instances the group deploys to",
+		"ec2-filters-file": "Path to the EC2 tag filters in JSON, selecting instances by tag",
+		"style-file":       "Path to the deployment style in JSON: in-place or blue/green, and whether traffic is controlled",
+		"rollback-file":    "Path to the automatic rollback configuration in JSON",
+	},
+	"delete.deploymentgroup": {
+		"name":        "Name of the deployment group to delete",
+		"application": "Name of the application it belongs to; group names are only unique within an application",
+	},
+	"create.deployment": {
+		"application":   "Name of the CodeDeploy application to deploy",
+		"group":         "Name of the deployment group to deploy to",
+		"description":   "Description recorded against the deployment",
+		"config":        "Deployment configuration controlling the rollout rate",
+		"revision-file": "Path to the revision in JSON, saying what to deploy: an S3 object, a GitHub commit or an ECS task definition",
+	},
+	"stop.deployment": {
+		"id":       "Identifier of the deployment to stop",
+		"rollback": "Roll back to the previous revision rather than leaving the deployment half applied",
+	},
 	"create.transitgateway": {
 		"description":         "Description of the transit gateway",
 		"asn":                 "BGP ASN for the AWS side; fixed at creation, defaults to 64512",

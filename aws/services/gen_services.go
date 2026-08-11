@@ -45,6 +45,8 @@ import (
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	codebuild "github.com/aws/aws-sdk-go-v2/service/codebuild"
 	codebuildtypes "github.com/aws/aws-sdk-go-v2/service/codebuild/types"
+	codedeploy "github.com/aws/aws-sdk-go-v2/service/codedeploy"
+	codedeploytypes "github.com/aws/aws-sdk-go-v2/service/codedeploy/types"
 	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
@@ -137,6 +139,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"codedeploy",
 	"codebuild",
 	"beanstalk",
 }
@@ -222,6 +225,8 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"deployapplication",
+	"deploymentgroup",
 	"buildproject",
 	"application",
 	"environment",
@@ -264,6 +269,7 @@ var ServicePerAPI = map[string]string{
 	"kinesis":                "kinesis",
 	"redshift":               "redshift",
 	"codepipeline":           "codepipeline",
+	"codedeploy":             "codedeploy",
 	"codebuild":              "codebuild",
 	"elasticbeanstalk":       "beanstalk",
 }
@@ -349,6 +355,8 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"deployapplication":        "codedeploy",
+	"deploymentgroup":          "codedeploy",
 	"buildproject":             "codebuild",
 	"application":              "beanstalk",
 	"environment":              "beanstalk",
@@ -435,6 +443,8 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"deployapplication":        "codedeploy",
+	"deploymentgroup":          "codedeploy",
 	"buildproject":             "codebuild",
 	"application":              "elasticbeanstalk",
 	"environment":              "elasticbeanstalk",
@@ -4947,6 +4957,157 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Codedeploy struct {
+	fetcher          fetch.Fetcher
+	region, profile  string
+	config           map[string]any
+	log              *logger.Logger
+	CodedeployClient *codedeploy.Client
+}
+
+func NewCodedeploy(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	codedeployClient := codedeploy.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		codedeployClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Codedeploy{
+		CodedeployClient: codedeployClient,
+		fetcher:          fetch.NewFetcher(awsfetch.BuildCodedeployFetchFuncs(fetchConfig)),
+		config:           extraConf,
+		region:           region,
+		profile:          profile,
+		log:              log,
+	}
+}
+
+func (s *Codedeploy) Name() string {
+	return "codedeploy"
+}
+
+func (s *Codedeploy) Region() string {
+	return s.region
+}
+
+func (s *Codedeploy) Profile() string {
+	return s.profile
+}
+
+func (s *Codedeploy) ResourceTypes() []string {
+	return []string{
+		"deployapplication",
+		"deploymentgroup",
+	}
+}
+
+func (s *Codedeploy) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.codedeploy.deployapplication.sync", true) {
+		list, err := s.fetcher.Get("deployapplication_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]codedeploytypes.ApplicationInfo); !ok {
+			return gph, errors.New("cannot cast to '[]codedeploytypes.ApplicationInfo' type from fetch context")
+		}
+		for _, r := range list.([]codedeploytypes.ApplicationInfo) {
+			for _, fn := range addParentsFns["deployapplication"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *codedeploytypes.ApplicationInfo) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.codedeploy.deploymentgroup.sync", true) {
+		list, err := s.fetcher.Get("deploymentgroup_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]codedeploytypes.DeploymentGroupInfo); !ok {
+			return gph, errors.New("cannot cast to '[]codedeploytypes.DeploymentGroupInfo' type from fetch context")
+		}
+		for _, r := range list.([]codedeploytypes.DeploymentGroupInfo) {
+			for _, fn := range addParentsFns["deploymentgroup"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *codedeploytypes.DeploymentGroupInfo) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Codedeploy) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Codedeploy) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.codedeploy.sync", true)
 }
 
 type Codebuild struct {

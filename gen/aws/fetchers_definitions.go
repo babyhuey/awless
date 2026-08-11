@@ -344,6 +344,16 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "codedeploy",
+		API:  []string{"codedeploy"},
+		Fetchers: []fetcher{
+			// ListApplications returns names only, and deployment groups can only be
+			// listed one application at a time, so both are manual.
+			{API: "codedeploy", ResourceType: cloud.DeployApplication, AWSType: "codedeploytypes.ApplicationInfo", ManualFetcher: true},
+			{API: "codedeploy", ResourceType: cloud.DeploymentGroup, AWSType: "codedeploytypes.DeploymentGroupInfo", ManualFetcher: true},
+		},
+	},
+	{
 		Name: "codebuild",
 		API:  []string{"codebuild"},
 		Fetchers: []fetcher{

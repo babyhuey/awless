@@ -61,6 +61,10 @@ type codebuildMock struct {
 	basicMock
 }
 
+type codedeployMock struct {
+	basicMock
+}
+
 type codepipelineMock struct {
 	basicMock
 }

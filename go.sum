@@ -57,6 +57,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.65.0 h1:3yaFbUbuLfN8n1q01
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.65.0/go.mod h1:PobeppEnIjw4pcgjFryNDZCTH7AiqZw0yb5r98Gvf9c=
 github.com/aws/aws-sdk-go-v2/service/codebuild v1.72.5 h1:CncKaxsxBrH1jbNgDKnZvJZm0/TIppVRC/syYjvCK0Y=
 github.com/aws/aws-sdk-go-v2/service/codebuild v1.72.5/go.mod h1:Dfqy1MKhHHiYahrokfoV0/9emaieogZwQZD3v0QemvI=
+github.com/aws/aws-sdk-go-v2/service/codedeploy v1.38.5 h1:FNmfATN/Cy36jswLrS4whq0HwsC0SsttUuHIprPNmwY=
+github.com/aws/aws-sdk-go-v2/service/codedeploy v1.38.5/go.mod h1:9me4fM7/jF8nEf1HsP8V8clxRHVOucEu0pbkWvW5YGk=
 github.com/aws/aws-sdk-go-v2/service/codepipeline v1.49.5 h1:qRXm4E2XQfONUt9OOIEqlpdH0TuwcoFz2wap2mPqARw=
 github.com/aws/aws-sdk-go-v2/service/codepipeline v1.49.5/go.mod h1:lhR0BeAq7ttC+jAi3sX3+gJbGDyl0erTwXbJ14Gaul8=
 github.com/aws/aws-sdk-go-v2/service/configservice v1.68.5 h1:wqV8zBPsEmcQ5pw7v8UT1N7YovTB18IhfIB612KkDoA=

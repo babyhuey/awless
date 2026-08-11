@@ -11,6 +11,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/codebuild"
 	codebuildtypes "github.com/aws/aws-sdk-go-v2/service/codebuild/types"
+	"github.com/aws/aws-sdk-go-v2/service/codedeploy"
+	codedeploytypes "github.com/aws/aws-sdk-go-v2/service/codedeploy/types"
 	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	"github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
@@ -1482,6 +1484,98 @@ func addManualBeanstalkFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 				break
 			}
 			next = out.NextToken
+		}
+
+		return resources, objects, nil
+	}
+}
+
+func addManualCodedeployFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	// listDeployApplicationNames is shared by both fetchers: the applications are the
+	// only way in to the deployment groups.
+	listNames := func(ctx context.Context) ([]string, error) {
+		var names []string
+		pager := codedeploy.NewListApplicationsPaginator(conf.APIs.Codedeploy, &codedeploy.ListApplicationsInput{})
+		for pager.HasMorePages() {
+			out, err := pager.NextPage(ctx)
+			if err != nil {
+				return nil, err
+			}
+			names = append(names, out.Applications...)
+		}
+		return names, nil
+	}
+
+	funcs["deployapplication"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []codedeploytypes.ApplicationInfo
+		var resources []*graph.Resource
+
+		names, err := listNames(ctx)
+		if err != nil {
+			return resources, objects, err
+		}
+
+		const batchSize = 100
+		for start := 0; start < len(names); start += batchSize {
+			end := min(start+batchSize, len(names))
+			out, err := conf.APIs.Codedeploy.BatchGetApplications(ctx, &codedeploy.BatchGetApplicationsInput{ApplicationNames: names[start:end]})
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, app := range out.ApplicationsInfo {
+				objects = append(objects, app)
+				res, err := awsconv.NewResource(app)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["deploymentgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []codedeploytypes.DeploymentGroupInfo
+		var resources []*graph.Resource
+
+		// Deployment groups belong to an application and cannot be listed globally, so
+		// this is one call per application. Applications are few, which is what makes
+		// that acceptable here where it would not be for, say, executions.
+		names, err := listNames(ctx)
+		if err != nil {
+			return resources, objects, err
+		}
+
+		for _, app := range names {
+			var groupNames []string
+			pager := codedeploy.NewListDeploymentGroupsPaginator(conf.APIs.Codedeploy, &codedeploy.ListDeploymentGroupsInput{ApplicationName: awssdk.String(app)})
+			for pager.HasMorePages() {
+				out, err := pager.NextPage(ctx)
+				if err != nil {
+					return resources, objects, err
+				}
+				groupNames = append(groupNames, out.DeploymentGroups...)
+			}
+			if len(groupNames) == 0 {
+				continue
+			}
+
+			out, err := conf.APIs.Codedeploy.BatchGetDeploymentGroups(ctx, &codedeploy.BatchGetDeploymentGroupsInput{
+				ApplicationName:      awssdk.String(app),
+				DeploymentGroupNames: groupNames,
+			})
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, group := range out.DeploymentGroupsInfo {
+				objects = append(objects, group)
+				res, err := awsconv.NewResource(group)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil

@@ -247,6 +247,18 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateDbsubnetgroup(f.config(), f.Graph, f.Logger)
 		}
+	case "createdeployapplication":
+		return func() any {
+			return awsspec.NewCreateDeployapplication(f.config(), f.Graph, f.Logger)
+		}
+	case "createdeployment":
+		return func() any {
+			return awsspec.NewCreateDeployment(f.config(), f.Graph, f.Logger)
+		}
+	case "createdeploymentgroup":
+		return func() any {
+			return awsspec.NewCreateDeploymentgroup(f.config(), f.Graph, f.Logger)
+		}
 	case "createdistribution":
 		return func() any {
 			return awsspec.NewCreateDistribution(f.config(), f.Graph, f.Logger)
@@ -570,6 +582,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletedbsubnetgroup":
 		return func() any {
 			return awsspec.NewDeleteDbsubnetgroup(f.config(), f.Graph, f.Logger)
+		}
+	case "deletedeployapplication":
+		return func() any {
+			return awsspec.NewDeleteDeployapplication(f.config(), f.Graph, f.Logger)
+		}
+	case "deletedeploymentgroup":
+		return func() any {
+			return awsspec.NewDeleteDeploymentgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deletedistribution":
 		return func() any {
@@ -946,6 +966,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "stopdatabase":
 		return func() any {
 			return awsspec.NewStopDatabase(f.config(), f.Graph, f.Logger)
+		}
+	case "stopdeployment":
+		return func() any {
+			return awsspec.NewStopDeployment(f.config(), f.Graph, f.Logger)
 		}
 	case "stopeventrule":
 		return func() any {

@@ -64,6 +64,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.5 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.37 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codebuild v1.72.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/codedeploy v1.38.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codepipeline v1.49.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/configservice v1.68.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/elasticache v1.56.5 // indirect

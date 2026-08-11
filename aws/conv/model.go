@@ -847,6 +847,21 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// CodeDeploy
+	cloud.DeployApplication: {
+		properties.Name:            {name: "ApplicationName", transform: extractValueFn},
+		properties.ID:              {name: "ApplicationId", transform: extractValueFn},
+		properties.ComputePlatform: {name: "ComputePlatform", transform: extractValueFn},
+		properties.Created:         {name: "CreateTime", transform: extractTimeFn},
+	},
+	cloud.DeploymentGroup: {
+		properties.Name:             {name: "DeploymentGroupName", transform: extractValueFn},
+		properties.ID:               {name: "DeploymentGroupId", transform: extractValueFn},
+		properties.Application:      {name: "ApplicationName", transform: extractValueFn},
+		properties.Role:             {name: "ServiceRoleArn", transform: extractValueFn},
+		properties.DeploymentConfig: {name: "DeploymentConfigName", transform: extractValueFn},
+		properties.ComputePlatform:  {name: "ComputePlatform", transform: extractValueFn},
+	},
 	// Elastic Beanstalk
 	cloud.Application: {
 		properties.Name:        {name: "ApplicationName", transform: extractValueFn},

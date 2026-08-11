@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/codebuild"
+	"github.com/aws/aws-sdk-go-v2/service/codedeploy"
 	"github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -83,6 +84,7 @@ type AWSAPI struct {
 	Redshift               *redshift.Client
 	Codepipeline           *codepipeline.Client
 	Codebuild              *codebuild.Client
+	Codedeploy             *codedeploy.Client
 	Elasticbeanstalk       *elasticbeanstalk.Client
 }
 

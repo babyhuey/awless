@@ -245,6 +245,21 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.deployapplication": {
+		"awless create deployapplication name=web-api platform=Server",
+	},
+	"delete.deployapplication": {"awless delete deployapplication name=web-api"},
+	"create.deploymentgroup": {
+		"awless create deploymentgroup name=prod application=web-api role=arn:aws:iam::123456789012:role/CodeDeploy config=CodeDeployDefault.OneAtATime",
+		"awless create deploymentgroup name=prod application=web-api role=arn:aws:iam::123456789012:role/CodeDeploy scalinggroups=web-asg",
+	},
+	"delete.deploymentgroup": {"awless delete deploymentgroup name=prod application=web-api"},
+	"create.deployment": {
+		"awless create deployment application=web-api group=prod revision-file=/home/jsmith/revision.json",
+	},
+	"stop.deployment": {
+		"awless stop deployment id=d-ABCDEF123 rollback=true",
+	},
 	"create.transitgateway": {
 		"awless create transitgateway description=\"Shared services hub\"",
 		"awless create transitgateway description=hub auto-accept=disable default-association=disable",

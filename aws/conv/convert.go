@@ -41,6 +41,7 @@ import (
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 	codebuildtypes "github.com/aws/aws-sdk-go-v2/service/codebuild/types"
+	codedeploytypes "github.com/aws/aws-sdk-go-v2/service/codedeploy/types"
 	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -280,6 +281,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// CodeDeploy
+	case codedeploytypes.ApplicationInfo:
+		res = graph.InitResource(cloud.DeployApplication, awssdk.ToString(ss.ApplicationName))
+	case codedeploytypes.DeploymentGroupInfo:
+		res = graph.InitResource(cloud.DeploymentGroup, awssdk.ToString(ss.DeploymentGroupName))
 	// Elastic Beanstalk
 	case elasticbeanstalktypes.ApplicationDescription:
 		res = graph.InitResource(cloud.Application, awssdk.ToString(ss.ApplicationName))

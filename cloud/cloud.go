@@ -146,6 +146,10 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//codedeploy. "deployapplication" rather than "application", which Elastic
+	//Beanstalk already owns.
+	DeployApplication string = "deployapplication"
+	DeploymentGroup   string = "deploymentgroup"
 	//transit gateway and vpc endpoints (both on the EC2 API)
 	TransitGateway           string = "transitgateway"
 	TransitGatewayAttachment string = "transitgatewayattachment"

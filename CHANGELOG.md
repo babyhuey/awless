@@ -10,6 +10,9 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **CodeDeploy.** Applications and deployment groups, plus creating and stopping a
+  deployment. The entity is `deployapplication`, because Elastic Beanstalk already owns
+  `application` and the template language has one flat namespace.
 - **Transit Gateway and VPC Endpoints.** Transit gateways, their VPC attachments and route
   tables, plus gateway and interface endpoints. Both ride the EC2 client the rest of the
   infra service already uses, so they also get dry-run support.

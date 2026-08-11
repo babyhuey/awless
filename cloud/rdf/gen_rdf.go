@@ -35,6 +35,7 @@ const (
 	AlarmNames                        = "cloud:alarmNames"
 	Alias                             = "cloud:alias"
 	Aliases                           = "cloud:aliases"
+	Application                       = "cloud:application"
 	ApproximateMessageCount           = "cloud:approximateMessageCount"
 	Architecture                      = "cloud:architecture"
 	Arn                               = "cloud:arn"
@@ -75,6 +76,7 @@ const (
 	CNAME                             = "cloud:cname"
 	Comment                           = "rdfs:comment"
 	Compliance                        = "cloud:compliance"
+	ComputePlatform                   = "cloud:computePlatform"
 	ComputeType                       = "cloud:computeType"
 	Config                            = "cloud:config"
 	ContainerInstance                 = "cloud:containerInstance"
@@ -91,6 +93,7 @@ const (
 	Default                           = "cloud:default"
 	DefaultCooldown                   = "cloud:defaultCooldown"
 	Delay                             = "cloud:delaySeconds"
+	DeploymentConfig                  = "cloud:deploymentConfig"
 	DeploymentName                    = "cloud:deploymentName"
 	Deployments                       = "cloud:deployments"
 	Description                       = "cloud:description"
@@ -325,6 +328,7 @@ func init() {
 		properties.AlarmNames:                        AlarmNames,
 		properties.Alias:                             Alias,
 		properties.Aliases:                           Aliases,
+		properties.Application:                       Application,
 		properties.ApproximateMessageCount:           ApproximateMessageCount,
 		properties.Architecture:                      Architecture,
 		properties.Arn:                               Arn,
@@ -365,6 +369,7 @@ func init() {
 		properties.CNAME:                             CNAME,
 		properties.Comment:                           Comment,
 		properties.Compliance:                        Compliance,
+		properties.ComputePlatform:                   ComputePlatform,
 		properties.ComputeType:                       ComputeType,
 		properties.Config:                            Config,
 		properties.ContainerInstance:                 ContainerInstance,
@@ -381,6 +386,7 @@ func init() {
 		properties.Default:                           Default,
 		properties.DefaultCooldown:                   DefaultCooldown,
 		properties.Delay:                             Delay,
+		properties.DeploymentConfig:                  DeploymentConfig,
 		properties.DeploymentName:                    DeploymentName,
 		properties.Deployments:                       Deployments,
 		properties.Description:                       Description,
@@ -615,6 +621,7 @@ var Properties = RDFProperties{
 	AlarmNames:                        {ID: AlarmNames, RdfType: "rdf:Property", RdfsLabel: "AlarmNames", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	Alias:                             {ID: Alias, RdfType: "rdf:Property", RdfsLabel: "Alias", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Aliases:                           {ID: Aliases, RdfType: "rdf:Property", RdfsLabel: "Aliases", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
+	Application:                       {ID: Application, RdfType: "rdf:Property", RdfsLabel: "Application", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ApproximateMessageCount:           {ID: ApproximateMessageCount, RdfType: "rdf:Property", RdfsLabel: "ApproximateMessageCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Architecture:                      {ID: Architecture, RdfType: "rdf:Property", RdfsLabel: "Architecture", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Arn:                               {ID: Arn, RdfType: "rdf:Property", RdfsLabel: "Arn", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -655,6 +662,7 @@ var Properties = RDFProperties{
 	CNAME:                             {ID: CNAME, RdfType: "rdf:Property", RdfsLabel: "CNAME", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Comment:                           {ID: Comment, RdfType: "rdf:Property", RdfsLabel: "Comment", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Compliance:                        {ID: Compliance, RdfType: "rdf:Property", RdfsLabel: "Compliance", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ComputePlatform:                   {ID: ComputePlatform, RdfType: "rdf:Property", RdfsLabel: "ComputePlatform", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ComputeType:                       {ID: ComputeType, RdfType: "rdf:Property", RdfsLabel: "ComputeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Config:                            {ID: Config, RdfType: "rdf:Property", RdfsLabel: "Config", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ContainerInstance:                 {ID: ContainerInstance, RdfType: "rdf:Property", RdfsLabel: "ContainerInstance", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
@@ -671,6 +679,7 @@ var Properties = RDFProperties{
 	Default:                           {ID: Default, RdfType: "rdf:Property", RdfsLabel: "Default", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	DefaultCooldown:                   {ID: DefaultCooldown, RdfType: "rdf:Property", RdfsLabel: "DefaultCooldown", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Delay:                             {ID: Delay, RdfType: "rdf:Property", RdfsLabel: "Delay", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	DeploymentConfig:                  {ID: DeploymentConfig, RdfType: "rdf:Property", RdfsLabel: "DeploymentConfig", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DeploymentName:                    {ID: DeploymentName, RdfType: "rdf:Property", RdfsLabel: "DeploymentName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Deployments:                       {ID: Deployments, RdfType: "rdf:Property", RdfsLabel: "Deployments", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
 	Description:                       {ID: Description, RdfType: "rdf:Property", RdfsLabel: "Description", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
