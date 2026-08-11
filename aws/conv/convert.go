@@ -49,6 +49,7 @@ import (
 	elasticachetypes "github.com/aws/aws-sdk-go-v2/service/elasticache/types"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
@@ -229,6 +230,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.ReplicationGroup, awssdk.ToString(ss.ReplicationGroupId))
 	case elasticachetypes.CacheSubnetGroup:
 		res = graph.InitResource(cloud.CacheSubnetGroup, awssdk.ToString(ss.CacheSubnetGroupName))
+	// EventBridge
+	case eventbridgetypes.EventBus:
+		res = graph.InitResource(cloud.EventBus, awssdk.ToString(ss.Name))
+	case eventbridgetypes.Rule:
+		res = graph.InitResource(cloud.EventRule, awssdk.ToString(ss.Name))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

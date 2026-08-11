@@ -93,6 +93,10 @@ type elbv2Mock struct {
 	basicMock
 }
 
+type eventbridgeMock struct {
+	basicMock
+}
+
 type iamMock struct {
 	basicMock
 }

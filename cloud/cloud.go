@@ -123,6 +123,9 @@ const (
 	CacheCluster     string = "cachecluster"
 	ReplicationGroup string = "replicationgroup"
 	CacheSubnetGroup string = "cachesubnetgroup"
+	//eventbridge
+	EventBus  string = "eventbus"
+	EventRule string = "eventrule"
 )
 
 type Service interface {
@@ -164,7 +167,26 @@ func GetServiceForType(t string) (Service, error) {
 	return nil, fmt.Errorf("cannot find cloud service for resource type %s", t)
 }
 
+// irregularPlurals holds the resource types whose plural is not formed by the rules
+// below. A name ending in "s" needs "es", but that cannot be inverted by suffix alone:
+// "eventbuses" and "databases" have the same ending and different singulars
+// ("eventbus" and "database"), so the mapping is listed rather than inferred.
+var irregularPlurals = map[string]string{
+	EventBus: "eventbuses",
+}
+
+var irregularSingulars = func() map[string]string {
+	m := make(map[string]string, len(irregularPlurals))
+	for singular, plural := range irregularPlurals {
+		m[plural] = singular
+	}
+	return m
+}()
+
 func PluralizeResource(singular string) string {
+	if plural, ok := irregularPlurals[singular]; ok {
+		return plural
+	}
 	if strings.HasSuffix(singular, "cy") || strings.HasSuffix(singular, "ry") {
 		return strings.TrimSuffix(singular, "y") + "ies"
 	}
@@ -172,6 +194,9 @@ func PluralizeResource(singular string) string {
 }
 
 func SingularizeResource(plural string) string {
+	if singular, ok := irregularSingulars[plural]; ok {
+		return singular
+	}
 	if strings.HasSuffix(plural, "ies") {
 		return strings.TrimSuffix(plural, "ies") + "y"
 	}

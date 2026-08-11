@@ -1355,3 +1355,9 @@ func BuildElasticacheFetchFuncs(conf *Config) fetch.Funcs {
 	}
 	return funcs
 }
+func BuildEventbridgeFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualEventbridgeFetchFuncs(conf, funcs)
+	return funcs
+}

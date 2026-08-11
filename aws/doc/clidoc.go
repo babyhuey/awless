@@ -205,6 +205,29 @@ var cliExamplesDoc = map[string][]string{
 		"awless delete replicationgroup id=sessions-group",
 		"awless delete replicationgroup id=sessions-group retain-primary=true",
 	},
+	"create.eventbus": {
+		"awless create eventbus name=orders description=\"Order domain events\"",
+	},
+	"delete.eventbus": {"awless delete eventbus name=orders"},
+	"create.eventrule": {
+		"awless create eventrule name=nightly-report schedule=\"cron(0 6 * * ? *)\"",
+		"awless create eventrule name=on-instance-stop pattern='{\"source\":[\"aws.ec2\"]}' eventbus=orders",
+	},
+	"update.eventrule": {
+		"awless update eventrule name=nightly-report schedule=\"rate(1 hour)\" state=DISABLED",
+	},
+	"delete.eventrule": {
+		"awless delete eventrule name=nightly-report",
+		"awless delete eventrule name=nightly-report force=true",
+	},
+	"start.eventrule": {"awless start eventrule name=nightly-report"},
+	"stop.eventrule":  {"awless stop eventrule name=nightly-report"},
+	"attach.eventtarget": {
+		"awless attach eventtarget rule=nightly-report id=report-lambda arn=arn:aws:lambda:us-west-2:123456789012:function:report",
+	},
+	"detach.eventtarget": {
+		"awless detach eventtarget rule=nightly-report id=report-lambda",
+	},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",
@@ -342,7 +365,7 @@ var cliExamplesDoc = map[string][]string{
 		"awless create zone callerreference=my-zone-2024-01-01 name=my-zone",
 	},
 	"delete.accesskey": {
-		"awless delete accesskey id / user=my-accesskey",
+		"awless delete accesskey id=AKIAIOSFODNN7EXAMPLE user=my-accesskey",
 	},
 	"delete.alarm": {
 		"awless delete alarm name=my-alarm",
@@ -606,9 +629,9 @@ var cliExamplesDoc = map[string][]string{
 		"awless create containercluster name=mycluster",
 	},
 	"create.classicloadbalancer": {
-		"create classicloadbalancer name=my-loadb subnets=[sub-123,sub-456] listeners=HTTPS:443:HTTP:80 securitygroups=sg-54321",
-		"create classicloadbalancer healthcheck-path=/health/ping listeners=TCP:80:TCP:8080 tags=Env:Test,Created:Awless",
-		"create classicloadbalancer listeners=[TCP:5000:TCP:5000,HTTPS:443:HTTP:80]",
+		"awless create classicloadbalancer name=my-loadb subnets=[sub-123,sub-456] listeners=HTTPS:443:HTTP:80 securitygroups=sg-54321",
+		"awless create classicloadbalancer name=my-loadb healthcheck-path=/health/ping listeners=TCP:80:TCP:8080 tags=Env:Test,Created:Awless",
+		"awless create classicloadbalancer name=my-loadb listeners=[TCP:5000:TCP:5000,HTTPS:443:HTTP:80]",
 	},
 	"create.database": {
 		"awless create database engine=postgres id=mystartup-prod-db subnetgroup=@my-dbsubnetgroup password=notsafe dbname=mydb size=5 type=db.t2.small username=admin vpcsecuritygroups=@postgres_sg",
@@ -623,7 +646,7 @@ var cliExamplesDoc = map[string][]string{
 		"awless create elasticip domain=vpc",
 	},
 	"create.group": {
-		"awless create name=admins",
+		"awless create group name=admins",
 	},
 	"create.image": {
 		"awless create image instance=@my-instance-name name=redis-image description='redis prod image'",
@@ -631,7 +654,7 @@ var cliExamplesDoc = map[string][]string{
 		"awless create image instance=@redis-prod name=redis-prod-image",
 	},
 	"create.instance": {
-		"awless create image=ami-123456 # Start to create instance from specific image",
+		"awless create instance image=ami-123456 # Start to create instance from specific image",
 		"awless create instance keypair=jsmith type=t2.micro subnet=@my-subnet",
 		"awless create instance image=ami-123456 keypair=jsmith",
 		"awless create instance name=redis type=t2.nano keypair=jsmith userdata=/home/jsmith/data.sh",
@@ -647,7 +670,6 @@ var cliExamplesDoc = map[string][]string{
 	},
 	"create.securitygroup": {
 		"awless create securitygroup vpc=@myvpc name=ssh-only description=ssh-access",
-		"(... see more params at `awless update securitygroup -h`)",
 	},
 	"delete.user": {
 		"awless delete user name=john",

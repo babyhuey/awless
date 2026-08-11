@@ -6,9 +6,21 @@
   `list`, and eight create/update/delete commands. `awless ls cacheclusters`,
   `awless create replicationgroup id=sessions description=Sessions engine=redis
   type=cache.t3.micro clusters=3 automatic-failover=true`, and so on.
+- **EventBridge.** Event buses and rules, with `list`, and nine commands including
+  `start`/`stop` on a rule and `attach`/`detach` for rule targets.
+  `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
+  `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
 
 ### Fixed
 
+- **A resource type ending in "s" was unlistable.** `PluralizeResource` appended a bare
+  `s`, so `eventbus` became `eventbuss` and no lookup could resolve it back. Irregular
+  plurals are now listed explicitly, and a test round-trips every resource type.
+- **Seven documented CLI examples could not be run.** Two omitted the resource entirely
+  (`awless create name=admins` rather than `awless create group name=admins`), three
+  omitted the binary name, one had a stray `/` where an access key id belonged, and one
+  event pattern used an escape the template grammar does not support. Examples are now
+  parsed by the grammar in CI, not just checked for param names.
 - **`awless revert` produced an invalid template for eight resources.** The revert builder
   falls back to `id=<result>`, but `apigatewaystage`, `dynamodbtable`, `ekscluster`,
   `eksnodegroup`, `loggroup`, `ssmparameter` and `trail` all have a `delete` command that

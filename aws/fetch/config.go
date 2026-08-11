@@ -21,6 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticache"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
@@ -66,6 +67,7 @@ type AWSAPI struct {
 	Cloudtrail             *cloudtrail.Client
 	Cloudwatchlogs         *cloudwatchlogs.Client
 	Elasticache            *elasticache.Client
+	Eventbridge            *eventbridge.Client
 }
 
 type Config struct {

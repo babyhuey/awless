@@ -61,6 +61,8 @@ import (
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
+	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	kms "github.com/aws/aws-sdk-go-v2/service/kms"
@@ -112,6 +114,7 @@ var ServiceNames = []string{
 	"cloudtrail",
 	"cloudwatchlogs",
 	"elasticache",
+	"eventbridge",
 }
 
 var ResourceTypes = []string{
@@ -180,6 +183,8 @@ var ResourceTypes = []string{
 	"cachecluster",
 	"replicationgroup",
 	"cachesubnetgroup",
+	"eventbus",
+	"eventrule",
 }
 
 var ServicePerAPI = map[string]string{
@@ -212,6 +217,7 @@ var ServicePerAPI = map[string]string{
 	"cloudtrail":             "cloudtrail",
 	"cloudwatchlogs":         "cloudwatchlogs",
 	"elasticache":            "elasticache",
+	"eventbridge":            "eventbridge",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -280,6 +286,8 @@ var ServicePerResourceType = map[string]string{
 	"cachecluster":        "elasticache",
 	"replicationgroup":    "elasticache",
 	"cachesubnetgroup":    "elasticache",
+	"eventbus":            "eventbridge",
+	"eventrule":           "eventbridge",
 }
 
 var APIPerResourceType = map[string]string{
@@ -348,6 +356,8 @@ var APIPerResourceType = map[string]string{
 	"cachecluster":        "elasticache",
 	"replicationgroup":    "elasticache",
 	"cachesubnetgroup":    "elasticache",
+	"eventbus":            "eventbridge",
+	"eventrule":           "eventbridge",
 }
 
 type Infra struct {
@@ -3777,4 +3787,155 @@ func (s *Elasticache) FetchByType(ctx context.Context, t string) (cloud.GraphAPI
 
 func (s *Elasticache) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.elasticache.sync", true)
+}
+
+type Eventbridge struct {
+	fetcher           fetch.Fetcher
+	region, profile   string
+	config            map[string]any
+	log               *logger.Logger
+	EventbridgeClient *eventbridge.Client
+}
+
+func NewEventbridge(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	eventbridgeClient := eventbridge.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		eventbridgeClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Eventbridge{
+		EventbridgeClient: eventbridgeClient,
+		fetcher:           fetch.NewFetcher(awsfetch.BuildEventbridgeFetchFuncs(fetchConfig)),
+		config:            extraConf,
+		region:            region,
+		profile:           profile,
+		log:               log,
+	}
+}
+
+func (s *Eventbridge) Name() string {
+	return "eventbridge"
+}
+
+func (s *Eventbridge) Region() string {
+	return s.region
+}
+
+func (s *Eventbridge) Profile() string {
+	return s.profile
+}
+
+func (s *Eventbridge) ResourceTypes() []string {
+	return []string{
+		"eventbus",
+		"eventrule",
+	}
+}
+
+func (s *Eventbridge) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.eventbridge.eventbus.sync", true) {
+		list, err := s.fetcher.Get("eventbus_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]eventbridgetypes.EventBus); !ok {
+			return gph, errors.New("cannot cast to '[]eventbridgetypes.EventBus' type from fetch context")
+		}
+		for _, r := range list.([]eventbridgetypes.EventBus) {
+			for _, fn := range addParentsFns["eventbus"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *eventbridgetypes.EventBus) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.eventbridge.eventrule.sync", true) {
+		list, err := s.fetcher.Get("eventrule_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]eventbridgetypes.Rule); !ok {
+			return gph, errors.New("cannot cast to '[]eventbridgetypes.Rule' type from fetch context")
+		}
+		for _, r := range list.([]eventbridgetypes.Rule) {
+			for _, fn := range addParentsFns["eventrule"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *eventbridgetypes.Rule) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Eventbridge) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Eventbridge) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.eventbridge.sync", true)
 }

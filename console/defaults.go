@@ -89,6 +89,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.CacheCluster:        {properties.ID, properties.State, properties.Engine, properties.CacheNodeType, properties.NodeCount, properties.Zone},
 	cloud.ReplicationGroup:    {properties.ID, properties.State, properties.Description, properties.CacheNodeType, properties.AutomaticFailover, properties.MultiAZ},
 	cloud.CacheSubnetGroup:    {properties.Name, properties.Description, properties.Vpc},
+	cloud.EventBus:            {properties.Name, properties.Arn, properties.Description},
+	cloud.EventRule:           {properties.Name, properties.State, properties.EventBus, properties.ScheduleExpression},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -652,6 +654,23 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Name},
 		StringColumnDefinition{Prop: properties.Description},
 		StringColumnDefinition{Prop: properties.Vpc},
+		StringColumnDefinition{Prop: properties.Arn},
+	},
+	// EventBridge
+	cloud.EventBus: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Arn},
+		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.LastModified}},
+	},
+	cloud.EventRule: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.EventBus, Friendly: "Bus"},
+		StringColumnDefinition{Prop: properties.ScheduleExpression, Friendly: "Schedule"},
+		StringColumnDefinition{Prop: properties.Description},
+		StringColumnDefinition{Prop: properties.Role},
 		StringColumnDefinition{Prop: properties.Arn},
 	},
 }

@@ -115,6 +115,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **CloudTrail** | trails |
 | **CloudWatch Logs** | log groups |
 | **ElastiCache** | cache clusters, replication groups, cache subnet groups |
+| **EventBridge** | event buses, rules, rule targets |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
 just listing — see [Changes in this fork](#changes-in-this-fork).
@@ -143,6 +144,8 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls filesystems
       $ awless ls cacheclusters
       $ awless ls replicationgroups
+      $ awless ls eventbuses
+      $ awless ls eventrules
       $ ...
       (see awless ls -h)
 

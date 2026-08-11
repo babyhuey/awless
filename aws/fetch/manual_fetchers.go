@@ -9,6 +9,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
+	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	apigatewayv2types "github.com/aws/aws-sdk-go-v2/service/apigatewayv2/types"
@@ -1188,4 +1191,60 @@ func addManualCloudwatchlogsFetchFuncs(conf *Config, funcs map[string]fetch.Func
 }
 
 func addManualElasticacheFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}
+
+func addManualEventbridgeFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["eventbus"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []eventbridgetypes.EventBus
+		var resources []*graph.Resource
+
+		var next *string
+		for {
+			out, err := conf.APIs.Eventbridge.ListEventBuses(ctx, &eventbridge.ListEventBusesInput{NextToken: next})
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, bus := range out.EventBuses {
+				objects = append(objects, bus)
+				res, err := awsconv.NewResource(bus)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+			if out.NextToken == nil || awssdk.ToString(out.NextToken) == "" {
+				break
+			}
+			next = out.NextToken
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["eventrule"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []eventbridgetypes.Rule
+		var resources []*graph.Resource
+
+		var next *string
+		for {
+			out, err := conf.APIs.Eventbridge.ListRules(ctx, &eventbridge.ListRulesInput{NextToken: next})
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, rule := range out.Rules {
+				objects = append(objects, rule)
+				res, err := awsconv.NewResource(rule)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+			if out.NextToken == nil || awssdk.ToString(out.NextToken) == "" {
+				break
+			}
+			next = out.NextToken
+		}
+
+		return resources, objects, nil
+	}
 }

@@ -51,6 +51,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewAttachContainertask(f.Cfg, f.Graph, f.Log) }
 	case "attachelasticip":
 		return func() any { return NewAttachElasticip(f.Cfg, f.Graph, f.Log) }
+	case "attacheventtarget":
+		return func() any { return NewAttachEventtarget(f.Cfg, f.Graph, f.Log) }
 	case "attachinstance":
 		return func() any { return NewAttachInstance(f.Cfg, f.Graph, f.Log) }
 	case "attachinstanceprofile":
@@ -141,6 +143,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "createelasticip":
 		return func() any { return NewCreateElasticip(f.Cfg, f.Graph, f.Log) }
+	case "createeventbus":
+		return func() any { return NewCreateEventbus(f.Cfg, f.Graph, f.Log) }
+	case "createeventrule":
+		return func() any { return NewCreateEventrule(f.Cfg, f.Graph, f.Log) }
 	case "createfilesystem":
 		return func() any { return NewCreateFilesystem(f.Cfg, f.Graph, f.Log) }
 	case "createfunction":
@@ -267,6 +273,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "deleteelasticip":
 		return func() any { return NewDeleteElasticip(f.Cfg, f.Graph, f.Log) }
+	case "deleteeventbus":
+		return func() any { return NewDeleteEventbus(f.Cfg, f.Graph, f.Log) }
+	case "deleteeventrule":
+		return func() any { return NewDeleteEventrule(f.Cfg, f.Graph, f.Log) }
 	case "deletefilesystem":
 		return func() any { return NewDeleteFilesystem(f.Cfg, f.Graph, f.Log) }
 	case "deletefunction":
@@ -359,6 +369,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDetachContainertask(f.Cfg, f.Graph, f.Log) }
 	case "detachelasticip":
 		return func() any { return NewDetachElasticip(f.Cfg, f.Graph, f.Log) }
+	case "detacheventtarget":
+		return func() any { return NewDetachEventtarget(f.Cfg, f.Graph, f.Log) }
 	case "detachinstance":
 		return func() any { return NewDetachInstance(f.Cfg, f.Graph, f.Log) }
 	case "detachinstanceprofile":
@@ -393,6 +405,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartContainertask(f.Cfg, f.Graph, f.Log) }
 	case "startdatabase":
 		return func() any { return NewStartDatabase(f.Cfg, f.Graph, f.Log) }
+	case "starteventrule":
+		return func() any { return NewStartEventrule(f.Cfg, f.Graph, f.Log) }
 	case "startinstance":
 		return func() any { return NewStartInstance(f.Cfg, f.Graph, f.Log) }
 	case "starttrail":
@@ -403,6 +417,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopContainertask(f.Cfg, f.Graph, f.Log) }
 	case "stopdatabase":
 		return func() any { return NewStopDatabase(f.Cfg, f.Graph, f.Log) }
+	case "stopeventrule":
+		return func() any { return NewStopEventrule(f.Cfg, f.Graph, f.Log) }
 	case "stopinstance":
 		return func() any { return NewStopInstance(f.Cfg, f.Graph, f.Log) }
 	case "stoptrail":
@@ -419,6 +435,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateContainertask(f.Cfg, f.Graph, f.Log) }
 	case "updatedistribution":
 		return func() any { return NewUpdateDistribution(f.Cfg, f.Graph, f.Log) }
+	case "updateeventrule":
+		return func() any { return NewUpdateEventrule(f.Cfg, f.Graph, f.Log) }
 	case "updateimage":
 		return func() any { return NewUpdateImage(f.Cfg, f.Graph, f.Log) }
 	case "updateinstance":
@@ -456,6 +474,7 @@ var (
 	_ command = &AttachClassicLoadbalancer{}
 	_ command = &AttachContainertask{}
 	_ command = &AttachElasticip{}
+	_ command = &AttachEventtarget{}
 	_ command = &AttachInstance{}
 	_ command = &AttachInstanceprofile{}
 	_ command = &AttachInternetgateway{}
@@ -501,6 +520,8 @@ var (
 	_ command = &CreateEkscluster{}
 	_ command = &CreateEksnodegroup{}
 	_ command = &CreateElasticip{}
+	_ command = &CreateEventbus{}
+	_ command = &CreateEventrule{}
 	_ command = &CreateFilesystem{}
 	_ command = &CreateFunction{}
 	_ command = &CreateGroup{}
@@ -564,6 +585,8 @@ var (
 	_ command = &DeleteEkscluster{}
 	_ command = &DeleteEksnodegroup{}
 	_ command = &DeleteElasticip{}
+	_ command = &DeleteEventbus{}
+	_ command = &DeleteEventrule{}
 	_ command = &DeleteFilesystem{}
 	_ command = &DeleteFunction{}
 	_ command = &DeleteGroup{}
@@ -610,6 +633,7 @@ var (
 	_ command = &DetachClassicLoadbalancer{}
 	_ command = &DetachContainertask{}
 	_ command = &DetachElasticip{}
+	_ command = &DetachEventtarget{}
 	_ command = &DetachInstance{}
 	_ command = &DetachInstanceprofile{}
 	_ command = &DetachInternetgateway{}
@@ -627,11 +651,13 @@ var (
 	_ command = &StartAlarm{}
 	_ command = &StartContainertask{}
 	_ command = &StartDatabase{}
+	_ command = &StartEventrule{}
 	_ command = &StartInstance{}
 	_ command = &StartTrail{}
 	_ command = &StopAlarm{}
 	_ command = &StopContainertask{}
 	_ command = &StopDatabase{}
+	_ command = &StopEventrule{}
 	_ command = &StopInstance{}
 	_ command = &StopTrail{}
 	_ command = &UpdateBucket{}
@@ -640,6 +666,7 @@ var (
 	_ command = &UpdateClassicLoadbalancer{}
 	_ command = &UpdateContainertask{}
 	_ command = &UpdateDistribution{}
+	_ command = &UpdateEventrule{}
 	_ command = &UpdateImage{}
 	_ command = &UpdateInstance{}
 	_ command = &UpdateLoggroup{}

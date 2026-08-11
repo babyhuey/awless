@@ -119,23 +119,75 @@ renders SDK type names and apigatewayv2's type is `Api`.
 
 ## Adding a New AWS Service
 
-See `SERVICES_TODO.md` for ranked candidates.
+See `SERVICES_TODO.md` for ranked candidates. Every step below is load-bearing; the ones
+that fail *silently* are called out, because those are the ones that cost time.
 
-1. Add SDK dependency: `go get github.com/aws/aws-sdk-go-v2/service/<servicename>`
-2. Define resources in `gen/aws/properties_definitions.go` (properties, RDF types)
-3. Define fetchers in `gen/aws/fetchers_definitions.go`
-4. Add service struct in `gen/aws/generators/services.go`
-5. Add mock definition in `gen/aws/mock_definitions.go`
-6. Run `make generate`
-7. Implement manual fetchers in `aws/fetch/manual_fetchers.go` for complex APIs
-8. Add conversion logic in `aws/conv/model.go` and `aws/conv/convert.go`
-9. Register the service in `aws/services/init.go` — a service that is generated but never
-   registered compiles fine and is invisible at runtime
-10. Add resource-specific command specs in `aws/spec/<resource>.go`
-11. Wire display columns in `console/defaults.go` and `console/headers.go`
-12. Add param docs and CLI examples in `aws/doc/` — `TestDocForEachParam` and
-    `TestDocForEachCommand` both fail without them
-13. Add an acceptance test in `acceptance/aws/`
+```sh
+go get github.com/aws/aws-sdk-go-v2/service/<svc>
+```
+
+**Definitions**
+
+1. `cloud/cloud.go` — a resource type constant per resource. The value is what users type,
+   so it must be a single lowercase word (`cachesubnetgroup`, not `cache-subnet-group`).
+2. `gen/aws/properties_definitions.go` — any property not already there. The list is
+   maintained alphabetically by `AwlessLabel`.
+3. `gen/aws/fetchers_definitions.go` — one `fetchersDef` for the service. This drives
+   **both** `gen_fetchers.go` and `gen_services.go`; there is nothing to add in
+   `generators/services.go`. Get `NextPageMarker` from the SDK's output type rather than
+   assuming `NextToken` — several services use `Marker`.
+4. `aws/fetch/config.go` — add `<Svc> *<svc>.Client` to `AWSAPI`. `assignAPIs` matches on
+   type by reflection, so no explicit assignment is needed anywhere.
+5. `aws/fetch/manual_fetchers.go` — add `func addManual<Svc>FetchFuncs(conf *Config, funcs
+   map[string]fetch.Func) {}`, empty if the service needs no manual fetchers. The generated
+   code calls it unconditionally, so its absence is a compile error.
+6. `make generate`.
+
+**Wiring**
+
+7. `aws/conv/convert.go` — a `case` per AWS type, plus the `<svc>types` import alias.
+   `aws/conv/model.go` — the property mapping. Use `extractValueFn` for a plain `[]string`;
+   `extractStringSliceValues("Field")` is for slices *of structs*.
+8. `aws/services/init.go` — declare the var, call `New<Svc>`, and add the
+   `cloud.ServiceRegistry` entry. A service that is generated but never registered compiles
+   fine and is **invisible at runtime**. `TestEveryGeneratedServiceIsRegistered` catches
+   this now.
+9. `aws/spec/<svc>.go` — the command specs. See
+   [Command Specs and the Reflective Setters](#command-specs-and-the-reflective-setters);
+   **verify every `awsName` against the SDK**, because one that does not resolve is dropped
+   without a word.
+10. `console/defaults.go` — **two** places: the short property list near the top, and the
+    full `ColumnDefinition` block lower down. Nothing is needed in `console/headers.go`,
+    which is generic machinery rather than a per-resource registry.
+11. `template/revert.go` — if the resource's `delete` takes `name` rather than `id`, add the
+    entity to the `name=` case in the `create` branch. The default emits `id=<result>`, and
+    a revert that does not match its own delete command fails with `unexpected param id`.
+    Eight resources shipped with this broken.
+12. `aws/doc/paramsdoc.go` and `aws/doc/clidoc.go` — a doc line per param and at least one
+    worked example per command. `TestDocForEachParam` and `TestDocForEachCommand` fail
+    without them, and `TestExamplesSatisfyParamsSpec` validates each example against the
+    spec.
+
+**Tests and docs**
+
+13. `acceptance/aws/<svc>_test.go` — assert the **input mapping**, not just that the call
+    happened. Include an empty-response case: an AWS reply with a nil body is the shape that
+    made six commands panic during the SDK v2 migration.
+14. `aws/services/services_registry_test.go` — add the service to the explicit list.
+15. `README.md` service table and `ls` examples, and a `CHANGELOG.md` entry.
+
+### Conventions that are not obvious
+
+- **Integer params are `*int64` with `awsType:"awsint64"`** even when the AWS field is
+  `*int32`. The setter converts widths through `reflect.Convert`; there is no `awsint32`.
+- **Shared params go above a `params.OnlyOneOf`, not inside each branch.** The param
+  collector walks every branch, so anything repeated is listed twice in `-h`. The trade-off
+  is that a param only meaningful to one form is accepted and then rejected by AWS.
+- **`ExtractResult` should fall back to a param** when the response body may be empty,
+  rather than dereferencing it.
+- **`RunExpectingError` returns the error**, and `errcheck` requires it to be checked.
+- Verify the `awsName` tags mechanically before committing. A `go doc` of each `awsInput`
+  type compared against the tags in the spec catches the whole class in one pass.
 
 The template parser's entity list is generated from the `entity:` struct tags, so a new
 entity needs no manual registration. That was not always true: a command could

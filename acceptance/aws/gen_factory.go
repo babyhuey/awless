@@ -71,6 +71,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewAttachElasticip(f.config(), f.Graph, f.Logger)
 		}
+	case "attacheventtarget":
+		return func() any {
+			return awsspec.NewAttachEventtarget(f.config(), f.Graph, f.Logger)
+		}
 	case "attachinstance":
 		return func() any {
 			return awsspec.NewAttachInstance(f.config(), f.Graph, f.Logger)
@@ -250,6 +254,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createelasticip":
 		return func() any {
 			return awsspec.NewCreateElasticip(f.config(), f.Graph, f.Logger)
+		}
+	case "createeventbus":
+		return func() any {
+			return awsspec.NewCreateEventbus(f.config(), f.Graph, f.Logger)
+		}
+	case "createeventrule":
+		return func() any {
+			return awsspec.NewCreateEventrule(f.config(), f.Graph, f.Logger)
 		}
 	case "createfilesystem":
 		return func() any {
@@ -503,6 +515,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteElasticip(f.config(), f.Graph, f.Logger)
 		}
+	case "deleteeventbus":
+		return func() any {
+			return awsspec.NewDeleteEventbus(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteeventrule":
+		return func() any {
+			return awsspec.NewDeleteEventrule(f.config(), f.Graph, f.Logger)
+		}
 	case "deletefilesystem":
 		return func() any {
 			return awsspec.NewDeleteFilesystem(f.config(), f.Graph, f.Logger)
@@ -687,6 +707,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDetachElasticip(f.config(), f.Graph, f.Logger)
 		}
+	case "detacheventtarget":
+		return func() any {
+			return awsspec.NewDetachEventtarget(f.config(), f.Graph, f.Logger)
+		}
 	case "detachinstance":
 		return func() any {
 			return awsspec.NewDetachInstance(f.config(), f.Graph, f.Logger)
@@ -755,6 +779,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStartDatabase(f.config(), f.Graph, f.Logger)
 		}
+	case "starteventrule":
+		return func() any {
+			return awsspec.NewStartEventrule(f.config(), f.Graph, f.Logger)
+		}
 	case "startinstance":
 		return func() any {
 			return awsspec.NewStartInstance(f.config(), f.Graph, f.Logger)
@@ -774,6 +802,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "stopdatabase":
 		return func() any {
 			return awsspec.NewStopDatabase(f.config(), f.Graph, f.Logger)
+		}
+	case "stopeventrule":
+		return func() any {
+			return awsspec.NewStopEventrule(f.config(), f.Graph, f.Logger)
 		}
 	case "stopinstance":
 		return func() any {
@@ -806,6 +838,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updatedistribution":
 		return func() any {
 			return awsspec.NewUpdateDistribution(f.config(), f.Graph, f.Logger)
+		}
+	case "updateeventrule":
+		return func() any {
+			return awsspec.NewUpdateEventrule(f.config(), f.Graph, f.Logger)
 		}
 	case "updateimage":
 		return func() any {

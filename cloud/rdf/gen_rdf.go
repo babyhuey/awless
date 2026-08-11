@@ -98,6 +98,7 @@ const (
 	Endpoint                          = "cloud:endpoint"
 	Engine                            = "cloud:engine"
 	EngineVersion                     = "cloud:engineVersion"
+	EventBus                          = "cloud:eventBus"
 	ExitCode                          = "cloud:exitCode"
 	Failover                          = "cloud:failover"
 	Fingerprint                       = "cloud:fingerprint"
@@ -128,6 +129,7 @@ const (
 	Key                               = "cloud:key"
 	KeyName                           = "cloud:keyName"
 	KeyPair                           = "cloud:keyPair"
+	LastModified                      = "cloud:lastModified"
 	LatestRestorableTime              = "cloud:latestRestorableTime"
 	LaunchConfigurationName           = "cloud:launchConfigurationName"
 	Launched                          = "cloud:launched"
@@ -137,6 +139,7 @@ const (
 	Location                          = "cloud:location"
 	MACAddress                        = "cloud:macAddress"
 	Main                              = "cloud:main"
+	ManagedBy                         = "cloud:managedBy"
 	MaxSize                           = "cloud:maxSize"
 	MemberClusters                    = "cloud:memberClusters"
 	Memory                            = "cloud:memory"
@@ -164,9 +167,11 @@ const (
 	PasswordLastUsed                  = "cloud:passwordLastUsed"
 	Path                              = "cloud:path"
 	PathPrefix                        = "cloud:pathPrefix"
+	Pattern                           = "cloud:pattern"
 	PendingTasksCount                 = "cloud:pendingTasksCount"
 	PlacementGroup                    = "cloud:placementGroup"
 	PlatformDetails                   = "cloud:platformDetails"
+	Policy                            = "cloud:policy"
 	Port                              = "net:port"
 	Ports                             = "net:ports"
 	PortRange                         = "net:portRange"
@@ -197,6 +202,7 @@ const (
 	Runtime                           = "cloud:runtime"
 	ScalingAdjustment                 = "cloud:scalingAdjustment"
 	ScalingGroupName                  = "cloud:scalingGroupName"
+	ScheduleExpression                = "cloud:scheduleExpression"
 	Scheme                            = "net:scheme"
 	SecondaryAvailabilityZone         = "cloud:secondaryAvailabilityZone"
 	SecurityGroups                    = "cloud:securityGroups"
@@ -361,6 +367,7 @@ func init() {
 		properties.Endpoint:                          Endpoint,
 		properties.Engine:                            Engine,
 		properties.EngineVersion:                     EngineVersion,
+		properties.EventBus:                          EventBus,
 		properties.ExitCode:                          ExitCode,
 		properties.Failover:                          Failover,
 		properties.Fingerprint:                       Fingerprint,
@@ -391,6 +398,7 @@ func init() {
 		properties.Key:                               Key,
 		properties.KeyName:                           KeyName,
 		properties.KeyPair:                           KeyPair,
+		properties.LastModified:                      LastModified,
 		properties.LatestRestorableTime:              LatestRestorableTime,
 		properties.LaunchConfigurationName:           LaunchConfigurationName,
 		properties.Launched:                          Launched,
@@ -400,6 +408,7 @@ func init() {
 		properties.Location:                          Location,
 		properties.MACAddress:                        MACAddress,
 		properties.Main:                              Main,
+		properties.ManagedBy:                         ManagedBy,
 		properties.MaxSize:                           MaxSize,
 		properties.MemberClusters:                    MemberClusters,
 		properties.Memory:                            Memory,
@@ -427,9 +436,11 @@ func init() {
 		properties.PasswordLastUsed:                  PasswordLastUsed,
 		properties.Path:                              Path,
 		properties.PathPrefix:                        PathPrefix,
+		properties.Pattern:                           Pattern,
 		properties.PendingTasksCount:                 PendingTasksCount,
 		properties.PlacementGroup:                    PlacementGroup,
 		properties.PlatformDetails:                   PlatformDetails,
+		properties.Policy:                            Policy,
 		properties.Port:                              Port,
 		properties.Ports:                             Ports,
 		properties.PortRange:                         PortRange,
@@ -460,6 +471,7 @@ func init() {
 		properties.Runtime:                           Runtime,
 		properties.ScalingAdjustment:                 ScalingAdjustment,
 		properties.ScalingGroupName:                  ScalingGroupName,
+		properties.ScheduleExpression:                ScheduleExpression,
 		properties.Scheme:                            Scheme,
 		properties.SecondaryAvailabilityZone:         SecondaryAvailabilityZone,
 		properties.SecurityGroups:                    SecurityGroups,
@@ -624,6 +636,7 @@ var Properties = RDFProperties{
 	Endpoint:                          {ID: Endpoint, RdfType: "rdf:Property", RdfsLabel: "Endpoint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Engine:                            {ID: Engine, RdfType: "rdf:Property", RdfsLabel: "Engine", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	EngineVersion:                     {ID: EngineVersion, RdfType: "rdf:Property", RdfsLabel: "EngineVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	EventBus:                          {ID: EventBus, RdfType: "rdf:Property", RdfsLabel: "EventBus", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ExitCode:                          {ID: ExitCode, RdfType: "rdf:Property", RdfsLabel: "ExitCode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Failover:                          {ID: Failover, RdfType: "rdf:Property", RdfsLabel: "Failover", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Fingerprint:                       {ID: Fingerprint, RdfType: "rdf:Property", RdfsLabel: "Fingerprint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -654,6 +667,7 @@ var Properties = RDFProperties{
 	Key:                               {ID: Key, RdfType: "rdf:Property", RdfsLabel: "Key", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	KeyName:                           {ID: KeyName, RdfType: "rdf:Property", RdfsLabel: "KeyName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	KeyPair:                           {ID: KeyPair, RdfType: "rdf:Property", RdfsLabel: "KeyPair", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	LastModified:                      {ID: LastModified, RdfType: "rdf:Property", RdfsLabel: "LastModified", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	LatestRestorableTime:              {ID: LatestRestorableTime, RdfType: "rdf:Property", RdfsLabel: "LatestRestorableTime", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	LaunchConfigurationName:           {ID: LaunchConfigurationName, RdfType: "rdf:Property", RdfsLabel: "LaunchConfigurationName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Launched:                          {ID: Launched, RdfType: "rdf:Property", RdfsLabel: "Launched", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
@@ -663,6 +677,7 @@ var Properties = RDFProperties{
 	Location:                          {ID: Location, RdfType: "rdf:Property", RdfsLabel: "Location", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	MACAddress:                        {ID: MACAddress, RdfType: "rdf:Property", RdfsLabel: "MACAddress", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Main:                              {ID: Main, RdfType: "rdf:Property", RdfsLabel: "Main", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+	ManagedBy:                         {ID: ManagedBy, RdfType: "rdf:Property", RdfsLabel: "ManagedBy", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MaxSize:                           {ID: MaxSize, RdfType: "rdf:Property", RdfsLabel: "MaxSize", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	MemberClusters:                    {ID: MemberClusters, RdfType: "rdf:Property", RdfsLabel: "MemberClusters", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	Memory:                            {ID: Memory, RdfType: "rdf:Property", RdfsLabel: "Memory", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
@@ -690,9 +705,11 @@ var Properties = RDFProperties{
 	PasswordLastUsed:                  {ID: PasswordLastUsed, RdfType: "rdf:Property", RdfsLabel: "PasswordLastUsed", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	Path:                              {ID: Path, RdfType: "rdf:Property", RdfsLabel: "Path", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PathPrefix:                        {ID: PathPrefix, RdfType: "rdf:Property", RdfsLabel: "PathPrefix", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Pattern:                           {ID: Pattern, RdfType: "rdf:Property", RdfsLabel: "Pattern", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PendingTasksCount:                 {ID: PendingTasksCount, RdfType: "rdf:Property", RdfsLabel: "PendingTasksCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	PlacementGroup:                    {ID: PlacementGroup, RdfType: "rdf:Property", RdfsLabel: "PlacementGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PlatformDetails:                   {ID: PlatformDetails, RdfType: "rdf:Property", RdfsLabel: "PlatformDetails", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Policy:                            {ID: Policy, RdfType: "rdf:Property", RdfsLabel: "Policy", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Port:                              {ID: Port, RdfType: "rdf:Property", RdfsLabel: "Port", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Ports:                             {ID: Ports, RdfType: "rdf:Property", RdfsLabel: "Ports", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	PortRange:                         {ID: PortRange, RdfType: "rdfs:subPropertyOf", RdfsLabel: "PortRange", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -723,6 +740,7 @@ var Properties = RDFProperties{
 	Runtime:                           {ID: Runtime, RdfType: "rdf:Property", RdfsLabel: "Runtime", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ScalingAdjustment:                 {ID: ScalingAdjustment, RdfType: "rdf:Property", RdfsLabel: "ScalingAdjustment", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	ScalingGroupName:                  {ID: ScalingGroupName, RdfType: "rdf:Property", RdfsLabel: "ScalingGroupName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ScheduleExpression:                {ID: ScheduleExpression, RdfType: "rdf:Property", RdfsLabel: "ScheduleExpression", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Scheme:                            {ID: Scheme, RdfType: "rdf:Property", RdfsLabel: "Scheme", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecondaryAvailabilityZone:         {ID: SecondaryAvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "SecondaryAvailabilityZone", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecurityGroups:                    {ID: SecurityGroups, RdfType: "rdf:Property", RdfsLabel: "SecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},

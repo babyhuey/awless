@@ -271,6 +271,17 @@ var FetchersDefs = []fetchersDef{
 			{API: "elasticache", ResourceType: cloud.CacheSubnetGroup, AWSType: "elasticachetypes.CacheSubnetGroup", APIMethod: "DescribeCacheSubnetGroups", Input: "elasticache.DescribeCacheSubnetGroupsInput{}", Output: "elasticache.DescribeCacheSubnetGroupsOutput", OutputsExtractor: "CacheSubnetGroups", Multipage: true, NextPageMarker: "Marker"},
 		},
 	},
+	{
+		Name: "eventbridge",
+		API:  []string{"eventbridge"},
+		Fetchers: []fetcher{
+			// EventBridge publishes no paginators, and the generator's only multipage
+			// mode drives an SDK paginator. Fetched manually rather than as a single
+			// page, which would silently stop at the API's default page size.
+			{API: "eventbridge", ResourceType: cloud.EventBus, AWSType: "eventbridgetypes.EventBus", ManualFetcher: true},
+			{API: "eventbridge", ResourceType: cloud.EventRule, AWSType: "eventbridgetypes.Rule", ManualFetcher: true},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

@@ -704,4 +704,24 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Description: {name: "CacheSubnetGroupDescription", transform: extractValueFn},
 		properties.Vpc:         {name: "VpcId", transform: extractValueFn},
 	},
+	// EventBridge
+	cloud.EventBus: {
+		properties.Name:         {name: "Name", transform: extractValueFn},
+		properties.Arn:          {name: "Arn", transform: extractValueFn},
+		properties.Description:  {name: "Description", transform: extractValueFn},
+		properties.Policy:       {name: "Policy", transform: extractValueFn},
+		properties.Created:      {name: "CreationTime", transform: extractTimeFn},
+		properties.LastModified: {name: "LastModifiedTime", transform: extractTimeFn},
+	},
+	cloud.EventRule: {
+		properties.Name:               {name: "Name", transform: extractValueFn},
+		properties.Arn:                {name: "Arn", transform: extractValueFn},
+		properties.Description:        {name: "Description", transform: extractValueFn},
+		properties.State:              {name: "State", transform: extractValueFn},
+		properties.EventBus:           {name: "EventBusName", transform: extractValueFn},
+		properties.Pattern:            {name: "EventPattern", transform: extractValueFn},
+		properties.ScheduleExpression: {name: "ScheduleExpression", transform: extractValueFn},
+		properties.Role:               {name: "RoleArn", transform: extractValueFn},
+		properties.ManagedBy:          {name: "ManagedBy", transform: extractValueFn},
+	},
 }

@@ -42,6 +42,7 @@ import (
 	elasticache "github.com/aws/aws-sdk-go-v2/service/elasticache"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
@@ -374,6 +375,84 @@ func (cmd *AttachElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *AttachElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewAttachEventtarget(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *AttachEventtarget {
+	cmd := new(AttachEventtarget)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *AttachEventtarget) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *AttachEventtarget) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.PutTargetsInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.PutTargetsInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutTargets(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.PutTargets call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("attach eventtarget: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("attach eventtarget '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("attach eventtarget done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *AttachEventtarget) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventtarget"), nil
+}
+
+func (cmd *AttachEventtarget) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -3875,6 +3954,162 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateEventbus(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateEventbus {
+	cmd := new(CreateEventbus)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateEventbus) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateEventbus) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.CreateEventBusInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.CreateEventBusInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateEventBus(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.CreateEventBus call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create eventbus: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create eventbus '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create eventbus done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateEventbus) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventbus"), nil
+}
+
+func (cmd *CreateEventbus) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateEventrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateEventrule {
+	cmd := new(CreateEventrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateEventrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateEventrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.PutRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.PutRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.PutRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create eventrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create eventrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create eventrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateEventrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventrule"), nil
+}
+
+func (cmd *CreateEventrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -9021,6 +9256,162 @@ func (cmd *DeleteElasticip) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteEventbus(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteEventbus {
+	cmd := new(DeleteEventbus)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteEventbus) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteEventbus) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.DeleteEventBusInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.DeleteEventBusInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteEventBus(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.DeleteEventBus call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete eventbus: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete eventbus '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete eventbus done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteEventbus) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventbus"), nil
+}
+
+func (cmd *DeleteEventbus) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteEventrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteEventrule {
+	cmd := new(DeleteEventrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteEventrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteEventrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.DeleteRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.DeleteRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.DeleteRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete eventrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete eventrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete eventrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteEventrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventrule"), nil
+}
+
+func (cmd *DeleteEventrule) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteFilesystem(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteFilesystem {
 	cmd := new(DeleteFilesystem)
 	if len(l) > 0 {
@@ -12847,6 +13238,84 @@ func (cmd *DetachElasticip) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDetachEventtarget(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachEventtarget {
+	cmd := new(DetachEventtarget)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DetachEventtarget) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DetachEventtarget) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.RemoveTargetsInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.RemoveTargetsInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.RemoveTargets(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.RemoveTargets call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("detach eventtarget: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("detach eventtarget '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("detach eventtarget done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DetachEventtarget) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventtarget"), nil
+}
+
+func (cmd *DetachEventtarget) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDetachInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DetachInstance {
 	cmd := new(DetachInstance)
 	if len(l) > 0 {
@@ -14249,6 +14718,84 @@ func (cmd *StartDatabase) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewStartEventrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartEventrule {
+	cmd := new(StartEventrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartEventrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartEventrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.EnableRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.EnableRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.EnableRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.EnableRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start eventrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start eventrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start eventrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartEventrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventrule"), nil
+}
+
+func (cmd *StartEventrule) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewStartInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartInstance {
 	cmd := new(StartInstance)
 	if len(l) > 0 {
@@ -14652,6 +15199,84 @@ func (cmd *StopDatabase) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *StopDatabase) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStopEventrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopEventrule {
+	cmd := new(StopEventrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StopEventrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StopEventrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.DisableRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.DisableRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DisableRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.DisableRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("stop eventrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("stop eventrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("stop eventrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StopEventrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventrule"), nil
+}
+
+func (cmd *StopEventrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -15283,6 +15908,84 @@ func (cmd *UpdateDistribution) dryRun(renv env.Running, params map[string]any) (
 }
 
 func (cmd *UpdateDistribution) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateEventrule(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateEventrule {
+	cmd := new(UpdateEventrule)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = eventbridge.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateEventrule) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateEventrule) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &eventbridge.PutRuleInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in eventbridge.PutRuleInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.PutRule(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("eventbridge.PutRule call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update eventrule: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update eventrule '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update eventrule done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateEventrule) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("eventrule"), nil
+}
+
+func (cmd *UpdateEventrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
