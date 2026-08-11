@@ -12,7 +12,7 @@ Guide for AI agents working in this repository.
 - **CLI framework:** `github.com/spf13/cobra`
 - **Graph storage:** `github.com/bootswithdefer/triplestore` v1.0.0 (RDF triples)
 - **Local DB:** bbolt (`go.etcd.io/bbolt`)
-- **Version:** `v1.1.0` in `config/version.go`; release builds inject it from the git tag via GoReleaser
+- **Version:** `v1.1.1` in `config/version.go`; release builds inject it from the git tag via GoReleaser. See [Releasing](#releasing).
 
 ## Build & Test
 
@@ -271,6 +271,74 @@ Note that CI is a stronger check than local `make verify`, because it runs on a 
 runner with no `~/.awless`, no AWS config and no cached tools. Two tests needed
 environment pinned for that reason — the service registry test sets static credentials to
 avoid a 15-second EC2 metadata timeout, and `create keypair` needs `__AWLESS_KEYS_DIR`.
+
+## Releasing
+
+A release is cut by pushing a `v*` tag. `.github/workflows/release.yml` then runs
+GoReleaser, which builds six platform archives, writes `checksums.txt`, publishes the
+GitHub release, and commits a Homebrew cask to `bootswithdefer/homebrew-tap`.
+
+**Once a version is on the module proxy it is immutable.** `proxy.golang.org` caches what
+a tag pointed at, so a mistake cannot be corrected by moving the tag — it needs a new
+patch version. Do the pre-flight.
+
+```sh
+# 1. Bump the fallback constant and add the changelog entry.
+#    config.Version is only used by a plain `go build`; GoReleaser injects the real
+#    version from the tag, so this is hygiene rather than the source of truth.
+$EDITOR config/version.go CHANGELOG.md
+
+# 2. Local gate.
+make verify
+
+# 3. Commit, push, and wait for CI to go green on that commit.
+#    CI is the stronger check — clean runner, no ~/.awless, no AWS config, no cached
+#    tools. Do not tag a commit whose CI has not finished.
+gh api "repos/bootswithdefer/awless/actions/runs?per_page=1" \
+  --jq '.workflow_runs[0] | "\(.head_sha[0:8]) \(.status)/\(.conclusion)"'
+
+# 4. Signed, annotated tag. Commits here are signed, so tags should be too.
+git tag -s v1.1.1 -F -   # summary of the release in the message body
+git tag -v v1.1.1        # expect "Good signature"
+git push origin v1.1.1
+```
+
+Verify afterwards that the release has its six archives plus checksums, and that the cask
+landed in the tap:
+
+```sh
+gh api repos/bootswithdefer/awless/releases --jq '.[0] | "\(.tag_name) assets=\(.assets|length)"'
+gh api repos/bootswithdefer/homebrew-tap/contents/Casks --jq '.[].name'
+```
+
+### Version numbering
+
+Semver here is relative to **this module's** history, not to upstream. The module path
+changed to `github.com/bootswithdefer/awless`, so the fork's first release was `v1.1.0`
+despite carrying breaking changes against `wallix/awless` — there was no prior release of
+this module to break.
+
+**Do not tag `v2.0.0` without renaming the module.** Go requires a major version of two or
+above to appear in the module path, so `v2` would mean moving to
+`github.com/bootswithdefer/awless/v2`, rewriting every import and changing the documented
+install command. A module without the suffix is rejected outright:
+`version "v2.0.0" invalid: should be v0 or v1, not v2`. That suffix exists so importers can
+depend on two majors at once, which is meaningless for a CLI nothing imports.
+
+### Homebrew
+
+The cask is committed over SSH with a **deploy key** scoped to the tap, held in the
+`HOMEBREW_TAP_SSH_KEY` secret. The workflow writes it to `~/.ssh/homebrew_tap` because
+GoReleaser wants a path rather than key contents.
+
+A personal access token would be the obvious alternative and is the wrong choice: the
+workflow's `GITHUB_TOKEN` cannot reach another repository, and the narrowest classic PAT
+that can needs `repo` scope, which grants write access to every repository the owner has.
+
+It is a cask rather than a formula because it ships a pre-built binary, which is what
+Homebrew expects casks to carry. GoReleaser's `brews` section is deprecated for the same
+reason — use `homebrew_casks`. Get its field names from `goreleaser schema` rather than
+from memory; several are deprecated within it too.
 
 ## Things to Watch Out For
 
