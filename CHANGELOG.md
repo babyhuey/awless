@@ -1,4 +1,4 @@
-## Unreleased
+## v1.2.0
 
 ### Added
 
@@ -79,6 +79,15 @@
   `awless create statemachine name=order-flow role=<role-arn> definition-file=flow.json`.
   Executions are deliberately not a listed resource — enumerating them needs one call per
   state machine, for run history rather than infrastructure.
+
+### Changed for importers
+
+- **`awsconfig.StdinRegionSelector` and `StdinInstanceTypeSelector` now return
+  `(string, error)`** rather than `string`. No CLI behaviour depends on this — it is what
+  allowed an `os.Exit` to be removed from library code — but it is a source-breaking change
+  for anyone vendoring `aws/config`. No major version bump was taken: Go would require the
+  module path to become `.../awless/v2`, which is a far larger break for a CLI nothing
+  imports.
 
 ### Fixed
 
