@@ -117,6 +117,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateAppscalingtarget(f.Cfg, f.Graph, f.Log) }
 	case "createbucket":
 		return func() any { return NewCreateBucket(f.Cfg, f.Graph, f.Log) }
+	case "createcachecluster":
+		return func() any { return NewCreateCachecluster(f.Cfg, f.Graph, f.Log) }
+	case "createcachesubnetgroup":
+		return func() any { return NewCreateCachesubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "createcertificate":
 		return func() any { return NewCreateCertificate(f.Cfg, f.Graph, f.Log) }
 	case "createclassicloadbalancer":
@@ -175,6 +179,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateQueue(f.Cfg, f.Graph, f.Log) }
 	case "createrecord":
 		return func() any { return NewCreateRecord(f.Cfg, f.Graph, f.Log) }
+	case "createreplicationgroup":
+		return func() any { return NewCreateReplicationgroup(f.Cfg, f.Graph, f.Log) }
 	case "createrepository":
 		return func() any { return NewCreateRepository(f.Cfg, f.Graph, f.Log) }
 	case "createrole":
@@ -235,6 +241,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteAppscalingtarget(f.Cfg, f.Graph, f.Log) }
 	case "deletebucket":
 		return func() any { return NewDeleteBucket(f.Cfg, f.Graph, f.Log) }
+	case "deletecachecluster":
+		return func() any { return NewDeleteCachecluster(f.Cfg, f.Graph, f.Log) }
+	case "deletecachesubnetgroup":
+		return func() any { return NewDeleteCachesubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "deletecertificate":
 		return func() any { return NewDeleteCertificate(f.Cfg, f.Graph, f.Log) }
 	case "deleteclassicloadbalancer":
@@ -295,6 +305,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteQueue(f.Cfg, f.Graph, f.Log) }
 	case "deleterecord":
 		return func() any { return NewDeleteRecord(f.Cfg, f.Graph, f.Log) }
+	case "deletereplicationgroup":
+		return func() any { return NewDeleteReplicationgroup(f.Cfg, f.Graph, f.Log) }
 	case "deleterepository":
 		return func() any { return NewDeleteRepository(f.Cfg, f.Graph, f.Log) }
 	case "deleterole":
@@ -397,6 +409,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopTrail(f.Cfg, f.Graph, f.Log) }
 	case "updatebucket":
 		return func() any { return NewUpdateBucket(f.Cfg, f.Graph, f.Log) }
+	case "updatecachecluster":
+		return func() any { return NewUpdateCachecluster(f.Cfg, f.Graph, f.Log) }
+	case "updatecachesubnetgroup":
+		return func() any { return NewUpdateCachesubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "updateclassicloadbalancer":
 		return func() any { return NewUpdateClassicLoadbalancer(f.Cfg, f.Graph, f.Log) }
 	case "updatecontainertask":
@@ -473,6 +489,8 @@ var (
 	_ command = &CreateAppscalingpolicy{}
 	_ command = &CreateAppscalingtarget{}
 	_ command = &CreateBucket{}
+	_ command = &CreateCachecluster{}
+	_ command = &CreateCachesubnetgroup{}
 	_ command = &CreateCertificate{}
 	_ command = &CreateClassicLoadbalancer{}
 	_ command = &CreateContainercluster{}
@@ -502,6 +520,7 @@ var (
 	_ command = &CreatePolicy{}
 	_ command = &CreateQueue{}
 	_ command = &CreateRecord{}
+	_ command = &CreateReplicationgroup{}
 	_ command = &CreateRepository{}
 	_ command = &CreateRole{}
 	_ command = &CreateRoute{}
@@ -532,6 +551,8 @@ var (
 	_ command = &DeleteAppscalingpolicy{}
 	_ command = &DeleteAppscalingtarget{}
 	_ command = &DeleteBucket{}
+	_ command = &DeleteCachecluster{}
+	_ command = &DeleteCachesubnetgroup{}
 	_ command = &DeleteCertificate{}
 	_ command = &DeleteClassicLoadbalancer{}
 	_ command = &DeleteContainercluster{}
@@ -562,6 +583,7 @@ var (
 	_ command = &DeletePolicy{}
 	_ command = &DeleteQueue{}
 	_ command = &DeleteRecord{}
+	_ command = &DeleteReplicationgroup{}
 	_ command = &DeleteRepository{}
 	_ command = &DeleteRole{}
 	_ command = &DeleteRoute{}
@@ -613,6 +635,8 @@ var (
 	_ command = &StopInstance{}
 	_ command = &StopTrail{}
 	_ command = &UpdateBucket{}
+	_ command = &UpdateCachecluster{}
+	_ command = &UpdateCachesubnetgroup{}
 	_ command = &UpdateClassicLoadbalancer{}
 	_ command = &UpdateContainertask{}
 	_ command = &UpdateDistribution{}

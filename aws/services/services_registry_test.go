@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/bootswithdefer/awless/cloud"
+	gen "github.com/bootswithdefer/awless/gen/aws"
 	"github.com/bootswithdefer/awless/logger"
 )
 
@@ -110,10 +111,34 @@ func TestNewServicesAreRegistered(t *testing.T) {
 	for _, want := range []string{
 		"infra", "access", "storage", "messaging", "dns", "lambda", "monitoring",
 		"cdn", "cloudformation", "eks", "dynamodb", "secretsmanager", "apigateway",
-		"ssm", "efs", "cloudtrail", "cloudwatchlogs",
+		"ssm", "efs", "cloudtrail", "cloudwatchlogs", "elasticache",
 	} {
 		if _, ok := cloud.ServiceRegistry[want]; !ok {
 			t.Errorf("service %q is not registered", want)
+		}
+	}
+}
+
+// The list above is hand-maintained, so on its own it cannot catch a service that is
+// added to the generator but never registered — the very mistake the comment warns
+// about. This derives the expectation from the generator definitions instead, so a new
+// fetchersDef that nobody wires into Init fails here rather than going unnoticed.
+func TestEveryGeneratedServiceIsRegistered(t *testing.T) {
+	initServices(t)
+	for _, def := range gen.FetchersDefs {
+		if _, ok := cloud.ServiceRegistry[def.Name]; !ok {
+			t.Errorf("service %q has a fetchers definition but is not in the registry; "+
+				"add it to Init in aws/services/init.go", def.Name)
+		}
+	}
+	// And the converse, so a registry entry cannot outlive its definition.
+	defined := make(map[string]bool, len(gen.FetchersDefs))
+	for _, def := range gen.FetchersDefs {
+		defined[def.Name] = true
+	}
+	for name := range cloud.ServiceRegistry {
+		if !defined[name] {
+			t.Errorf("service %q is registered but has no fetchers definition", name)
 		}
 	}
 }

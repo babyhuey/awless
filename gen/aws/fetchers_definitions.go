@@ -262,6 +262,15 @@ var FetchersDefs = []fetchersDef{
 			{API: "cloudwatchlogs", ResourceType: cloud.LogGroup, AWSType: "cloudwatchlogstypes.LogGroup", APIMethod: "DescribeLogGroups", Input: "cloudwatchlogs.DescribeLogGroupsInput{}", Output: "cloudwatchlogs.DescribeLogGroupsOutput", OutputsExtractor: "LogGroups", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
+	{
+		Name: "elasticache",
+		API:  []string{"elasticache"},
+		Fetchers: []fetcher{
+			{API: "elasticache", ResourceType: cloud.CacheCluster, AWSType: "elasticachetypes.CacheCluster", APIMethod: "DescribeCacheClusters", Input: "elasticache.DescribeCacheClustersInput{}", Output: "elasticache.DescribeCacheClustersOutput", OutputsExtractor: "CacheClusters", Multipage: true, NextPageMarker: "Marker"},
+			{API: "elasticache", ResourceType: cloud.ReplicationGroup, AWSType: "elasticachetypes.ReplicationGroup", APIMethod: "DescribeReplicationGroups", Input: "elasticache.DescribeReplicationGroupsInput{}", Output: "elasticache.DescribeReplicationGroupsOutput", OutputsExtractor: "ReplicationGroups", Multipage: true, NextPageMarker: "Marker"},
+			{API: "elasticache", ResourceType: cloud.CacheSubnetGroup, AWSType: "elasticachetypes.CacheSubnetGroup", APIMethod: "DescribeCacheSubnetGroups", Input: "elasticache.DescribeCacheSubnetGroupsInput{}", Output: "elasticache.DescribeCacheSubnetGroupsOutput", OutputsExtractor: "CacheSubnetGroups", Multipage: true, NextPageMarker: "Marker"},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

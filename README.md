@@ -114,6 +114,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **EFS** | file systems, mount targets |
 | **CloudTrail** | trails |
 | **CloudWatch Logs** | log groups |
+| **ElastiCache** | cache clusters, replication groups, cache subnet groups |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
 just listing — see [Changes in this fork](#changes-in-this-fork).
@@ -140,6 +141,8 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls secrets
       $ awless ls ssmparameters
       $ awless ls filesystems
+      $ awless ls cacheclusters
+      $ awless ls replicationgroups
       $ ...
       (see awless ls -h)
 

@@ -55,6 +55,8 @@ import (
 	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
 	eks "github.com/aws/aws-sdk-go-v2/service/eks"
 	ekstypes "github.com/aws/aws-sdk-go-v2/service/eks/types"
+	elasticache "github.com/aws/aws-sdk-go-v2/service/elasticache"
+	elasticachetypes "github.com/aws/aws-sdk-go-v2/service/elasticache/types"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -109,6 +111,7 @@ var ServiceNames = []string{
 	"efs",
 	"cloudtrail",
 	"cloudwatchlogs",
+	"elasticache",
 }
 
 var ResourceTypes = []string{
@@ -174,6 +177,9 @@ var ResourceTypes = []string{
 	"mounttarget",
 	"trail",
 	"loggroup",
+	"cachecluster",
+	"replicationgroup",
+	"cachesubnetgroup",
 }
 
 var ServicePerAPI = map[string]string{
@@ -205,6 +211,7 @@ var ServicePerAPI = map[string]string{
 	"efs":                    "efs",
 	"cloudtrail":             "cloudtrail",
 	"cloudwatchlogs":         "cloudwatchlogs",
+	"elasticache":            "elasticache",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -270,6 +277,9 @@ var ServicePerResourceType = map[string]string{
 	"mounttarget":         "efs",
 	"trail":               "cloudtrail",
 	"loggroup":            "cloudwatchlogs",
+	"cachecluster":        "elasticache",
+	"replicationgroup":    "elasticache",
+	"cachesubnetgroup":    "elasticache",
 }
 
 var APIPerResourceType = map[string]string{
@@ -335,6 +345,9 @@ var APIPerResourceType = map[string]string{
 	"mounttarget":         "efs",
 	"trail":               "cloudtrail",
 	"loggroup":            "cloudwatchlogs",
+	"cachecluster":        "elasticache",
+	"replicationgroup":    "elasticache",
+	"cachesubnetgroup":    "elasticache",
 }
 
 type Infra struct {
@@ -3590,4 +3603,178 @@ func (s *Cloudwatchlogs) FetchByType(ctx context.Context, t string) (cloud.Graph
 
 func (s *Cloudwatchlogs) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.cloudwatchlogs.sync", true)
+}
+
+type Elasticache struct {
+	fetcher           fetch.Fetcher
+	region, profile   string
+	config            map[string]any
+	log               *logger.Logger
+	ElasticacheClient *elasticache.Client
+}
+
+func NewElasticache(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	elasticacheClient := elasticache.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		elasticacheClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Elasticache{
+		ElasticacheClient: elasticacheClient,
+		fetcher:           fetch.NewFetcher(awsfetch.BuildElasticacheFetchFuncs(fetchConfig)),
+		config:            extraConf,
+		region:            region,
+		profile:           profile,
+		log:               log,
+	}
+}
+
+func (s *Elasticache) Name() string {
+	return "elasticache"
+}
+
+func (s *Elasticache) Region() string {
+	return s.region
+}
+
+func (s *Elasticache) Profile() string {
+	return s.profile
+}
+
+func (s *Elasticache) ResourceTypes() []string {
+	return []string{
+		"cachecluster",
+		"replicationgroup",
+		"cachesubnetgroup",
+	}
+}
+
+func (s *Elasticache) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.elasticache.cachecluster.sync", true) {
+		list, err := s.fetcher.Get("cachecluster_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]elasticachetypes.CacheCluster); !ok {
+			return gph, errors.New("cannot cast to '[]elasticachetypes.CacheCluster' type from fetch context")
+		}
+		for _, r := range list.([]elasticachetypes.CacheCluster) {
+			for _, fn := range addParentsFns["cachecluster"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *elasticachetypes.CacheCluster) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.elasticache.replicationgroup.sync", true) {
+		list, err := s.fetcher.Get("replicationgroup_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]elasticachetypes.ReplicationGroup); !ok {
+			return gph, errors.New("cannot cast to '[]elasticachetypes.ReplicationGroup' type from fetch context")
+		}
+		for _, r := range list.([]elasticachetypes.ReplicationGroup) {
+			for _, fn := range addParentsFns["replicationgroup"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *elasticachetypes.ReplicationGroup) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.elasticache.cachesubnetgroup.sync", true) {
+		list, err := s.fetcher.Get("cachesubnetgroup_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]elasticachetypes.CacheSubnetGroup); !ok {
+			return gph, errors.New("cannot cast to '[]elasticachetypes.CacheSubnetGroup' type from fetch context")
+		}
+		for _, r := range list.([]elasticachetypes.CacheSubnetGroup) {
+			for _, fn := range addParentsFns["cachesubnetgroup"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *elasticachetypes.CacheSubnetGroup) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Elasticache) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Elasticache) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.elasticache.sync", true)
 }

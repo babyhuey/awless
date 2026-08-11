@@ -119,6 +119,10 @@ const (
 	Trail string = "trail"
 	//cloudwatchlogs
 	LogGroup string = "loggroup"
+	//elasticache
+	CacheCluster     string = "cachecluster"
+	ReplicationGroup string = "replicationgroup"
+	CacheSubnetGroup string = "cachesubnetgroup"
 )
 
 type Service interface {

@@ -43,6 +43,8 @@ import (
 	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
 	efs "github.com/aws/aws-sdk-go-v2/service/efs"
 	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
+	elasticache "github.com/aws/aws-sdk-go-v2/service/elasticache"
+	elasticachetypes "github.com/aws/aws-sdk-go-v2/service/elasticache/types"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -1249,6 +1251,96 @@ func BuildCloudwatchlogsFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.LogGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildElasticacheFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualElasticacheFetchFuncs(conf, funcs)
+
+	funcs["cachecluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []elasticachetypes.CacheCluster
+
+		if !conf.getBoolDefaultTrue("aws.elasticache.cachecluster.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource elasticache[cachecluster]")
+			return resources, objects, nil
+		}
+		paginator := elasticache.NewDescribeCacheClustersPaginator(conf.APIs.Elasticache, &elasticache.DescribeCacheClustersInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.CacheClusters {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["replicationgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []elasticachetypes.ReplicationGroup
+
+		if !conf.getBoolDefaultTrue("aws.elasticache.replicationgroup.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource elasticache[replicationgroup]")
+			return resources, objects, nil
+		}
+		paginator := elasticache.NewDescribeReplicationGroupsPaginator(conf.APIs.Elasticache, &elasticache.DescribeReplicationGroupsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.ReplicationGroups {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["cachesubnetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []elasticachetypes.CacheSubnetGroup
+
+		if !conf.getBoolDefaultTrue("aws.elasticache.cachesubnetgroup.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource elasticache[cachesubnetgroup]")
+			return resources, objects, nil
+		}
+		paginator := elasticache.NewDescribeCacheSubnetGroupsPaginator(conf.APIs.Elasticache, &elasticache.DescribeCacheSubnetGroupsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.CacheSubnetGroups {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

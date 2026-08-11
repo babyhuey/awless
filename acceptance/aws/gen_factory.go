@@ -203,6 +203,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateBucket(f.config(), f.Graph, f.Logger)
 		}
+	case "createcachecluster":
+		return func() any {
+			return awsspec.NewCreateCachecluster(f.config(), f.Graph, f.Logger)
+		}
+	case "createcachesubnetgroup":
+		return func() any {
+			return awsspec.NewCreateCachesubnetgroup(f.config(), f.Graph, f.Logger)
+		}
 	case "createcertificate":
 		return func() any {
 			return awsspec.NewCreateCertificate(f.config(), f.Graph, f.Logger)
@@ -318,6 +326,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createrecord":
 		return func() any {
 			return awsspec.NewCreateRecord(f.config(), f.Graph, f.Logger)
+		}
+	case "createreplicationgroup":
+		return func() any {
+			return awsspec.NewCreateReplicationgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "createrepository":
 		return func() any {
@@ -439,6 +451,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteBucket(f.config(), f.Graph, f.Logger)
 		}
+	case "deletecachecluster":
+		return func() any {
+			return awsspec.NewDeleteCachecluster(f.config(), f.Graph, f.Logger)
+		}
+	case "deletecachesubnetgroup":
+		return func() any {
+			return awsspec.NewDeleteCachesubnetgroup(f.config(), f.Graph, f.Logger)
+		}
 	case "deletecertificate":
 		return func() any {
 			return awsspec.NewDeleteCertificate(f.config(), f.Graph, f.Logger)
@@ -558,6 +578,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleterecord":
 		return func() any {
 			return awsspec.NewDeleteRecord(f.config(), f.Graph, f.Logger)
+		}
+	case "deletereplicationgroup":
+		return func() any {
+			return awsspec.NewDeleteReplicationgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deleterepository":
 		return func() any {
@@ -762,6 +786,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updatebucket":
 		return func() any {
 			return awsspec.NewUpdateBucket(f.config(), f.Graph, f.Logger)
+		}
+	case "updatecachecluster":
+		return func() any {
+			return awsspec.NewUpdateCachecluster(f.config(), f.Graph, f.Logger)
+		}
+	case "updatecachesubnetgroup":
+		return func() any {
+			return awsspec.NewUpdateCachesubnetgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "updateclassicloadbalancer":
 		return func() any {

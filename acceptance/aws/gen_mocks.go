@@ -81,6 +81,10 @@ type eksMock struct {
 	basicMock
 }
 
+type elasticacheMock struct {
+	basicMock
+}
+
 type elbMock struct {
 	basicMock
 }

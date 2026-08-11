@@ -44,11 +44,13 @@ const (
 	AttachedAt                        = "cloud:attachedAt"
 	Attachment                        = "cloud:attachment"
 	Attributes                        = "cloud:attributes"
+	AutomaticFailover                 = "cloud:automaticFailover"
 	AutoUpgrade                       = "cloud:autoUpgrade"
 	AvailabilityZone                  = "cloud:availabilityZone"
 	AvailabilityZones                 = "cloud:availabilityZones"
 	BackupRetentionPeriod             = "cloud:backupRetentionPeriod"
 	Bucket                            = "cloud:bucketName"
+	CacheNodeType                     = "cloud:cacheNodeType"
 	CallerReference                   = "cloud:callerReference"
 	Capabilities                      = "cloud:capabilities"
 	Certificate                       = "cloud:certificate"
@@ -67,6 +69,7 @@ const (
 	CipherSuite                       = "cloud:cipherSuite"
 	Class                             = "cloud:class"
 	Cluster                           = "cloud:cluster"
+	ClusterEnabled                    = "cloud:clusterEnabled"
 	Comment                           = "rdfs:comment"
 	Config                            = "cloud:config"
 	ContainerInstance                 = "cloud:containerInstance"
@@ -135,6 +138,7 @@ const (
 	MACAddress                        = "cloud:macAddress"
 	Main                              = "cloud:main"
 	MaxSize                           = "cloud:maxSize"
+	MemberClusters                    = "cloud:memberClusters"
 	Memory                            = "cloud:memory"
 	Messages                          = "cloud:messages"
 	MetricName                        = "cloud:metricName"
@@ -147,6 +151,7 @@ const (
 	Namespace                         = "cloud:namemespace"
 	NetworkInterfaces                 = "cloud:networkInterfaces"
 	NewInstancesProtected             = "cloud:newInstancesProtected"
+	NodeCount                         = "cloud:nodeCount"
 	Notifications                     = "cloud:notifications"
 	OKActions                         = "cloud:okActions"
 	OptionGroups                      = "cloud:optionGroups"
@@ -182,6 +187,7 @@ const (
 	Region                            = "cloud:region"
 	RegisteredContainerInstancesCount = "cloud:registeredContainerInstancesCount"
 	ReplicaOf                         = "cloud:replicaOf"
+	ReplicationGroup                  = "cloud:replicationGroup"
 	Role                              = "cloud:role"
 	Roles                             = "cloud:roles"
 	RootDevice                        = "cloud:rootDevice"
@@ -206,6 +212,7 @@ const (
 	Storage                           = "cloud:storage"
 	StorageType                       = "cloud:storageType"
 	Subnet                            = "cloud:subnet"
+	SubnetGroup                       = "cloud:subnetGroup"
 	Subnets                           = "cloud:subnets"
 	Tags                              = "cloud:tags"
 	TargetGroups                      = "cloud:targetGroups"
@@ -300,11 +307,13 @@ func init() {
 		properties.AttachedAt:                        AttachedAt,
 		properties.Attachment:                        Attachment,
 		properties.Attributes:                        Attributes,
+		properties.AutomaticFailover:                 AutomaticFailover,
 		properties.AutoUpgrade:                       AutoUpgrade,
 		properties.AvailabilityZone:                  AvailabilityZone,
 		properties.AvailabilityZones:                 AvailabilityZones,
 		properties.BackupRetentionPeriod:             BackupRetentionPeriod,
 		properties.Bucket:                            Bucket,
+		properties.CacheNodeType:                     CacheNodeType,
 		properties.CallerReference:                   CallerReference,
 		properties.Capabilities:                      Capabilities,
 		properties.Certificate:                       Certificate,
@@ -323,6 +332,7 @@ func init() {
 		properties.CipherSuite:                       CipherSuite,
 		properties.Class:                             Class,
 		properties.Cluster:                           Cluster,
+		properties.ClusterEnabled:                    ClusterEnabled,
 		properties.Comment:                           Comment,
 		properties.Config:                            Config,
 		properties.ContainerInstance:                 ContainerInstance,
@@ -391,6 +401,7 @@ func init() {
 		properties.MACAddress:                        MACAddress,
 		properties.Main:                              Main,
 		properties.MaxSize:                           MaxSize,
+		properties.MemberClusters:                    MemberClusters,
 		properties.Memory:                            Memory,
 		properties.Messages:                          Messages,
 		properties.MetricName:                        MetricName,
@@ -403,6 +414,7 @@ func init() {
 		properties.Namespace:                         Namespace,
 		properties.NetworkInterfaces:                 NetworkInterfaces,
 		properties.NewInstancesProtected:             NewInstancesProtected,
+		properties.NodeCount:                         NodeCount,
 		properties.Notifications:                     Notifications,
 		properties.OKActions:                         OKActions,
 		properties.OptionGroups:                      OptionGroups,
@@ -438,6 +450,7 @@ func init() {
 		properties.Region:                            Region,
 		properties.RegisteredContainerInstancesCount: RegisteredContainerInstancesCount,
 		properties.ReplicaOf:                         ReplicaOf,
+		properties.ReplicationGroup:                  ReplicationGroup,
 		properties.Role:                              Role,
 		properties.Roles:                             Roles,
 		properties.RootDevice:                        RootDevice,
@@ -462,6 +475,7 @@ func init() {
 		properties.Storage:                           Storage,
 		properties.StorageType:                       StorageType,
 		properties.Subnet:                            Subnet,
+		properties.SubnetGroup:                       SubnetGroup,
 		properties.Subnets:                           Subnets,
 		properties.Tags:                              Tags,
 		properties.TargetGroups:                      TargetGroups,
@@ -556,11 +570,13 @@ var Properties = RDFProperties{
 	AttachedAt:                        {ID: AttachedAt, RdfType: "rdf:Property", RdfsLabel: "AttachedAt", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	Attachment:                        {ID: Attachment, RdfType: "rdf:Property", RdfsLabel: "Attachment", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Attributes:                        {ID: Attributes, RdfType: "rdf:Property", RdfsLabel: "Attributes", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
+	AutomaticFailover:                 {ID: AutomaticFailover, RdfType: "rdf:Property", RdfsLabel: "AutomaticFailover", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	AutoUpgrade:                       {ID: AutoUpgrade, RdfType: "rdf:Property", RdfsLabel: "AutoUpgrade", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	AvailabilityZone:                  {ID: AvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "AvailabilityZone", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	AvailabilityZones:                 {ID: AvailabilityZones, RdfType: "rdf:Property", RdfsLabel: "AvailabilityZones", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	BackupRetentionPeriod:             {ID: BackupRetentionPeriod, RdfType: "rdf:Property", RdfsLabel: "BackupRetentionPeriod", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	Bucket:                            {ID: Bucket, RdfType: "rdf:Property", RdfsLabel: "Bucket", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	CacheNodeType:                     {ID: CacheNodeType, RdfType: "rdf:Property", RdfsLabel: "CacheNodeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	CallerReference:                   {ID: CallerReference, RdfType: "rdf:Property", RdfsLabel: "CallerReference", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Capabilities:                      {ID: Capabilities, RdfType: "rdf:Property", RdfsLabel: "Capabilities", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	Certificate:                       {ID: Certificate, RdfType: "rdf:Property", RdfsLabel: "Certificate", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -579,6 +595,7 @@ var Properties = RDFProperties{
 	CipherSuite:                       {ID: CipherSuite, RdfType: "rdf:Property", RdfsLabel: "CipherSuite", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Class:                             {ID: Class, RdfType: "rdf:Property", RdfsLabel: "Class", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Cluster:                           {ID: Cluster, RdfType: "rdf:Property", RdfsLabel: "Cluster", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ClusterEnabled:                    {ID: ClusterEnabled, RdfType: "rdf:Property", RdfsLabel: "ClusterEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	Comment:                           {ID: Comment, RdfType: "rdf:Property", RdfsLabel: "Comment", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Config:                            {ID: Config, RdfType: "rdf:Property", RdfsLabel: "Config", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ContainerInstance:                 {ID: ContainerInstance, RdfType: "rdf:Property", RdfsLabel: "ContainerInstance", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
@@ -647,6 +664,7 @@ var Properties = RDFProperties{
 	MACAddress:                        {ID: MACAddress, RdfType: "rdf:Property", RdfsLabel: "MACAddress", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Main:                              {ID: Main, RdfType: "rdf:Property", RdfsLabel: "Main", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	MaxSize:                           {ID: MaxSize, RdfType: "rdf:Property", RdfsLabel: "MaxSize", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	MemberClusters:                    {ID: MemberClusters, RdfType: "rdf:Property", RdfsLabel: "MemberClusters", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	Memory:                            {ID: Memory, RdfType: "rdf:Property", RdfsLabel: "Memory", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Messages:                          {ID: Messages, RdfType: "rdf:Property", RdfsLabel: "Messages", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	MetricName:                        {ID: MetricName, RdfType: "rdf:Property", RdfsLabel: "MetricName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -659,6 +677,7 @@ var Properties = RDFProperties{
 	Namespace:                         {ID: Namespace, RdfType: "rdf:Property", RdfsLabel: "Namespace", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	NetworkInterfaces:                 {ID: NetworkInterfaces, RdfType: "rdf:Property", RdfsLabel: "NetworkInterfaces", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	NewInstancesProtected:             {ID: NewInstancesProtected, RdfType: "rdf:Property", RdfsLabel: "NewInstancesProtected", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+	NodeCount:                         {ID: NodeCount, RdfType: "rdf:Property", RdfsLabel: "NodeCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Notifications:                     {ID: Notifications, RdfType: "rdf:Property", RdfsLabel: "Notifications", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	OKActions:                         {ID: OKActions, RdfType: "rdf:Property", RdfsLabel: "OKActions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	OptionGroups:                      {ID: OptionGroups, RdfType: "rdf:Property", RdfsLabel: "OptionGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
@@ -694,6 +713,7 @@ var Properties = RDFProperties{
 	Region:                            {ID: Region, RdfType: "rdf:Property", RdfsLabel: "Region", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	RegisteredContainerInstancesCount: {ID: RegisteredContainerInstancesCount, RdfType: "rdf:Property", RdfsLabel: "RegisteredContainerInstancesCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	ReplicaOf:                         {ID: ReplicaOf, RdfType: "rdf:Property", RdfsLabel: "ReplicaOf", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ReplicationGroup:                  {ID: ReplicationGroup, RdfType: "rdf:Property", RdfsLabel: "ReplicationGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Role:                              {ID: Role, RdfType: "rdf:Property", RdfsLabel: "Role", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	Roles:                             {ID: Roles, RdfType: "rdf:Property", RdfsLabel: "Roles", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	RootDevice:                        {ID: RootDevice, RdfType: "rdf:Property", RdfsLabel: "RootDevice", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -718,6 +738,7 @@ var Properties = RDFProperties{
 	Storage:                           {ID: Storage, RdfType: "rdf:Property", RdfsLabel: "Storage", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	StorageType:                       {ID: StorageType, RdfType: "rdf:Property", RdfsLabel: "StorageType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Subnet:                            {ID: Subnet, RdfType: "rdf:Property", RdfsLabel: "Subnet", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	SubnetGroup:                       {ID: SubnetGroup, RdfType: "rdf:Property", RdfsLabel: "SubnetGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Subnets:                           {ID: Subnets, RdfType: "rdf:Property", RdfsLabel: "Subnets", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	Tags:                              {ID: Tags, RdfType: "rdf:Property", RdfsLabel: "Tags", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	TargetGroups:                      {ID: TargetGroups, RdfType: "rdf:Property", RdfsLabel: "TargetGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},

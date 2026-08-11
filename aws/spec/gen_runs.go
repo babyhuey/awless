@@ -39,6 +39,7 @@ import (
 	ecs "github.com/aws/aws-sdk-go-v2/service/ecs"
 	efs "github.com/aws/aws-sdk-go-v2/service/efs"
 	eks "github.com/aws/aws-sdk-go-v2/service/eks"
+	elasticache "github.com/aws/aws-sdk-go-v2/service/elasticache"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
@@ -2970,6 +2971,162 @@ func (cmd *CreateBucket) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateCachecluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateCachecluster {
+	cmd := new(CreateCachecluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateCachecluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateCachecluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.CreateCacheClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.CreateCacheClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateCacheCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.CreateCacheCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create cachecluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create cachecluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create cachecluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateCachecluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("cachecluster"), nil
+}
+
+func (cmd *CreateCachecluster) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateCachesubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateCachesubnetgroup {
+	cmd := new(CreateCachesubnetgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateCachesubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateCachesubnetgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.CreateCacheSubnetGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.CreateCacheSubnetGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateCacheSubnetGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.CreateCacheSubnetGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create cachesubnetgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create cachesubnetgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create cachesubnetgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateCachesubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("cachesubnetgroup"), nil
+}
+
+func (cmd *CreateCachesubnetgroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateCertificate {
 	cmd := new(CreateCertificate)
 	if len(l) > 0 {
@@ -5282,6 +5439,84 @@ func (cmd *CreateRecord) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *CreateRecord) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateReplicationgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateReplicationgroup {
+	cmd := new(CreateReplicationgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateReplicationgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateReplicationgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.CreateReplicationGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.CreateReplicationGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateReplicationGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.CreateReplicationGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create replicationgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create replicationgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create replicationgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateReplicationgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("replicationgroup"), nil
+}
+
+func (cmd *CreateReplicationgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7769,6 +8004,162 @@ func (cmd *DeleteBucket) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteCachecluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCachecluster {
+	cmd := new(DeleteCachecluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteCachecluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteCachecluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.DeleteCacheClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.DeleteCacheClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteCacheCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.DeleteCacheCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete cachecluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete cachecluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete cachecluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteCachecluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("cachecluster"), nil
+}
+
+func (cmd *DeleteCachecluster) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteCachesubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCachesubnetgroup {
+	cmd := new(DeleteCachesubnetgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteCachesubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteCachesubnetgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.DeleteCacheSubnetGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.DeleteCacheSubnetGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteCacheSubnetGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.DeleteCacheSubnetGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete cachesubnetgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete cachesubnetgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete cachesubnetgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteCachesubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("cachesubnetgroup"), nil
+}
+
+func (cmd *DeleteCachesubnetgroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteCertificate(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCertificate {
 	cmd := new(DeleteCertificate)
 	if len(l) > 0 {
@@ -10187,6 +10578,84 @@ func (cmd *DeleteRecord) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *DeleteRecord) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteReplicationgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteReplicationgroup {
+	cmd := new(DeleteReplicationgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteReplicationgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteReplicationgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.DeleteReplicationGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.DeleteReplicationGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteReplicationGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.DeleteReplicationGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete replicationgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete replicationgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete replicationgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteReplicationgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("replicationgroup"), nil
+}
+
+func (cmd *DeleteReplicationgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14433,6 +14902,162 @@ func (cmd *UpdateBucket) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *UpdateBucket) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateCachecluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateCachecluster {
+	cmd := new(UpdateCachecluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateCachecluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateCachecluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.ModifyCacheClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.ModifyCacheClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.ModifyCacheCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.ModifyCacheCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update cachecluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update cachecluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update cachecluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateCachecluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("cachecluster"), nil
+}
+
+func (cmd *UpdateCachecluster) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateCachesubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateCachesubnetgroup {
+	cmd := new(UpdateCachesubnetgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticache.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateCachesubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateCachesubnetgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticache.ModifyCacheSubnetGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticache.ModifyCacheSubnetGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.ModifyCacheSubnetGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticache.ModifyCacheSubnetGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update cachesubnetgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update cachesubnetgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update cachesubnetgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateCachesubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("cachesubnetgroup"), nil
+}
+
+func (cmd *UpdateCachesubnetgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

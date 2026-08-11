@@ -18,6 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
+	"github.com/aws/aws-sdk-go-v2/service/elasticache"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -64,6 +65,7 @@ type AWSAPI struct {
 	EFS                    *efs.Client
 	Cloudtrail             *cloudtrail.Client
 	Cloudwatchlogs         *cloudwatchlogs.Client
+	Elasticache            *elasticache.Client
 }
 
 type Config struct {

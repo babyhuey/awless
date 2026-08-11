@@ -126,6 +126,18 @@ func (s *Template) Revert() (*Template, error) {
 					params = append(params, fmt.Sprintf("bucket=%s", printItem(cmd.ParamNodes["bucket"])))
 				case "role", "group", "user", "stack", "instanceprofile", "repository", "classicloadbalancer":
 					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
+				// These delete commands accept only `name`, so the id= default below
+				// produced a revert that failed validation with "unexpected param id".
+				// Taken from the create's own param rather than from the command result,
+				// which is not populated for every one of them.
+				case "cachesubnetgroup", "dynamodbtable", "ekscluster", "loggroup", "ssmparameter", "trail":
+					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
+				case "eksnodegroup":
+					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
+					params = append(params, fmt.Sprintf("cluster=%s", printItem(cmd.ParamNodes["cluster"])))
+				case "apigatewaystage":
+					params = append(params, fmt.Sprintf("api=%s", printItem(cmd.ParamNodes["api"])))
+					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
 				case "accesskey":
 					params = append(params, fmt.Sprintf("id=%s", quoteParamIfNeeded(cmd.CmdResult)))
 					params = append(params, fmt.Sprintf("user=%s", printItem(cmd.ParamNodes["user"])))

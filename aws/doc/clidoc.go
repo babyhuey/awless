@@ -177,6 +177,34 @@ var cliExamplesDoc = map[string][]string{
 	"update.loggroup": {
 		"awless update loggroup name=/aws/lambda/my-function retention=30",
 	},
+	"create.cachecluster": {
+		"awless create cachecluster id=sessions engine=redis type=cache.t3.micro nodes=1",
+		"awless create cachecluster id=sessions engine=redis type=cache.t3.micro nodes=1 subnet-group=cache-private port=6379",
+		"awless create cachecluster id=sessions-replica-1 replication-group=sessions-group",
+	},
+	"delete.cachecluster": {
+		"awless delete cachecluster id=sessions",
+		"awless delete cachecluster id=sessions snapshot=sessions-final",
+	},
+	"update.cachecluster": {
+		"awless update cachecluster id=sessions nodes=3 apply-immediately=true",
+		"awless update cachecluster id=sessions type=cache.t3.small",
+	},
+	"create.cachesubnetgroup": {
+		"awless create cachesubnetgroup name=cache-private subnets=subnet-1234,subnet-5678 description=\"Private cache subnets\"",
+	},
+	"delete.cachesubnetgroup": {"awless delete cachesubnetgroup name=cache-private"},
+	"update.cachesubnetgroup": {
+		"awless update cachesubnetgroup name=cache-private subnets=subnet-1234,subnet-5678,subnet-9abc",
+	},
+	"create.replicationgroup": {
+		"awless create replicationgroup id=sessions-group description=\"Session cache\" engine=redis type=cache.t3.micro clusters=2",
+		"awless create replicationgroup id=sessions-group description=\"Session cache\" engine=redis type=cache.t3.micro clusters=3 automatic-failover=true multi-az=true",
+	},
+	"delete.replicationgroup": {
+		"awless delete replicationgroup id=sessions-group",
+		"awless delete replicationgroup id=sessions-group retain-primary=true",
+	},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",

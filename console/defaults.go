@@ -86,6 +86,9 @@ var ColumnsInListing = map[string][]string{
 	cloud.MountTarget:         {properties.ID, properties.Subnet, properties.Vpc, properties.IPAddress, properties.LifecycleState},
 	cloud.Trail:               {properties.ID, properties.Name, properties.Arn, properties.IsMultiRegion, properties.S3BucketName, properties.HomeRegion},
 	cloud.LogGroup:            {properties.Name, properties.Arn, properties.RetentionDays, properties.StoredBytes, properties.Created},
+	cloud.CacheCluster:        {properties.ID, properties.State, properties.Engine, properties.CacheNodeType, properties.NodeCount, properties.Zone},
+	cloud.ReplicationGroup:    {properties.ID, properties.State, properties.Description, properties.CacheNodeType, properties.AutomaticFailover, properties.MultiAZ},
+	cloud.CacheSubnetGroup:    {properties.Name, properties.Description, properties.Vpc},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -621,5 +624,34 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.RetentionDays, Friendly: "Retention (days)"},
 		StringColumnDefinition{Prop: properties.StoredBytes, Friendly: "Stored (bytes)"},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	// ElastiCache
+	cloud.CacheCluster: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Engine},
+		StringColumnDefinition{Prop: properties.EngineVersion, Friendly: "Version"},
+		StringColumnDefinition{Prop: properties.CacheNodeType, Friendly: "Node Type"},
+		StringColumnDefinition{Prop: properties.NodeCount, Friendly: "Nodes"},
+		StringColumnDefinition{Prop: properties.Zone},
+		StringColumnDefinition{Prop: properties.ReplicationGroup, Friendly: "Repl. Group"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.ReplicationGroup: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Description},
+		StringColumnDefinition{Prop: properties.Engine},
+		StringColumnDefinition{Prop: properties.CacheNodeType, Friendly: "Node Type"},
+		StringColumnDefinition{Prop: properties.AutomaticFailover, Friendly: "Failover"},
+		StringColumnDefinition{Prop: properties.MultiAZ, Friendly: "Multi-AZ"},
+		StringColumnDefinition{Prop: properties.ClusterEnabled, Friendly: "Cluster Mode"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.CacheSubnetGroup: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Description},
+		StringColumnDefinition{Prop: properties.Vpc},
+		StringColumnDefinition{Prop: properties.Arn},
 	},
 }

@@ -1186,3 +1186,6 @@ func addManualEFSFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 
 func addManualCloudwatchlogsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
+
+func addManualElasticacheFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

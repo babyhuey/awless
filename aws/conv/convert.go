@@ -46,6 +46,7 @@ import (
 	ecstypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
 	ekstypes "github.com/aws/aws-sdk-go-v2/service/eks/types"
+	elasticachetypes "github.com/aws/aws-sdk-go-v2/service/elasticache/types"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
@@ -221,6 +222,13 @@ func InitResource(source any) (*graph.Resource, error) {
 	// CloudWatch Logs
 	case cloudwatchlogstypes.LogGroup:
 		res = graph.InitResource(cloud.LogGroup, awssdk.ToString(ss.LogGroupName))
+	// ElastiCache
+	case elasticachetypes.CacheCluster:
+		res = graph.InitResource(cloud.CacheCluster, awssdk.ToString(ss.CacheClusterId))
+	case elasticachetypes.ReplicationGroup:
+		res = graph.InitResource(cloud.ReplicationGroup, awssdk.ToString(ss.ReplicationGroupId))
+	case elasticachetypes.CacheSubnetGroup:
+		res = graph.InitResource(cloud.CacheSubnetGroup, awssdk.ToString(ss.CacheSubnetGroupName))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

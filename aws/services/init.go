@@ -29,6 +29,7 @@ import (
 var (
 	AccessService, InfraService, StorageService, MessagingService, DNSService, LambdaService, MonitoringService, CdnService, CloudformationService cloud.Service
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService        cloud.Service
+	ElasticacheService                                                                                                                             cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]any, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -61,6 +62,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	EfsService = NewEFS(cfg, profile, extraConf, log)
 	CloudtrailService = NewCloudtrail(cfg, profile, extraConf, log)
 	CloudwatchlogsService = NewCloudwatchlogs(cfg, profile, extraConf, log)
+	ElasticacheService = NewElasticache(cfg, profile, extraConf, log)
 
 	cloud.ServiceRegistry[InfraService.Name()] = InfraService
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
@@ -79,6 +81,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	cloud.ServiceRegistry[EfsService.Name()] = EfsService
 	cloud.ServiceRegistry[CloudtrailService.Name()] = CloudtrailService
 	cloud.ServiceRegistry[CloudwatchlogsService.Name()] = CloudwatchlogsService
+	cloud.ServiceRegistry[ElasticacheService.Name()] = ElasticacheService
 
 	awsspec.CommandFactory = &awsspec.AWSFactory{
 		Log: log,

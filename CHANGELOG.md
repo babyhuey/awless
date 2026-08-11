@@ -1,6 +1,20 @@
 ## Unreleased
 
+### Added
+
+- **ElastiCache.** Cache clusters, replication groups and cache subnet groups, with
+  `list`, and eight create/update/delete commands. `awless ls cacheclusters`,
+  `awless create replicationgroup id=sessions description=Sessions engine=redis
+  type=cache.t3.micro clusters=3 automatic-failover=true`, and so on.
+
 ### Fixed
+
+- **`awless revert` produced an invalid template for eight resources.** The revert builder
+  falls back to `id=<result>`, but `apigatewaystage`, `dynamodbtable`, `ekscluster`,
+  `eksnodegroup`, `loggroup`, `ssmparameter` and `trail` all have a `delete` command that
+  accepts only `name`, so reverting their creation failed with `unexpected param id`. Seven
+  of the eight shipped in earlier releases; the failure only surfaced when a revert was
+  actually run.
 
 - **Interactive prompts spun forever on a closed or piped stdin.** `awless config set
   <key>` and the instance-type selector both looped on `fmt.Scan` while discarding its
