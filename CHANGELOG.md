@@ -1,3 +1,25 @@
+## v1.1.1
+
+### Added
+
+- **Homebrew.** `brew install --cask bootswithdefer/tap/awless`, published to
+  [bootswithdefer/homebrew-tap](https://github.com/bootswithdefer/homebrew-tap) by the
+  release pipeline.
+
+  A cask rather than a formula because it ships the pre-built binary; Homebrew reserves
+  formulae for software built from source. Upgrade with `brew upgrade --cask awless`.
+
+  The cask clears the macOS quarantine attribute on install, without which Gatekeeper
+  blocks the first run of a downloaded binary with no useful explanation.
+
+### Fixed
+
+- **The update check told Homebrew users to download a tarball by hand.**
+  `config.BuildFor` is fixed at build time, and the cask and the tarballs are cut from the
+  same artifacts, so it could not tell them apart — the `brew` branch of the upgrade hint
+  was unreachable. The binary now checks whether it is running from inside a Homebrew
+  prefix and suggests `brew upgrade awless` when it is.
+
 ## v1.1.0
 
 First release of this fork. Everything below is relative to upstream
