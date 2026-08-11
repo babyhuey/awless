@@ -49,7 +49,14 @@ func ResolveRegionFromEnv() (region string) {
 	}
 
 	if !awsconfig.IsValidRegion(region) {
-		region = awsconfig.StdinRegionSelector()
+		// Resolution is best-effort and the signature has no error to return, so an
+		// aborted prompt leaves region empty for the caller to reject.
+		selected, err := awsconfig.StdinRegionSelector()
+		if err != nil {
+			fmt.Fprintln(os.Stderr)
+			return ""
+		}
+		region = selected
 		fmt.Println()
 	}
 

@@ -33,6 +33,21 @@ type Client struct {
 	StrictHostKeyChecking   bool
 	InteractiveTerminalFunc func(*gossh.Client) error
 	logger                  *logger.Logger
+
+	// dialFunc establishes the SSH connection. Nil everywhere in production, where
+	// dialer() falls back to gossh.Dial; tests substitute it to exercise the
+	// username-iteration and partial-failure paths without a network.
+	dialFunc func(network, addr string, config *gossh.ClientConfig) (*gossh.Client, error)
+}
+
+// dialer returns the configured dial function, defaulting to the real one. Written as
+// a fallback rather than initialized in InitClient so that a zero-value Client — which
+// several tests and callers build directly — still dials for real.
+func (c *Client) dialer() func(string, string, *gossh.ClientConfig) (*gossh.Client, error) {
+	if c.dialFunc != nil {
+		return c.dialFunc
+	}
+	return gossh.Dial
 }
 
 func InitClient(ctx context.Context, keyname string, keyFolders ...string) (*Client, error) {
@@ -80,13 +95,20 @@ func (c *Client) DialWithUsers(usernames ...string) error {
 
 	hostport := fmt.Sprintf("%s:%d", c.IP, c.Port)
 
+	if len(usernames) == 0 {
+		// Reported separately because the loop below would leave err nil, and
+		// wrapping a nil error renders as "%!w(<nil>)".
+		return fmt.Errorf("unable to authenticate to %s: no username given", hostport)
+	}
+
+	dial := c.dialer()
 	for _, user := range usernames {
 		newConfig := *c.Config
 		newConfig.User = user
 		if !c.StrictHostKeyChecking {
 			newConfig.HostKeyCallback = gossh.InsecureIgnoreHostKey()
 		}
-		client, err = gossh.Dial("tcp", hostport, &newConfig)
+		client, err = dial("tcp", hostport, &newConfig)
 		if err != nil {
 			continue
 		} else {

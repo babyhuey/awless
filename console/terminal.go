@@ -26,8 +26,14 @@ import (
 	"golang.org/x/term"
 )
 
+// termGetSize looks up the terminal dimensions. Replaceable in tests, where stdout is
+// a pipe rather than a tty and the real call fails.
+var termGetSize = func() (width, height int, err error) {
+	return term.GetSize(int(os.Stdout.Fd()))
+}
+
 func GetTerminalWidth() int {
-	w, _, err := term.GetSize(int(os.Stdout.Fd()))
+	w, _, err := termGetSize()
 	if err != nil {
 		return 0
 	}
@@ -35,11 +41,31 @@ func GetTerminalWidth() int {
 }
 
 func GetTerminalHeight() int {
-	_, h, err := term.GetSize(int(os.Stdout.Fd()))
+	_, h, err := termGetSize()
 	if err != nil {
 		return 0
 	}
 	return h
+}
+
+// defaultPtyDimension is used when the real terminal size is unavailable, which is the
+// case whenever stdout is redirected.
+const defaultPtyDimension = 100
+
+// ptySize resolves the dimensions to request for a remote pty, substituting a default
+// for either axis the terminal could not report. Split out from InteractiveTerminal so
+// the fallback is reachable without a live SSH session; a zero slipping through here
+// would ask the remote for a 0x0 terminal.
+func ptySize() (width, height int) {
+	width = GetTerminalWidth()
+	if width == 0 {
+		width = defaultPtyDimension
+	}
+	height = GetTerminalHeight()
+	if height == 0 {
+		height = defaultPtyDimension
+	}
+	return width, height
 }
 
 func InteractiveTerminal(client *ssh.Client) error {
@@ -77,14 +103,7 @@ func InteractiveTerminal(client *ssh.Client) error {
 	}
 
 	// Request pseudo terminal
-	width := GetTerminalWidth()
-	if width == 0 {
-		width = 100
-	}
-	height := GetTerminalHeight()
-	if height == 0 {
-		height = 100
-	}
+	width, height := ptySize()
 	if err := session.RequestPty("xterm", height, width, modes); err != nil {
 		return err
 	}

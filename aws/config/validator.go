@@ -1,6 +1,7 @@
 package awsconfig
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -39,7 +40,25 @@ func ParseInstanceType(i string) (any, error) {
 	return i, nil
 }
 
-func StdinRegionSelector() string {
+// ErrPromptAborted means the user ended an interactive prompt with Ctrl-C or EOF, or
+// that stdin was never interactive. Callers should treat it as a deliberate abort and
+// stop rather than re-prompt: a non-interactive stdin returns EOF immediately, so
+// retrying spins.
+var ErrPromptAborted = errors.New("prompt aborted")
+
+// promptStdin is the source the interactive selectors read from. Nil in production,
+// where readline and the scanners fall back to os.Stdin; tests set it to drive the
+// prompts without a terminal.
+var promptStdin io.ReadCloser
+
+func promptReader() io.Reader {
+	if promptStdin != nil {
+		return promptStdin
+	}
+	return os.Stdin
+}
+
+func StdinRegionSelector() (string, error) {
 	var regionItems []readline.PrefixCompleterInterface
 	for _, r := range allRegions() {
 		regionItems = append(regionItems, readline.PcItem(r))
@@ -51,28 +70,23 @@ func StdinRegionSelector() string {
 	rl, err := readline.NewEx(&readline.Config{
 		Prompt:       "> ",
 		AutoComplete: regionCompleter,
+		Stdin:        promptStdin,
 	})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error while selecting region: %s", err)
-		return ""
+		return "", fmt.Errorf("selecting region: %w", err)
 	}
 	defer rl.Close()
 
 	for !IsValidRegion(region) {
 		line, err := rl.Readline()
-		if errors.Is(err, readline.ErrInterrupt) || errors.Is(err, io.EOF) {
-			// Ctrl-C or EOF while choosing a region aborts awless.
-			//
-			// One of two os.Exit calls left outside main. It cannot return an error
-			// instead: this is registered as a stdinParamProviderFn in
-			// config.configDefinitions, whose signature is func() string, so there is
-			// no error to return. Closing explicitly first because os.Exit skips the
-			// deferred rl.Close(), which would leave the terminal in raw mode.
-			_ = rl.Close()
-			os.Exit(1)
-		} else if err != nil {
-			fmt.Fprintf(os.Stderr, "error while selecting region: %s", err)
-			return ""
+		switch {
+		case errors.Is(err, readline.ErrInterrupt), errors.Is(err, io.EOF):
+			// Ctrl-C or EOF while choosing a region aborts. This used to be one of
+			// two os.Exit calls left outside main, because the enclosing signature
+			// had no error to return; it now does.
+			return "", ErrPromptAborted
+		case err != nil:
+			return "", fmt.Errorf("selecting region: %w", err)
 		}
 
 		region = strings.TrimSpace(line)
@@ -81,15 +95,14 @@ func StdinRegionSelector() string {
 		}
 	}
 
-	return region
+	return region, nil
 }
 
-func StdinInstanceTypeSelector() string {
+func StdinInstanceTypeSelector() (string, error) {
 	fmt.Println("Please choose one instance type")
 	fmt.Println()
 	fmt.Println("Here are few examples:")
 
-	var instanceType string
 	t := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
 	fmt.Fprintln(t, "\tinstance type\tvCPU\tMemory (GiB)")
 	fmt.Fprintln(t, "\tt2.nano\t1\t0.5")
@@ -107,14 +120,25 @@ func StdinInstanceTypeSelector() string {
 	t.Flush()
 
 	fmt.Println()
-	fmt.Print("Value ? > ")
-	_, _ = fmt.Scan(&instanceType)
-	for !isValidInstanceType(instanceType) {
-		fmt.Printf("'%s' is not a valid instance type\n", instanceType)
+
+	// Read with a scanner rather than fmt.Scan. fmt.Scan returns its error without
+	// assigning, so the previous `for !isValid(...)` loop spun at full speed forever
+	// on a closed or piped stdin instead of giving up.
+	scanner := bufio.NewScanner(promptReader())
+	for {
 		fmt.Print("Value ? > ")
-		_, _ = fmt.Scan(&instanceType)
+		if !scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				return "", fmt.Errorf("selecting instance type: %w", err)
+			}
+			return "", ErrPromptAborted
+		}
+		instanceType := strings.TrimSpace(scanner.Text())
+		if isValidInstanceType(instanceType) {
+			return instanceType, nil
+		}
+		fmt.Printf("'%s' is not a valid instance type\n", instanceType)
 	}
-	return instanceType
 }
 
 func IsValidRegion(given string) bool {

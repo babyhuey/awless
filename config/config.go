@@ -1,8 +1,10 @@
 package config
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -75,7 +77,7 @@ type onUpdateFunc func(any)
 type Definition struct {
 	help                 string
 	parseParamFn         func(string) (any, error)
-	stdinParamProviderFn func() string
+	stdinParamProviderFn func() (string, error)
 	onUpdateFns          []onUpdateFunc
 	defaultValue         string
 }
@@ -189,13 +191,15 @@ func SetVolatile(key, value string) error {
 }
 
 func InteractiveSet(key string) error {
-	var val string
+	provider := defaultStdinParamProvider
 	if def, ok := configDefinitions[key]; ok && def.stdinParamProviderFn != nil {
-		val = def.stdinParamProviderFn()
+		provider = def.stdinParamProviderFn
 	} else if def, ok := defaultsDefinitions[key]; ok && def.stdinParamProviderFn != nil {
-		val = def.stdinParamProviderFn()
-	} else {
-		val = defaultStdinParamProvider()
+		provider = def.stdinParamProviderFn
+	}
+	val, err := provider()
+	if err != nil {
+		return err
 	}
 	return Set(key, val)
 }
@@ -231,13 +235,23 @@ func parseDistroQuery(v string) (any, error) {
 	return v, err
 }
 
-func defaultStdinParamProvider() string {
-	var value string
-	for value == "" {
+func defaultStdinParamProvider() (string, error) {
+	// Read with a scanner rather than fmt.Scan. fmt.Scan returns its error without
+	// assigning, so the previous `for value == ""` loop spun at full speed forever on
+	// a closed or piped stdin instead of giving up.
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
 		fmt.Print("Value ? > ")
-		_, _ = fmt.Scan(&value)
+		if !scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				return "", fmt.Errorf("reading value: %w", err)
+			}
+			return "", awsconfig.ErrPromptAborted
+		}
+		if value := strings.TrimSpace(scanner.Text()); value != "" {
+			return value, nil
+		}
 	}
-	return value
 }
 
 func setVolatile(key, value string) (any, *Definition, bool, error) {
