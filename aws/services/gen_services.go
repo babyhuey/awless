@@ -142,6 +142,10 @@ var ServiceNames = []string{
 }
 
 var ResourceTypes = []string{
+	"transitgateway",
+	"transitgatewayattachment",
+	"transitgatewayroutetable",
+	"vpcendpoint",
 	"instance",
 	"subnet",
 	"vpc",
@@ -265,167 +269,175 @@ var ServicePerAPI = map[string]string{
 }
 
 var ServicePerResourceType = map[string]string{
-	"instance":            "infra",
-	"subnet":              "infra",
-	"vpc":                 "infra",
-	"keypair":             "infra",
-	"securitygroup":       "infra",
-	"volume":              "infra",
-	"internetgateway":     "infra",
-	"natgateway":          "infra",
-	"routetable":          "infra",
-	"availabilityzone":    "infra",
-	"image":               "infra",
-	"importimagetask":     "infra",
-	"elasticip":           "infra",
-	"snapshot":            "infra",
-	"networkinterface":    "infra",
-	"classicloadbalancer": "infra",
-	"loadbalancer":        "infra",
-	"targetgroup":         "infra",
-	"listener":            "infra",
-	"database":            "infra",
-	"dbsubnetgroup":       "infra",
-	"launchconfiguration": "infra",
-	"scalinggroup":        "infra",
-	"scalingpolicy":       "infra",
-	"repository":          "infra",
-	"containercluster":    "infra",
-	"containertask":       "infra",
-	"container":           "infra",
-	"containerinstance":   "infra",
-	"certificate":         "infra",
-	"user":                "access",
-	"group":               "access",
-	"role":                "access",
-	"policy":              "access",
-	"accesskey":           "access",
-	"instanceprofile":     "access",
-	"mfadevice":           "access",
-	"bucket":              "storage",
-	"s3object":            "storage",
-	"subscription":        "messaging",
-	"topic":               "messaging",
-	"queue":               "messaging",
-	"zone":                "dns",
-	"record":              "dns",
-	"function":            "lambda",
-	"metric":              "monitoring",
-	"alarm":               "monitoring",
-	"distribution":        "cdn",
-	"stack":               "cloudformation",
-	"ekscluster":          "eks",
-	"eksnodegroup":        "eks",
-	"dynamodbtable":       "dynamodb",
-	"secret":              "secretsmanager",
-	"key":                 "secretsmanager",
-	"apigateway":          "apigateway",
-	"apigatewayroute":     "apigateway",
-	"apigatewaystage":     "apigateway",
-	"ssmparameter":        "ssm",
-	"filesystem":          "efs",
-	"mounttarget":         "efs",
-	"trail":               "cloudtrail",
-	"loggroup":            "cloudwatchlogs",
-	"cachecluster":        "elasticache",
-	"replicationgroup":    "elasticache",
-	"cachesubnetgroup":    "elasticache",
-	"eventbus":            "eventbridge",
-	"eventrule":           "eventbridge",
-	"statemachine":        "stepfunctions",
-	"webacl":              "waf",
-	"ipset":               "waf",
-	"rulegroup":           "waf",
-	"configrule":          "configservice",
-	"stream":              "kinesis",
-	"redshiftcluster":     "redshift",
-	"redshiftsubnetgroup": "redshift",
-	"pipeline":            "codepipeline",
-	"buildproject":        "codebuild",
-	"application":         "beanstalk",
-	"environment":         "beanstalk",
+	"transitgateway":           "infra",
+	"transitgatewayattachment": "infra",
+	"transitgatewayroutetable": "infra",
+	"vpcendpoint":              "infra",
+	"instance":                 "infra",
+	"subnet":                   "infra",
+	"vpc":                      "infra",
+	"keypair":                  "infra",
+	"securitygroup":            "infra",
+	"volume":                   "infra",
+	"internetgateway":          "infra",
+	"natgateway":               "infra",
+	"routetable":               "infra",
+	"availabilityzone":         "infra",
+	"image":                    "infra",
+	"importimagetask":          "infra",
+	"elasticip":                "infra",
+	"snapshot":                 "infra",
+	"networkinterface":         "infra",
+	"classicloadbalancer":      "infra",
+	"loadbalancer":             "infra",
+	"targetgroup":              "infra",
+	"listener":                 "infra",
+	"database":                 "infra",
+	"dbsubnetgroup":            "infra",
+	"launchconfiguration":      "infra",
+	"scalinggroup":             "infra",
+	"scalingpolicy":            "infra",
+	"repository":               "infra",
+	"containercluster":         "infra",
+	"containertask":            "infra",
+	"container":                "infra",
+	"containerinstance":        "infra",
+	"certificate":              "infra",
+	"user":                     "access",
+	"group":                    "access",
+	"role":                     "access",
+	"policy":                   "access",
+	"accesskey":                "access",
+	"instanceprofile":          "access",
+	"mfadevice":                "access",
+	"bucket":                   "storage",
+	"s3object":                 "storage",
+	"subscription":             "messaging",
+	"topic":                    "messaging",
+	"queue":                    "messaging",
+	"zone":                     "dns",
+	"record":                   "dns",
+	"function":                 "lambda",
+	"metric":                   "monitoring",
+	"alarm":                    "monitoring",
+	"distribution":             "cdn",
+	"stack":                    "cloudformation",
+	"ekscluster":               "eks",
+	"eksnodegroup":             "eks",
+	"dynamodbtable":            "dynamodb",
+	"secret":                   "secretsmanager",
+	"key":                      "secretsmanager",
+	"apigateway":               "apigateway",
+	"apigatewayroute":          "apigateway",
+	"apigatewaystage":          "apigateway",
+	"ssmparameter":             "ssm",
+	"filesystem":               "efs",
+	"mounttarget":              "efs",
+	"trail":                    "cloudtrail",
+	"loggroup":                 "cloudwatchlogs",
+	"cachecluster":             "elasticache",
+	"replicationgroup":         "elasticache",
+	"cachesubnetgroup":         "elasticache",
+	"eventbus":                 "eventbridge",
+	"eventrule":                "eventbridge",
+	"statemachine":             "stepfunctions",
+	"webacl":                   "waf",
+	"ipset":                    "waf",
+	"rulegroup":                "waf",
+	"configrule":               "configservice",
+	"stream":                   "kinesis",
+	"redshiftcluster":          "redshift",
+	"redshiftsubnetgroup":      "redshift",
+	"pipeline":                 "codepipeline",
+	"buildproject":             "codebuild",
+	"application":              "beanstalk",
+	"environment":              "beanstalk",
 }
 
 var APIPerResourceType = map[string]string{
-	"instance":            "ec2",
-	"subnet":              "ec2",
-	"vpc":                 "ec2",
-	"keypair":             "ec2",
-	"securitygroup":       "ec2",
-	"volume":              "ec2",
-	"internetgateway":     "ec2",
-	"natgateway":          "ec2",
-	"routetable":          "ec2",
-	"availabilityzone":    "ec2",
-	"image":               "ec2",
-	"importimagetask":     "ec2",
-	"elasticip":           "ec2",
-	"snapshot":            "ec2",
-	"networkinterface":    "ec2",
-	"classicloadbalancer": "elb",
-	"loadbalancer":        "elbv2",
-	"targetgroup":         "elbv2",
-	"listener":            "elbv2",
-	"database":            "rds",
-	"dbsubnetgroup":       "rds",
-	"launchconfiguration": "autoscaling",
-	"scalinggroup":        "autoscaling",
-	"scalingpolicy":       "autoscaling",
-	"repository":          "ecr",
-	"containercluster":    "ecs",
-	"containertask":       "ecs",
-	"container":           "ecs",
-	"containerinstance":   "ecs",
-	"certificate":         "acm",
-	"user":                "iam",
-	"group":               "iam",
-	"role":                "iam",
-	"policy":              "iam",
-	"accesskey":           "iam",
-	"instanceprofile":     "iam",
-	"mfadevice":           "iam",
-	"bucket":              "s3",
-	"s3object":            "s3",
-	"subscription":        "sns",
-	"topic":               "sns",
-	"queue":               "sqs",
-	"zone":                "route53",
-	"record":              "route53",
-	"function":            "lambda",
-	"metric":              "cloudwatch",
-	"alarm":               "cloudwatch",
-	"distribution":        "cloudfront",
-	"stack":               "cloudformation",
-	"ekscluster":          "eks",
-	"eksnodegroup":        "eks",
-	"dynamodbtable":       "dynamodb",
-	"secret":              "secretsmanager",
-	"key":                 "kms",
-	"apigateway":          "apigatewayv2",
-	"apigatewayroute":     "apigatewayv2",
-	"apigatewaystage":     "apigatewayv2",
-	"ssmparameter":        "ssm",
-	"filesystem":          "efs",
-	"mounttarget":         "efs",
-	"trail":               "cloudtrail",
-	"loggroup":            "cloudwatchlogs",
-	"cachecluster":        "elasticache",
-	"replicationgroup":    "elasticache",
-	"cachesubnetgroup":    "elasticache",
-	"eventbus":            "eventbridge",
-	"eventrule":           "eventbridge",
-	"statemachine":        "sfn",
-	"webacl":              "wafv2",
-	"ipset":               "wafv2",
-	"rulegroup":           "wafv2",
-	"configrule":          "configservice",
-	"stream":              "kinesis",
-	"redshiftcluster":     "redshift",
-	"redshiftsubnetgroup": "redshift",
-	"pipeline":            "codepipeline",
-	"buildproject":        "codebuild",
-	"application":         "elasticbeanstalk",
-	"environment":         "elasticbeanstalk",
+	"transitgateway":           "ec2",
+	"transitgatewayattachment": "ec2",
+	"transitgatewayroutetable": "ec2",
+	"vpcendpoint":              "ec2",
+	"instance":                 "ec2",
+	"subnet":                   "ec2",
+	"vpc":                      "ec2",
+	"keypair":                  "ec2",
+	"securitygroup":            "ec2",
+	"volume":                   "ec2",
+	"internetgateway":          "ec2",
+	"natgateway":               "ec2",
+	"routetable":               "ec2",
+	"availabilityzone":         "ec2",
+	"image":                    "ec2",
+	"importimagetask":          "ec2",
+	"elasticip":                "ec2",
+	"snapshot":                 "ec2",
+	"networkinterface":         "ec2",
+	"classicloadbalancer":      "elb",
+	"loadbalancer":             "elbv2",
+	"targetgroup":              "elbv2",
+	"listener":                 "elbv2",
+	"database":                 "rds",
+	"dbsubnetgroup":            "rds",
+	"launchconfiguration":      "autoscaling",
+	"scalinggroup":             "autoscaling",
+	"scalingpolicy":            "autoscaling",
+	"repository":               "ecr",
+	"containercluster":         "ecs",
+	"containertask":            "ecs",
+	"container":                "ecs",
+	"containerinstance":        "ecs",
+	"certificate":              "acm",
+	"user":                     "iam",
+	"group":                    "iam",
+	"role":                     "iam",
+	"policy":                   "iam",
+	"accesskey":                "iam",
+	"instanceprofile":          "iam",
+	"mfadevice":                "iam",
+	"bucket":                   "s3",
+	"s3object":                 "s3",
+	"subscription":             "sns",
+	"topic":                    "sns",
+	"queue":                    "sqs",
+	"zone":                     "route53",
+	"record":                   "route53",
+	"function":                 "lambda",
+	"metric":                   "cloudwatch",
+	"alarm":                    "cloudwatch",
+	"distribution":             "cloudfront",
+	"stack":                    "cloudformation",
+	"ekscluster":               "eks",
+	"eksnodegroup":             "eks",
+	"dynamodbtable":            "dynamodb",
+	"secret":                   "secretsmanager",
+	"key":                      "kms",
+	"apigateway":               "apigatewayv2",
+	"apigatewayroute":          "apigatewayv2",
+	"apigatewaystage":          "apigatewayv2",
+	"ssmparameter":             "ssm",
+	"filesystem":               "efs",
+	"mounttarget":              "efs",
+	"trail":                    "cloudtrail",
+	"loggroup":                 "cloudwatchlogs",
+	"cachecluster":             "elasticache",
+	"replicationgroup":         "elasticache",
+	"cachesubnetgroup":         "elasticache",
+	"eventbus":                 "eventbridge",
+	"eventrule":                "eventbridge",
+	"statemachine":             "sfn",
+	"webacl":                   "wafv2",
+	"ipset":                    "wafv2",
+	"rulegroup":                "wafv2",
+	"configrule":               "configservice",
+	"stream":                   "kinesis",
+	"redshiftcluster":          "redshift",
+	"redshiftsubnetgroup":      "redshift",
+	"pipeline":                 "codepipeline",
+	"buildproject":             "codebuild",
+	"application":              "elasticbeanstalk",
+	"environment":              "elasticbeanstalk",
 }
 
 type Infra struct {
@@ -502,6 +514,10 @@ func (s *Infra) Profile() string {
 
 func (s *Infra) ResourceTypes() []string {
 	return []string{
+		"transitgateway",
+		"transitgatewayattachment",
+		"transitgatewayroutetable",
+		"vpcendpoint",
 		"instance",
 		"subnet",
 		"vpc",
@@ -567,6 +583,94 @@ func (s *Infra) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
 
 	errc := make(chan error)
 	var wg sync.WaitGroup
+	if getBool(s.config, "aws.infra.transitgateway.sync", true) {
+		list, err := s.fetcher.Get("transitgateway_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]ec2types.TransitGateway); !ok {
+			return gph, errors.New("cannot cast to '[]ec2types.TransitGateway' type from fetch context")
+		}
+		for _, r := range list.([]ec2types.TransitGateway) {
+			for _, fn := range addParentsFns["transitgateway"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *ec2types.TransitGateway) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.infra.transitgatewayattachment.sync", true) {
+		list, err := s.fetcher.Get("transitgatewayattachment_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]ec2types.TransitGatewayVpcAttachment); !ok {
+			return gph, errors.New("cannot cast to '[]ec2types.TransitGatewayVpcAttachment' type from fetch context")
+		}
+		for _, r := range list.([]ec2types.TransitGatewayVpcAttachment) {
+			for _, fn := range addParentsFns["transitgatewayattachment"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *ec2types.TransitGatewayVpcAttachment) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.infra.transitgatewayroutetable.sync", true) {
+		list, err := s.fetcher.Get("transitgatewayroutetable_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]ec2types.TransitGatewayRouteTable); !ok {
+			return gph, errors.New("cannot cast to '[]ec2types.TransitGatewayRouteTable' type from fetch context")
+		}
+		for _, r := range list.([]ec2types.TransitGatewayRouteTable) {
+			for _, fn := range addParentsFns["transitgatewayroutetable"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *ec2types.TransitGatewayRouteTable) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.infra.vpcendpoint.sync", true) {
+		list, err := s.fetcher.Get("vpcendpoint_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]ec2types.VpcEndpoint); !ok {
+			return gph, errors.New("cannot cast to '[]ec2types.VpcEndpoint' type from fetch context")
+		}
+		for _, r := range list.([]ec2types.VpcEndpoint) {
+			for _, fn := range addParentsFns["vpcendpoint"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *ec2types.VpcEndpoint) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
 	if getBool(s.config, "aws.infra.instance.sync", true) {
 		list, err := s.fetcher.Get("instance_objects")
 		if err != nil {

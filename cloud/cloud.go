@@ -146,6 +146,11 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//transit gateway and vpc endpoints (both on the EC2 API)
+	TransitGateway           string = "transitgateway"
+	TransitGatewayAttachment string = "transitgatewayattachment"
+	TransitGatewayRouteTable string = "transitgatewayroutetable"
+	VpcEndpoint              string = "vpcendpoint"
 )
 
 type Service interface {

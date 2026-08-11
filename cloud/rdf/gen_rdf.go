@@ -220,6 +220,7 @@ const (
 	Scope                             = "cloud:scope"
 	SecondaryAvailabilityZone         = "cloud:secondaryAvailabilityZone"
 	SecurityGroups                    = "cloud:securityGroups"
+	ServiceName                       = "cloud:serviceName"
 	Set                               = "cloud:set"
 	ShardCount                        = "cloud:shardCount"
 	Size                              = "cloud:size"
@@ -245,6 +246,7 @@ const (
 	TLSVersionRequired                = "cloud:tlsVersionRequired"
 	Topic                             = "cloud:topic"
 	TrafficPolicyInstance             = "cloud:trafficPolicyInstance"
+	TransitGateway                    = "cloud:transitGateway"
 	TrustPolicy                       = "cloud:trustPolicy"
 	TTL                               = "cloud:ttl"
 	Type                              = "cloud:type"
@@ -508,6 +510,7 @@ func init() {
 		properties.Scope:                             Scope,
 		properties.SecondaryAvailabilityZone:         SecondaryAvailabilityZone,
 		properties.SecurityGroups:                    SecurityGroups,
+		properties.ServiceName:                       ServiceName,
 		properties.Set:                               Set,
 		properties.ShardCount:                        ShardCount,
 		properties.Size:                              Size,
@@ -533,6 +536,7 @@ func init() {
 		properties.TLSVersionRequired:                TLSVersionRequired,
 		properties.Topic:                             Topic,
 		properties.TrafficPolicyInstance:             TrafficPolicyInstance,
+		properties.TransitGateway:                    TransitGateway,
 		properties.TrustPolicy:                       TrustPolicy,
 		properties.TTL:                               TTL,
 		properties.Type:                              Type,
@@ -796,6 +800,7 @@ var Properties = RDFProperties{
 	Scope:                             {ID: Scope, RdfType: "rdf:Property", RdfsLabel: "Scope", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecondaryAvailabilityZone:         {ID: SecondaryAvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "SecondaryAvailabilityZone", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecurityGroups:                    {ID: SecurityGroups, RdfType: "rdf:Property", RdfsLabel: "SecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
+	ServiceName:                       {ID: ServiceName, RdfType: "rdf:Property", RdfsLabel: "ServiceName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ShardCount:                        {ID: ShardCount, RdfType: "rdf:Property", RdfsLabel: "ShardCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Size:                              {ID: Size, RdfType: "rdf:Property", RdfsLabel: "Size", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
@@ -821,6 +826,7 @@ var Properties = RDFProperties{
 	TLSVersionRequired:                {ID: TLSVersionRequired, RdfType: "rdf:Property", RdfsLabel: "TLSVersionRequired", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Topic:                             {ID: Topic, RdfType: "rdf:Property", RdfsLabel: "Topic", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	TrafficPolicyInstance:             {ID: TrafficPolicyInstance, RdfType: "rdf:Property", RdfsLabel: "TrafficPolicyInstance", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	TransitGateway:                    {ID: TransitGateway, RdfType: "rdf:Property", RdfsLabel: "TransitGateway", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	TrustPolicy:                       {ID: TrustPolicy, RdfType: "rdf:Property", RdfsLabel: "TrustPolicy", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	TTL:                               {ID: TTL, RdfType: "rdf:Property", RdfsLabel: "TTL", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Type:                              {ID: Type, RdfType: "rdf:Property", RdfsLabel: "Type", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},

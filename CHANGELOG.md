@@ -10,6 +10,9 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Transit Gateway and VPC Endpoints.** Transit gateways, their VPC attachments and route
+  tables, plus gateway and interface endpoints. Both ride the EC2 client the rest of the
+  infra service already uses, so they also get dry-run support.
 - **Document-shaped inputs.** Some AWS inputs are documents rather than flags, and now take
   a JSON file: `awless create pipeline definition-file=build-and-deploy.json`, and
   `create webacl` / `create rulegroup` with their default action, visibility config and

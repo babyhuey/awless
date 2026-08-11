@@ -98,6 +98,12 @@ var FetchersDefs = []fetchersDef{
 		Name: "infra",
 		API:  []string{"ec2", "elbv2", "elb", "rds", "autoscaling", "ecr", "ecs", "applicationautoscaling", "acm"},
 		Fetchers: []fetcher{
+			// Transit gateways and VPC endpoints ride the EC2 client that the rest of
+			// infra already uses, so they need no service of their own.
+			{API: "ec2", ResourceType: cloud.TransitGateway, AWSType: "ec2types.TransitGateway", APIMethod: "DescribeTransitGateways", Input: "ec2.DescribeTransitGatewaysInput{}", Output: "ec2.DescribeTransitGatewaysOutput", OutputsExtractor: "TransitGateways", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ec2", ResourceType: cloud.TransitGatewayAttachment, AWSType: "ec2types.TransitGatewayVpcAttachment", APIMethod: "DescribeTransitGatewayVpcAttachments", Input: "ec2.DescribeTransitGatewayVpcAttachmentsInput{}", Output: "ec2.DescribeTransitGatewayVpcAttachmentsOutput", OutputsExtractor: "TransitGatewayVpcAttachments", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ec2", ResourceType: cloud.TransitGatewayRouteTable, AWSType: "ec2types.TransitGatewayRouteTable", APIMethod: "DescribeTransitGatewayRouteTables", Input: "ec2.DescribeTransitGatewayRouteTablesInput{}", Output: "ec2.DescribeTransitGatewayRouteTablesOutput", OutputsExtractor: "TransitGatewayRouteTables", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "ec2", ResourceType: cloud.VpcEndpoint, AWSType: "ec2types.VpcEndpoint", APIMethod: "DescribeVpcEndpoints", Input: "ec2.DescribeVpcEndpointsInput{}", Output: "ec2.DescribeVpcEndpointsOutput", OutputsExtractor: "VpcEndpoints", Multipage: true, NextPageMarker: "NextToken"},
 			{API: "ec2", ResourceType: cloud.Instance, AWSType: "ec2types.Instance", APIMethod: "DescribeInstances", Input: "ec2.DescribeInstancesInput{}", Output: "ec2.DescribeInstancesOutput", OutputsExtractor: "Instances", OutputsContainers: "Reservations", Multipage: true, NextPageMarker: "NextToken"},
 			{API: "ec2", ResourceType: cloud.Subnet, AWSType: "ec2types.Subnet", APIMethod: "DescribeSubnets", Input: "ec2.DescribeSubnetsInput{}", Output: "ec2.DescribeSubnetsOutput", OutputsExtractor: "Subnets"},
 			{API: "ec2", ResourceType: cloud.Vpc, AWSType: "ec2types.Vpc", APIMethod: "DescribeVpcs", Input: "ec2.DescribeVpcsInput{}", Output: "ec2.DescribeVpcsOutput", OutputsExtractor: "Vpcs"},

@@ -8110,6 +8110,315 @@ func (cmd *CreateTrail) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateTransitgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateTransitgateway {
+	cmd := new(CreateTransitgateway)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateTransitgateway) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateTransitgateway) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.CreateTransitGatewayInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateTransitGatewayInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateTransitGateway(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.CreateTransitGateway call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create transitgateway: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create transitgateway '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create transitgateway done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateTransitgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.CreateTransitGatewayInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateTransitGatewayInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.CreateTransitGateway(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.CreateTransitGateway call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: create transitgateway ok")
+			return fakeDryRunID("transitgateway"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *CreateTransitgateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateTransitgatewayattachment(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateTransitgatewayattachment {
+	cmd := new(CreateTransitgatewayattachment)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateTransitgatewayattachment) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateTransitgatewayattachment) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.CreateTransitGatewayVpcAttachmentInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateTransitGatewayVpcAttachmentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateTransitGatewayVpcAttachment(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.CreateTransitGatewayVpcAttachment call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create transitgatewayattachment: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create transitgatewayattachment '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create transitgatewayattachment done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateTransitgatewayattachment) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.CreateTransitGatewayVpcAttachmentInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateTransitGatewayVpcAttachmentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.CreateTransitGatewayVpcAttachment(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.CreateTransitGatewayVpcAttachment call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: create transitgatewayattachment ok")
+			return fakeDryRunID("transitgatewayattachment"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *CreateTransitgatewayattachment) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateTransitgatewayroutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateTransitgatewayroutetable {
+	cmd := new(CreateTransitgatewayroutetable)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateTransitgatewayroutetable) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateTransitgatewayroutetable) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.CreateTransitGatewayRouteTableInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateTransitGatewayRouteTableInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateTransitGatewayRouteTable(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.CreateTransitGatewayRouteTable call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create transitgatewayroutetable: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create transitgatewayroutetable '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create transitgatewayroutetable done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateTransitgatewayroutetable) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.CreateTransitGatewayRouteTableInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateTransitGatewayRouteTableInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.CreateTransitGatewayRouteTable(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.CreateTransitGatewayRouteTable call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: create transitgatewayroutetable ok")
+			return fakeDryRunID("transitgatewayroutetable"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *CreateTransitgatewayroutetable) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateUser {
 	cmd := new(CreateUser)
 	if len(l) > 0 {
@@ -8391,6 +8700,109 @@ func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *CreateVpc) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateVpcendpoint(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateVpcendpoint {
+	cmd := new(CreateVpcendpoint)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateVpcendpoint) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateVpcendpoint) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.CreateVpcEndpointInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcEndpointInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateVpcEndpoint(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.CreateVpcEndpoint call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create vpcendpoint: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create vpcendpoint '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create vpcendpoint done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateVpcendpoint) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.CreateVpcEndpointInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.CreateVpcEndpointInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.CreateVpcEndpoint(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.CreateVpcEndpoint call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: create vpcendpoint ok")
+			return fakeDryRunID("vpcendpoint"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *CreateVpcendpoint) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -14332,6 +14744,315 @@ func (cmd *DeleteTrail) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteTransitgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTransitgateway {
+	cmd := new(DeleteTransitgateway)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteTransitgateway) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteTransitgateway) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.DeleteTransitGatewayInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTransitGatewayInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteTransitGateway(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.DeleteTransitGateway call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete transitgateway: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete transitgateway '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete transitgateway done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteTransitgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.DeleteTransitGatewayInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTransitGatewayInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.DeleteTransitGateway(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.DeleteTransitGateway call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: delete transitgateway ok")
+			return fakeDryRunID("transitgateway"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *DeleteTransitgateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteTransitgatewayattachment(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTransitgatewayattachment {
+	cmd := new(DeleteTransitgatewayattachment)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteTransitgatewayattachment) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteTransitgatewayattachment) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.DeleteTransitGatewayVpcAttachmentInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTransitGatewayVpcAttachmentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteTransitGatewayVpcAttachment(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.DeleteTransitGatewayVpcAttachment call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete transitgatewayattachment: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete transitgatewayattachment '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete transitgatewayattachment done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteTransitgatewayattachment) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.DeleteTransitGatewayVpcAttachmentInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTransitGatewayVpcAttachmentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.DeleteTransitGatewayVpcAttachment(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.DeleteTransitGatewayVpcAttachment call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: delete transitgatewayattachment ok")
+			return fakeDryRunID("transitgatewayattachment"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *DeleteTransitgatewayattachment) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteTransitgatewayroutetable(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteTransitgatewayroutetable {
+	cmd := new(DeleteTransitgatewayroutetable)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteTransitgatewayroutetable) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteTransitgatewayroutetable) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.DeleteTransitGatewayRouteTableInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTransitGatewayRouteTableInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteTransitGatewayRouteTable(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.DeleteTransitGatewayRouteTable call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete transitgatewayroutetable: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete transitgatewayroutetable '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete transitgatewayroutetable done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteTransitgatewayroutetable) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.DeleteTransitGatewayRouteTableInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteTransitGatewayRouteTableInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.DeleteTransitGatewayRouteTable(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.DeleteTransitGatewayRouteTable call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: delete transitgatewayroutetable ok")
+			return fakeDryRunID("transitgatewayroutetable"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *DeleteTransitgatewayroutetable) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteUser(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteUser {
 	cmd := new(DeleteUser)
 	if len(l) > 0 {
@@ -14613,6 +15334,109 @@ func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DeleteVpc) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteVpcendpoint(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteVpcendpoint {
+	cmd := new(DeleteVpcendpoint)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = ec2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteVpcendpoint) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteVpcendpoint) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &ec2.DeleteVpcEndpointsInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcEndpointsInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteVpcEndpoints(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("ec2.DeleteVpcEndpoints call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete vpcendpoint: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete vpcendpoint '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete vpcendpoint done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteVpcendpoint) dryRun(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	input := &ec2.DeleteVpcEndpointsInput{}
+	input.DryRun = aws.Bool(true)
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in ec2.DeleteVpcEndpointsInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+
+	start := time.Now()
+	_, err := cmd.api.DeleteVpcEndpoints(renv.RequestContext(), input)
+	var ae smithy.APIError
+	if errors.As(err, &ae) {
+		switch code := ae.ErrorCode(); {
+		case code == dryRunOperation, strings.HasSuffix(code, notFound), strings.Contains(ae.ErrorMessage(), "Invalid IAM Instance Profile name"):
+			renv.Log().ExtraVerbosef("dry run: ec2.DeleteVpcEndpoints call took %s", time.Since(start))
+			renv.Log().Verbose("dry run: delete vpcendpoint ok")
+			return fakeDryRunID("vpcendpoint"), nil
+		}
+	}
+
+	return nil, err
+}
+
+func (cmd *DeleteVpcendpoint) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

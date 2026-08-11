@@ -271,6 +271,15 @@ func InitResource(source any) (*graph.Resource, error) {
 	// CodeBuild
 	case codebuildtypes.Project:
 		res = graph.InitResource(cloud.BuildProject, awssdk.ToString(ss.Name))
+	// Transit gateway and VPC endpoints
+	case ec2types.TransitGateway:
+		res = graph.InitResource(cloud.TransitGateway, awssdk.ToString(ss.TransitGatewayId))
+	case ec2types.TransitGatewayVpcAttachment:
+		res = graph.InitResource(cloud.TransitGatewayAttachment, awssdk.ToString(ss.TransitGatewayAttachmentId))
+	case ec2types.TransitGatewayRouteTable:
+		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
+	case ec2types.VpcEndpoint:
+		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
 	// Elastic Beanstalk
 	case elasticbeanstalktypes.ApplicationDescription:
 		res = graph.InitResource(cloud.Application, awssdk.ToString(ss.ApplicationName))

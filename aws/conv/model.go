@@ -815,6 +815,38 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Created:     {name: "Created", transform: extractTimeFn},
 		properties.Modified:    {name: "LastModified", transform: extractTimeFn},
 	},
+	// Transit gateway and VPC endpoints
+	cloud.TransitGateway: {
+		properties.ID:          {name: "TransitGatewayId", transform: extractValueFn},
+		properties.Arn:         {name: "TransitGatewayArn", transform: extractValueFn},
+		properties.State:       {name: "State", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+		properties.Owner:       {name: "OwnerId", transform: extractValueFn},
+		properties.Created:     {name: "CreationTime", transform: extractTimeFn},
+	},
+	cloud.TransitGatewayAttachment: {
+		properties.ID:             {name: "TransitGatewayAttachmentId", transform: extractValueFn},
+		properties.TransitGateway: {name: "TransitGatewayId", transform: extractValueFn},
+		properties.Vpc:            {name: "VpcId", transform: extractValueFn},
+		properties.State:          {name: "State", transform: extractValueFn},
+		properties.Subnets:        {name: "SubnetIds", transform: extractValueFn},
+		properties.Created:        {name: "CreationTime", transform: extractTimeFn},
+	},
+	cloud.TransitGatewayRouteTable: {
+		properties.ID:             {name: "TransitGatewayRouteTableId", transform: extractValueFn},
+		properties.TransitGateway: {name: "TransitGatewayId", transform: extractValueFn},
+		properties.State:          {name: "State", transform: extractValueFn},
+		properties.Created:        {name: "CreationTime", transform: extractTimeFn},
+	},
+	cloud.VpcEndpoint: {
+		properties.ID:          {name: "VpcEndpointId", transform: extractValueFn},
+		properties.Type:        {name: "VpcEndpointType", transform: extractValueFn},
+		properties.ServiceName: {name: "ServiceName", transform: extractValueFn},
+		properties.State:       {name: "State", transform: extractValueFn},
+		properties.Vpc:         {name: "VpcId", transform: extractValueFn},
+		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
+		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
+	},
 	// Elastic Beanstalk
 	cloud.Application: {
 		properties.Name:        {name: "ApplicationName", transform: extractValueFn},

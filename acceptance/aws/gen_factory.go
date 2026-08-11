@@ -459,6 +459,18 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateTrail(f.config(), f.Graph, f.Logger)
 		}
+	case "createtransitgateway":
+		return func() any {
+			return awsspec.NewCreateTransitgateway(f.config(), f.Graph, f.Logger)
+		}
+	case "createtransitgatewayattachment":
+		return func() any {
+			return awsspec.NewCreateTransitgatewayattachment(f.config(), f.Graph, f.Logger)
+		}
+	case "createtransitgatewayroutetable":
+		return func() any {
+			return awsspec.NewCreateTransitgatewayroutetable(f.config(), f.Graph, f.Logger)
+		}
 	case "createuser":
 		return func() any {
 			return awsspec.NewCreateUser(f.config(), f.Graph, f.Logger)
@@ -470,6 +482,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createvpc":
 		return func() any {
 			return awsspec.NewCreateVpc(f.config(), f.Graph, f.Logger)
+		}
+	case "createvpcendpoint":
+		return func() any {
+			return awsspec.NewCreateVpcendpoint(f.config(), f.Graph, f.Logger)
 		}
 	case "createwebacl":
 		return func() any {
@@ -767,6 +783,18 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteTrail(f.config(), f.Graph, f.Logger)
 		}
+	case "deletetransitgateway":
+		return func() any {
+			return awsspec.NewDeleteTransitgateway(f.config(), f.Graph, f.Logger)
+		}
+	case "deletetransitgatewayattachment":
+		return func() any {
+			return awsspec.NewDeleteTransitgatewayattachment(f.config(), f.Graph, f.Logger)
+		}
+	case "deletetransitgatewayroutetable":
+		return func() any {
+			return awsspec.NewDeleteTransitgatewayroutetable(f.config(), f.Graph, f.Logger)
+		}
 	case "deleteuser":
 		return func() any {
 			return awsspec.NewDeleteUser(f.config(), f.Graph, f.Logger)
@@ -778,6 +806,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletevpc":
 		return func() any {
 			return awsspec.NewDeleteVpc(f.config(), f.Graph, f.Logger)
+		}
+	case "deletevpcendpoint":
+		return func() any {
+			return awsspec.NewDeleteVpcendpoint(f.config(), f.Graph, f.Logger)
 		}
 	case "deletewebacl":
 		return func() any {

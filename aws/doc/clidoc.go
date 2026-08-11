@@ -245,6 +245,24 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.transitgateway": {
+		"awless create transitgateway description=\"Shared services hub\"",
+		"awless create transitgateway description=hub auto-accept=disable default-association=disable",
+	},
+	"delete.transitgateway": {"awless delete transitgateway id=tgw-1234"},
+	"create.transitgatewayattachment": {
+		"awless create transitgatewayattachment transitgateway=tgw-1234 vpc=vpc-5678 subnets=subnet-1,subnet-2",
+	},
+	"delete.transitgatewayattachment": {"awless delete transitgatewayattachment id=tgw-attach-1234"},
+	"create.transitgatewayroutetable": {
+		"awless create transitgatewayroutetable transitgateway=tgw-1234",
+	},
+	"delete.transitgatewayroutetable": {"awless delete transitgatewayroutetable id=tgw-rtb-1234"},
+	"create.vpcendpoint": {
+		"awless create vpcendpoint vpc=vpc-1234 service=com.amazonaws.us-west-2.s3 type=Gateway routetables=rtb-1234",
+		"awless create vpcendpoint vpc=vpc-1234 service=com.amazonaws.us-west-2.secretsmanager type=Interface subnets=subnet-1,subnet-2 securitygroups=sg-1234 private-dns=true",
+	},
+	"delete.vpcendpoint": {"awless delete vpcendpoint id=vpce-1234"},
 	"create.pipeline": {
 		"awless create pipeline definition-file=/home/jsmith/build-and-deploy.json",
 	},

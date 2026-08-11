@@ -84,6 +84,118 @@ func BuildInfraFetchFuncs(conf *Config) fetch.Funcs {
 
 	addManualInfraFetchFuncs(conf, funcs)
 
+	funcs["transitgateway"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []ec2types.TransitGateway
+
+		if !conf.getBoolDefaultTrue("aws.infra.transitgateway.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource infra[transitgateway]")
+			return resources, objects, nil
+		}
+		paginator := ec2.NewDescribeTransitGatewaysPaginator(conf.APIs.Ec2, &ec2.DescribeTransitGatewaysInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.TransitGateways {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["transitgatewayattachment"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []ec2types.TransitGatewayVpcAttachment
+
+		if !conf.getBoolDefaultTrue("aws.infra.transitgatewayattachment.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource infra[transitgatewayattachment]")
+			return resources, objects, nil
+		}
+		paginator := ec2.NewDescribeTransitGatewayVpcAttachmentsPaginator(conf.APIs.Ec2, &ec2.DescribeTransitGatewayVpcAttachmentsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.TransitGatewayVpcAttachments {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["transitgatewayroutetable"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []ec2types.TransitGatewayRouteTable
+
+		if !conf.getBoolDefaultTrue("aws.infra.transitgatewayroutetable.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource infra[transitgatewayroutetable]")
+			return resources, objects, nil
+		}
+		paginator := ec2.NewDescribeTransitGatewayRouteTablesPaginator(conf.APIs.Ec2, &ec2.DescribeTransitGatewayRouteTablesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.TransitGatewayRouteTables {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["vpcendpoint"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []ec2types.VpcEndpoint
+
+		if !conf.getBoolDefaultTrue("aws.infra.vpcendpoint.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource infra[vpcendpoint]")
+			return resources, objects, nil
+		}
+		paginator := ec2.NewDescribeVpcEndpointsPaginator(conf.APIs.Ec2, &ec2.DescribeVpcEndpointsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.VpcEndpoints {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
 	funcs["instance"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
 		var resources []*graph.Resource
 		var objects []ec2types.Instance

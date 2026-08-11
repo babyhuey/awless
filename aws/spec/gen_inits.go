@@ -245,12 +245,20 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateTopic(f.Cfg, f.Graph, f.Log) }
 	case "createtrail":
 		return func() any { return NewCreateTrail(f.Cfg, f.Graph, f.Log) }
+	case "createtransitgateway":
+		return func() any { return NewCreateTransitgateway(f.Cfg, f.Graph, f.Log) }
+	case "createtransitgatewayattachment":
+		return func() any { return NewCreateTransitgatewayattachment(f.Cfg, f.Graph, f.Log) }
+	case "createtransitgatewayroutetable":
+		return func() any { return NewCreateTransitgatewayroutetable(f.Cfg, f.Graph, f.Log) }
 	case "createuser":
 		return func() any { return NewCreateUser(f.Cfg, f.Graph, f.Log) }
 	case "createvolume":
 		return func() any { return NewCreateVolume(f.Cfg, f.Graph, f.Log) }
 	case "createvpc":
 		return func() any { return NewCreateVpc(f.Cfg, f.Graph, f.Log) }
+	case "createvpcendpoint":
+		return func() any { return NewCreateVpcendpoint(f.Cfg, f.Graph, f.Log) }
 	case "createwebacl":
 		return func() any { return NewCreateWebacl(f.Cfg, f.Graph, f.Log) }
 	case "createzone":
@@ -399,12 +407,20 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteTopic(f.Cfg, f.Graph, f.Log) }
 	case "deletetrail":
 		return func() any { return NewDeleteTrail(f.Cfg, f.Graph, f.Log) }
+	case "deletetransitgateway":
+		return func() any { return NewDeleteTransitgateway(f.Cfg, f.Graph, f.Log) }
+	case "deletetransitgatewayattachment":
+		return func() any { return NewDeleteTransitgatewayattachment(f.Cfg, f.Graph, f.Log) }
+	case "deletetransitgatewayroutetable":
+		return func() any { return NewDeleteTransitgatewayroutetable(f.Cfg, f.Graph, f.Log) }
 	case "deleteuser":
 		return func() any { return NewDeleteUser(f.Cfg, f.Graph, f.Log) }
 	case "deletevolume":
 		return func() any { return NewDeleteVolume(f.Cfg, f.Graph, f.Log) }
 	case "deletevpc":
 		return func() any { return NewDeleteVpc(f.Cfg, f.Graph, f.Log) }
+	case "deletevpcendpoint":
+		return func() any { return NewDeleteVpcendpoint(f.Cfg, f.Graph, f.Log) }
 	case "deletewebacl":
 		return func() any { return NewDeleteWebacl(f.Cfg, f.Graph, f.Log) }
 	case "deletezone":
@@ -647,9 +663,13 @@ var (
 	_ command = &CreateTargetgroup{}
 	_ command = &CreateTopic{}
 	_ command = &CreateTrail{}
+	_ command = &CreateTransitgateway{}
+	_ command = &CreateTransitgatewayattachment{}
+	_ command = &CreateTransitgatewayroutetable{}
 	_ command = &CreateUser{}
 	_ command = &CreateVolume{}
 	_ command = &CreateVpc{}
+	_ command = &CreateVpcendpoint{}
 	_ command = &CreateWebacl{}
 	_ command = &CreateZone{}
 	_ command = &DeleteAccesskey{}
@@ -724,9 +744,13 @@ var (
 	_ command = &DeleteTargetgroup{}
 	_ command = &DeleteTopic{}
 	_ command = &DeleteTrail{}
+	_ command = &DeleteTransitgateway{}
+	_ command = &DeleteTransitgatewayattachment{}
+	_ command = &DeleteTransitgatewayroutetable{}
 	_ command = &DeleteUser{}
 	_ command = &DeleteVolume{}
 	_ command = &DeleteVpc{}
+	_ command = &DeleteVpcendpoint{}
 	_ command = &DeleteWebacl{}
 	_ command = &DeleteZone{}
 	_ command = &DetachAlarm{}
