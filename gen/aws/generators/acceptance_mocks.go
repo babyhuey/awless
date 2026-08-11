@@ -166,10 +166,6 @@ limitations under the License.
 // This file was automatically generated with go generate
 package awsat
 
-// TODO: Acceptance mocks need reworking for AWS SDK v2.
-// SDK v2 does not have iface packages, so mocks must be manually defined
-// or use a different mocking strategy (e.g., httptest or interface wrappers).
-
 {{ range $, $api := . }}
 
 type {{ $api }}Mock struct {

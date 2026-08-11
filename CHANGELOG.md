@@ -1,3 +1,24 @@
+## Unreleased
+
+### Fixed
+
+- **Profiles requiring MFA could not be used at all.** Any profile with `mfa_serial` failed
+  with `assume role with MFA enabled, but AssumeRoleTokenProvider session option not set`
+  before awless could even resolve a region. There is now a stdin token provider, and the
+  code that looks up a profile's region reads the shared config files instead of resolving
+  the whole credential chain — looking up a region should not need credentials.
+- **Assumed-role credentials were not cached, so MFA would be re-entered on every
+  invocation.** The on-disk cache had survived the SDK v2 migration already implementing the
+  v2 interface, but was never wired in; its only remaining reference was a TODO naming a
+  second provider that no longer exists. Now wired in, keyed by profile, written 0600.
+- **The credential cache ignored the credential's own expiry**, assuming a flat fifteen
+  minutes. A profile with `duration_seconds = 3600` therefore re-prompted for MFA four times
+  an hour. It now honors the reported expiration, less a one-minute margin so a long sync
+  cannot start with a valid credential and finish without one.
+- **`AWS_CONFIG_FILE` and `AWS_SHARED_CREDENTIALS_FILE` are honored** when reading a
+  profile's region. The config-only loader does not consult them the way the full loader
+  does, so they had to be passed explicitly.
+
 ## v1.2.0
 
 ### Added

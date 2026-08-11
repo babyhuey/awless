@@ -277,14 +277,34 @@ func migrationActionsAndExtraMessages(current string) {
 	}
 }
 
+// hasEmbeddedRegionInSharedConfigForProfile reports the region a profile declares in the
+// shared config files.
+//
+// This reads the ini files only. It used to call LoadDefaultConfig, which also resolves
+// the whole credential chain, so asking a profile for its region would assume its role —
+// and fail outright on any profile carrying mfa_serial, since a token provider is not
+// wired in this early. Looking up a region should not need credentials.
+//
+// The file locations have to be passed explicitly: unlike LoadDefaultConfig,
+// LoadSharedConfigProfile does not consult AWS_CONFIG_FILE or
+// AWS_SHARED_CREDENTIALS_FILE, so relying on its defaults would ignore both.
 func hasEmbeddedRegionInSharedConfigForProfile(profile string) (string, bool, error) {
-	cfg, err := awsconfig.LoadDefaultConfig(RootContext(),
-		awsconfig.WithSharedConfigProfile(profile),
-	)
+	opts := func(o *awsconfig.LoadSharedConfigOptions) {
+		if env, err := awsconfig.NewEnvConfig(); err == nil {
+			if env.SharedConfigFile != "" {
+				o.ConfigFiles = []string{env.SharedConfigFile}
+			}
+			if env.SharedCredentialsFile != "" {
+				o.CredentialsFiles = []string{env.SharedCredentialsFile}
+			}
+		}
+	}
+
+	shared, err := awsconfig.LoadSharedConfigProfile(RootContext(), profile, opts)
 	if err != nil {
 		return "", false, fmt.Errorf("cannot check profile '%s' has embedded region in shared config file: %w", profile, err)
 	}
-	region := cfg.Region
+	region := shared.Region
 	return region, len(region) > 0, nil
 }
 

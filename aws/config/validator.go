@@ -58,6 +58,49 @@ func promptReader() io.Reader {
 	return os.Stdin
 }
 
+// mfaTokenPattern is what AWS accepts for a virtual MFA device: exactly six digits.
+// Checking locally turns a typo into an immediate re-prompt rather than a round trip
+// and an AccessDenied that does not say which part was wrong.
+var mfaTokenPattern = regexp.MustCompile(`^[0-9]{6}$`)
+
+// StdinMFATokenProvider prompts for an MFA token code. Its signature is what
+// stscreds.AssumeRoleOptions.TokenProvider requires, so it can be handed to the SDK
+// directly.
+//
+// The SDK ships StdinTokenProvider, which is not used here for two reasons: it reads
+// os.Stdin directly, so there is no seam to drive it in a test, and it validates
+// nothing, so a mistyped code becomes an AccessDenied from STS.
+func StdinMFATokenProvider() (string, error) {
+	fmt.Println("Assuming a role that requires MFA. (Ctrl+C to quit)")
+
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt: "MFA token code> ",
+		Stdin:  promptStdin,
+	})
+	if err != nil {
+		return "", fmt.Errorf("reading MFA token: %w", err)
+	}
+	defer rl.Close()
+
+	for {
+		line, err := rl.Readline()
+		switch {
+		case errors.Is(err, readline.ErrInterrupt), errors.Is(err, io.EOF):
+			// A non-interactive stdin returns EOF immediately, so this must abort
+			// rather than loop. Both prompt selectors used to spin here forever.
+			return "", ErrPromptAborted
+		case err != nil:
+			return "", fmt.Errorf("reading MFA token: %w", err)
+		}
+
+		token := strings.TrimSpace(line)
+		if mfaTokenPattern.MatchString(token) {
+			return token, nil
+		}
+		fmt.Fprintln(os.Stderr, "an MFA token code is six digits")
+	}
+}
+
 func StdinRegionSelector() (string, error) {
 	var regionItems []readline.PrefixCompleterInterface
 	for _, r := range allRegions() {

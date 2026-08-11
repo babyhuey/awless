@@ -25,6 +25,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 
 	awsconfig "github.com/bootswithdefer/awless/aws/config"
@@ -124,19 +125,34 @@ func (s *configResolver) resolve() (aws.Config, error) {
 
 	opts = append(opts, config.WithHTTPClient(s.httpClient))
 
+	if s.enableCredentialResolvers {
+		// Without a token provider, a profile carrying mfa_serial does not prompt: the
+		// SDK fails the whole load with "assume role with MFA enabled, but
+		// AssumeRoleTokenProvider session option not set". This has to be passed to
+		// LoadDefaultConfig rather than set afterwards, because the provider chain is
+		// built during the load.
+		opts = append(opts, config.WithAssumeRoleCredentialOptions(func(o *stscreds.AssumeRoleOptions) {
+			o.TokenProvider = awsconfig.StdinMFATokenProvider
+		}))
+	}
+
 	cfg, err := config.LoadDefaultConfig(context.Background(), opts...)
 	if err != nil {
 		return aws.Config{}, err
 	}
 
 	if s.enableCredentialResolvers {
-		// TODO: Migrate fileCacheProvider and credentialsPrompterProvider
-		// to implement aws.CredentialsProvider (v2) instead of the v1
-		// credentials.Provider interface, then wire them back in here.
+		// Cache assumed-role credentials on disk, keyed by profile, so MFA is entered
+		// once per session rather than once per awless invocation.
 		//
-		// For now, rely on the default credential chain from
-		// config.LoadDefaultConfig which covers environment variables,
-		// shared credentials/config files, and IAM roles.
+		// Not wrapped in aws.NewCredentialsCache: cfg.Credentials is already one, and
+		// nesting two made every credential error report "failed to refresh cached
+		// credentials" twice. fileCacheProvider holds its own in-memory copy instead.
+		cfg.Credentials = &fileCacheProvider{
+			creds:   cfg.Credentials,
+			profile: s.profile,
+			log:     s.logger,
+		}
 		if _, err = cfg.Credentials.Retrieve(context.Background()); err != nil {
 			return cfg, err
 		}
