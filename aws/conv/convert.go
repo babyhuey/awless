@@ -40,6 +40,7 @@ import (
 	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	codebuildtypes "github.com/aws/aws-sdk-go-v2/service/codebuild/types"
 	codepipelinetypes "github.com/aws/aws-sdk-go-v2/service/codepipeline/types"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -266,6 +267,9 @@ func InitResource(source any) (*graph.Resource, error) {
 	// CodePipeline
 	case codepipelinetypes.PipelineSummary:
 		res = graph.InitResource(cloud.Pipeline, awssdk.ToString(ss.Name))
+	// CodeBuild
+	case codebuildtypes.Project:
+		res = graph.InitResource(cloud.BuildProject, awssdk.ToString(ss.Name))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

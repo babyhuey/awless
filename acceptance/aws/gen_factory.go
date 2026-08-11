@@ -207,6 +207,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateBucket(f.config(), f.Graph, f.Logger)
 		}
+	case "createbuildproject":
+		return func() any {
+			return awsspec.NewCreateBuildproject(f.config(), f.Graph, f.Logger)
+		}
 	case "createcachecluster":
 		return func() any {
 			return awsspec.NewCreateCachecluster(f.config(), f.Graph, f.Logger)
@@ -486,6 +490,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletebucket":
 		return func() any {
 			return awsspec.NewDeleteBucket(f.config(), f.Graph, f.Logger)
+		}
+	case "deletebuildproject":
+		return func() any {
+			return awsspec.NewDeleteBuildproject(f.config(), f.Graph, f.Logger)
 		}
 	case "deletecachecluster":
 		return func() any {
@@ -823,6 +831,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStartAlarm(f.config(), f.Graph, f.Logger)
 		}
+	case "startbuildproject":
+		return func() any {
+			return awsspec.NewStartBuildproject(f.config(), f.Graph, f.Logger)
+		}
 	case "startcontainertask":
 		return func() any {
 			return awsspec.NewStartContainertask(f.config(), f.Graph, f.Logger)
@@ -855,6 +867,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStopAlarm(f.config(), f.Graph, f.Logger)
 		}
+	case "stopbuildproject":
+		return func() any {
+			return awsspec.NewStopBuildproject(f.config(), f.Graph, f.Logger)
+		}
 	case "stopcontainertask":
 		return func() any {
 			return awsspec.NewStopContainertask(f.config(), f.Graph, f.Logger)
@@ -886,6 +902,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updatebucket":
 		return func() any {
 			return awsspec.NewUpdateBucket(f.config(), f.Graph, f.Logger)
+		}
+	case "updatebuildproject":
+		return func() any {
+			return awsspec.NewUpdateBuildproject(f.config(), f.Graph, f.Logger)
 		}
 	case "updatecachecluster":
 		return func() any {

@@ -337,6 +337,14 @@ var FetchersDefs = []fetchersDef{
 			{API: "codepipeline", ResourceType: cloud.Pipeline, AWSType: "codepipelinetypes.PipelineSummary", APIMethod: "ListPipelines", Input: "codepipeline.ListPipelinesInput{}", Output: "codepipeline.ListPipelinesOutput", OutputsExtractor: "Pipelines", Multipage: true, NextPageMarker: "NextToken"},
 		},
 	},
+	{
+		Name: "codebuild",
+		API:  []string{"codebuild"},
+		Fetchers: []fetcher{
+			// ListProjects returns names only, so the details need a second call.
+			{API: "codebuild", ResourceType: cloud.BuildProject, AWSType: "codebuildtypes.Project", ManualFetcher: true},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

@@ -291,7 +291,21 @@ var cliExamplesDoc = map[string][]string{
 	},
 	"delete.redshiftsubnetgroup": {"awless delete redshiftsubnetgroup name=warehouse-private"},
 	"delete.pipeline":            {"awless delete pipeline name=build-and-deploy"},
-	"start.pipeline":             {"awless start pipeline name=build-and-deploy"},
+	"create.buildproject": {
+		"awless create buildproject name=api-build role=arn:aws:iam::123456789012:role/CodeBuild source-type=GITHUB source-location=https://github.com/acme/api env-type=LINUX_CONTAINER image=aws/codebuild/standard:7.0 compute-type=BUILD_GENERAL1_SMALL artifact-type=NO_ARTIFACTS",
+	},
+	"update.buildproject": {
+		"awless update buildproject name=api-build compute-type=BUILD_GENERAL1_MEDIUM timeout=30",
+	},
+	"delete.buildproject": {"awless delete buildproject name=api-build"},
+	"start.buildproject": {
+		"awless start buildproject name=api-build",
+		"awless start buildproject name=api-build source-version=release-2.0",
+	},
+	"stop.buildproject": {
+		"awless stop buildproject build='api-build:11111111-2222-3333-4444-555555555555'",
+	},
+	"start.pipeline": {"awless start pipeline name=build-and-deploy"},
 	"stop.pipeline": {
 		"awless stop pipeline name=build-and-deploy execution='12345678-1234-1234-1234-123456789012' reason=\"Superseded by a newer commit\"",
 	},

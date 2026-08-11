@@ -10,6 +10,9 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **CodeBuild.** Build projects with create/update/delete, and `start`/`stop` to run a
+  build. `awless start buildproject name=api-build source-version=release-2.0` returns the
+  build id that `stop` takes.
 - **CodePipeline.** Pipelines are listed, deleted, and run: `awless start pipeline
   name=build-and-deploy` returns the execution id that `awless stop pipeline` takes.
   Creation is not offered — a pipeline is a whole document of stages and actions rather than

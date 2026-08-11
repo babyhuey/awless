@@ -69,6 +69,7 @@ var PropertiesDefinitions = []property{
 	{AwlessLabel: "ClusterEnabled", RDFLabel: fmt.Sprintf("%s:clusterEnabled", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdBoolean},
 	{AwlessLabel: "Comment", RDFLabel: rdf.RdfsComment, RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "Compliance", RDFLabel: fmt.Sprintf("%s:compliance", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
+	{AwlessLabel: "ComputeType", RDFLabel: fmt.Sprintf("%s:computeType", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "Config", RDFLabel: fmt.Sprintf("%s:config", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "ContainerInstance", RDFLabel: fmt.Sprintf("%s:containerInstance", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsClass, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "ContainersImages", RDFLabel: fmt.Sprintf("%s:containersImages", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsList, RdfsDataType: rdf.KeyValue},

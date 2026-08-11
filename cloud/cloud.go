@@ -141,6 +141,8 @@ const (
 	RedshiftSubnetGroup string = "redshiftsubnetgroup"
 	//codepipeline
 	Pipeline string = "pipeline"
+	//codebuild
+	BuildProject string = "buildproject"
 )
 
 type Service interface {

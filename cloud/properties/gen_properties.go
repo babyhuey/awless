@@ -72,6 +72,7 @@ const (
 	ClusterEnabled                    = "ClusterEnabled"
 	Comment                           = "Comment"
 	Compliance                        = "Compliance"
+	ComputeType                       = "ComputeType"
 	Config                            = "Config"
 	ContainerInstance                 = "ContainerInstance"
 	ContainersImages                  = "ContainersImages"

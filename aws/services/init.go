@@ -30,6 +30,7 @@ var (
 	AccessService, InfraService, StorageService, MessagingService, DNSService, LambdaService, MonitoringService, CdnService, CloudformationService       cloud.Service
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService              cloud.Service
 	ElasticacheService, EventbridgeService, StepfunctionsService, WafService, ConfigserviceService, KinesisService, RedshiftService, CodepipelineService cloud.Service
+	CodebuildService                                                                                                                                     cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]any, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -70,6 +71,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	KinesisService = NewKinesis(cfg, profile, extraConf, log)
 	RedshiftService = NewRedshift(cfg, profile, extraConf, log)
 	CodepipelineService = NewCodepipeline(cfg, profile, extraConf, log)
+	CodebuildService = NewCodebuild(cfg, profile, extraConf, log)
 
 	cloud.ServiceRegistry[InfraService.Name()] = InfraService
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
@@ -96,6 +98,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	cloud.ServiceRegistry[KinesisService.Name()] = KinesisService
 	cloud.ServiceRegistry[RedshiftService.Name()] = RedshiftService
 	cloud.ServiceRegistry[CodepipelineService.Name()] = CodepipelineService
+	cloud.ServiceRegistry[CodebuildService.Name()] = CodebuildService
 
 	awsspec.CommandFactory = &awsspec.AWSFactory{
 		Log: log,

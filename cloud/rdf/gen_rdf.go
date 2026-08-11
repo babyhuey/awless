@@ -74,6 +74,7 @@ const (
 	ClusterEnabled                    = "cloud:clusterEnabled"
 	Comment                           = "rdfs:comment"
 	Compliance                        = "cloud:compliance"
+	ComputeType                       = "cloud:computeType"
 	Config                            = "cloud:config"
 	ContainerInstance                 = "cloud:containerInstance"
 	ContainersImages                  = "cloud:containersImages"
@@ -357,6 +358,7 @@ func init() {
 		properties.ClusterEnabled:                    ClusterEnabled,
 		properties.Comment:                           Comment,
 		properties.Compliance:                        Compliance,
+		properties.ComputeType:                       ComputeType,
 		properties.Config:                            Config,
 		properties.ContainerInstance:                 ContainerInstance,
 		properties.ContainersImages:                  ContainersImages,
@@ -640,6 +642,7 @@ var Properties = RDFProperties{
 	ClusterEnabled:                    {ID: ClusterEnabled, RdfType: "rdf:Property", RdfsLabel: "ClusterEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	Comment:                           {ID: Comment, RdfType: "rdf:Property", RdfsLabel: "Comment", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Compliance:                        {ID: Compliance, RdfType: "rdf:Property", RdfsLabel: "Compliance", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ComputeType:                       {ID: ComputeType, RdfType: "rdf:Property", RdfsLabel: "ComputeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Config:                            {ID: Config, RdfType: "rdf:Property", RdfsLabel: "Config", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ContainerInstance:                 {ID: ContainerInstance, RdfType: "rdf:Property", RdfsLabel: "ContainerInstance", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	ContainersImages:                  {ID: ContainersImages, RdfType: "rdf:Property", RdfsLabel: "ContainersImages", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},

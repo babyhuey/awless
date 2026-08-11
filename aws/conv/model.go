@@ -802,4 +802,17 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Created:       {name: "Created", transform: extractTimeFn},
 		properties.Updated:       {name: "Updated", transform: extractTimeFn},
 	},
+	// CodeBuild
+	cloud.BuildProject: {
+		properties.Name:        {name: "Name", transform: extractValueFn},
+		properties.Arn:         {name: "Arn", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+		properties.Role:        {name: "ServiceRole", transform: extractValueFn},
+		properties.Type:        {name: "Source.Type", transform: extractValueFn},
+		properties.Image:       {name: "Environment.Image", transform: extractValueFn},
+		properties.ComputeType: {name: "Environment.ComputeType", transform: extractValueFn},
+		properties.Timeout:     {name: "TimeoutInMinutes", transform: extractValueFn},
+		properties.Created:     {name: "Created", transform: extractTimeFn},
+		properties.Modified:    {name: "LastModified", transform: extractTimeFn},
+	},
 }

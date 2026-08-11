@@ -119,6 +119,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateAppscalingtarget(f.Cfg, f.Graph, f.Log) }
 	case "createbucket":
 		return func() any { return NewCreateBucket(f.Cfg, f.Graph, f.Log) }
+	case "createbuildproject":
+		return func() any { return NewCreateBuildproject(f.Cfg, f.Graph, f.Log) }
 	case "createcachecluster":
 		return func() any { return NewCreateCachecluster(f.Cfg, f.Graph, f.Log) }
 	case "createcachesubnetgroup":
@@ -259,6 +261,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteAppscalingtarget(f.Cfg, f.Graph, f.Log) }
 	case "deletebucket":
 		return func() any { return NewDeleteBucket(f.Cfg, f.Graph, f.Log) }
+	case "deletebuildproject":
+		return func() any { return NewDeleteBuildproject(f.Cfg, f.Graph, f.Log) }
 	case "deletecachecluster":
 		return func() any { return NewDeleteCachecluster(f.Cfg, f.Graph, f.Log) }
 	case "deletecachesubnetgroup":
@@ -427,6 +431,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewRestartInstance(f.Cfg, f.Graph, f.Log) }
 	case "startalarm":
 		return func() any { return NewStartAlarm(f.Cfg, f.Graph, f.Log) }
+	case "startbuildproject":
+		return func() any { return NewStartBuildproject(f.Cfg, f.Graph, f.Log) }
 	case "startcontainertask":
 		return func() any { return NewStartContainertask(f.Cfg, f.Graph, f.Log) }
 	case "startdatabase":
@@ -443,6 +449,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartTrail(f.Cfg, f.Graph, f.Log) }
 	case "stopalarm":
 		return func() any { return NewStopAlarm(f.Cfg, f.Graph, f.Log) }
+	case "stopbuildproject":
+		return func() any { return NewStopBuildproject(f.Cfg, f.Graph, f.Log) }
 	case "stopcontainertask":
 		return func() any { return NewStopContainertask(f.Cfg, f.Graph, f.Log) }
 	case "stopdatabase":
@@ -459,6 +467,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopTrail(f.Cfg, f.Graph, f.Log) }
 	case "updatebucket":
 		return func() any { return NewUpdateBucket(f.Cfg, f.Graph, f.Log) }
+	case "updatebuildproject":
+		return func() any { return NewUpdateBuildproject(f.Cfg, f.Graph, f.Log) }
 	case "updatecachecluster":
 		return func() any { return NewUpdateCachecluster(f.Cfg, f.Graph, f.Log) }
 	case "updatecachesubnetgroup":
@@ -552,6 +562,7 @@ var (
 	_ command = &CreateAppscalingpolicy{}
 	_ command = &CreateAppscalingtarget{}
 	_ command = &CreateBucket{}
+	_ command = &CreateBuildproject{}
 	_ command = &CreateCachecluster{}
 	_ command = &CreateCachesubnetgroup{}
 	_ command = &CreateCertificate{}
@@ -622,6 +633,7 @@ var (
 	_ command = &DeleteAppscalingpolicy{}
 	_ command = &DeleteAppscalingtarget{}
 	_ command = &DeleteBucket{}
+	_ command = &DeleteBuildproject{}
 	_ command = &DeleteCachecluster{}
 	_ command = &DeleteCachesubnetgroup{}
 	_ command = &DeleteCertificate{}
@@ -706,6 +718,7 @@ var (
 	_ command = &RestartDatabase{}
 	_ command = &RestartInstance{}
 	_ command = &StartAlarm{}
+	_ command = &StartBuildproject{}
 	_ command = &StartContainertask{}
 	_ command = &StartDatabase{}
 	_ command = &StartEventrule{}
@@ -714,6 +727,7 @@ var (
 	_ command = &StartPipeline{}
 	_ command = &StartTrail{}
 	_ command = &StopAlarm{}
+	_ command = &StopBuildproject{}
 	_ command = &StopContainertask{}
 	_ command = &StopDatabase{}
 	_ command = &StopEventrule{}
@@ -722,6 +736,7 @@ var (
 	_ command = &StopPipeline{}
 	_ command = &StopTrail{}
 	_ command = &UpdateBucket{}
+	_ command = &UpdateBuildproject{}
 	_ command = &UpdateCachecluster{}
 	_ command = &UpdateCachesubnetgroup{}
 	_ command = &UpdateClassicLoadbalancer{}

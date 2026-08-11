@@ -33,6 +33,7 @@ import (
 	cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
 	cloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cloudwatchlogs "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	codebuild "github.com/aws/aws-sdk-go-v2/service/codebuild"
 	codepipeline "github.com/aws/aws-sdk-go-v2/service/codepipeline"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -3053,6 +3054,84 @@ func (cmd *CreateBucket) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *CreateBucket) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateBuildproject(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateBuildproject {
+	cmd := new(CreateBuildproject)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codebuild.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateBuildproject) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateBuildproject) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codebuild.CreateProjectInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codebuild.CreateProjectInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateProject(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codebuild.CreateProject call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create buildproject: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create buildproject '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create buildproject done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateBuildproject) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("buildproject"), nil
+}
+
+func (cmd *CreateBuildproject) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8701,6 +8780,84 @@ func (cmd *DeleteBucket) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *DeleteBucket) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteBuildproject(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteBuildproject {
+	cmd := new(DeleteBuildproject)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codebuild.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteBuildproject) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteBuildproject) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codebuild.DeleteProjectInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codebuild.DeleteProjectInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteProject(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codebuild.DeleteProject call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete buildproject: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete buildproject '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete buildproject done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteBuildproject) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("buildproject"), nil
+}
+
+func (cmd *DeleteBuildproject) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -15573,6 +15730,84 @@ func (cmd *StartAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewStartBuildproject(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartBuildproject {
+	cmd := new(StartBuildproject)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codebuild.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartBuildproject) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartBuildproject) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codebuild.StartBuildInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codebuild.StartBuildInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StartBuild(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codebuild.StartBuild call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start buildproject: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start buildproject '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start buildproject done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartBuildproject) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("buildproject"), nil
+}
+
+func (cmd *StartBuildproject) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewStartContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartContainertask {
 	cmd := new(StartContainertask)
 	if len(l) > 0 {
@@ -16213,6 +16448,84 @@ func (cmd *StopAlarm) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewStopBuildproject(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopBuildproject {
+	cmd := new(StopBuildproject)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codebuild.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StopBuildproject) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StopBuildproject) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codebuild.StopBuildInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codebuild.StopBuildInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StopBuild(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codebuild.StopBuild call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("stop buildproject: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("stop buildproject '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("stop buildproject done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StopBuildproject) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("buildproject"), nil
+}
+
+func (cmd *StopBuildproject) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewStopContainertask(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopContainertask {
 	cmd := new(StopContainertask)
 	if len(l) > 0 {
@@ -16841,6 +17154,84 @@ func (cmd *UpdateBucket) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *UpdateBucket) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateBuildproject(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateBuildproject {
+	cmd := new(UpdateBuildproject)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codebuild.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateBuildproject) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateBuildproject) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codebuild.UpdateProjectInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codebuild.UpdateProjectInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.UpdateProject(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codebuild.UpdateProject call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update buildproject: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update buildproject '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update buildproject done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateBuildproject) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("buildproject"), nil
+}
+
+func (cmd *UpdateBuildproject) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/codebuild"
+	codebuildtypes "github.com/aws/aws-sdk-go-v2/service/codebuild/types"
 	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
@@ -1414,4 +1416,43 @@ func addManualRedshiftFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualCodepipelineFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}
+
+func addManualCodebuildFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["buildproject"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []codebuildtypes.Project
+		var resources []*graph.Resource
+
+		// ListProjects yields names; the projects themselves come from BatchGetProjects,
+		// which takes up to 100 names per call.
+		var names []string
+		pager := codebuild.NewListProjectsPaginator(conf.APIs.Codebuild, &codebuild.ListProjectsInput{})
+		for pager.HasMorePages() {
+			out, err := pager.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			names = append(names, out.Projects...)
+		}
+
+		const batchSize = 100
+		for start := 0; start < len(names); start += batchSize {
+			end := min(start+batchSize, len(names))
+
+			out, err := conf.APIs.Codebuild.BatchGetProjects(ctx, &codebuild.BatchGetProjectsInput{Names: names[start:end]})
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, project := range out.Projects {
+				objects = append(objects, project)
+				res, err := awsconv.NewResource(project)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
 }
