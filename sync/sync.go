@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	gosync "sync"
 	"time"
@@ -26,6 +27,7 @@ import (
 	"runtime"
 
 	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/properties"
 	"github.com/bootswithdefer/awless/graph"
 	"github.com/bootswithdefer/awless/logger"
 	"github.com/bootswithdefer/awless/sync/repo"
@@ -188,7 +190,7 @@ func concatErrors(errs []error) error {
 
 func LoadLocalGraphForService(serviceName, profile, region string) cloud.GraphAPI {
 	regionDir := region
-	if serviceName == "access" || serviceName == "dns" || serviceName == "cdn" {
+	if isGlobalService(serviceName) {
 		regionDir = "global"
 	}
 	path := filepath.Join(repo.BaseDir(), profile, regionDir, fmt.Sprintf("%s%s", serviceName, fileExt))
@@ -215,4 +217,78 @@ func LoadAllLocalGraphs(profile string) (cloud.GraphAPI, error) {
 	files, _ := filepath.Glob(path)
 
 	return graph.NewGraphFromFiles(files...)
+}
+
+// LocalRegions lists the regions that have been synced locally for a profile, in sorted
+// order. The "global" directory is not a region: it holds the services whose resources are
+// not regional (IAM, Route53, CloudFront), and is reported separately by callers that need
+// it.
+func LocalRegions(profile string) []string {
+	entries, err := os.ReadDir(filepath.Join(repo.BaseDir(), profile))
+	if err != nil {
+		return nil
+	}
+
+	var regions []string
+	for _, e := range entries {
+		if !e.IsDir() || e.Name() == "global" || strings.HasPrefix(e.Name(), ".") {
+			continue
+		}
+		regions = append(regions, e.Name())
+	}
+	sort.Strings(regions)
+	return regions
+}
+
+// LoadLocalGraphForTypeInAllRegions merges one resource type from every locally synced
+// region into a single graph, recording on each resource the region it came from.
+//
+// The region has to be applied here rather than read back from the data, because nothing in
+// a synced graph records it: the region is expressed only by which directory the file sits
+// in. Without this, merging regions would produce a list with no way to tell an instance in
+// us-east-1 from one in eu-west-1 — and, for resources whose ID is a name rather than an
+// ARN, two same-named resources in different regions would collide into one row.
+//
+// Resources of a global service are returned with a region of "global", since asking for
+// IAM users per region is meaningless.
+func LoadLocalGraphForTypeInAllRegions(serviceName, resType, profile string) (cloud.GraphAPI, error) {
+	combined := graph.NewGraph()
+
+	regions := LocalRegions(profile)
+	if isGlobalService(serviceName) {
+		// A global service is stored once, under "global", so there is a single graph to
+		// load and its resources are not regional.
+		regions = []string{"global"}
+	}
+
+	for _, region := range regions {
+		g := LoadLocalGraphForService(serviceName, profile, region)
+
+		resources, err := g.Find(cloud.NewQuery(resType))
+		if err != nil {
+			return combined, fmt.Errorf("loading %s from region %s: %w", resType, region, err)
+		}
+
+		for _, r := range resources {
+			// Find hands back the interface, but the concrete type is what can carry a
+			// new property. Anything else is skipped rather than silently dropped from
+			// the count, because it would indicate the graph package changed shape.
+			res, ok := r.(*graph.Resource)
+			if !ok {
+				return combined, fmt.Errorf("loading %s from region %s: unexpected resource implementation %T", resType, region, r)
+			}
+			res.SetProperty(properties.Region, region)
+			if err := combined.AddResource(res); err != nil {
+				return combined, fmt.Errorf("merging %s from region %s: %w", resType, region, err)
+			}
+		}
+	}
+
+	return combined, nil
+}
+
+// isGlobalService reports whether a service's resources are stored under "global" rather
+// than per region, because they are not regional in AWS.
+func isGlobalService(serviceName string) bool {
+	return serviceName == "access" || serviceName == "dns" || serviceName == "cdn"
 }

@@ -151,6 +151,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
 - `awless list` : Clear and easy listing of multi-region cloud resources with filters via *resources properties* or *resources tags*.
 
       $ awless list instances --sort uptime --local
+      $ awless list instances --all-local-regions
       $ awless list users --format csv --columns name,created
       $ awless list volumes --filter state=in-use --filter type=gp2
       $ awless list volumes --tag-value Purchased

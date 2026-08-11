@@ -1,3 +1,14 @@
+## Unreleased
+
+### Added
+
+- **`awless list --all-local-regions`** merges a resource type from every locally synced
+  region into one listing and adds a region column. Reads only the local graph, so it makes
+  no AWS calls, and `awless show` already had the equivalent. The region is recorded per
+  resource as the graph is loaded, because nothing in a synced graph carries it — the region
+  is expressed only by which directory the file sits in. Without that, two same-named
+  resources in different regions would be indistinguishable.
+
 ## v1.2.1
 
 ### Added

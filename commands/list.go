@@ -27,6 +27,7 @@ import (
 
 	awsservices "github.com/bootswithdefer/awless/aws/services"
 	"github.com/bootswithdefer/awless/cloud"
+	"github.com/bootswithdefer/awless/cloud/properties"
 	"github.com/bootswithdefer/awless/config"
 	"github.com/bootswithdefer/awless/console"
 	"github.com/bootswithdefer/awless/logger"
@@ -46,6 +47,7 @@ var (
 	noHeadersFlag              bool
 	sortBy                     []string
 	reverseFlag                bool
+	allLocalRegionsFlag        bool
 )
 
 func init() {
@@ -73,6 +75,7 @@ func init() {
 	listCmd.PersistentFlags().StringSliceVar(&listingColumnsFlag, "columns", []string{}, "Select the properties to display in the columns. Ex: --columns id,name,cidr")
 	listCmd.PersistentFlags().BoolVar(&listOnlyIDs, "ids", false, "List only ids")
 	listCmd.PersistentFlags().BoolVar(&noHeadersFlag, "no-headers", false, "Do not display headers")
+	listCmd.PersistentFlags().BoolVar(&allLocalRegionsFlag, "all-local-regions", false, "List resources from every locally synced region, adding a region column. Implies --local")
 	listCmd.PersistentFlags().BoolVar(&reverseFlag, "reverse", false, "Use in conjunction with --sort to reverse sort")
 	listCmd.PersistentFlags().StringSliceVar(&sortBy, "sort", []string{"Id"}, "Sort tables by column(s) name(s)")
 }
@@ -96,7 +99,8 @@ var listCmd = &cobra.Command{
   awless list secrets
   awless list ssmparameters
   awless list filesystems
-  awless list apigateways`,
+  awless list apigateways
+  awless list instances --all-local-regions`,
 	PersistentPreRunE:  applyHooks(initLoggerHook, initAwlessEnvHook, initCloudServicesHook, firstInstallDoneHook),
 	PersistentPostRunE: applyHooks(verifyNewVersionHook, onVersionUpgrade, networkMonitorHook),
 	Short:              "List resources: sorting, filtering via tag/properties, output formatting, etc...",
@@ -125,13 +129,24 @@ var listSpecificResourceCmd = func(resType string) *cobra.Command {
 			}
 			var g cloud.GraphAPI
 
-			if localGlobalFlag {
+			switch {
+			case allLocalRegionsFlag:
+				srvName, ok := awsservices.ServicePerResourceType[resType]
+				if !ok {
+					return fmt.Errorf("cannot find service for resource type %s", resType)
+				}
+				var err error
+				g, err = sync.LoadLocalGraphForTypeInAllRegions(srvName, resType, config.GetAWSProfile())
+				if err != nil {
+					return err
+				}
+			case localGlobalFlag:
 				if srvName, ok := awsservices.ServicePerResourceType[resType]; ok {
 					g = sync.LoadLocalGraphForService(srvName, config.GetAWSProfile(), config.GetAWSRegion())
 				} else {
 					return fmt.Errorf("cannot find service for resource type %s", resType)
 				}
-			} else {
+			default:
 				srv, err := cloud.GetServiceForType(resType)
 				if err != nil {
 					return err
@@ -175,7 +190,7 @@ var listAllResourceInServiceCmd = func(srvName string) *cobra.Command {
 func printResources(g cloud.GraphAPI, resType string) error {
 	displayer, err := console.BuildOptions(
 		console.WithRdfType(resType),
-		console.WithColumns(listingColumnsFlag),
+		console.WithColumns(listingColumns(resType)),
 		console.WithFilters(listingFiltersFlag),
 		console.WithTagFilters(listingTagFiltersFlag),
 		console.WithTagKeyFilters(listingTagKeyFiltersFlag),
@@ -192,4 +207,31 @@ func printResources(g cloud.GraphAPI, resType string) error {
 	}
 
 	return displayer.Print(os.Stdout)
+}
+
+// listingColumns is the requested column set, with a region column added when listing
+// across regions.
+//
+// The region is not decoration there: several resources are identified by a name rather
+// than an ARN, so the same name in two regions produces two rows that are otherwise
+// identical. It is appended rather than inserted so an explicit --columns still controls
+// the order of everything the user asked for, and skipped when already present.
+func listingColumns(resType string) []string {
+	if !allLocalRegionsFlag {
+		return listingColumnsFlag
+	}
+
+	columns := listingColumnsFlag
+	if len(columns) == 0 {
+		// Copy: this is the package-level default set, and appending to it would leak
+		// the region column into later listings of the same type.
+		columns = append([]string{}, console.ColumnsInListing[resType]...)
+	}
+
+	for _, c := range columns {
+		if strings.EqualFold(c, properties.Region) {
+			return columns
+		}
+	}
+	return append(columns, properties.Region)
 }
