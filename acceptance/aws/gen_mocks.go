@@ -121,6 +121,10 @@ type secretsmanagerMock struct {
 	basicMock
 }
 
+type sfnMock struct {
+	basicMock
+}
+
 type snsMock struct {
 	basicMock
 }

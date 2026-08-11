@@ -434,6 +434,30 @@ var paramsDoc = map[string]map[string]string{
 		"eventbus": "Name of the event bus the rule is on",
 		"force":    "Remove the target even if the rule is managed by another service",
 	},
+	"create.statemachine": {
+		"name":            "Name for the state machine",
+		"role":            "ARN of the IAM role the state machine assumes",
+		"definition-file": "Path to the Amazon States Language definition, in JSON",
+		"type":            "Whether the workflow is STANDARD or EXPRESS",
+		"publish":         "Publish a version of the state machine on creation",
+	},
+	"delete.statemachine": {"arn": "ARN of the state machine to delete"},
+	"update.statemachine": {
+		"arn":             "ARN of the state machine to update",
+		"role":            "New ARN of the IAM role the state machine assumes",
+		"definition-file": "Path to the replacement Amazon States Language definition",
+		"publish":         "Publish a version of the state machine after updating",
+	},
+	"start.execution": {
+		"statemachine": "ARN of the state machine to execute",
+		"name":         "Name for this execution; must be unique within the state machine",
+		"input":        "JSON passed as the execution input",
+	},
+	"stop.execution": {
+		"arn":   "ARN of the execution to stop",
+		"cause": "Human-readable reason the execution was stopped",
+		"error": "Error code describing why the execution was stopped",
+	},
 	"create.apigateway": {
 		"name":        "Name of the API",
 		"protocol":    "Protocol of the API",

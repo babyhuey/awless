@@ -116,6 +116,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **CloudWatch Logs** | log groups |
 | **ElastiCache** | cache clusters, replication groups, cache subnet groups |
 | **EventBridge** | event buses, rules, rule targets |
+| **Step Functions** | state machines, executions |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
 just listing — see [Changes in this fork](#changes-in-this-fork).
@@ -146,6 +147,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls replicationgroups
       $ awless ls eventbuses
       $ awless ls eventrules
+      $ awless ls statemachines
       $ ...
       (see awless ls -h)
 

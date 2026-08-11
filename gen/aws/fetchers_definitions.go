@@ -282,6 +282,16 @@ var FetchersDefs = []fetchersDef{
 			{API: "eventbridge", ResourceType: cloud.EventRule, AWSType: "eventbridgetypes.Rule", ManualFetcher: true},
 		},
 	},
+	{
+		Name: "stepfunctions",
+		API:  []string{"sfn"},
+		Fetchers: []fetcher{
+			// The list item carries only name, ARN, type and creation date; the
+			// definition and role need a DescribeStateMachine per machine and are not
+			// worth an N+1 on every sync.
+			{API: "sfn", ResourceType: cloud.StateMachine, AWSType: "sfntypes.StateMachineListItem", APIMethod: "ListStateMachines", Input: "sfn.ListStateMachinesInput{}", Output: "sfn.ListStateMachinesOutput", OutputsExtractor: "StateMachines", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

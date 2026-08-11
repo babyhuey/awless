@@ -59,6 +59,8 @@ import (
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
+	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
 	ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
@@ -1359,5 +1361,39 @@ func BuildEventbridgeFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
 	addManualEventbridgeFetchFuncs(conf, funcs)
+	return funcs
+}
+func BuildStepfunctionsFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualStepfunctionsFetchFuncs(conf, funcs)
+
+	funcs["statemachine"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []sfntypes.StateMachineListItem
+
+		if !conf.getBoolDefaultTrue("aws.stepfunctions.statemachine.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource stepfunctions[statemachine]")
+			return resources, objects, nil
+		}
+		paginator := sfn.NewListStateMachinesPaginator(conf.APIs.Sfn, &sfn.ListStateMachinesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.StateMachines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
 	return funcs
 }

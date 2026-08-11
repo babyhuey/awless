@@ -29,6 +29,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/aws/aws-sdk-go-v2/service/sfn"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
@@ -68,6 +69,7 @@ type AWSAPI struct {
 	Cloudwatchlogs         *cloudwatchlogs.Client
 	Elasticache            *elasticache.Client
 	Eventbridge            *eventbridge.Client
+	Sfn                    *sfn.Client
 }
 
 type Config struct {

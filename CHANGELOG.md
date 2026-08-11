@@ -10,6 +10,11 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Step Functions.** State machines, with `list` and create/update/delete, plus
+  `start`/`stop` on an execution. The state machine definition is passed as a file:
+  `awless create statemachine name=order-flow role=<role-arn> definition-file=flow.json`.
+  Executions are deliberately not a listed resource — enumerating them needs one call per
+  state machine, for run history rather than infrastructure.
 
 ### Fixed
 

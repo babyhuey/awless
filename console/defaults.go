@@ -91,6 +91,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.CacheSubnetGroup:    {properties.Name, properties.Description, properties.Vpc},
 	cloud.EventBus:            {properties.Name, properties.Arn, properties.Description},
 	cloud.EventRule:           {properties.Name, properties.State, properties.EventBus, properties.ScheduleExpression},
+	cloud.StateMachine:        {properties.Name, properties.Type, properties.Arn, properties.Created},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -672,5 +673,12 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Description},
 		StringColumnDefinition{Prop: properties.Role},
 		StringColumnDefinition{Prop: properties.Arn},
+	},
+	// Step Functions
+	cloud.StateMachine: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.Arn},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

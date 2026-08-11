@@ -57,6 +57,7 @@ import (
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
 	ssmtypes "github.com/aws/aws-sdk-go-v2/service/ssm/types"
 
@@ -235,6 +236,9 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.EventBus, awssdk.ToString(ss.Name))
 	case eventbridgetypes.Rule:
 		res = graph.InitResource(cloud.EventRule, awssdk.ToString(ss.Name))
+	// Step Functions
+	case sfntypes.StateMachineListItem:
+		res = graph.InitResource(cloud.StateMachine, awssdk.ToString(ss.Name))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

@@ -391,6 +391,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateStack(f.config(), f.Graph, f.Logger)
 		}
+	case "createstatemachine":
+		return func() any {
+			return awsspec.NewCreateStatemachine(f.config(), f.Graph, f.Logger)
+		}
 	case "createsubnet":
 		return func() any {
 			return awsspec.NewCreateSubnet(f.config(), f.Graph, f.Logger)
@@ -651,6 +655,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteStack(f.config(), f.Graph, f.Logger)
 		}
+	case "deletestatemachine":
+		return func() any {
+			return awsspec.NewDeleteStatemachine(f.config(), f.Graph, f.Logger)
+		}
 	case "deletesubnet":
 		return func() any {
 			return awsspec.NewDeleteSubnet(f.config(), f.Graph, f.Logger)
@@ -783,6 +791,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStartEventrule(f.config(), f.Graph, f.Logger)
 		}
+	case "startexecution":
+		return func() any {
+			return awsspec.NewStartExecution(f.config(), f.Graph, f.Logger)
+		}
 	case "startinstance":
 		return func() any {
 			return awsspec.NewStartInstance(f.config(), f.Graph, f.Logger)
@@ -806,6 +818,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "stopeventrule":
 		return func() any {
 			return awsspec.NewStopEventrule(f.config(), f.Graph, f.Logger)
+		}
+	case "stopexecution":
+		return func() any {
+			return awsspec.NewStopExecution(f.config(), f.Graph, f.Logger)
 		}
 	case "stopinstance":
 		return func() any {
@@ -890,6 +906,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updatestack":
 		return func() any {
 			return awsspec.NewUpdateStack(f.config(), f.Graph, f.Logger)
+		}
+	case "updatestatemachine":
+		return func() any {
+			return awsspec.NewUpdateStatemachine(f.config(), f.Graph, f.Logger)
 		}
 	case "updatesubnet":
 		return func() any {

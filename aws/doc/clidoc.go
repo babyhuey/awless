@@ -228,6 +228,23 @@ var cliExamplesDoc = map[string][]string{
 	"detach.eventtarget": {
 		"awless detach eventtarget rule=nightly-report id=report-lambda",
 	},
+	"create.statemachine": {
+		"awless create statemachine name=order-flow role=arn:aws:iam::123456789012:role/StepFunctions definition-file=/home/jsmith/order-flow.json",
+		"awless create statemachine name=fast-flow role=arn:aws:iam::123456789012:role/StepFunctions definition-file=/home/jsmith/flow.json type=EXPRESS",
+	},
+	"delete.statemachine": {
+		"awless delete statemachine arn=arn:aws:states:us-west-2:123456789012:stateMachine:order-flow",
+	},
+	"update.statemachine": {
+		"awless update statemachine arn=arn:aws:states:us-west-2:123456789012:stateMachine:order-flow definition-file=/home/jsmith/order-flow-v2.json",
+	},
+	"start.execution": {
+		"awless start execution statemachine=arn:aws:states:us-west-2:123456789012:stateMachine:order-flow",
+		"awless start execution statemachine=arn:aws:states:us-west-2:123456789012:stateMachine:order-flow name=order-4711 input='{\"orderId\":4711}'",
+	},
+	"stop.execution": {
+		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
+	},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",

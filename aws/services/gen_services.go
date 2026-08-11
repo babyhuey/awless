@@ -77,6 +77,8 @@ import (
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
+	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
 	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -115,6 +117,7 @@ var ServiceNames = []string{
 	"cloudwatchlogs",
 	"elasticache",
 	"eventbridge",
+	"stepfunctions",
 }
 
 var ResourceTypes = []string{
@@ -185,6 +188,7 @@ var ResourceTypes = []string{
 	"cachesubnetgroup",
 	"eventbus",
 	"eventrule",
+	"statemachine",
 }
 
 var ServicePerAPI = map[string]string{
@@ -218,6 +222,7 @@ var ServicePerAPI = map[string]string{
 	"cloudwatchlogs":         "cloudwatchlogs",
 	"elasticache":            "elasticache",
 	"eventbridge":            "eventbridge",
+	"sfn":                    "stepfunctions",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -288,6 +293,7 @@ var ServicePerResourceType = map[string]string{
 	"cachesubnetgroup":    "elasticache",
 	"eventbus":            "eventbridge",
 	"eventrule":           "eventbridge",
+	"statemachine":        "stepfunctions",
 }
 
 var APIPerResourceType = map[string]string{
@@ -358,6 +364,7 @@ var APIPerResourceType = map[string]string{
 	"cachesubnetgroup":    "elasticache",
 	"eventbus":            "eventbridge",
 	"eventrule":           "eventbridge",
+	"statemachine":        "sfn",
 }
 
 type Infra struct {
@@ -3938,4 +3945,132 @@ func (s *Eventbridge) FetchByType(ctx context.Context, t string) (cloud.GraphAPI
 
 func (s *Eventbridge) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.eventbridge.sync", true)
+}
+
+type Stepfunctions struct {
+	fetcher         fetch.Fetcher
+	region, profile string
+	config          map[string]any
+	log             *logger.Logger
+	SfnClient       *sfn.Client
+}
+
+func NewStepfunctions(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	sfnClient := sfn.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		sfnClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Stepfunctions{
+		SfnClient: sfnClient,
+		fetcher:   fetch.NewFetcher(awsfetch.BuildStepfunctionsFetchFuncs(fetchConfig)),
+		config:    extraConf,
+		region:    region,
+		profile:   profile,
+		log:       log,
+	}
+}
+
+func (s *Stepfunctions) Name() string {
+	return "stepfunctions"
+}
+
+func (s *Stepfunctions) Region() string {
+	return s.region
+}
+
+func (s *Stepfunctions) Profile() string {
+	return s.profile
+}
+
+func (s *Stepfunctions) ResourceTypes() []string {
+	return []string{
+		"statemachine",
+	}
+}
+
+func (s *Stepfunctions) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.stepfunctions.statemachine.sync", true) {
+		list, err := s.fetcher.Get("statemachine_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]sfntypes.StateMachineListItem); !ok {
+			return gph, errors.New("cannot cast to '[]sfntypes.StateMachineListItem' type from fetch context")
+		}
+		for _, r := range list.([]sfntypes.StateMachineListItem) {
+			for _, fn := range addParentsFns["statemachine"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *sfntypes.StateMachineListItem) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Stepfunctions) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Stepfunctions) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.stepfunctions.sync", true)
 }

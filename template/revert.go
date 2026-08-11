@@ -114,7 +114,7 @@ func (s *Template) Revert() (*Template, error) {
 				case "database":
 					params = append(params, fmt.Sprintf("id=%s", quoteParamIfNeeded(cmd.CmdResult)))
 					params = append(params, "skip-snapshot=true")
-				case "certificate":
+				case "certificate", "statemachine":
 					params = append(params, fmt.Sprintf("arn=%s", quoteParamIfNeeded(cmd.CmdResult)))
 				case "policy":
 					params = append(params, fmt.Sprintf("arn=%s", quoteParamIfNeeded(cmd.CmdResult)))

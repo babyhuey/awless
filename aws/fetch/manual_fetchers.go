@@ -1248,3 +1248,6 @@ func addManualEventbridgeFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 		return resources, objects, nil
 	}
 }
+
+func addManualStepfunctionsFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

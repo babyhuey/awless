@@ -724,4 +724,11 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Role:               {name: "RoleArn", transform: extractValueFn},
 		properties.ManagedBy:          {name: "ManagedBy", transform: extractValueFn},
 	},
+	// Step Functions
+	cloud.StateMachine: {
+		properties.Name:    {name: "Name", transform: extractValueFn},
+		properties.Arn:     {name: "StateMachineArn", transform: extractValueFn},
+		properties.Type:    {name: "Type", transform: extractValueFn},
+		properties.Created: {name: "CreationDate", transform: extractTimeFn},
+	},
 }

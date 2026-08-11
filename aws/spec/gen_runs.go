@@ -49,6 +49,7 @@ import (
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
 	sqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 	ssm "github.com/aws/aws-sdk-go-v2/service/ssm"
@@ -6773,6 +6774,84 @@ func (cmd *CreateStack) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateStatemachine(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateStatemachine {
+	cmd := new(CreateStatemachine)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sfn.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateStatemachine) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateStatemachine) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sfn.CreateStateMachineInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sfn.CreateStateMachineInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateStateMachine(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sfn.CreateStateMachine call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create statemachine: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create statemachine '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create statemachine done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateStatemachine) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("statemachine"), nil
+}
+
+func (cmd *CreateStatemachine) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateSubnet {
 	cmd := new(CreateSubnet)
 	if len(l) > 0 {
@@ -12077,6 +12156,84 @@ func (cmd *DeleteStack) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteStatemachine(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteStatemachine {
+	cmd := new(DeleteStatemachine)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sfn.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteStatemachine) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteStatemachine) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sfn.DeleteStateMachineInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sfn.DeleteStateMachineInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteStateMachine(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sfn.DeleteStateMachine call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete statemachine: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete statemachine '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete statemachine done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteStatemachine) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("statemachine"), nil
+}
+
+func (cmd *DeleteStatemachine) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteSubnet(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteSubnet {
 	cmd := new(DeleteSubnet)
 	if len(l) > 0 {
@@ -14796,6 +14953,84 @@ func (cmd *StartEventrule) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewStartExecution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartExecution {
+	cmd := new(StartExecution)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sfn.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StartExecution) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StartExecution) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sfn.StartExecutionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sfn.StartExecutionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StartExecution(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sfn.StartExecution call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("start execution: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("start execution '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("start execution done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StartExecution) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("execution"), nil
+}
+
+func (cmd *StartExecution) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewStartInstance(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StartInstance {
 	cmd := new(StartInstance)
 	if len(l) > 0 {
@@ -15277,6 +15512,84 @@ func (cmd *StopEventrule) dryRun(renv env.Running, params map[string]any) (any, 
 }
 
 func (cmd *StopEventrule) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewStopExecution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *StopExecution {
+	cmd := new(StopExecution)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sfn.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *StopExecution) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *StopExecution) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sfn.StopExecutionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sfn.StopExecutionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.StopExecution(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sfn.StopExecution call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("stop execution: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("stop execution '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("stop execution done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *StopExecution) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("execution"), nil
+}
+
+func (cmd *StopExecution) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -16912,6 +17225,84 @@ func (cmd *UpdateStack) dryRun(renv env.Running, params map[string]any) (any, er
 }
 
 func (cmd *UpdateStack) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateStatemachine(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateStatemachine {
+	cmd := new(UpdateStatemachine)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = sfn.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateStatemachine) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateStatemachine) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &sfn.UpdateStateMachineInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in sfn.UpdateStateMachineInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.UpdateStateMachine(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("sfn.UpdateStateMachine call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update statemachine: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update statemachine '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update statemachine done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateStatemachine) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("statemachine"), nil
+}
+
+func (cmd *UpdateStatemachine) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

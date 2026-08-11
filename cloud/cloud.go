@@ -126,6 +126,8 @@ const (
 	//eventbridge
 	EventBus  string = "eventbus"
 	EventRule string = "eventrule"
+	//stepfunctions
+	StateMachine string = "statemachine"
 )
 
 type Service interface {

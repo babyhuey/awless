@@ -211,6 +211,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateSsmparameter(f.Cfg, f.Graph, f.Log) }
 	case "createstack":
 		return func() any { return NewCreateStack(f.Cfg, f.Graph, f.Log) }
+	case "createstatemachine":
+		return func() any { return NewCreateStatemachine(f.Cfg, f.Graph, f.Log) }
 	case "createsubnet":
 		return func() any { return NewCreateSubnet(f.Cfg, f.Graph, f.Log) }
 	case "createsubscription":
@@ -341,6 +343,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteSsmparameter(f.Cfg, f.Graph, f.Log) }
 	case "deletestack":
 		return func() any { return NewDeleteStack(f.Cfg, f.Graph, f.Log) }
+	case "deletestatemachine":
+		return func() any { return NewDeleteStatemachine(f.Cfg, f.Graph, f.Log) }
 	case "deletesubnet":
 		return func() any { return NewDeleteSubnet(f.Cfg, f.Graph, f.Log) }
 	case "deletesubscription":
@@ -407,6 +411,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStartDatabase(f.Cfg, f.Graph, f.Log) }
 	case "starteventrule":
 		return func() any { return NewStartEventrule(f.Cfg, f.Graph, f.Log) }
+	case "startexecution":
+		return func() any { return NewStartExecution(f.Cfg, f.Graph, f.Log) }
 	case "startinstance":
 		return func() any { return NewStartInstance(f.Cfg, f.Graph, f.Log) }
 	case "starttrail":
@@ -419,6 +425,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopDatabase(f.Cfg, f.Graph, f.Log) }
 	case "stopeventrule":
 		return func() any { return NewStopEventrule(f.Cfg, f.Graph, f.Log) }
+	case "stopexecution":
+		return func() any { return NewStopExecution(f.Cfg, f.Graph, f.Log) }
 	case "stopinstance":
 		return func() any { return NewStopInstance(f.Cfg, f.Graph, f.Log) }
 	case "stoptrail":
@@ -461,6 +469,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateSsmparameter(f.Cfg, f.Graph, f.Log) }
 	case "updatestack":
 		return func() any { return NewUpdateStack(f.Cfg, f.Graph, f.Log) }
+	case "updatestatemachine":
+		return func() any { return NewUpdateStatemachine(f.Cfg, f.Graph, f.Log) }
 	case "updatesubnet":
 		return func() any { return NewUpdateSubnet(f.Cfg, f.Graph, f.Log) }
 	case "updatetargetgroup":
@@ -554,6 +564,7 @@ var (
 	_ command = &CreateSnapshot{}
 	_ command = &CreateSsmparameter{}
 	_ command = &CreateStack{}
+	_ command = &CreateStatemachine{}
 	_ command = &CreateSubnet{}
 	_ command = &CreateSubscription{}
 	_ command = &CreateTag{}
@@ -619,6 +630,7 @@ var (
 	_ command = &DeleteSnapshot{}
 	_ command = &DeleteSsmparameter{}
 	_ command = &DeleteStack{}
+	_ command = &DeleteStatemachine{}
 	_ command = &DeleteSubnet{}
 	_ command = &DeleteSubscription{}
 	_ command = &DeleteTag{}
@@ -652,12 +664,14 @@ var (
 	_ command = &StartContainertask{}
 	_ command = &StartDatabase{}
 	_ command = &StartEventrule{}
+	_ command = &StartExecution{}
 	_ command = &StartInstance{}
 	_ command = &StartTrail{}
 	_ command = &StopAlarm{}
 	_ command = &StopContainertask{}
 	_ command = &StopDatabase{}
 	_ command = &StopEventrule{}
+	_ command = &StopExecution{}
 	_ command = &StopInstance{}
 	_ command = &StopTrail{}
 	_ command = &UpdateBucket{}
@@ -679,6 +693,7 @@ var (
 	_ command = &UpdateSecuritygroup{}
 	_ command = &UpdateSsmparameter{}
 	_ command = &UpdateStack{}
+	_ command = &UpdateStatemachine{}
 	_ command = &UpdateSubnet{}
 	_ command = &UpdateTargetgroup{}
 )
