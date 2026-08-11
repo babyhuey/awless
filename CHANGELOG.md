@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Fixed
+
+- **All-numeric hyphenated values are accepted unquoted.** A UUID, an ISO date
+  (`2024-02-09`) and an ISO timestamp were all rejected, because the int-range rule matched
+  their leading digits-dash-digits and the parser does not reconsider once a rule has
+  matched. This mattered most for AWS Backup, whose plan IDs are UUIDs. Port ranges such as
+  `22-80` are unchanged, and quoting — the documented workaround — still works.
+
 ### Added
 
 - **`awless list --all-local-regions`** merges a resource type from every locally synced

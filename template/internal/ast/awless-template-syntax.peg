@@ -61,7 +61,7 @@ QuotedString <- DoubleQuotedValue / SingleQuotedValue
 DoubleQuotedValue <- DoubleQuote <[^"]*> DoubleQuote
 SingleQuotedValue <- SingleQuote <[^']*> SingleQuote
 
-IntRangeValue <- [0-9]+'-'[0-9]+
+IntRangeValue <- [0-9]+'-'[0-9]+ ![a-zA-Z0-9-._:/+;~@<>*]
 
 RefValue <- '$'<Identifier>
 AliasValue <- '@'<UnquotedParam> / '@' DoubleQuotedValue / '@' SingleQuotedValue

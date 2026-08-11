@@ -46,7 +46,12 @@ func Parse(text string) (tmpl *Template, err error) {
 	tmpl = &Template{}
 
 	p := &ast.Peg{AST: &ast.AST{}, Buffer: text}
-	p.Init()
+	// Init returns an error as of peg v1.0.1; it only fails when given an option that
+	// rejects the parser, and none are passed here, but errcheck is right that dropping it
+	// would hide a future one.
+	if err = p.Init(); err != nil {
+		return nil, fmt.Errorf("initializing template parser: %w", err)
+	}
 
 	if err = p.Parse(); err != nil {
 		err = newParseError(text, err.Error())

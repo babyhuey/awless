@@ -487,13 +487,19 @@ Two test details that are easy to lose:
   `env.Fillers`).
 - **`wallix/awless-templates` references in `commands/run.go`** point at a *different*
   upstream repo and must stay.
-- **Template PEG regeneration** requires the `peg` tool
-  (`go install github.com/pointlander/peg@latest`). Edit the `.peg` file, never the
-  `.peg.go`.
-- **A bare UUID is not a valid param value.** The grammar accepts `name=build-and-deploy`
-  and `execution=abcd-1234`, but rejects `execution=12345678-1234-1234-1234-123456789012` —
-  an all-numeric hyphenated value appears to parse as an expression. Quote it, and say so in
-  the param documentation for any command that takes one.
+- **Template PEG regeneration** is `make generate-parser`, which installs the pinned `peg`
+  version. Edit the `.peg` file, never the `.peg.go`. The version is pinned (`PEG_VERSION` in
+  the Makefile) because the previously committed parser was produced by an unrecorded one:
+  `@latest` rewrote 598 unrelated lines and embedded the absolute path of whoever ran it in
+  the header. The target runs `peg` by name from the grammar's directory so that header stays
+  relative. Note also that the local template log re-parses persisted command lines, so the
+  grammar is a compatibility surface — a grammar change should be checked for round-trip
+  stability, not just for what it newly accepts.
+- **All-numeric hyphenated values used to be rejected** — a UUID, an ISO date and an ISO
+  timestamp among them. `IntRangeValue` matched the leading `12345678-1234` and PEG does not
+  reconsider an alternative that already succeeded, so the value never fell through to
+  `UnquotedParam`. Fixed by requiring `IntRangeValue` to end at a token boundary. Quoting
+  still works, so templates and stored log lines that already quote are unaffected.
 - **Inline JSON must be single-quoted.** There is no escape for a double quote inside a
   double-quoted value, so `pattern='{"source":["aws.ec2"]}'` is the only form that works.
   For anything longer than a line, take a file instead — see `create statemachine`.

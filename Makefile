@@ -12,10 +12,12 @@ GOBIN           := $(shell go env GOPATH)/bin
 
 # Must match the version installed by the lint job in CI.
 GOLANGCI_VERSION := v2.12.2
+PEG_VERSION      := v1.0.1
 GOLANGCI         := $(GOBIN)/golangci-lint
 GORELEASER       := $(GOBIN)/goreleaser
 GOVULNCHECK      := $(GOBIN)/govulncheck
 GOIMPORTS        := $(GOBIN)/goimports
+PEG              := $(GOBIN)/peg
 
 # Files that are generated or vendored grammar output, excluded from formatting
 # checks to match the exclusions in .golangci.yml.
@@ -121,7 +123,7 @@ verify: fmt-check vet lint test-race vuln ## Full gate, mirrors CI
 ## --- tooling -------------------------------------------------------------
 
 .PHONY: tools
-tools: $(GOLANGCI) $(GOVULNCHECK) $(GOIMPORTS) ## Install pinned dev tools
+tools: $(GOLANGCI) $(GOVULNCHECK) $(GOIMPORTS) $(PEG) ## Install pinned dev tools
 
 $(GOLANGCI):
 	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_VERSION)
@@ -131,6 +133,19 @@ $(GOVULNCHECK):
 
 $(GOIMPORTS):
 	go install golang.org/x/tools/cmd/goimports@latest
+
+$(PEG):
+	go install github.com/pointlander/peg@$(PEG_VERSION)
+
+.PHONY: generate-parser
+generate-parser: $(PEG) ## Regenerate the template parser from the PEG grammar
+	@# Run from the grammar's directory and invoke peg by name, so the generated
+	@# header records a relative command rather than the absolute path of whoever
+	@# ran it. The version is pinned because the committed parser was produced by an
+	@# unrecorded one, and matching it afterwards was guesswork.
+	cd template/internal/ast && PATH="$(GOBIN):$$PATH" \
+		peg -inline -switch -output awless-template-syntax.peg.go awless-template-syntax.peg
+	gofmt -w -s template/internal/ast/awless-template-syntax.peg.go
 
 .PHONY: release-check
 release-check: $(GORELEASER) ## Validate .goreleaser.yml
