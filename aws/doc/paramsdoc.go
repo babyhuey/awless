@@ -458,6 +458,15 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.backupvault": {
+		"name":    "Name for the backup vault",
+		"kms-key": "ARN of a customer-managed KMS key; a customer-managed key is what makes cross-account and cross-region copies possible",
+	},
+	"delete.backupvault": {"name": "Name of the vault to delete; it must hold no recovery points, which AWS enforces"},
+	"create.backupplan": {
+		"definition-file": "Path to the backup plan in JSON: its name and a list of rules, each with a schedule, lifecycle and target vault",
+	},
+	"delete.backupplan": {"id": "Identifier of the backup plan to delete"},
 	"create.namespace": {
 		"name":        "Name for the namespace",
 		"description": "Description of the namespace",

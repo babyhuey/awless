@@ -215,6 +215,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateAppscalingtarget(f.config(), f.Graph, f.Logger)
 		}
+	case "createbackupplan":
+		return func() any {
+			return awsspec.NewCreateBackupplan(f.config(), f.Graph, f.Logger)
+		}
+	case "createbackupvault":
+		return func() any {
+			return awsspec.NewCreateBackupvault(f.config(), f.Graph, f.Logger)
+		}
 	case "createbroker":
 		return func() any {
 			return awsspec.NewCreateBroker(f.config(), f.Graph, f.Logger)
@@ -610,6 +618,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteappscalingtarget":
 		return func() any {
 			return awsspec.NewDeleteAppscalingtarget(f.config(), f.Graph, f.Logger)
+		}
+	case "deletebackupplan":
+		return func() any {
+			return awsspec.NewDeleteBackupplan(f.config(), f.Graph, f.Logger)
+		}
+	case "deletebackupvault":
+		return func() any {
+			return awsspec.NewDeleteBackupvault(f.config(), f.Graph, f.Logger)
 		}
 	case "deletebroker":
 		return func() any {

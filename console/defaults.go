@@ -126,6 +126,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.VpcPeering:               {properties.ID, properties.State, properties.Vpc, properties.PeerVpc},
 	cloud.Namespace:                {properties.ID, properties.Name, properties.Type, properties.ServiceCount},
 	cloud.DiscoveryService:         {properties.ID, properties.Name, properties.Type, properties.InstanceCount},
+	cloud.BackupPlan:               {properties.ID, properties.Name, properties.LastExecution, properties.Created},
+	cloud.BackupVault:              {properties.Name, properties.Locked, properties.MaxRetentionDays, properties.Created},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -964,6 +966,20 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Type},
 		StringColumnDefinition{Prop: properties.InstanceCount, Friendly: "Instances"},
 		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	}, // AWS Backup
+	cloud.BackupPlan: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Version},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.LastExecution}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.BackupVault: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Locked},
+		StringColumnDefinition{Prop: properties.MaxRetentionDays, Friendly: "Max Retention"},
+		StringColumnDefinition{Prop: properties.Arn},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

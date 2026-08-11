@@ -33,6 +33,8 @@ import (
 	applicationautoscaling "github.com/aws/aws-sdk-go-v2/service/applicationautoscaling"
 	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	backup "github.com/aws/aws-sdk-go-v2/service/backup"
+	backuptypes "github.com/aws/aws-sdk-go-v2/service/backup/types"
 	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -157,6 +159,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"backup",
 	"cloudmap",
 	"globalaccelerator",
 	"fsx",
@@ -252,6 +255,8 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"backupplan",
+	"backupvault",
 	"namespace",
 	"discoveryservice",
 	"accelerator",
@@ -312,6 +317,7 @@ var ServicePerAPI = map[string]string{
 	"kinesis":                 "kinesis",
 	"redshift":                "redshift",
 	"codepipeline":            "codepipeline",
+	"backup":                  "backup",
 	"servicediscovery":        "cloudmap",
 	"globalaccelerator":       "globalaccelerator",
 	"fsx":                     "fsx",
@@ -408,6 +414,8 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"backupplan":               "backup",
+	"backupvault":              "backup",
 	"namespace":                "cloudmap",
 	"discoveryservice":         "cloudmap",
 	"accelerator":              "globalaccelerator",
@@ -513,6 +521,8 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"backupplan":               "backup",
+	"backupvault":              "backup",
 	"namespace":                "servicediscovery",
 	"discoveryservice":         "servicediscovery",
 	"accelerator":              "globalaccelerator",
@@ -5066,6 +5076,157 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Backup struct {
+	fetcher         fetch.Fetcher
+	region, profile string
+	config          map[string]any
+	log             *logger.Logger
+	BackupClient    *backup.Client
+}
+
+func NewBackup(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	backupClient := backup.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		backupClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Backup{
+		BackupClient: backupClient,
+		fetcher:      fetch.NewFetcher(awsfetch.BuildBackupFetchFuncs(fetchConfig)),
+		config:       extraConf,
+		region:       region,
+		profile:      profile,
+		log:          log,
+	}
+}
+
+func (s *Backup) Name() string {
+	return "backup"
+}
+
+func (s *Backup) Region() string {
+	return s.region
+}
+
+func (s *Backup) Profile() string {
+	return s.profile
+}
+
+func (s *Backup) ResourceTypes() []string {
+	return []string{
+		"backupplan",
+		"backupvault",
+	}
+}
+
+func (s *Backup) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.backup.backupplan.sync", true) {
+		list, err := s.fetcher.Get("backupplan_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]backuptypes.BackupPlansListMember); !ok {
+			return gph, errors.New("cannot cast to '[]backuptypes.BackupPlansListMember' type from fetch context")
+		}
+		for _, r := range list.([]backuptypes.BackupPlansListMember) {
+			for _, fn := range addParentsFns["backupplan"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *backuptypes.BackupPlansListMember) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.backup.backupvault.sync", true) {
+		list, err := s.fetcher.Get("backupvault_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]backuptypes.BackupVaultListMember); !ok {
+			return gph, errors.New("cannot cast to '[]backuptypes.BackupVaultListMember' type from fetch context")
+		}
+		for _, r := range list.([]backuptypes.BackupVaultListMember) {
+			for _, fn := range addParentsFns["backupvault"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *backuptypes.BackupVaultListMember) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Backup) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Backup) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.backup.sync", true)
 }
 
 type Cloudmap struct {

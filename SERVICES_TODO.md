@@ -8,4 +8,3 @@ ElastiCache, EventBridge, Step Functions, WAF v2, AWS Config, Kinesis, Redshift,
 
 | Rank | Service | Resources | Complexity |
 |------|---------|-----------|------------|
-| 1 | AWS Backup | backup plans, vaults, recovery points | Low |

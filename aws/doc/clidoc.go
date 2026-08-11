@@ -245,6 +245,13 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.backupvault": {
+		"awless create backupvault name=daily",
+		"awless create backupvault name=compliance kms-key=arn:aws:kms:us-west-2:123456789012:key/abcd",
+	},
+	"delete.backupvault": {"awless delete backupvault name=daily"},
+	"create.backupplan":  {"awless create backupplan definition-file=/home/jsmith/plan.json"},
+	"delete.backupplan":  {"awless delete backupplan id=abcd1234-5678"},
 	"create.namespace": {
 		"awless create namespace name=internal vpc=vpc-1234",
 		"awless create namespace name=http-only description=\"HTTP discovery only\"",

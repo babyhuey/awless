@@ -1710,3 +1710,6 @@ func addManualGlobalacceleratorFetchFuncs(conf *Config, funcs map[string]fetch.F
 
 func addManualCloudmapFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
+
+func addManualBackupFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

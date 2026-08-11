@@ -27,6 +27,8 @@ import (
 	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
 	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	backup "github.com/aws/aws-sdk-go-v2/service/backup"
+	backuptypes "github.com/aws/aws-sdk-go-v2/service/backup/types"
 	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -1691,6 +1693,68 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.Pipelines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildBackupFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualBackupFetchFuncs(conf, funcs)
+
+	funcs["backupplan"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []backuptypes.BackupPlansListMember
+
+		if !conf.getBoolDefaultTrue("aws.backup.backupplan.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource backup[backupplan]")
+			return resources, objects, nil
+		}
+		paginator := backup.NewListBackupPlansPaginator(conf.APIs.Backup, &backup.ListBackupPlansInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.BackupPlansList {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["backupvault"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []backuptypes.BackupVaultListMember
+
+		if !conf.getBoolDefaultTrue("aws.backup.backupvault.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource backup[backupvault]")
+			return resources, objects, nil
+		}
+		paginator := backup.NewListBackupVaultsPaginator(conf.APIs.Backup, &backup.ListBackupVaultsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.BackupVaultList {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

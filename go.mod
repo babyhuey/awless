@@ -63,6 +63,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.36 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.5 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.37 // indirect
+	github.com/aws/aws-sdk-go-v2/service/backup v1.60.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codebuild v1.72.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codedeploy v1.38.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/codepipeline v1.49.5 // indirect

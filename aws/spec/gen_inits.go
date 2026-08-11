@@ -123,6 +123,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "createappscalingtarget":
 		return func() any { return NewCreateAppscalingtarget(f.Cfg, f.Graph, f.Log) }
+	case "createbackupplan":
+		return func() any { return NewCreateBackupplan(f.Cfg, f.Graph, f.Log) }
+	case "createbackupvault":
+		return func() any { return NewCreateBackupvault(f.Cfg, f.Graph, f.Log) }
 	case "createbroker":
 		return func() any { return NewCreateBroker(f.Cfg, f.Graph, f.Log) }
 	case "createbucket":
@@ -321,6 +325,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "deleteappscalingtarget":
 		return func() any { return NewDeleteAppscalingtarget(f.Cfg, f.Graph, f.Log) }
+	case "deletebackupplan":
+		return func() any { return NewDeleteBackupplan(f.Cfg, f.Graph, f.Log) }
+	case "deletebackupvault":
+		return func() any { return NewDeleteBackupvault(f.Cfg, f.Graph, f.Log) }
 	case "deletebroker":
 		return func() any { return NewDeleteBroker(f.Cfg, f.Graph, f.Log) }
 	case "deletebucket":
@@ -688,6 +696,8 @@ var (
 	_ command = &CreateApplication{}
 	_ command = &CreateAppscalingpolicy{}
 	_ command = &CreateAppscalingtarget{}
+	_ command = &CreateBackupplan{}
+	_ command = &CreateBackupvault{}
 	_ command = &CreateBroker{}
 	_ command = &CreateBucket{}
 	_ command = &CreateBuildproject{}
@@ -787,6 +797,8 @@ var (
 	_ command = &DeleteApplication{}
 	_ command = &DeleteAppscalingpolicy{}
 	_ command = &DeleteAppscalingtarget{}
+	_ command = &DeleteBackupplan{}
+	_ command = &DeleteBackupvault{}
 	_ command = &DeleteBroker{}
 	_ command = &DeleteBucket{}
 	_ command = &DeleteBuildproject{}

@@ -28,6 +28,7 @@ import (
 	apigatewayv2 "github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	applicationautoscaling "github.com/aws/aws-sdk-go-v2/service/applicationautoscaling"
 	autoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	backup "github.com/aws/aws-sdk-go-v2/service/backup"
 	cloudformation "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	cloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	cloudtrail "github.com/aws/aws-sdk-go-v2/service/cloudtrail"
@@ -3221,6 +3222,162 @@ func (cmd *CreateAppscalingtarget) dryRun(renv env.Running, params map[string]an
 }
 
 func (cmd *CreateAppscalingtarget) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateBackupplan(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateBackupplan {
+	cmd := new(CreateBackupplan)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = backup.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateBackupplan) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateBackupplan) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &backup.CreateBackupPlanInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in backup.CreateBackupPlanInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateBackupPlan(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("backup.CreateBackupPlan call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create backupplan: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create backupplan '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create backupplan done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateBackupplan) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("backupplan"), nil
+}
+
+func (cmd *CreateBackupplan) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateBackupvault(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateBackupvault {
+	cmd := new(CreateBackupvault)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = backup.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateBackupvault) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateBackupvault) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &backup.CreateBackupVaultInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in backup.CreateBackupVaultInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateBackupVault(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("backup.CreateBackupVault call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create backupvault: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create backupvault '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create backupvault done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateBackupvault) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("backupvault"), nil
+}
+
+func (cmd *CreateBackupvault) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -11247,6 +11404,162 @@ func (cmd *DeleteAppscalingtarget) dryRun(renv env.Running, params map[string]an
 }
 
 func (cmd *DeleteAppscalingtarget) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteBackupplan(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteBackupplan {
+	cmd := new(DeleteBackupplan)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = backup.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteBackupplan) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteBackupplan) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &backup.DeleteBackupPlanInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in backup.DeleteBackupPlanInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteBackupPlan(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("backup.DeleteBackupPlan call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete backupplan: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete backupplan '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete backupplan done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteBackupplan) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("backupplan"), nil
+}
+
+func (cmd *DeleteBackupplan) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteBackupvault(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteBackupvault {
+	cmd := new(DeleteBackupvault)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = backup.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteBackupvault) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteBackupvault) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &backup.DeleteBackupVaultInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in backup.DeleteBackupVaultInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteBackupVault(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("backup.DeleteBackupVault call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete backupvault: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete backupvault '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete backupvault done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteBackupvault) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("backupvault"), nil
+}
+
+func (cmd *DeleteBackupvault) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

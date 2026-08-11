@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	"github.com/aws/aws-sdk-go-v2/service/applicationautoscaling"
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	"github.com/aws/aws-sdk-go-v2/service/backup"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudtrail"
@@ -103,6 +104,7 @@ type AWSAPI struct {
 	Fsx                     *fsx.Client
 	Globalaccelerator       *globalaccelerator.Client
 	Servicediscovery        *servicediscovery.Client
+	Backup                  *backup.Client
 	Elasticbeanstalk        *elasticbeanstalk.Client
 }
 

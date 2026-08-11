@@ -35,6 +35,7 @@ import (
 	acmtypes "github.com/aws/aws-sdk-go-v2/service/acm/types"
 	apigatewayv2types "github.com/aws/aws-sdk-go-v2/service/apigatewayv2/types"
 	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
+	backuptypes "github.com/aws/aws-sdk-go-v2/service/backup/types"
 	cloudformationtypes "github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 	cloudfronttypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	cloudtrailtypes "github.com/aws/aws-sdk-go-v2/service/cloudtrail/types"
@@ -293,6 +294,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// AWS Backup
+	case backuptypes.BackupPlansListMember:
+		res = graph.InitResource(cloud.BackupPlan, awssdk.ToString(ss.BackupPlanId))
+	case backuptypes.BackupVaultListMember:
+		res = graph.InitResource(cloud.BackupVault, awssdk.ToString(ss.BackupVaultName))
 	// Cloud Map
 	case servicediscoverytypes.NamespaceSummary:
 		res = graph.InitResource(cloud.Namespace, awssdk.ToString(ss.Id))

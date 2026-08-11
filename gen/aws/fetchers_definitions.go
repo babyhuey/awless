@@ -345,6 +345,14 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "backup",
+		API:  []string{"backup"},
+		Fetchers: []fetcher{
+			{API: "backup", ResourceType: cloud.BackupPlan, AWSType: "backuptypes.BackupPlansListMember", APIMethod: "ListBackupPlans", Input: "backup.ListBackupPlansInput{}", Output: "backup.ListBackupPlansOutput", OutputsExtractor: "BackupPlansList", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "backup", ResourceType: cloud.BackupVault, AWSType: "backuptypes.BackupVaultListMember", APIMethod: "ListBackupVaults", Input: "backup.ListBackupVaultsInput{}", Output: "backup.ListBackupVaultsOutput", OutputsExtractor: "BackupVaultList", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
+	{
 		Name: "cloudmap",
 		API:  []string{"servicediscovery"},
 		Fetchers: []fetcher{

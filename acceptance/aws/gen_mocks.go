@@ -37,6 +37,10 @@ type autoscalingMock struct {
 	basicMock
 }
 
+type backupMock struct {
+	basicMock
+}
+
 type cloudformationMock struct {
 	basicMock
 }

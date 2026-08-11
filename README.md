@@ -135,6 +135,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **Global Accelerator** | accelerators, listeners |
 | **VPC Peering** | peering connections |
 | **Cloud Map** | namespaces, services |
+| **AWS Backup** | backup plans, vaults |
 | **VPC Endpoints** | gateway and interface endpoints |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
@@ -191,6 +192,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls accelerators
       $ awless ls vpcpeerings
       $ awless ls namespaces
+      $ awless ls backupplans
       $ ...
       (see awless ls -h)
 

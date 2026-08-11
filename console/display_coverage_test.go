@@ -82,5 +82,6 @@ func allResourceTypes() []string {
 		cloud.FSxFileSystem, cloud.FSxBackup,
 		cloud.Accelerator, cloud.AcceleratorListener,
 		cloud.VpcPeering, cloud.Namespace, cloud.DiscoveryService,
+		cloud.BackupPlan, cloud.BackupVault,
 	}
 }

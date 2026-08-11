@@ -154,6 +154,7 @@ const (
 	Key                               = "cloud:key"
 	KeyName                           = "cloud:keyName"
 	KeyPair                           = "cloud:keyPair"
+	LastExecution                     = "cloud:lastExecution"
 	LastModified                      = "cloud:lastModified"
 	LatestRestorableTime              = "cloud:latestRestorableTime"
 	LaunchConfigurationName           = "cloud:launchConfigurationName"
@@ -163,10 +164,12 @@ const (
 	LoadBalancer                      = "cloud:loadBalancer"
 	Location                          = "cloud:location"
 	LocationURI                       = "cloud:locationUri"
+	Locked                            = "cloud:locked"
 	MACAddress                        = "cloud:macAddress"
 	Main                              = "cloud:main"
 	ManagedBy                         = "cloud:managedBy"
 	MasterUsername                    = "cloud:masterUsername"
+	MaxRetentionDays                  = "cloud:maxRetentionDays"
 	MaxSize                           = "cloud:maxSize"
 	MemberClusters                    = "cloud:memberClusters"
 	Memory                            = "cloud:memory"
@@ -468,6 +471,7 @@ func init() {
 		properties.Key:                               Key,
 		properties.KeyName:                           KeyName,
 		properties.KeyPair:                           KeyPair,
+		properties.LastExecution:                     LastExecution,
 		properties.LastModified:                      LastModified,
 		properties.LatestRestorableTime:              LatestRestorableTime,
 		properties.LaunchConfigurationName:           LaunchConfigurationName,
@@ -477,10 +481,12 @@ func init() {
 		properties.LoadBalancer:                      LoadBalancer,
 		properties.Location:                          Location,
 		properties.LocationURI:                       LocationURI,
+		properties.Locked:                            Locked,
 		properties.MACAddress:                        MACAddress,
 		properties.Main:                              Main,
 		properties.ManagedBy:                         ManagedBy,
 		properties.MasterUsername:                    MasterUsername,
+		properties.MaxRetentionDays:                  MaxRetentionDays,
 		properties.MaxSize:                           MaxSize,
 		properties.MemberClusters:                    MemberClusters,
 		properties.Memory:                            Memory,
@@ -782,6 +788,7 @@ var Properties = RDFProperties{
 	Key:                               {ID: Key, RdfType: "rdf:Property", RdfsLabel: "Key", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	KeyName:                           {ID: KeyName, RdfType: "rdf:Property", RdfsLabel: "KeyName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	KeyPair:                           {ID: KeyPair, RdfType: "rdf:Property", RdfsLabel: "KeyPair", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	LastExecution:                     {ID: LastExecution, RdfType: "rdf:Property", RdfsLabel: "LastExecution", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	LastModified:                      {ID: LastModified, RdfType: "rdf:Property", RdfsLabel: "LastModified", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	LatestRestorableTime:              {ID: LatestRestorableTime, RdfType: "rdf:Property", RdfsLabel: "LatestRestorableTime", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	LaunchConfigurationName:           {ID: LaunchConfigurationName, RdfType: "rdf:Property", RdfsLabel: "LaunchConfigurationName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -791,10 +798,12 @@ var Properties = RDFProperties{
 	LoadBalancer:                      {ID: LoadBalancer, RdfType: "rdf:Property", RdfsLabel: "LoadBalancer", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	Location:                          {ID: Location, RdfType: "rdf:Property", RdfsLabel: "Location", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	LocationURI:                       {ID: LocationURI, RdfType: "rdf:Property", RdfsLabel: "LocationURI", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Locked:                            {ID: Locked, RdfType: "rdf:Property", RdfsLabel: "Locked", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	MACAddress:                        {ID: MACAddress, RdfType: "rdf:Property", RdfsLabel: "MACAddress", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Main:                              {ID: Main, RdfType: "rdf:Property", RdfsLabel: "Main", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	ManagedBy:                         {ID: ManagedBy, RdfType: "rdf:Property", RdfsLabel: "ManagedBy", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MasterUsername:                    {ID: MasterUsername, RdfType: "rdf:Property", RdfsLabel: "MasterUsername", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	MaxRetentionDays:                  {ID: MaxRetentionDays, RdfType: "rdf:Property", RdfsLabel: "MaxRetentionDays", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	MaxSize:                           {ID: MaxSize, RdfType: "rdf:Property", RdfsLabel: "MaxSize", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	MemberClusters:                    {ID: MemberClusters, RdfType: "rdf:Property", RdfsLabel: "MemberClusters", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	Memory:                            {ID: Memory, RdfType: "rdf:Property", RdfsLabel: "Memory", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},

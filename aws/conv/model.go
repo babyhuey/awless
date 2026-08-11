@@ -857,6 +857,22 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// AWS Backup
+	cloud.BackupPlan: {
+		properties.ID:            {name: "BackupPlanId", transform: extractValueFn},
+		properties.Name:          {name: "BackupPlanName", transform: extractValueFn},
+		properties.Arn:           {name: "BackupPlanArn", transform: extractValueFn},
+		properties.Version:       {name: "VersionId", transform: extractValueFn},
+		properties.LastExecution: {name: "LastExecutionDate", transform: extractTimeFn},
+		properties.Created:       {name: "CreationDate", transform: extractTimeFn},
+	},
+	cloud.BackupVault: {
+		properties.Name:             {name: "BackupVaultName", transform: extractValueFn},
+		properties.Arn:              {name: "BackupVaultArn", transform: extractValueFn},
+		properties.Locked:           {name: "Locked", transform: extractValueFn},
+		properties.MaxRetentionDays: {name: "MaxRetentionDays", transform: extractValueFn},
+		properties.Created:          {name: "CreationDate", transform: extractTimeFn},
+	},
 	// Cloud Map
 	cloud.Namespace: {
 		properties.ID:           {name: "Id", transform: extractValueFn},

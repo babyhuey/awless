@@ -146,6 +146,9 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//aws backup
+	BackupPlan  string = "backupplan"
+	BackupVault string = "backupvault"
 	//cloud map. "discoveryservice" because "containerservice" and the generic notion of
 	//a service are both already in play.
 	Namespace        string = "namespace"
