@@ -118,6 +118,7 @@ var ColumnsInListing = map[string][]string{
 	cloud.UserPool:                 {properties.ID, properties.Name, properties.State, properties.Created},
 	cloud.IdentityPool:             {properties.ID, properties.Name},
 	cloud.KafkaCluster:             {properties.Name, properties.State, properties.KafkaVersion, properties.BrokerCount},
+	cloud.Broker:                   {properties.ID, properties.Name, properties.State, properties.EngineType, properties.DeploymentMode},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -894,6 +895,15 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Type},
 		StringColumnDefinition{Prop: properties.KafkaVersion, Friendly: "Kafka"},
 		StringColumnDefinition{Prop: properties.BrokerCount, Friendly: "Brokers"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	}, // Amazon MQ
+	cloud.Broker: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.EngineType, Friendly: "Engine"},
+		StringColumnDefinition{Prop: properties.DeploymentMode, Friendly: "Mode"},
+		StringColumnDefinition{Prop: properties.HostInstanceType, Friendly: "Instance"},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

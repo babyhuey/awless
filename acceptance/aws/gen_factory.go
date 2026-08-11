@@ -207,6 +207,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateAppscalingtarget(f.config(), f.Graph, f.Logger)
 		}
+	case "createbroker":
+		return func() any {
+			return awsspec.NewCreateBroker(f.config(), f.Graph, f.Logger)
+		}
 	case "createbucket":
 		return func() any {
 			return awsspec.NewCreateBucket(f.config(), f.Graph, f.Logger)
@@ -570,6 +574,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteappscalingtarget":
 		return func() any {
 			return awsspec.NewDeleteAppscalingtarget(f.config(), f.Graph, f.Logger)
+		}
+	case "deletebroker":
+		return func() any {
+			return awsspec.NewDeleteBroker(f.config(), f.Graph, f.Logger)
 		}
 	case "deletebucket":
 		return func() any {

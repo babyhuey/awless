@@ -10,6 +10,9 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Amazon MQ.** Brokers, with create and delete. The initial user credentials are passed as
+  a file rather than on the command line, so a password does not end up in shell history or
+  the template log.
 - **MSK.** Kafka clusters, with create and delete. The entity is `kafkacluster`, since ECS,
   EKS and Redshift already have clusters of their own.
 - **Cognito.** User pools and identity pools, with create and delete. These are two

@@ -89,6 +89,8 @@ import (
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	mq "github.com/aws/aws-sdk-go-v2/service/mq"
+	mqtypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
@@ -149,6 +151,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"mq",
 	"msk",
 	"cognito",
 	"ses",
@@ -239,6 +242,7 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"broker",
 	"kafkacluster",
 	"userpool",
 	"identitypool",
@@ -292,6 +296,7 @@ var ServicePerAPI = map[string]string{
 	"kinesis":                 "kinesis",
 	"redshift":                "redshift",
 	"codepipeline":            "codepipeline",
+	"mq":                      "mq",
 	"kafka":                   "msk",
 	"cognitoidentityprovider": "cognito",
 	"cognitoidentity":         "cognito",
@@ -383,6 +388,7 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"broker":                   "mq",
 	"kafkacluster":             "msk",
 	"userpool":                 "cognito",
 	"identitypool":             "cognito",
@@ -480,6 +486,7 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"broker":                   "mq",
 	"kafkacluster":             "kafka",
 	"userpool":                 "cognitoidentityprovider",
 	"identitypool":             "cognitoidentity",
@@ -5003,6 +5010,134 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Mq struct {
+	fetcher         fetch.Fetcher
+	region, profile string
+	config          map[string]any
+	log             *logger.Logger
+	MqClient        *mq.Client
+}
+
+func NewMq(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	mqClient := mq.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		mqClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Mq{
+		MqClient: mqClient,
+		fetcher:  fetch.NewFetcher(awsfetch.BuildMqFetchFuncs(fetchConfig)),
+		config:   extraConf,
+		region:   region,
+		profile:  profile,
+		log:      log,
+	}
+}
+
+func (s *Mq) Name() string {
+	return "mq"
+}
+
+func (s *Mq) Region() string {
+	return s.region
+}
+
+func (s *Mq) Profile() string {
+	return s.profile
+}
+
+func (s *Mq) ResourceTypes() []string {
+	return []string{
+		"broker",
+	}
+}
+
+func (s *Mq) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.mq.broker.sync", true) {
+		list, err := s.fetcher.Get("broker_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]mqtypes.BrokerSummary); !ok {
+			return gph, errors.New("cannot cast to '[]mqtypes.BrokerSummary' type from fetch context")
+		}
+		for _, r := range list.([]mqtypes.BrokerSummary) {
+			for _, fn := range addParentsFns["broker"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *mqtypes.BrokerSummary) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Mq) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Mq) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.mq.sync", true)
 }
 
 type Msk struct {

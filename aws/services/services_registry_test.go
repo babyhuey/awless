@@ -111,7 +111,7 @@ func TestNewServicesAreRegistered(t *testing.T) {
 	for _, want := range []string{
 		"infra", "access", "storage", "messaging", "dns", "lambda", "monitoring",
 		"cdn", "cloudformation", "eks", "dynamodb", "secretsmanager", "apigateway",
-		"ssm", "efs", "cloudtrail", "cloudwatchlogs", "elasticache", "eventbridge", "stepfunctions", "waf", "configservice", "kinesis", "redshift", "codepipeline", "codebuild", "beanstalk", "codedeploy", "glue", "ses", "cognito", "msk",
+		"ssm", "efs", "cloudtrail", "cloudwatchlogs", "elasticache", "eventbridge", "stepfunctions", "waf", "configservice", "kinesis", "redshift", "codepipeline", "codebuild", "beanstalk", "codedeploy", "glue", "ses", "cognito", "msk", "mq",
 	} {
 		if _, ok := cloud.ServiceRegistry[want]; !ok {
 			t.Errorf("service %q is not registered", want)

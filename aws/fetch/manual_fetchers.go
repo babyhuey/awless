@@ -1656,3 +1656,6 @@ func addManualCognitoFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 
 func addManualMskFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
+
+func addManualMqFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

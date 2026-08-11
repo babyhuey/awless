@@ -63,6 +63,7 @@ import (
 	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	mqtypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	redshifttypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
@@ -286,6 +287,9 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// Amazon MQ
+	case mqtypes.BrokerSummary:
+		res = graph.InitResource(cloud.Broker, awssdk.ToString(ss.BrokerId))
 	// MSK
 	case kafkatypes.Cluster:
 		res = graph.InitResource(cloud.KafkaCluster, awssdk.ToString(ss.ClusterName))

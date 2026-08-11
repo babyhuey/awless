@@ -80,6 +80,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.21 // indirect
 	github.com/aws/aws-sdk-go-v2/service/kafka v1.58.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.46.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/mq v1.39.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/redshift v1.65.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.66.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sfn v1.45.5 // indirect

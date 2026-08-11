@@ -245,6 +245,10 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.broker": {
+		"awless create broker name=orders engine=RABBITMQ type=mq.m5.large mode=SINGLE_INSTANCE public=false users-file=/home/jsmith/users.json",
+	},
+	"delete.broker": {"awless delete broker id=b-1234abcd"},
 	"create.kafkacluster": {
 		"awless create kafkacluster name=events version=3.6.0 brokers=3 subnets=subnet-1,subnet-2,subnet-3 type=kafka.m5.large storage=100",
 	},

@@ -78,6 +78,6 @@ func allResourceTypes() []string {
 		cloud.GlueDatabase, cloud.GlueTable, cloud.Crawler, cloud.Job,
 		cloud.EmailIdentity, cloud.ConfigurationSet,
 		cloud.UserPool, cloud.IdentityPool,
-		cloud.KafkaCluster,
+		cloud.KafkaCluster, cloud.Broker,
 	}
 }

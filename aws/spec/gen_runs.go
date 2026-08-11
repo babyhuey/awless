@@ -55,6 +55,7 @@ import (
 	kafka "github.com/aws/aws-sdk-go-v2/service/kafka"
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	mq "github.com/aws/aws-sdk-go-v2/service/mq"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
@@ -3061,6 +3062,84 @@ func (cmd *CreateAppscalingtarget) dryRun(renv env.Running, params map[string]an
 }
 
 func (cmd *CreateAppscalingtarget) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateBroker(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateBroker {
+	cmd := new(CreateBroker)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = mq.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateBroker) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateBroker) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &mq.CreateBrokerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in mq.CreateBrokerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateBroker(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("mq.CreateBroker call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create broker: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create broker '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create broker done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateBroker) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("broker"), nil
+}
+
+func (cmd *CreateBroker) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10447,6 +10526,84 @@ func (cmd *DeleteAppscalingtarget) dryRun(renv env.Running, params map[string]an
 }
 
 func (cmd *DeleteAppscalingtarget) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteBroker(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteBroker {
+	cmd := new(DeleteBroker)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = mq.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteBroker) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteBroker) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &mq.DeleteBrokerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in mq.DeleteBrokerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteBroker(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("mq.DeleteBroker call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete broker: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete broker '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete broker done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteBroker) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("broker"), nil
+}
+
+func (cmd *DeleteBroker) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

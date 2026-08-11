@@ -30,6 +30,7 @@ var entities = map[Entity]struct{}{
 	"application":              {},
 	"appscalingpolicy":         {},
 	"appscalingtarget":         {},
+	"broker":                   {},
 	"bucket":                   {},
 	"buildproject":             {},
 	"cachecluster":             {},

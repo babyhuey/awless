@@ -67,6 +67,8 @@ import (
 	kinesistypes "github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
+	mq "github.com/aws/aws-sdk-go-v2/service/mq"
+	mqtypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
@@ -1655,6 +1657,40 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.Pipelines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildMqFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualMqFetchFuncs(conf, funcs)
+
+	funcs["broker"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []mqtypes.BrokerSummary
+
+		if !conf.getBoolDefaultTrue("aws.mq.broker.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource mq[broker]")
+			return resources, objects, nil
+		}
+		paginator := mq.NewListBrokersPaginator(conf.APIs.Mq, &mq.ListBrokersInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.BrokerSummaries {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

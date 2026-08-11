@@ -847,6 +847,17 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// Amazon MQ
+	cloud.Broker: {
+		properties.ID:               {name: "BrokerId", transform: extractValueFn},
+		properties.Name:             {name: "BrokerName", transform: extractValueFn},
+		properties.Arn:              {name: "BrokerArn", transform: extractValueFn},
+		properties.State:            {name: "BrokerState", transform: extractValueFn},
+		properties.EngineType:       {name: "EngineType", transform: extractValueFn},
+		properties.DeploymentMode:   {name: "DeploymentMode", transform: extractValueFn},
+		properties.HostInstanceType: {name: "HostInstanceType", transform: extractValueFn},
+		properties.Created:          {name: "Created", transform: extractTimeFn},
+	},
 	// MSK. The V2 Cluster wraps the provisioned detail, hence the nested paths.
 	cloud.KafkaCluster: {
 		properties.Name:         {name: "ClusterName", transform: extractValueFn},

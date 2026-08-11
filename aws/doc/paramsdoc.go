@@ -458,6 +458,18 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.broker": {
+		"name":           "Name for the broker",
+		"engine":         "ACTIVEMQ or RABBITMQ",
+		"type":           "Broker instance type, e.g. mq.m5.large",
+		"mode":           "SINGLE_INSTANCE, ACTIVE_STANDBY_MULTI_AZ or CLUSTER_MULTI_AZ; this decides both the cost and whether the broker survives losing an availability zone",
+		"engine-version": "Version of the broker engine",
+		"subnets":        "Subnets to place the broker in; a single-instance broker takes one, a multi-AZ broker takes two",
+		"securitygroups": "Security groups for the broker",
+		"public":         "Whether the broker is reachable from the internet",
+		"users-file":     "Path to the broker users in JSON; passed as a file so a password does not reach the command line or the template log",
+	},
+	"delete.broker": {"id": "Identifier of the broker to delete; the API takes the id rather than the name"},
 	"create.kafkacluster": {
 		"name":            "Name for the MSK cluster",
 		"version":         "Apache Kafka version to run",

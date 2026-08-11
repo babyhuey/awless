@@ -145,6 +145,10 @@ type lambdaMock struct {
 	basicMock
 }
 
+type mqMock struct {
+	basicMock
+}
+
 type rdsMock struct {
 	basicMock
 }

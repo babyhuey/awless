@@ -30,7 +30,7 @@ var (
 	AccessService, InfraService, StorageService, MessagingService, DNSService, LambdaService, MonitoringService, CdnService, CloudformationService       cloud.Service
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService              cloud.Service
 	ElasticacheService, EventbridgeService, StepfunctionsService, WafService, ConfigserviceService, KinesisService, RedshiftService, CodepipelineService cloud.Service
-	CodebuildService, BeanstalkService, CodedeployService, GlueService, SesService, CognitoService, MskService                                           cloud.Service
+	CodebuildService, BeanstalkService, CodedeployService, GlueService, SesService, CognitoService, MskService, MqService                                cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]any, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -78,6 +78,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	SesService = NewSes(cfg, profile, extraConf, log)
 	CognitoService = NewCognito(cfg, profile, extraConf, log)
 	MskService = NewMsk(cfg, profile, extraConf, log)
+	MqService = NewMq(cfg, profile, extraConf, log)
 
 	cloud.ServiceRegistry[InfraService.Name()] = InfraService
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
@@ -111,6 +112,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	cloud.ServiceRegistry[SesService.Name()] = SesService
 	cloud.ServiceRegistry[CognitoService.Name()] = CognitoService
 	cloud.ServiceRegistry[MskService.Name()] = MskService
+	cloud.ServiceRegistry[MqService.Name()] = MqService
 
 	awsspec.CommandFactory = &awsspec.AWSFactory{
 		Log: log,

@@ -146,6 +146,8 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//amazon mq
+	Broker string = "broker"
 	//msk
 	KafkaCluster string = "kafkacluster"
 	//cognito. Two APIs: user pools on cognito-idp, identity pools on cognito-identity.

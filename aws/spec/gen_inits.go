@@ -119,6 +119,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "createappscalingtarget":
 		return func() any { return NewCreateAppscalingtarget(f.Cfg, f.Graph, f.Log) }
+	case "createbroker":
+		return func() any { return NewCreateBroker(f.Cfg, f.Graph, f.Log) }
 	case "createbucket":
 		return func() any { return NewCreateBucket(f.Cfg, f.Graph, f.Log) }
 	case "createbuildproject":
@@ -301,6 +303,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "deleteappscalingtarget":
 		return func() any { return NewDeleteAppscalingtarget(f.Cfg, f.Graph, f.Log) }
+	case "deletebroker":
+		return func() any { return NewDeleteBroker(f.Cfg, f.Graph, f.Log) }
 	case "deletebucket":
 		return func() any { return NewDeleteBucket(f.Cfg, f.Graph, f.Log) }
 	case "deletebuildproject":
@@ -650,6 +654,7 @@ var (
 	_ command = &CreateApplication{}
 	_ command = &CreateAppscalingpolicy{}
 	_ command = &CreateAppscalingtarget{}
+	_ command = &CreateBroker{}
 	_ command = &CreateBucket{}
 	_ command = &CreateBuildproject{}
 	_ command = &CreateCachecluster{}
@@ -741,6 +746,7 @@ var (
 	_ command = &DeleteApplication{}
 	_ command = &DeleteAppscalingpolicy{}
 	_ command = &DeleteAppscalingtarget{}
+	_ command = &DeleteBroker{}
 	_ command = &DeleteBucket{}
 	_ command = &DeleteBuildproject{}
 	_ command = &DeleteCachecluster{}

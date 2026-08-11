@@ -344,6 +344,13 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "mq",
+		API:  []string{"mq"},
+		Fetchers: []fetcher{
+			{API: "mq", ResourceType: cloud.Broker, AWSType: "mqtypes.BrokerSummary", APIMethod: "ListBrokers", Input: "mq.ListBrokersInput{}", Output: "mq.ListBrokersOutput", OutputsExtractor: "BrokerSummaries", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
+	{
 		Name: "msk",
 		API:  []string{"kafka"},
 		Fetchers: []fetcher{

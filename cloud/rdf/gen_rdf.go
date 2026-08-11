@@ -96,6 +96,7 @@ const (
 	DefaultCooldown                   = "cloud:defaultCooldown"
 	Delay                             = "cloud:delaySeconds"
 	DeploymentConfig                  = "cloud:deploymentConfig"
+	DeploymentMode                    = "cloud:deploymentMode"
 	DeploymentName                    = "cloud:deploymentName"
 	Deployments                       = "cloud:deployments"
 	Description                       = "cloud:description"
@@ -108,6 +109,7 @@ const (
 	Encrypted                         = "cloud:encrypted"
 	Endpoint                          = "cloud:endpoint"
 	Engine                            = "cloud:engine"
+	EngineType                        = "cloud:engineType"
 	EngineVersion                     = "cloud:engineVersion"
 	EventBus                          = "cloud:eventBus"
 	ExecutionMode                     = "cloud:executionMode"
@@ -127,6 +129,7 @@ const (
 	HealthCheckType                   = "cloud:healthCheckType"
 	HealthyThresholdCount             = "cloud:healthyThresholdCount"
 	Host                              = "cloud:host"
+	HostInstanceType                  = "cloud:hostInstanceType"
 	HTTPVersion                       = "cloud:httpVersion"
 	Hypervisor                        = "cloud:hypervisor"
 	ID                                = "cloud:id"
@@ -397,6 +400,7 @@ func init() {
 		properties.DefaultCooldown:                   DefaultCooldown,
 		properties.Delay:                             Delay,
 		properties.DeploymentConfig:                  DeploymentConfig,
+		properties.DeploymentMode:                    DeploymentMode,
 		properties.DeploymentName:                    DeploymentName,
 		properties.Deployments:                       Deployments,
 		properties.Description:                       Description,
@@ -409,6 +413,7 @@ func init() {
 		properties.Encrypted:                         Encrypted,
 		properties.Endpoint:                          Endpoint,
 		properties.Engine:                            Engine,
+		properties.EngineType:                        EngineType,
 		properties.EngineVersion:                     EngineVersion,
 		properties.EventBus:                          EventBus,
 		properties.ExecutionMode:                     ExecutionMode,
@@ -428,6 +433,7 @@ func init() {
 		properties.HealthCheckType:                   HealthCheckType,
 		properties.HealthyThresholdCount:             HealthyThresholdCount,
 		properties.Host:                              Host,
+		properties.HostInstanceType:                  HostInstanceType,
 		properties.HTTPVersion:                       HTTPVersion,
 		properties.Hypervisor:                        Hypervisor,
 		properties.ID:                                ID,
@@ -698,6 +704,7 @@ var Properties = RDFProperties{
 	DefaultCooldown:                   {ID: DefaultCooldown, RdfType: "rdf:Property", RdfsLabel: "DefaultCooldown", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Delay:                             {ID: Delay, RdfType: "rdf:Property", RdfsLabel: "Delay", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	DeploymentConfig:                  {ID: DeploymentConfig, RdfType: "rdf:Property", RdfsLabel: "DeploymentConfig", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	DeploymentMode:                    {ID: DeploymentMode, RdfType: "rdf:Property", RdfsLabel: "DeploymentMode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DeploymentName:                    {ID: DeploymentName, RdfType: "rdf:Property", RdfsLabel: "DeploymentName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Deployments:                       {ID: Deployments, RdfType: "rdf:Property", RdfsLabel: "Deployments", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
 	Description:                       {ID: Description, RdfType: "rdf:Property", RdfsLabel: "Description", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -710,6 +717,7 @@ var Properties = RDFProperties{
 	Encrypted:                         {ID: Encrypted, RdfType: "rdf:Property", RdfsLabel: "Encrypted", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	Endpoint:                          {ID: Endpoint, RdfType: "rdf:Property", RdfsLabel: "Endpoint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Engine:                            {ID: Engine, RdfType: "rdf:Property", RdfsLabel: "Engine", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	EngineType:                        {ID: EngineType, RdfType: "rdf:Property", RdfsLabel: "EngineType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	EngineVersion:                     {ID: EngineVersion, RdfType: "rdf:Property", RdfsLabel: "EngineVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	EventBus:                          {ID: EventBus, RdfType: "rdf:Property", RdfsLabel: "EventBus", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ExecutionMode:                     {ID: ExecutionMode, RdfType: "rdf:Property", RdfsLabel: "ExecutionMode", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -729,6 +737,7 @@ var Properties = RDFProperties{
 	HealthCheckType:                   {ID: HealthCheckType, RdfType: "rdf:Property", RdfsLabel: "HealthCheckType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	HealthyThresholdCount:             {ID: HealthyThresholdCount, RdfType: "rdf:Property", RdfsLabel: "HealthyThresholdCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Host:                              {ID: Host, RdfType: "rdf:Property", RdfsLabel: "Host", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	HostInstanceType:                  {ID: HostInstanceType, RdfType: "rdf:Property", RdfsLabel: "HostInstanceType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	HTTPVersion:                       {ID: HTTPVersion, RdfType: "rdf:Property", RdfsLabel: "HTTPVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Hypervisor:                        {ID: Hypervisor, RdfType: "rdf:Property", RdfsLabel: "Hypervisor", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ID:                                {ID: ID, RdfType: "rdf:Property", RdfsLabel: "ID", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
