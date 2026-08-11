@@ -103,6 +103,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCopyImage(f.Cfg, f.Graph, f.Log) }
 	case "copysnapshot":
 		return func() any { return NewCopySnapshot(f.Cfg, f.Graph, f.Log) }
+	case "createaccelerator":
+		return func() any { return NewCreateAccelerator(f.Cfg, f.Graph, f.Log) }
+	case "createacceleratorlistener":
+		return func() any { return NewCreateAcceleratorlistener(f.Cfg, f.Graph, f.Log) }
 	case "createaccesskey":
 		return func() any { return NewCreateAccesskey(f.Cfg, f.Graph, f.Log) }
 	case "createalarm":
@@ -291,6 +295,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateWebacl(f.Cfg, f.Graph, f.Log) }
 	case "createzone":
 		return func() any { return NewCreateZone(f.Cfg, f.Graph, f.Log) }
+	case "deleteaccelerator":
+		return func() any { return NewDeleteAccelerator(f.Cfg, f.Graph, f.Log) }
+	case "deleteacceleratorlistener":
+		return func() any { return NewDeleteAcceleratorlistener(f.Cfg, f.Graph, f.Log) }
 	case "deleteaccesskey":
 		return func() any { return NewDeleteAccesskey(f.Cfg, f.Graph, f.Log) }
 	case "deletealarm":
@@ -561,6 +569,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopPipeline(f.Cfg, f.Graph, f.Log) }
 	case "stoptrail":
 		return func() any { return NewStopTrail(f.Cfg, f.Graph, f.Log) }
+	case "updateaccelerator":
+		return func() any { return NewUpdateAccelerator(f.Cfg, f.Graph, f.Log) }
 	case "updateapplication":
 		return func() any { return NewUpdateApplication(f.Cfg, f.Graph, f.Log) }
 	case "updatebucket":
@@ -654,6 +664,8 @@ var (
 	_ command = &CheckVolume{}
 	_ command = &CopyImage{}
 	_ command = &CopySnapshot{}
+	_ command = &CreateAccelerator{}
+	_ command = &CreateAcceleratorlistener{}
 	_ command = &CreateAccesskey{}
 	_ command = &CreateAlarm{}
 	_ command = &CreateApigateway{}
@@ -748,6 +760,8 @@ var (
 	_ command = &CreateVpcendpoint{}
 	_ command = &CreateWebacl{}
 	_ command = &CreateZone{}
+	_ command = &DeleteAccelerator{}
+	_ command = &DeleteAcceleratorlistener{}
 	_ command = &DeleteAccesskey{}
 	_ command = &DeleteAlarm{}
 	_ command = &DeleteApigateway{}
@@ -883,6 +897,7 @@ var (
 	_ command = &StopInstance{}
 	_ command = &StopPipeline{}
 	_ command = &StopTrail{}
+	_ command = &UpdateAccelerator{}
 	_ command = &UpdateApplication{}
 	_ command = &UpdateBucket{}
 	_ command = &UpdateBuildproject{}

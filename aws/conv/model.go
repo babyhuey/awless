@@ -847,6 +847,21 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// Global Accelerator
+	cloud.Accelerator: {
+		properties.Name:          {name: "Name", transform: extractValueFn},
+		properties.Arn:           {name: "AcceleratorArn", transform: extractValueFn},
+		properties.State:         {name: "Status", transform: extractValueFn},
+		properties.Enabled:       {name: "Enabled", transform: extractValueFn},
+		properties.DNSName:       {name: "DnsName", transform: extractValueFn},
+		properties.IPAddressType: {name: "IpAddressType", transform: extractValueFn},
+		properties.Created:       {name: "CreatedTime", transform: extractTimeFn},
+	},
+	cloud.AcceleratorListener: {
+		properties.Arn:            {name: "ListenerArn", transform: extractValueFn},
+		properties.Protocol:       {name: "Protocol", transform: extractValueFn},
+		properties.ClientAffinity: {name: "ClientAffinity", transform: extractValueFn},
+	},
 	// FSx
 	cloud.FSxFileSystem: {
 		properties.ID:              {name: "FileSystemId", transform: extractValueFn},

@@ -15,6 +15,7 @@ type property struct {
 }
 
 var PropertiesDefinitions = []property{
+	{AwlessLabel: "Accelerator", RDFLabel: fmt.Sprintf("%s:accelerator", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "Account", RDFLabel: fmt.Sprintf("%s:account", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "ACMCertificate", RDFLabel: fmt.Sprintf("%s:acmCertificate", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "Actions", RDFLabel: fmt.Sprintf("%s:actions", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsList, RdfsDataType: rdf.XsdString},
@@ -67,6 +68,7 @@ var PropertiesDefinitions = []property{
 	{AwlessLabel: "CIDRv6", RDFLabel: fmt.Sprintf("%s:cidrv6", rdf.NetNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "CipherSuite", RDFLabel: fmt.Sprintf("%s:cipherSuite", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "Class", RDFLabel: fmt.Sprintf("%s:class", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
+	{AwlessLabel: "ClientAffinity", RDFLabel: fmt.Sprintf("%s:clientAffinity", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "Cluster", RDFLabel: fmt.Sprintf("%s:cluster", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "ClusterEnabled", RDFLabel: fmt.Sprintf("%s:clusterEnabled", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdBoolean},
 	{AwlessLabel: "CNAME", RDFLabel: fmt.Sprintf("%s:cname", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
@@ -138,6 +140,7 @@ var PropertiesDefinitions = []property{
 	{AwlessLabel: "Instances", RDFLabel: fmt.Sprintf("%s:instances", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsList, RdfsDataType: rdf.RdfsClass},
 	{AwlessLabel: "InsufficientDataActions", RDFLabel: fmt.Sprintf("%s:insufficientDataActions", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsList, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "IOPS", RDFLabel: fmt.Sprintf("%s:iops", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdInt},
+	{AwlessLabel: "IPAddressType", RDFLabel: fmt.Sprintf("%s:ipAddressType", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "IPType", RDFLabel: fmt.Sprintf("%s:ipType", rdf.NetNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "IPv6Addresses", RDFLabel: fmt.Sprintf("%s:ipv6Addresses", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsList, RdfsDataType: rdf.XsdString},
 	{AwlessLabel: "IPv6Enabled", RDFLabel: fmt.Sprintf("%s:ipv6Enabled", rdf.CloudNS), RDFType: rdf.RdfProperty, RdfsDefinedBy: rdf.RdfsLiteral, RdfsDataType: rdf.XsdBoolean},

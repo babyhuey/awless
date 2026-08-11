@@ -22,6 +22,8 @@ package ast
 // template history already written to ~/.awless still loads. See
 // gen/aws/generators/entities.go.
 var entities = map[Entity]struct{}{
+	"accelerator":              {},
+	"acceleratorlistener":      {},
 	"accesskey":                {},
 	"alarm":                    {},
 	"apigateway":               {},

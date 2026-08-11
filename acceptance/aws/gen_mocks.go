@@ -129,6 +129,10 @@ type fsxMock struct {
 	basicMock
 }
 
+type globalacceleratorMock struct {
+	basicMock
+}
+
 type glueMock struct {
 	basicMock
 }

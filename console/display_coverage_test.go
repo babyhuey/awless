@@ -80,5 +80,6 @@ func allResourceTypes() []string {
 		cloud.UserPool, cloud.IdentityPool,
 		cloud.KafkaCluster, cloud.Broker,
 		cloud.FSxFileSystem, cloud.FSxBackup,
+		cloud.Accelerator, cloud.AcceleratorListener,
 	}
 }

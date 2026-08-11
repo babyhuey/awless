@@ -20,6 +20,7 @@ package rdf
 import "github.com/bootswithdefer/awless/cloud/properties"
 
 const (
+	Accelerator                       = "cloud:accelerator"
 	Account                           = "cloud:account"
 	ACMCertificate                    = "cloud:acmCertificate"
 	Actions                           = "cloud:actions"
@@ -72,6 +73,7 @@ const (
 	CIDRv6                            = "net:cidrv6"
 	CipherSuite                       = "cloud:cipherSuite"
 	Class                             = "cloud:class"
+	ClientAffinity                    = "cloud:clientAffinity"
 	Cluster                           = "cloud:cluster"
 	ClusterEnabled                    = "cloud:clusterEnabled"
 	CNAME                             = "cloud:cname"
@@ -143,6 +145,7 @@ const (
 	Instances                         = "cloud:instances"
 	InsufficientDataActions           = "cloud:insufficientDataActions"
 	IOPS                              = "cloud:iops"
+	IPAddressType                     = "cloud:ipAddressType"
 	IPType                            = "net:ipType"
 	IPv6Addresses                     = "cloud:ipv6Addresses"
 	IPv6Enabled                       = "cloud:ipv6Enabled"
@@ -326,6 +329,7 @@ const (
 
 func init() {
 	Labels = map[string]string{
+		properties.Accelerator:                       Accelerator,
 		properties.Account:                           Account,
 		properties.ACMCertificate:                    ACMCertificate,
 		properties.Actions:                           Actions,
@@ -378,6 +382,7 @@ func init() {
 		properties.CIDRv6:                            CIDRv6,
 		properties.CipherSuite:                       CipherSuite,
 		properties.Class:                             Class,
+		properties.ClientAffinity:                    ClientAffinity,
 		properties.Cluster:                           Cluster,
 		properties.ClusterEnabled:                    ClusterEnabled,
 		properties.CNAME:                             CNAME,
@@ -449,6 +454,7 @@ func init() {
 		properties.Instances:                         Instances,
 		properties.InsufficientDataActions:           InsufficientDataActions,
 		properties.IOPS:                              IOPS,
+		properties.IPAddressType:                     IPAddressType,
 		properties.IPType:                            IPType,
 		properties.IPv6Addresses:                     IPv6Addresses,
 		properties.IPv6Enabled:                       IPv6Enabled,
@@ -632,6 +638,7 @@ func init() {
 }
 
 var Properties = RDFProperties{
+	Accelerator:                       {ID: Accelerator, RdfType: "rdf:Property", RdfsLabel: "Accelerator", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Account:                           {ID: Account, RdfType: "rdf:Property", RdfsLabel: "Account", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ACMCertificate:                    {ID: ACMCertificate, RdfType: "rdf:Property", RdfsLabel: "ACMCertificate", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Actions:                           {ID: Actions, RdfType: "rdf:Property", RdfsLabel: "Actions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
@@ -684,6 +691,7 @@ var Properties = RDFProperties{
 	CIDRv6:                            {ID: CIDRv6, RdfType: "rdf:Property", RdfsLabel: "CIDRv6", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	CipherSuite:                       {ID: CipherSuite, RdfType: "rdf:Property", RdfsLabel: "CipherSuite", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Class:                             {ID: Class, RdfType: "rdf:Property", RdfsLabel: "Class", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ClientAffinity:                    {ID: ClientAffinity, RdfType: "rdf:Property", RdfsLabel: "ClientAffinity", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Cluster:                           {ID: Cluster, RdfType: "rdf:Property", RdfsLabel: "Cluster", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ClusterEnabled:                    {ID: ClusterEnabled, RdfType: "rdf:Property", RdfsLabel: "ClusterEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	CNAME:                             {ID: CNAME, RdfType: "rdf:Property", RdfsLabel: "CNAME", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -755,6 +763,7 @@ var Properties = RDFProperties{
 	Instances:                         {ID: Instances, RdfType: "rdf:Property", RdfsLabel: "Instances", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	InsufficientDataActions:           {ID: InsufficientDataActions, RdfType: "rdf:Property", RdfsLabel: "InsufficientDataActions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	IOPS:                              {ID: IOPS, RdfType: "rdf:Property", RdfsLabel: "IOPS", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	IPAddressType:                     {ID: IPAddressType, RdfType: "rdf:Property", RdfsLabel: "IPAddressType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	IPType:                            {ID: IPType, RdfType: "rdf:Property", RdfsLabel: "IPType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	IPv6Addresses:                     {ID: IPv6Addresses, RdfType: "rdf:Property", RdfsLabel: "IPv6Addresses", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	IPv6Enabled:                       {ID: IPv6Enabled, RdfType: "rdf:Property", RdfsLabel: "IPv6Enabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},

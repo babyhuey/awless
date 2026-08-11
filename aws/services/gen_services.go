@@ -79,6 +79,8 @@ import (
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	fsx "github.com/aws/aws-sdk-go-v2/service/fsx"
 	fsxtypes "github.com/aws/aws-sdk-go-v2/service/fsx/types"
+	globalaccelerator "github.com/aws/aws-sdk-go-v2/service/globalaccelerator"
+	globalacceleratortypes "github.com/aws/aws-sdk-go-v2/service/globalaccelerator/types"
 	glue "github.com/aws/aws-sdk-go-v2/service/glue"
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
@@ -153,6 +155,7 @@ var ServiceNames = []string{
 	"kinesis",
 	"redshift",
 	"codepipeline",
+	"globalaccelerator",
 	"fsx",
 	"mq",
 	"msk",
@@ -245,6 +248,8 @@ var ResourceTypes = []string{
 	"redshiftcluster",
 	"redshiftsubnetgroup",
 	"pipeline",
+	"accelerator",
+	"acceleratorlistener",
 	"fsxfilesystem",
 	"fsxbackup",
 	"broker",
@@ -301,6 +306,7 @@ var ServicePerAPI = map[string]string{
 	"kinesis":                 "kinesis",
 	"redshift":                "redshift",
 	"codepipeline":            "codepipeline",
+	"globalaccelerator":       "globalaccelerator",
 	"fsx":                     "fsx",
 	"mq":                      "mq",
 	"kafka":                   "msk",
@@ -394,6 +400,8 @@ var ServicePerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"accelerator":              "globalaccelerator",
+	"acceleratorlistener":      "globalaccelerator",
 	"fsxfilesystem":            "fsx",
 	"fsxbackup":                "fsx",
 	"broker":                   "mq",
@@ -494,6 +502,8 @@ var APIPerResourceType = map[string]string{
 	"redshiftcluster":          "redshift",
 	"redshiftsubnetgroup":      "redshift",
 	"pipeline":                 "codepipeline",
+	"accelerator":              "globalaccelerator",
+	"acceleratorlistener":      "globalaccelerator",
 	"fsxfilesystem":            "fsx",
 	"fsxbackup":                "fsx",
 	"broker":                   "mq",
@@ -5020,6 +5030,157 @@ func (s *Codepipeline) FetchByType(ctx context.Context, t string) (cloud.GraphAP
 
 func (s *Codepipeline) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codepipeline.sync", true)
+}
+
+type Globalaccelerator struct {
+	fetcher                 fetch.Fetcher
+	region, profile         string
+	config                  map[string]any
+	log                     *logger.Logger
+	GlobalacceleratorClient *globalaccelerator.Client
+}
+
+func NewGlobalaccelerator(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := "global"
+	globalacceleratorClient := globalaccelerator.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		globalacceleratorClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Globalaccelerator{
+		GlobalacceleratorClient: globalacceleratorClient,
+		fetcher:                 fetch.NewFetcher(awsfetch.BuildGlobalacceleratorFetchFuncs(fetchConfig)),
+		config:                  extraConf,
+		region:                  region,
+		profile:                 profile,
+		log:                     log,
+	}
+}
+
+func (s *Globalaccelerator) Name() string {
+	return "globalaccelerator"
+}
+
+func (s *Globalaccelerator) Region() string {
+	return s.region
+}
+
+func (s *Globalaccelerator) Profile() string {
+	return s.profile
+}
+
+func (s *Globalaccelerator) ResourceTypes() []string {
+	return []string{
+		"accelerator",
+		"acceleratorlistener",
+	}
+}
+
+func (s *Globalaccelerator) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.globalaccelerator.accelerator.sync", true) {
+		list, err := s.fetcher.Get("accelerator_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]globalacceleratortypes.Accelerator); !ok {
+			return gph, errors.New("cannot cast to '[]globalacceleratortypes.Accelerator' type from fetch context")
+		}
+		for _, r := range list.([]globalacceleratortypes.Accelerator) {
+			for _, fn := range addParentsFns["accelerator"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *globalacceleratortypes.Accelerator) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.globalaccelerator.acceleratorlistener.sync", true) {
+		list, err := s.fetcher.Get("acceleratorlistener_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]globalacceleratortypes.Listener); !ok {
+			return gph, errors.New("cannot cast to '[]globalacceleratortypes.Listener' type from fetch context")
+		}
+		for _, r := range list.([]globalacceleratortypes.Listener) {
+			for _, fn := range addParentsFns["acceleratorlistener"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *globalacceleratortypes.Listener) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Globalaccelerator) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Globalaccelerator) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.globalaccelerator.sync", true)
 }
 
 type Fsx struct {

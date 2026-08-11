@@ -18,6 +18,7 @@ limitations under the License.
 package properties
 
 const (
+	Accelerator                       = "Accelerator"
 	Account                           = "Account"
 	ACMCertificate                    = "ACMCertificate"
 	Actions                           = "Actions"
@@ -70,6 +71,7 @@ const (
 	CIDRv6                            = "CIDRv6"
 	CipherSuite                       = "CipherSuite"
 	Class                             = "Class"
+	ClientAffinity                    = "ClientAffinity"
 	Cluster                           = "Cluster"
 	ClusterEnabled                    = "ClusterEnabled"
 	CNAME                             = "CNAME"
@@ -141,6 +143,7 @@ const (
 	Instances                         = "Instances"
 	InsufficientDataActions           = "InsufficientDataActions"
 	IOPS                              = "IOPS"
+	IPAddressType                     = "IPAddressType"
 	IPType                            = "IPType"
 	IPv6Addresses                     = "IPv6Addresses"
 	IPv6Enabled                       = "IPv6Enabled"

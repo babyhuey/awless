@@ -51,6 +51,7 @@ import (
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	fsx "github.com/aws/aws-sdk-go-v2/service/fsx"
+	globalaccelerator "github.com/aws/aws-sdk-go-v2/service/globalaccelerator"
 	glue "github.com/aws/aws-sdk-go-v2/service/glue"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
 	kafka "github.com/aws/aws-sdk-go-v2/service/kafka"
@@ -2439,6 +2440,162 @@ func (cmd *CopySnapshot) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *CopySnapshot) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateAccelerator(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAccelerator {
+	cmd := new(CreateAccelerator)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = globalaccelerator.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateAccelerator) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateAccelerator) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &globalaccelerator.CreateAcceleratorInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in globalaccelerator.CreateAcceleratorInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateAccelerator(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("globalaccelerator.CreateAccelerator call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create accelerator: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create accelerator '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create accelerator done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateAccelerator) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("accelerator"), nil
+}
+
+func (cmd *CreateAccelerator) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateAcceleratorlistener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAcceleratorlistener {
+	cmd := new(CreateAcceleratorlistener)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = globalaccelerator.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateAcceleratorlistener) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateAcceleratorlistener) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &globalaccelerator.CreateListenerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in globalaccelerator.CreateListenerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateListener(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("globalaccelerator.CreateListener call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create acceleratorlistener: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create acceleratorlistener '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create acceleratorlistener done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateAcceleratorlistener) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("acceleratorlistener"), nil
+}
+
+func (cmd *CreateAcceleratorlistener) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -10059,6 +10216,162 @@ func (cmd *CreateZone) dryRun(renv env.Running, params map[string]any) (any, err
 }
 
 func (cmd *CreateZone) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteAccelerator(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAccelerator {
+	cmd := new(DeleteAccelerator)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = globalaccelerator.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteAccelerator) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteAccelerator) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &globalaccelerator.DeleteAcceleratorInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in globalaccelerator.DeleteAcceleratorInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteAccelerator(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("globalaccelerator.DeleteAccelerator call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete accelerator: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete accelerator '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete accelerator done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteAccelerator) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("accelerator"), nil
+}
+
+func (cmd *DeleteAccelerator) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteAcceleratorlistener(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAcceleratorlistener {
+	cmd := new(DeleteAcceleratorlistener)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = globalaccelerator.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteAcceleratorlistener) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteAcceleratorlistener) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &globalaccelerator.DeleteListenerInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in globalaccelerator.DeleteListenerInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteListener(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("globalaccelerator.DeleteListener call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete acceleratorlistener: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete acceleratorlistener '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete acceleratorlistener done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteAcceleratorlistener) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("acceleratorlistener"), nil
+}
+
+func (cmd *DeleteAcceleratorlistener) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -21020,6 +21333,84 @@ func (cmd *StopTrail) dryRun(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *StopTrail) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateAccelerator(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateAccelerator {
+	cmd := new(UpdateAccelerator)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = globalaccelerator.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateAccelerator) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateAccelerator) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &globalaccelerator.UpdateAcceleratorInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in globalaccelerator.UpdateAcceleratorInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.UpdateAccelerator(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("globalaccelerator.UpdateAccelerator call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update accelerator: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update accelerator '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update accelerator done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateAccelerator) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("accelerator"), nil
+}
+
+func (cmd *UpdateAccelerator) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

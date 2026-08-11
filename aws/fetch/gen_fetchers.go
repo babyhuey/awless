@@ -59,6 +59,8 @@ import (
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	fsx "github.com/aws/aws-sdk-go-v2/service/fsx"
 	fsxtypes "github.com/aws/aws-sdk-go-v2/service/fsx/types"
+	globalaccelerator "github.com/aws/aws-sdk-go-v2/service/globalaccelerator"
+	globalacceleratortypes "github.com/aws/aws-sdk-go-v2/service/globalaccelerator/types"
 	glue "github.com/aws/aws-sdk-go-v2/service/glue"
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iam "github.com/aws/aws-sdk-go-v2/service/iam"
@@ -1659,6 +1661,40 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.Pipelines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildGlobalacceleratorFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualGlobalacceleratorFetchFuncs(conf, funcs)
+
+	funcs["accelerator"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []globalacceleratortypes.Accelerator
+
+		if !conf.getBoolDefaultTrue("aws.globalaccelerator.accelerator.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource globalaccelerator[accelerator]")
+			return resources, objects, nil
+		}
+		paginator := globalaccelerator.NewListAcceleratorsPaginator(conf.APIs.Globalaccelerator, &globalaccelerator.ListAcceleratorsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Accelerators {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

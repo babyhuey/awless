@@ -245,6 +245,17 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.accelerator": {"awless create accelerator name=global-api enabled=true"},
+	"delete.accelerator": {"awless delete accelerator arn=arn:aws:globalaccelerator::123456789012:accelerator/abcd"},
+	"update.accelerator": {
+		"awless update accelerator arn=arn:aws:globalaccelerator::123456789012:accelerator/abcd enabled=false",
+	},
+	"create.acceleratorlistener": {
+		"awless create acceleratorlistener accelerator=arn:aws:globalaccelerator::123456789012:accelerator/abcd protocol=TCP ports-file=/home/jsmith/ports.json",
+	},
+	"delete.acceleratorlistener": {
+		"awless delete acceleratorlistener arn=arn:aws:globalaccelerator::123456789012:accelerator/abcd/listener/1234",
+	},
 	"create.fsxfilesystem": {
 		"awless create fsxfilesystem type=LUSTRE capacity=1200 subnets=subnet-1 lustre-file=/home/jsmith/lustre.json",
 		"awless create fsxfilesystem type=WINDOWS capacity=32 subnets=subnet-1,subnet-2 windows-file=/home/jsmith/windows.json",

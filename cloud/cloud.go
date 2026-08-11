@@ -146,6 +146,9 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//global accelerator. "acceleratorlistener" because ELBv2 already owns "listener".
+	Accelerator         string = "accelerator"
+	AcceleratorListener string = "acceleratorlistener"
 	//fsx. "fsxfilesystem" because EFS already owns "filesystem".
 	FSxFileSystem string = "fsxfilesystem"
 	FSxBackup     string = "fsxbackup"

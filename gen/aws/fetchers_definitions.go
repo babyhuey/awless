@@ -344,6 +344,16 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name:   "globalaccelerator",
+		Global: true,
+		API:    []string{"globalaccelerator"},
+		Fetchers: []fetcher{
+			{API: "globalaccelerator", ResourceType: cloud.Accelerator, AWSType: "globalacceleratortypes.Accelerator", APIMethod: "ListAccelerators", Input: "globalaccelerator.ListAcceleratorsInput{}", Output: "globalaccelerator.ListAcceleratorsOutput", OutputsExtractor: "Accelerators", Multipage: true, NextPageMarker: "NextToken"},
+			// Listeners belong to an accelerator and cannot be listed globally.
+			{API: "globalaccelerator", ResourceType: cloud.AcceleratorListener, AWSType: "globalacceleratortypes.Listener", ManualFetcher: true},
+		},
+	},
+	{
 		Name: "fsx",
 		API:  []string{"fsx"},
 		Fetchers: []fetcher{

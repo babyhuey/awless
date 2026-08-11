@@ -10,6 +10,8 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Global Accelerator.** Accelerators with create/update/delete and their listeners with
+  create/delete. The required idempotency token is generated rather than asked for.
 - **FSx.** File systems and backups, with create and delete. The entity is
   `fsxfilesystem`, since EFS already owns `filesystem` and the two are different products.
 - **Amazon MQ.** Brokers, with create and delete. The initial user credentials are passed as

@@ -121,6 +121,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.Broker:                   {properties.ID, properties.Name, properties.State, properties.EngineType, properties.DeploymentMode},
 	cloud.FSxFileSystem:            {properties.ID, properties.Type, properties.Lifecycle, properties.StorageCapacity, properties.DNSName},
 	cloud.FSxBackup:                {properties.ID, properties.Type, properties.Lifecycle, properties.Created},
+	cloud.Accelerator:              {properties.Name, properties.State, properties.Enabled, properties.DNSName},
+	cloud.AcceleratorListener:      {properties.Arn, properties.Protocol, properties.ClientAffinity},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -922,5 +924,19 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.Type},
 		StringColumnDefinition{Prop: properties.Lifecycle},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	}, // Global Accelerator
+	cloud.Accelerator: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Enabled},
+		StringColumnDefinition{Prop: properties.DNSName, Friendly: "DNS"},
+		StringColumnDefinition{Prop: properties.IPAddressType, Friendly: "IP Type"},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.AcceleratorListener: {
+		StringColumnDefinition{Prop: properties.Arn},
+		StringColumnDefinition{Prop: properties.Protocol},
+		StringColumnDefinition{Prop: properties.ClientAffinity, Friendly: "Affinity"},
+		StringColumnDefinition{Prop: properties.Accelerator},
 	},
 }

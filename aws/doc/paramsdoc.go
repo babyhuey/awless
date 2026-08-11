@@ -458,6 +458,27 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.accelerator": {
+		"name":    "Name for the accelerator",
+		"enabled": "Whether the accelerator starts enabled",
+		"ip-type": "IPV4 or DUAL_STACK",
+		"token":   "Idempotency token; generated when omitted, since it is machinery rather than a choice",
+	},
+	"delete.accelerator": {"arn": "ARN of the accelerator to delete; it must be disabled first, which AWS enforces"},
+	"update.accelerator": {
+		"arn":     "ARN of the accelerator to update",
+		"name":    "New name for the accelerator",
+		"enabled": "Enable or disable the accelerator; disabling is the prerequisite for deleting it",
+		"ip-type": "IPV4 or DUAL_STACK",
+	},
+	"create.acceleratorlistener": {
+		"accelerator":     "ARN of the accelerator the listener belongs to",
+		"protocol":        "TCP or UDP",
+		"ports-file":      "Path to the port ranges in JSON, as a list of from/to pairs",
+		"client-affinity": "NONE, or SOURCE_IP to route a client to the same endpoint each time",
+		"token":           "Idempotency token; generated when omitted",
+	},
+	"delete.acceleratorlistener": {"arn": "ARN of the listener to delete"},
 	"create.fsxfilesystem": {
 		"type":           "WINDOWS, LUSTRE, ONTAP or OPENZFS; this decides which configuration file applies",
 		"capacity":       "Storage capacity in GiB; the valid range depends on the type and deployment",

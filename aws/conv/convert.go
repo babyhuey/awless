@@ -58,6 +58,7 @@ import (
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	fsxtypes "github.com/aws/aws-sdk-go-v2/service/fsx/types"
+	globalacceleratortypes "github.com/aws/aws-sdk-go-v2/service/globalaccelerator/types"
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	kafkatypes "github.com/aws/aws-sdk-go-v2/service/kafka/types"
@@ -288,6 +289,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// Global Accelerator
+	case globalacceleratortypes.Accelerator:
+		res = graph.InitResource(cloud.Accelerator, awssdk.ToString(ss.Name))
+	case globalacceleratortypes.Listener:
+		res = graph.InitResource(cloud.AcceleratorListener, awssdk.ToString(ss.ListenerArn))
 	// FSx
 	case fsxtypes.FileSystem:
 		res = graph.InitResource(cloud.FSxFileSystem, awssdk.ToString(ss.FileSystemId))

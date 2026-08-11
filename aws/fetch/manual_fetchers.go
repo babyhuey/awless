@@ -19,6 +19,8 @@ import (
 	elasticbeanstalktypes "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk/types"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
+	"github.com/aws/aws-sdk-go-v2/service/globalaccelerator"
+	globalacceleratortypes "github.com/aws/aws-sdk-go-v2/service/globalaccelerator/types"
 	"github.com/aws/aws-sdk-go-v2/service/glue"
 	gluetypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
@@ -1661,4 +1663,47 @@ func addManualMqFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
 
 func addManualFsxFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}
+
+func addManualGlobalacceleratorFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["acceleratorlistener"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []globalacceleratortypes.Listener
+		var resources []*graph.Resource
+
+		// One pass per accelerator, which is bounded: the default account limit is ten.
+		var accelerators []string
+		accPager := globalaccelerator.NewListAcceleratorsPaginator(conf.APIs.Globalaccelerator, &globalaccelerator.ListAcceleratorsInput{})
+		for accPager.HasMorePages() {
+			out, err := accPager.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, acc := range out.Accelerators {
+				accelerators = append(accelerators, awssdk.ToString(acc.AcceleratorArn))
+			}
+		}
+
+		for _, arn := range accelerators {
+			pager := globalaccelerator.NewListListenersPaginator(conf.APIs.Globalaccelerator, &globalaccelerator.ListListenersInput{AcceleratorArn: awssdk.String(arn)})
+			for pager.HasMorePages() {
+				out, err := pager.NextPage(ctx)
+				if err != nil {
+					return resources, objects, err
+				}
+				for _, listener := range out.Listeners {
+					objects = append(objects, listener)
+					res, err := awsconv.NewResource(listener)
+					if err != nil {
+						return resources, objects, err
+					}
+					// The listener carries no reference back to its accelerator, so
+					// the relation would otherwise be lost.
+					res.Properties()[properties.Accelerator] = arn
+					resources = append(resources, res)
+				}
+			}
+		}
+
+		return resources, objects, nil
+	}
 }

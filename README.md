@@ -132,6 +132,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **MSK** | Kafka clusters |
 | **Amazon MQ** | brokers |
 | **FSx** | file systems, backups |
+| **Global Accelerator** | accelerators, listeners |
 | **VPC Endpoints** | gateway and interface endpoints |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
@@ -185,6 +186,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls kafkaclusters
       $ awless ls brokers
       $ awless ls fsxfilesystems
+      $ awless ls accelerators
       $ ...
       (see awless ls -h)
 

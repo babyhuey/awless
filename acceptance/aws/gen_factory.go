@@ -175,6 +175,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCopySnapshot(f.config(), f.Graph, f.Logger)
 		}
+	case "createaccelerator":
+		return func() any {
+			return awsspec.NewCreateAccelerator(f.config(), f.Graph, f.Logger)
+		}
+	case "createacceleratorlistener":
+		return func() any {
+			return awsspec.NewCreateAcceleratorlistener(f.config(), f.Graph, f.Logger)
+		}
 	case "createaccesskey":
 		return func() any {
 			return awsspec.NewCreateAccesskey(f.config(), f.Graph, f.Logger)
@@ -550,6 +558,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createzone":
 		return func() any {
 			return awsspec.NewCreateZone(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteaccelerator":
+		return func() any {
+			return awsspec.NewDeleteAccelerator(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteacceleratorlistener":
+		return func() any {
+			return awsspec.NewDeleteAcceleratorlistener(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteaccesskey":
 		return func() any {
@@ -1090,6 +1106,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "stoptrail":
 		return func() any {
 			return awsspec.NewStopTrail(f.config(), f.Graph, f.Logger)
+		}
+	case "updateaccelerator":
+		return func() any {
+			return awsspec.NewUpdateAccelerator(f.config(), f.Graph, f.Logger)
 		}
 	case "updateapplication":
 		return func() any {
