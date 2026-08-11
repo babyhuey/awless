@@ -123,6 +123,7 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **Redshift** | clusters, cluster subnet groups |
 | **CodePipeline** | pipelines |
 | **CodeBuild** | build projects |
+| **Elastic Beanstalk** | applications, environments |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
 just listing — see [Changes in this fork](#changes-in-this-fork).
@@ -161,6 +162,8 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls redshiftclusters
       $ awless ls pipelines
       $ awless ls buildprojects
+      $ awless ls applications
+      $ awless ls environments
       $ ...
       (see awless ls -h)
 

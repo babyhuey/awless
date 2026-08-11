@@ -50,6 +50,7 @@ import (
 	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
 	ekstypes "github.com/aws/aws-sdk-go-v2/service/eks/types"
 	elasticachetypes "github.com/aws/aws-sdk-go-v2/service/elasticache/types"
+	elasticbeanstalktypes "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk/types"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2types "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
@@ -270,6 +271,11 @@ func InitResource(source any) (*graph.Resource, error) {
 	// CodeBuild
 	case codebuildtypes.Project:
 		res = graph.InitResource(cloud.BuildProject, awssdk.ToString(ss.Name))
+	// Elastic Beanstalk
+	case elasticbeanstalktypes.ApplicationDescription:
+		res = graph.InitResource(cloud.Application, awssdk.ToString(ss.ApplicationName))
+	case elasticbeanstalktypes.EnvironmentDescription:
+		res = graph.InitResource(cloud.Environment, awssdk.ToString(ss.EnvironmentName))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

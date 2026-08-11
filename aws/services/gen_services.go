@@ -63,6 +63,8 @@ import (
 	ekstypes "github.com/aws/aws-sdk-go-v2/service/eks/types"
 	elasticache "github.com/aws/aws-sdk-go-v2/service/elasticache"
 	elasticachetypes "github.com/aws/aws-sdk-go-v2/service/elasticache/types"
+	elasticbeanstalk "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
+	elasticbeanstalktypes "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk/types"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -136,6 +138,7 @@ var ServiceNames = []string{
 	"redshift",
 	"codepipeline",
 	"codebuild",
+	"beanstalk",
 }
 
 var ResourceTypes = []string{
@@ -216,6 +219,8 @@ var ResourceTypes = []string{
 	"redshiftsubnetgroup",
 	"pipeline",
 	"buildproject",
+	"application",
+	"environment",
 }
 
 var ServicePerAPI = map[string]string{
@@ -256,6 +261,7 @@ var ServicePerAPI = map[string]string{
 	"redshift":               "redshift",
 	"codepipeline":           "codepipeline",
 	"codebuild":              "codebuild",
+	"elasticbeanstalk":       "beanstalk",
 }
 
 var ServicePerResourceType = map[string]string{
@@ -336,6 +342,8 @@ var ServicePerResourceType = map[string]string{
 	"redshiftsubnetgroup": "redshift",
 	"pipeline":            "codepipeline",
 	"buildproject":        "codebuild",
+	"application":         "beanstalk",
+	"environment":         "beanstalk",
 }
 
 var APIPerResourceType = map[string]string{
@@ -416,6 +424,8 @@ var APIPerResourceType = map[string]string{
 	"redshiftsubnetgroup": "redshift",
 	"pipeline":            "codepipeline",
 	"buildproject":        "codebuild",
+	"application":         "elasticbeanstalk",
+	"environment":         "elasticbeanstalk",
 }
 
 type Infra struct {
@@ -4961,4 +4971,155 @@ func (s *Codebuild) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, 
 
 func (s *Codebuild) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.codebuild.sync", true)
+}
+
+type Beanstalk struct {
+	fetcher                fetch.Fetcher
+	region, profile        string
+	config                 map[string]any
+	log                    *logger.Logger
+	ElasticbeanstalkClient *elasticbeanstalk.Client
+}
+
+func NewBeanstalk(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	elasticbeanstalkClient := elasticbeanstalk.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		elasticbeanstalkClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Beanstalk{
+		ElasticbeanstalkClient: elasticbeanstalkClient,
+		fetcher:                fetch.NewFetcher(awsfetch.BuildBeanstalkFetchFuncs(fetchConfig)),
+		config:                 extraConf,
+		region:                 region,
+		profile:                profile,
+		log:                    log,
+	}
+}
+
+func (s *Beanstalk) Name() string {
+	return "beanstalk"
+}
+
+func (s *Beanstalk) Region() string {
+	return s.region
+}
+
+func (s *Beanstalk) Profile() string {
+	return s.profile
+}
+
+func (s *Beanstalk) ResourceTypes() []string {
+	return []string{
+		"application",
+		"environment",
+	}
+}
+
+func (s *Beanstalk) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.beanstalk.application.sync", true) {
+		list, err := s.fetcher.Get("application_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]elasticbeanstalktypes.ApplicationDescription); !ok {
+			return gph, errors.New("cannot cast to '[]elasticbeanstalktypes.ApplicationDescription' type from fetch context")
+		}
+		for _, r := range list.([]elasticbeanstalktypes.ApplicationDescription) {
+			for _, fn := range addParentsFns["application"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *elasticbeanstalktypes.ApplicationDescription) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.beanstalk.environment.sync", true) {
+		list, err := s.fetcher.Get("environment_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]elasticbeanstalktypes.EnvironmentDescription); !ok {
+			return gph, errors.New("cannot cast to '[]elasticbeanstalktypes.EnvironmentDescription' type from fetch context")
+		}
+		for _, r := range list.([]elasticbeanstalktypes.EnvironmentDescription) {
+			for _, fn := range addParentsFns["environment"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *elasticbeanstalktypes.EnvironmentDescription) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Beanstalk) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Beanstalk) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.beanstalk.sync", true)
 }

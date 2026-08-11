@@ -305,7 +305,22 @@ var cliExamplesDoc = map[string][]string{
 	"stop.buildproject": {
 		"awless stop buildproject build='api-build:11111111-2222-3333-4444-555555555555'",
 	},
-	"start.pipeline": {"awless start pipeline name=build-and-deploy"},
+	"create.application": {"awless create application name=web-api description=\"Public API\""},
+	"delete.application": {
+		"awless delete application name=web-api",
+		"awless delete application name=web-api force=true",
+	},
+	"update.application": {"awless update application name=web-api description=\"Public API v2\""},
+	"create.environment": {
+		"awless create environment name=web-api-prod application=web-api solution-stack=\"64bit Amazon Linux 2023 v4.0.0 running Go 1\"",
+		"awless create environment name=web-api-staging application=web-api config-template=saved-config version=build-42",
+	},
+	"delete.environment": {
+		"awless delete environment name=web-api-prod",
+		"awless delete environment name=web-api-prod force=true",
+	},
+	"update.environment": {"awless update environment name=web-api-prod version=build-43"},
+	"start.pipeline":     {"awless start pipeline name=build-and-deploy"},
 	"stop.pipeline": {
 		"awless stop pipeline name=build-and-deploy execution='12345678-1234-1234-1234-123456789012' reason=\"Superseded by a newer commit\"",
 	},

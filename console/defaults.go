@@ -100,6 +100,9 @@ var ColumnsInListing = map[string][]string{
 	cloud.RedshiftCluster:     {properties.ID, properties.State, properties.NodeType, properties.NodeCount, properties.Endpoint},
 	cloud.RedshiftSubnetGroup: {properties.Name, properties.State, properties.Vpc, properties.Description},
 	cloud.Pipeline:            {properties.Name, properties.PipelineType, properties.Version, properties.Updated},
+	cloud.BuildProject:        {properties.Name, properties.Type, properties.ComputeType, properties.Image},
+	cloud.Application:         {properties.Name, properties.Description, properties.Updated},
+	cloud.Environment:         {properties.Name, properties.State, properties.Health, properties.VersionLabel, properties.CNAME},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -755,6 +758,32 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.ExecutionMode, Friendly: "Mode"},
 		StringColumnDefinition{Prop: properties.Version},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Updated}},
+	},
+	// CodeBuild
+	cloud.BuildProject: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Type, Friendly: "Source"},
+		StringColumnDefinition{Prop: properties.ComputeType, Friendly: "Compute"},
+		StringColumnDefinition{Prop: properties.Image},
+		StringColumnDefinition{Prop: properties.Timeout, Friendly: "Timeout (min)"},
+		StringColumnDefinition{Prop: properties.Role},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	// Elastic Beanstalk
+	cloud.Application: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Updated}},
+	},
+	cloud.Environment: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Health},
+		StringColumnDefinition{Prop: properties.VersionLabel, Friendly: "Version"},
+		StringColumnDefinition{Prop: properties.SolutionStack, Friendly: "Platform"},
+		StringColumnDefinition{Prop: properties.CNAME},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Updated}},
 	},
 }

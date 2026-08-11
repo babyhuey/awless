@@ -72,6 +72,7 @@ const (
 	Class                             = "cloud:class"
 	Cluster                           = "cloud:cluster"
 	ClusterEnabled                    = "cloud:clusterEnabled"
+	CNAME                             = "cloud:cname"
 	Comment                           = "rdfs:comment"
 	Compliance                        = "cloud:compliance"
 	ComputeType                       = "cloud:computeType"
@@ -114,6 +115,7 @@ const (
 	Grants                            = "cloud:grants"
 	Handler                           = "cloud:handler"
 	Hash                              = "cloud:hash"
+	Health                            = "cloud:health"
 	HealthCheck                       = "cloud:healthCheck"
 	HealthCheckGracePeriod            = "cloud:healthCheckGracePeriod"
 	HealthCheckType                   = "cloud:healthCheckType"
@@ -221,6 +223,7 @@ const (
 	Set                               = "cloud:set"
 	ShardCount                        = "cloud:shardCount"
 	Size                              = "cloud:size"
+	SolutionStack                     = "cloud:solutionStack"
 	Source                            = "cloud:source"
 	SourceIdentifier                  = "cloud:sourceIdentifier"
 	SpotInstanceRequestId             = "cloud:spotInstanceRequestId"
@@ -252,6 +255,7 @@ const (
 	Username                          = "cloud:username"
 	Value                             = "cloud:value"
 	Version                           = "cloud:version"
+	VersionLabel                      = "cloud:versionLabel"
 	Virtualization                    = "cloud:virtualization"
 	Volume                            = "cloud:volume"
 	Vpc                               = "cloud:vpc"
@@ -356,6 +360,7 @@ func init() {
 		properties.Class:                             Class,
 		properties.Cluster:                           Cluster,
 		properties.ClusterEnabled:                    ClusterEnabled,
+		properties.CNAME:                             CNAME,
 		properties.Comment:                           Comment,
 		properties.Compliance:                        Compliance,
 		properties.ComputeType:                       ComputeType,
@@ -398,6 +403,7 @@ func init() {
 		properties.Grants:                            Grants,
 		properties.Handler:                           Handler,
 		properties.Hash:                              Hash,
+		properties.Health:                            Health,
 		properties.HealthCheck:                       HealthCheck,
 		properties.HealthCheckGracePeriod:            HealthCheckGracePeriod,
 		properties.HealthCheckType:                   HealthCheckType,
@@ -505,6 +511,7 @@ func init() {
 		properties.Set:                               Set,
 		properties.ShardCount:                        ShardCount,
 		properties.Size:                              Size,
+		properties.SolutionStack:                     SolutionStack,
 		properties.Source:                            Source,
 		properties.SourceIdentifier:                  SourceIdentifier,
 		properties.SpotInstanceRequestId:             SpotInstanceRequestId,
@@ -536,6 +543,7 @@ func init() {
 		properties.Username:                          Username,
 		properties.Value:                             Value,
 		properties.Version:                           Version,
+		properties.VersionLabel:                      VersionLabel,
 		properties.Virtualization:                    Virtualization,
 		properties.Volume:                            Volume,
 		properties.Vpc:                               Vpc,
@@ -640,6 +648,7 @@ var Properties = RDFProperties{
 	Class:                             {ID: Class, RdfType: "rdf:Property", RdfsLabel: "Class", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Cluster:                           {ID: Cluster, RdfType: "rdf:Property", RdfsLabel: "Cluster", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ClusterEnabled:                    {ID: ClusterEnabled, RdfType: "rdf:Property", RdfsLabel: "ClusterEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+	CNAME:                             {ID: CNAME, RdfType: "rdf:Property", RdfsLabel: "CNAME", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Comment:                           {ID: Comment, RdfType: "rdf:Property", RdfsLabel: "Comment", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Compliance:                        {ID: Compliance, RdfType: "rdf:Property", RdfsLabel: "Compliance", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ComputeType:                       {ID: ComputeType, RdfType: "rdf:Property", RdfsLabel: "ComputeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -682,6 +691,7 @@ var Properties = RDFProperties{
 	Grants:                            {ID: Grants, RdfType: "rdf:Property", RdfsLabel: "Grants", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:Grant"},
 	Handler:                           {ID: Handler, RdfType: "rdf:Property", RdfsLabel: "Handler", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Hash:                              {ID: Hash, RdfType: "rdf:Property", RdfsLabel: "Hash", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Health:                            {ID: Health, RdfType: "rdf:Property", RdfsLabel: "Health", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	HealthCheck:                       {ID: HealthCheck, RdfType: "rdf:Property", RdfsLabel: "HealthCheck", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	HealthCheckGracePeriod:            {ID: HealthCheckGracePeriod, RdfType: "rdf:Property", RdfsLabel: "HealthCheckGracePeriod", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	HealthCheckType:                   {ID: HealthCheckType, RdfType: "rdf:Property", RdfsLabel: "HealthCheckType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -789,6 +799,7 @@ var Properties = RDFProperties{
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ShardCount:                        {ID: ShardCount, RdfType: "rdf:Property", RdfsLabel: "ShardCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Size:                              {ID: Size, RdfType: "rdf:Property", RdfsLabel: "Size", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	SolutionStack:                     {ID: SolutionStack, RdfType: "rdf:Property", RdfsLabel: "SolutionStack", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Source:                            {ID: Source, RdfType: "rdf:Property", RdfsLabel: "Source", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SourceIdentifier:                  {ID: SourceIdentifier, RdfType: "rdf:Property", RdfsLabel: "SourceIdentifier", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SpotInstanceRequestId:             {ID: SpotInstanceRequestId, RdfType: "rdf:Property", RdfsLabel: "SpotInstanceRequestId", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -820,6 +831,7 @@ var Properties = RDFProperties{
 	Username:                          {ID: Username, RdfType: "rdf:Property", RdfsLabel: "Username", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Value:                             {ID: Value, RdfType: "rdf:Property", RdfsLabel: "Value", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Version:                           {ID: Version, RdfType: "rdf:Property", RdfsLabel: "Version", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	VersionLabel:                      {ID: VersionLabel, RdfType: "rdf:Property", RdfsLabel: "VersionLabel", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Virtualization:                    {ID: Virtualization, RdfType: "rdf:Property", RdfsLabel: "Virtualization", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Volume:                            {ID: Volume, RdfType: "rdf:Property", RdfsLabel: "Volume", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	Vpc:                               {ID: Vpc, RdfType: "rdf:Property", RdfsLabel: "Vpc", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},

@@ -43,6 +43,7 @@ import (
 	efs "github.com/aws/aws-sdk-go-v2/service/efs"
 	eks "github.com/aws/aws-sdk-go-v2/service/eks"
 	elasticache "github.com/aws/aws-sdk-go-v2/service/elasticache"
+	elasticbeanstalk "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	eventbridge "github.com/aws/aws-sdk-go-v2/service/eventbridge"
@@ -2823,6 +2824,84 @@ func (cmd *CreateApigatewaystage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateApplication(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateApplication {
+	cmd := new(CreateApplication)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticbeanstalk.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateApplication) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateApplication) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticbeanstalk.CreateApplicationInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticbeanstalk.CreateApplicationInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateApplication(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticbeanstalk.CreateApplication call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create application: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create application '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create application done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateApplication) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("application"), nil
+}
+
+func (cmd *CreateApplication) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateAppscalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateAppscalingpolicy {
 	cmd := new(CreateAppscalingpolicy)
 	if len(l) > 0 {
@@ -4117,6 +4196,84 @@ func (cmd *CreateElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateEnvironment(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateEnvironment {
+	cmd := new(CreateEnvironment)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticbeanstalk.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateEnvironment) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateEnvironment) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticbeanstalk.CreateEnvironmentInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticbeanstalk.CreateEnvironmentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateEnvironment(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticbeanstalk.CreateEnvironment call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create environment: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create environment '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create environment done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateEnvironment) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("environment"), nil
+}
+
+func (cmd *CreateEnvironment) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8549,6 +8706,84 @@ func (cmd *DeleteApigatewaystage) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteApplication(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteApplication {
+	cmd := new(DeleteApplication)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticbeanstalk.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteApplication) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteApplication) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticbeanstalk.DeleteApplicationInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticbeanstalk.DeleteApplicationInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteApplication(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticbeanstalk.DeleteApplication call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete application: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete application '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete application done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteApplication) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("application"), nil
+}
+
+func (cmd *DeleteApplication) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteAppscalingpolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteAppscalingpolicy {
 	cmd := new(DeleteAppscalingpolicy)
 	if len(l) > 0 {
@@ -9953,6 +10188,84 @@ func (cmd *DeleteElasticip) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteElasticip) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteEnvironment(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteEnvironment {
+	cmd := new(DeleteEnvironment)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticbeanstalk.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteEnvironment) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteEnvironment) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticbeanstalk.TerminateEnvironmentInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticbeanstalk.TerminateEnvironmentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.TerminateEnvironment(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticbeanstalk.TerminateEnvironment call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete environment: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete environment '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete environment done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteEnvironment) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("environment"), nil
+}
+
+func (cmd *DeleteEnvironment) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -17088,6 +17401,84 @@ func (cmd *StopTrail) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewUpdateApplication(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateApplication {
+	cmd := new(UpdateApplication)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticbeanstalk.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateApplication) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateApplication) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticbeanstalk.UpdateApplicationInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticbeanstalk.UpdateApplicationInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.UpdateApplication(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticbeanstalk.UpdateApplication call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update application: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update application '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update application done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateApplication) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("application"), nil
+}
+
+func (cmd *UpdateApplication) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewUpdateBucket(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateBucket {
 	cmd := new(UpdateBucket)
 	if len(l) > 0 {
@@ -17691,6 +18082,84 @@ func (cmd *UpdateDistribution) dryRun(renv env.Running, params map[string]any) (
 }
 
 func (cmd *UpdateDistribution) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateEnvironment(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateEnvironment {
+	cmd := new(UpdateEnvironment)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = elasticbeanstalk.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateEnvironment) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateEnvironment) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &elasticbeanstalk.UpdateEnvironmentInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in elasticbeanstalk.UpdateEnvironmentInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.UpdateEnvironment(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("elasticbeanstalk.UpdateEnvironment call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update environment: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update environment '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update environment done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateEnvironment) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("environment"), nil
+}
+
+func (cmd *UpdateEnvironment) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

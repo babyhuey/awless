@@ -10,6 +10,9 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Elastic Beanstalk.** Applications and environments, both with create/update/delete.
+  `awless update environment name=web-api-prod version=build-43` deploys a version;
+  `delete environment` maps to Beanstalk's TerminateEnvironment.
 - **CodeBuild.** Build projects with create/update/delete, and `start`/`stop` to run a
   build. `awless start buildproject name=api-build source-version=release-2.0` returns the
   build id that `stop` takes.

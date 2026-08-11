@@ -195,6 +195,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateApigatewaystage(f.config(), f.Graph, f.Logger)
 		}
+	case "createapplication":
+		return func() any {
+			return awsspec.NewCreateApplication(f.config(), f.Graph, f.Logger)
+		}
 	case "createappscalingpolicy":
 		return func() any {
 			return awsspec.NewCreateAppscalingpolicy(f.config(), f.Graph, f.Logger)
@@ -262,6 +266,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createelasticip":
 		return func() any {
 			return awsspec.NewCreateElasticip(f.config(), f.Graph, f.Logger)
+		}
+	case "createenvironment":
+		return func() any {
+			return awsspec.NewCreateEnvironment(f.config(), f.Graph, f.Logger)
 		}
 	case "createeventbus":
 		return func() any {
@@ -479,6 +487,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteApigatewaystage(f.config(), f.Graph, f.Logger)
 		}
+	case "deleteapplication":
+		return func() any {
+			return awsspec.NewDeleteApplication(f.config(), f.Graph, f.Logger)
+		}
 	case "deleteappscalingpolicy":
 		return func() any {
 			return awsspec.NewDeleteAppscalingpolicy(f.config(), f.Graph, f.Logger)
@@ -550,6 +562,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleteelasticip":
 		return func() any {
 			return awsspec.NewDeleteElasticip(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteenvironment":
+		return func() any {
+			return awsspec.NewDeleteEnvironment(f.config(), f.Graph, f.Logger)
 		}
 	case "deleteeventbus":
 		return func() any {
@@ -899,6 +915,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewStopTrail(f.config(), f.Graph, f.Logger)
 		}
+	case "updateapplication":
+		return func() any {
+			return awsspec.NewUpdateApplication(f.config(), f.Graph, f.Logger)
+		}
 	case "updatebucket":
 		return func() any {
 			return awsspec.NewUpdateBucket(f.config(), f.Graph, f.Logger)
@@ -930,6 +950,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updatedistribution":
 		return func() any {
 			return awsspec.NewUpdateDistribution(f.config(), f.Graph, f.Logger)
+		}
+	case "updateenvironment":
+		return func() any {
+			return awsspec.NewUpdateEnvironment(f.config(), f.Graph, f.Logger)
 		}
 	case "updateeventrule":
 		return func() any {

@@ -97,6 +97,10 @@ type elasticacheMock struct {
 	basicMock
 }
 
+type elasticbeanstalkMock struct {
+	basicMock
+}
+
 type elbMock struct {
 	basicMock
 }

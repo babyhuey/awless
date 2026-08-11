@@ -579,6 +579,40 @@ var paramsDoc = map[string]map[string]string{
 	"stop.buildproject": {
 		"build": "Identifier of the running build to stop, as returned by start buildproject",
 	},
+	"create.application": {
+		"name":        "Name for the Elastic Beanstalk application",
+		"description": "Description of the application",
+	},
+	"delete.application": {
+		"name":  "Name of the application to delete",
+		"force": "Terminate the application's running environments so it can be deleted",
+	},
+	"update.application": {
+		"name":        "Name of the application to update",
+		"description": "New description; the only mutable field on an application",
+	},
+	"create.environment": {
+		"name":            "Name for the environment",
+		"application":     "Name of the application the environment belongs to",
+		"solution-stack":  "Platform to run, e.g. \"64bit Amazon Linux 2023 v4.0.0 running Go 1\"",
+		"platform":        "ARN of a custom platform, as an alternative to a solution stack",
+		"config-template": "Name of a saved configuration template to build the environment from",
+		"version":         "Application version label to deploy",
+		"description":     "Description of the environment",
+		"cname-prefix":    "Prefix for the environment's public CNAME",
+	},
+	"delete.environment": {
+		"name":                "Name of the environment to terminate",
+		"terminate-resources": "Whether to tear down the environment's AWS resources; leaving them keeps the load balancer and instances",
+		"force":               "Terminate even while another operation is in progress",
+	},
+	"update.environment": {
+		"name":           "Name of the environment to update",
+		"version":        "Application version label to deploy",
+		"description":    "New description of the environment",
+		"solution-stack": "Platform to move the environment to, which performs a platform update",
+		"platform":       "ARN of a custom platform to move the environment to",
+	},
 	"start.pipeline": {"name": "Name of the pipeline to start an execution of"},
 	"stop.pipeline": {
 		"name":      "Name of the pipeline whose execution should stop",

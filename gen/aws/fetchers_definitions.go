@@ -345,6 +345,18 @@ var FetchersDefs = []fetchersDef{
 			{API: "codebuild", ResourceType: cloud.BuildProject, AWSType: "codebuildtypes.Project", ManualFetcher: true},
 		},
 	},
+	{
+		Name: "beanstalk",
+		API:  []string{"elasticbeanstalk"},
+		Fetchers: []fetcher{
+			// DescribeApplications returns everything in one response; it has neither a
+			// paginator nor a token.
+			{API: "elasticbeanstalk", ResourceType: cloud.Application, AWSType: "elasticbeanstalktypes.ApplicationDescription", APIMethod: "DescribeApplications", Input: "elasticbeanstalk.DescribeApplicationsInput{}", Output: "elasticbeanstalk.DescribeApplicationsOutput", OutputsExtractor: "Applications"},
+			// DescribeEnvironments takes a NextToken but has no paginator, so it is
+			// walked manually rather than truncated to the first page.
+			{API: "elasticbeanstalk", ResourceType: cloud.Environment, AWSType: "elasticbeanstalktypes.EnvironmentDescription", ManualFetcher: true},
+		},
+	},
 }
 
 // capitalize upper-cases the first character of s.

@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/elasticache"
+	"github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
@@ -82,6 +83,7 @@ type AWSAPI struct {
 	Redshift               *redshift.Client
 	Codepipeline           *codepipeline.Client
 	Codebuild              *codebuild.Client
+	Elasticbeanstalk       *elasticbeanstalk.Client
 }
 
 type Config struct {

@@ -815,4 +815,26 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Created:     {name: "Created", transform: extractTimeFn},
 		properties.Modified:    {name: "LastModified", transform: extractTimeFn},
 	},
+	// Elastic Beanstalk
+	cloud.Application: {
+		properties.Name:        {name: "ApplicationName", transform: extractValueFn},
+		properties.Arn:         {name: "ApplicationArn", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+		properties.Created:     {name: "DateCreated", transform: extractTimeFn},
+		properties.Updated:     {name: "DateUpdated", transform: extractTimeFn},
+	},
+	cloud.Environment: {
+		properties.Name:          {name: "EnvironmentName", transform: extractValueFn},
+		properties.ID:            {name: "EnvironmentId", transform: extractValueFn},
+		properties.Arn:           {name: "EnvironmentArn", transform: extractValueFn},
+		properties.State:         {name: "Status", transform: extractValueFn},
+		properties.Health:        {name: "Health", transform: extractValueFn},
+		properties.CNAME:         {name: "CNAME", transform: extractValueFn},
+		properties.Endpoint:      {name: "EndpointURL", transform: extractValueFn},
+		properties.SolutionStack: {name: "SolutionStackName", transform: extractValueFn},
+		properties.VersionLabel:  {name: "VersionLabel", transform: extractValueFn},
+		properties.Description:   {name: "Description", transform: extractValueFn},
+		properties.Created:       {name: "DateCreated", transform: extractTimeFn},
+		properties.Updated:       {name: "DateUpdated", transform: extractTimeFn},
+	},
 }

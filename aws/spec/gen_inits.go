@@ -113,6 +113,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateApigatewayroute(f.Cfg, f.Graph, f.Log) }
 	case "createapigatewaystage":
 		return func() any { return NewCreateApigatewaystage(f.Cfg, f.Graph, f.Log) }
+	case "createapplication":
+		return func() any { return NewCreateApplication(f.Cfg, f.Graph, f.Log) }
 	case "createappscalingpolicy":
 		return func() any { return NewCreateAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "createappscalingtarget":
@@ -147,6 +149,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "createelasticip":
 		return func() any { return NewCreateElasticip(f.Cfg, f.Graph, f.Log) }
+	case "createenvironment":
+		return func() any { return NewCreateEnvironment(f.Cfg, f.Graph, f.Log) }
 	case "createeventbus":
 		return func() any { return NewCreateEventbus(f.Cfg, f.Graph, f.Log) }
 	case "createeventrule":
@@ -255,6 +259,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteApigatewayroute(f.Cfg, f.Graph, f.Log) }
 	case "deleteapigatewaystage":
 		return func() any { return NewDeleteApigatewaystage(f.Cfg, f.Graph, f.Log) }
+	case "deleteapplication":
+		return func() any { return NewDeleteApplication(f.Cfg, f.Graph, f.Log) }
 	case "deleteappscalingpolicy":
 		return func() any { return NewDeleteAppscalingpolicy(f.Cfg, f.Graph, f.Log) }
 	case "deleteappscalingtarget":
@@ -291,6 +297,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteEksnodegroup(f.Cfg, f.Graph, f.Log) }
 	case "deleteelasticip":
 		return func() any { return NewDeleteElasticip(f.Cfg, f.Graph, f.Log) }
+	case "deleteenvironment":
+		return func() any { return NewDeleteEnvironment(f.Cfg, f.Graph, f.Log) }
 	case "deleteeventbus":
 		return func() any { return NewDeleteEventbus(f.Cfg, f.Graph, f.Log) }
 	case "deleteeventrule":
@@ -465,6 +473,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewStopPipeline(f.Cfg, f.Graph, f.Log) }
 	case "stoptrail":
 		return func() any { return NewStopTrail(f.Cfg, f.Graph, f.Log) }
+	case "updateapplication":
+		return func() any { return NewUpdateApplication(f.Cfg, f.Graph, f.Log) }
 	case "updatebucket":
 		return func() any { return NewUpdateBucket(f.Cfg, f.Graph, f.Log) }
 	case "updatebuildproject":
@@ -481,6 +491,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdateContainertask(f.Cfg, f.Graph, f.Log) }
 	case "updatedistribution":
 		return func() any { return NewUpdateDistribution(f.Cfg, f.Graph, f.Log) }
+	case "updateenvironment":
+		return func() any { return NewUpdateEnvironment(f.Cfg, f.Graph, f.Log) }
 	case "updateeventrule":
 		return func() any { return NewUpdateEventrule(f.Cfg, f.Graph, f.Log) }
 	case "updateimage":
@@ -559,6 +571,7 @@ var (
 	_ command = &CreateApigateway{}
 	_ command = &CreateApigatewayroute{}
 	_ command = &CreateApigatewaystage{}
+	_ command = &CreateApplication{}
 	_ command = &CreateAppscalingpolicy{}
 	_ command = &CreateAppscalingtarget{}
 	_ command = &CreateBucket{}
@@ -576,6 +589,7 @@ var (
 	_ command = &CreateEkscluster{}
 	_ command = &CreateEksnodegroup{}
 	_ command = &CreateElasticip{}
+	_ command = &CreateEnvironment{}
 	_ command = &CreateEventbus{}
 	_ command = &CreateEventrule{}
 	_ command = &CreateFilesystem{}
@@ -630,6 +644,7 @@ var (
 	_ command = &DeleteApigateway{}
 	_ command = &DeleteApigatewayroute{}
 	_ command = &DeleteApigatewaystage{}
+	_ command = &DeleteApplication{}
 	_ command = &DeleteAppscalingpolicy{}
 	_ command = &DeleteAppscalingtarget{}
 	_ command = &DeleteBucket{}
@@ -648,6 +663,7 @@ var (
 	_ command = &DeleteEkscluster{}
 	_ command = &DeleteEksnodegroup{}
 	_ command = &DeleteElasticip{}
+	_ command = &DeleteEnvironment{}
 	_ command = &DeleteEventbus{}
 	_ command = &DeleteEventrule{}
 	_ command = &DeleteFilesystem{}
@@ -735,6 +751,7 @@ var (
 	_ command = &StopInstance{}
 	_ command = &StopPipeline{}
 	_ command = &StopTrail{}
+	_ command = &UpdateApplication{}
 	_ command = &UpdateBucket{}
 	_ command = &UpdateBuildproject{}
 	_ command = &UpdateCachecluster{}
@@ -743,6 +760,7 @@ var (
 	_ command = &UpdateConfigrule{}
 	_ command = &UpdateContainertask{}
 	_ command = &UpdateDistribution{}
+	_ command = &UpdateEnvironment{}
 	_ command = &UpdateEventrule{}
 	_ command = &UpdateImage{}
 	_ command = &UpdateInstance{}

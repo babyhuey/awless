@@ -47,6 +47,8 @@ import (
 	efstypes "github.com/aws/aws-sdk-go-v2/service/efs/types"
 	elasticache "github.com/aws/aws-sdk-go-v2/service/elasticache"
 	elasticachetypes "github.com/aws/aws-sdk-go-v2/service/elasticache/types"
+	elasticbeanstalk "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
+	elasticbeanstalktypes "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk/types"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elbtypes "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -1549,5 +1551,37 @@ func BuildCodebuildFetchFuncs(conf *Config) fetch.Funcs {
 	funcs := make(map[string]fetch.Func)
 
 	addManualCodebuildFetchFuncs(conf, funcs)
+	return funcs
+}
+func BuildBeanstalkFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualBeanstalkFetchFuncs(conf, funcs)
+
+	funcs["application"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []elasticbeanstalktypes.ApplicationDescription
+
+		if !conf.getBoolDefaultTrue("aws.beanstalk.application.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource beanstalk[application]")
+			return resources, objects, nil
+		}
+
+		out, err := conf.APIs.Elasticbeanstalk.DescribeApplications(ctx, &elasticbeanstalk.DescribeApplicationsInput{})
+		if err != nil {
+			return resources, objects, err
+		}
+
+		for _, output := range out.Applications {
+			objects = append(objects, output)
+			res, err := awsconv.NewResource(output)
+			if err != nil {
+				return resources, objects, err
+			}
+			resources = append(resources, res)
+		}
+
+		return resources, objects, nil
+	}
 	return funcs
 }

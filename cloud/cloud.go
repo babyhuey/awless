@@ -143,6 +143,9 @@ const (
 	Pipeline string = "pipeline"
 	//codebuild
 	BuildProject string = "buildproject"
+	//elasticbeanstalk
+	Application string = "application"
+	Environment string = "environment"
 )
 
 type Service interface {

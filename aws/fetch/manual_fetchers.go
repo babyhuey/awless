@@ -13,6 +13,8 @@ import (
 	codebuildtypes "github.com/aws/aws-sdk-go-v2/service/codebuild/types"
 	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
+	"github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
+	elasticbeanstalktypes "github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk/types"
 	"github.com/aws/aws-sdk-go-v2/service/eventbridge"
 	eventbridgetypes "github.com/aws/aws-sdk-go-v2/service/eventbridge/types"
 	"github.com/aws/aws-sdk-go-v2/service/wafv2"
@@ -1451,6 +1453,35 @@ func addManualCodebuildFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 				}
 				resources = append(resources, res)
 			}
+		}
+
+		return resources, objects, nil
+	}
+}
+
+func addManualBeanstalkFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+	funcs["environment"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var objects []elasticbeanstalktypes.EnvironmentDescription
+		var resources []*graph.Resource
+
+		var next *string
+		for {
+			out, err := conf.APIs.Elasticbeanstalk.DescribeEnvironments(ctx, &elasticbeanstalk.DescribeEnvironmentsInput{NextToken: next})
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, envDesc := range out.Environments {
+				objects = append(objects, envDesc)
+				res, err := awsconv.NewResource(envDesc)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+			if out.NextToken == nil || awssdk.ToString(out.NextToken) == "" {
+				break
+			}
+			next = out.NextToken
 		}
 
 		return resources, objects, nil
