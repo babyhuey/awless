@@ -314,9 +314,13 @@ Terraform is much broader in scope. `awless` takes a different approach:
 
 **Is this fork maintained?**
 
-It is modernized rather than actively developed. CI is green and every command has an
-acceptance test, but no release has been published yet — build from source. Known gaps are
-tracked in [ISSUES.md](./ISSUES.md).
+It is modernized rather than actively developed. CI is green, every command has an
+acceptance test, and releases are published for Linux, macOS and Windows — install with
+Homebrew or grab a binary from [Releases](https://github.com/bootswithdefer/awless/releases).
+
+There is no open backlog. Decisions that look like gaps but are deliberate — `gosec` not
+being a build gate, Classic ELB support being retained, five functions left untested — are
+recorded under [Deliberate Omissions](./AGENTS.md#deliberate-omissions) in `AGENTS.md`.
 
 # About
 

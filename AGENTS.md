@@ -252,7 +252,7 @@ positives or a legitimate builder pattern, and are excluded with that reasoning 
 `SA1019` (deprecated usage) is suppressed; `gen_*.go` and the PEG parser are excluded;
 `fieldalignment` and `shadow` are off for govet, and so is `inline`.
 
-`gosec` is deliberately **not** enabled — see `ISSUES.md` I21. It was reviewed once
+`gosec` is deliberately **not** enabled — see [Deliberate Omissions](#deliberate-omissions). It was reviewed once
 rather than adopted: over half its findings duplicate `errcheck` or describe inherent
 properties of a CLI that reads user-specified files and URLs. Worth re-running
 periodically rather than gating on.
@@ -339,6 +339,64 @@ It is a cask rather than a formula because it ships a pre-built binary, which is
 Homebrew expects casks to carry. GoReleaser's `brews` section is deprecated for the same
 reason — use `homebrew_casks`. Get its field names from `goreleaser schema` rather than
 from memory; several are deprecated within it too.
+
+## Deliberate Omissions
+
+Things that look like oversights and are not. Recorded here so they are not "fixed" by
+someone who assumes nobody looked.
+
+**`gosec` is not enabled as a gate.** It was run once over the whole tree as a review, and
+produced 127 findings: 57 duplicate `errcheck`, which is already on; 14 are `G304` file
+paths from variables, inherent to a CLI that takes `--template-file`; 11 are `0644` writes
+already reviewed; 10 are false positives in doc strings and fixtures; 4 are `docker` and
+`ssh` invocation. Its `G115` integer-overflow rule did find two real crashes in the network
+monitor — a divide-by-zero when every request completes in the same instant, and an
+unsigned wrap on a narrow terminal — both fixed. Worth re-running periodically; not worth
+blocking a build on.
+
+**`math/rand` is used unseeded** in `aws/spec/spec.go` and `graph/rdf.go`. Both sites
+generate dry-run IDs and graph identifiers where unpredictability does not matter, and the
+global source has been auto-seeded since Go 1.20. Left alone deliberately rather than
+switched to `crypto/rand`.
+
+**Classic ELB (v1) is still supported** alongside ELBv2, so the tree depends on both SDK
+modules. EC2-Classic was retired in 2022, but Classic Load Balancers still exist in older
+VPC accounts. Kept so the maintenance cost is a choice; dropping it would remove one SDK
+module and `aws/spec/classicloadbalancer.go`.
+
+**golangci-lint is installed with a pinned `go install`** rather than
+`golangci-lint-action`. The action is faster, but pinning the exact version (v2.12.2) in the
+Makefile is what keeps CI and local runs from disagreeing — an unpinned `@latest` is what
+broke the lint job once already.
+
+**Five functions are deliberately untested.** `InteractiveTerminal`, `propagateSignals`,
+`NewClientWithProxy`, `Connect` and `workaroundExeCVEThroughScript` need a live SSH
+handshake or replace the process through `syscall.Exec`. Covering them means an
+integration test with an in-process SSH server, not a seam. Everything else in the
+terminal, stdin and network paths now has one — see the seam table below.
+
+## Test Seams
+
+Three seams exist purely for testability, each defaulting to the real implementation so
+production behavior is unchanged. All are unexported or package-level, and tests restore
+them with `t.Cleanup`.
+
+| Seam | Falls back to | Why |
+|---|---|---|
+| `ssh.Client.dialFunc` | `gossh.Dial` via `dialer()` | exercise username iteration and partial failure without a network |
+| `awsconfig.promptStdin` | `os.Stdin` | drive the region and instance-type prompts without a terminal |
+| `console.termGetSize` | `term.GetSize(os.Stdout)` | stdout is a pipe under `go test`, so the real call fails |
+
+`dialer()` is a fallback rather than a constructor default because `Client` is built
+directly in several places; a zero-value `Client` must still dial for real.
+
+Two test details that are easy to lose:
+
+- The prompt-selector tests run under a 5s watchdog goroutine. A regression there is an
+  infinite loop, not a wrong value, so without the watchdog the suite hangs instead of
+  failing. Both selectors previously spun forever on a closed stdin.
+- Tests that touch region resolution must set `AWS_EC2_METADATA_DISABLED`, or they wait out
+  the EC2 instance metadata timeout — 5s instead of 0.01s per test.
 
 ## Things to Watch Out For
 

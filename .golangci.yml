@@ -9,7 +9,7 @@ linters:
     - staticcheck
     - unconvert
     - unused
-    # Added incrementally (ISSUES.md I9).
+    # Added incrementally; see the CHANGELOG for the sweep that introduced them.
     - bodyclose
     - errcheck
     - errorlint

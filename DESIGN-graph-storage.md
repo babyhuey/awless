@@ -2,7 +2,7 @@
 
 **Status:** evaluation only. Not scheduled, not committed to.  
 **Created:** 2026-08-06  
-**Decision record:** [`PLAN.md`](./PLAN.md) § 0.6
+**Decision:** keep `triplestore`. This document is the record; it was evaluated once and not scheduled.
 
 This document exists because the question "is there a better-maintained RDF library we could use instead of `triplestore`?" has a more interesting answer than expected: **no, and `awless` may not need RDF at all.**
 
@@ -74,7 +74,7 @@ These are the reasons this is a design doc and not a scheduled phase.
 1. **On-disk cache migration.** `triplestore`'s binary format *is* the format of every synced graph in every user's `~/.awless` (`graph/graph.go:366`). Changing the storage model needs either a converter, or a detect-and-resync-on-first-run path. `(*triple).key()` is effectively a wire contract.
 2. **Generated code.** `cloud/rdf/gen_rdf.go` and `cloud/properties/gen_properties.go` are generated from `gen/aws/properties_definitions.go`. Replacing the model means rewriting generator templates, not just output.
 3. **Public output formats.** `awless show --format rdf` and the DOT export are user-facing. Dropping RDF internally means either re-implementing an NTriples serialiser for output, or removing those formats — the latter being a breaking change.
-4. **Effort exceeds anything currently planned.** Larger than the SDK v2 mocking rework (`awless#D1`), which is presently the biggest item in `PLAN.md` Phase 5.
+4. **Effort exceeds anything else attempted here.** Larger than the SDK v2 mocking rework, which was the biggest single task in the modernization.
 
 ## Recommendation
 

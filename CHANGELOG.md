@@ -1,3 +1,26 @@
+## Unreleased
+
+### Fixed
+
+- **Interactive prompts spun forever on a closed or piped stdin.** `awless config set
+  <key>` and the instance-type selector both looped on `fmt.Scan` while discarding its
+  error, and `fmt.Scan` returns its error without assigning — so neither loop could make
+  progress once stdin was exhausted. Measured at 200,001 iterations in 300ms, burning a
+  core until killed. `awless config set region < /dev/null` was enough to trigger it. Both
+  now read with a `bufio.Scanner` and abort with a clear error.
+- **Ctrl-C at the region prompt called `os.Exit(1)` from library code**, skipping deferred
+  cleanup. Both stdin selectors now return an error, so the abort travels through the
+  normal path to `main`.
+- **`awless ssh` reported a nil error** when given an empty username list, rendering
+  `Last error: %!w(<nil>)`.
+
+### Removed
+
+- `ISSUES.md` and `PLAN.md`. Every tracked item was closed, so both had become historical
+  records that misreported their own status. The decisions worth keeping — why `gosec` is
+  not a build gate, why Classic ELB support stays, why five functions are left untested —
+  moved to `AGENTS.md` under Deliberate Omissions.
+
 ## v1.1.2
 
 ### Fixed
