@@ -124,6 +124,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.Accelerator:              {properties.Name, properties.State, properties.Enabled, properties.DNSName},
 	cloud.AcceleratorListener:      {properties.Arn, properties.Protocol, properties.ClientAffinity},
 	cloud.VpcPeering:               {properties.ID, properties.State, properties.Vpc, properties.PeerVpc},
+	cloud.Namespace:                {properties.ID, properties.Name, properties.Type, properties.ServiceCount},
+	cloud.DiscoveryService:         {properties.ID, properties.Name, properties.Type, properties.InstanceCount},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -947,5 +949,21 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.PeerVpc, Friendly: "Accepter VPC"},
 		StringColumnDefinition{Prop: properties.PeerOwner, Friendly: "Peer Account"},
 		StringColumnDefinition{Prop: properties.PeerRegion, Friendly: "Peer Region"},
+	}, // Cloud Map
+	cloud.Namespace: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.ServiceCount, Friendly: "Services"},
+		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.DiscoveryService: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.Type},
+		StringColumnDefinition{Prop: properties.InstanceCount, Friendly: "Instances"},
+		StringColumnDefinition{Prop: properties.Description},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
 	},
 }

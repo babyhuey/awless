@@ -146,6 +146,10 @@ const (
 	//elasticbeanstalk
 	Application string = "application"
 	Environment string = "environment"
+	//cloud map. "discoveryservice" because "containerservice" and the generic notion of
+	//a service are both already in play.
+	Namespace        string = "namespace"
+	DiscoveryService string = "discoveryservice"
 	//global accelerator. "acceleratorlistener" because ELBv2 already owns "listener".
 	Accelerator         string = "accelerator"
 	AcceleratorListener string = "acceleratorlistener"

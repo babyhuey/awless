@@ -10,6 +10,8 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Cloud Map.** Namespaces and services, with create and delete. Giving `create namespace` a
+  VPC makes it private-DNS backed; without one it is HTTP-only, which is a different API call.
 - **VPC Peering.** Peering connections with create/delete, plus `start vpcpeering` to accept
   a pending request — creating one leaves it pending until the other side accepts.
 - **Global Accelerator.** Accelerators with create/update/delete and their listeners with

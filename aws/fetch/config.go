@@ -43,6 +43,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/aws/aws-sdk-go-v2/service/servicediscovery"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/aws/aws-sdk-go-v2/service/sfn"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
@@ -101,6 +102,7 @@ type AWSAPI struct {
 	Mq                      *mq.Client
 	Fsx                     *fsx.Client
 	Globalaccelerator       *globalaccelerator.Client
+	Servicediscovery        *servicediscovery.Client
 	Elasticbeanstalk        *elasticbeanstalk.Client
 }
 

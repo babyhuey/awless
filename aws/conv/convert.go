@@ -71,6 +71,7 @@ import (
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	servicediscoverytypes "github.com/aws/aws-sdk-go-v2/service/servicediscovery/types"
 	sesv2types "github.com/aws/aws-sdk-go-v2/service/sesv2/types"
 	sfntypes "github.com/aws/aws-sdk-go-v2/service/sfn/types"
 	snstypes "github.com/aws/aws-sdk-go-v2/service/sns/types"
@@ -292,6 +293,11 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.TransitGatewayRouteTable, awssdk.ToString(ss.TransitGatewayRouteTableId))
 	case ec2types.VpcEndpoint:
 		res = graph.InitResource(cloud.VpcEndpoint, awssdk.ToString(ss.VpcEndpointId))
+	// Cloud Map
+	case servicediscoverytypes.NamespaceSummary:
+		res = graph.InitResource(cloud.Namespace, awssdk.ToString(ss.Id))
+	case servicediscoverytypes.ServiceSummary:
+		res = graph.InitResource(cloud.DiscoveryService, awssdk.ToString(ss.Id))
 	// Global Accelerator
 	case globalacceleratortypes.Accelerator:
 		res = graph.InitResource(cloud.Accelerator, awssdk.ToString(ss.Name))

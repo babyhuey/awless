@@ -81,6 +81,8 @@ import (
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
+	servicediscovery "github.com/aws/aws-sdk-go-v2/service/servicediscovery"
+	servicediscoverytypes "github.com/aws/aws-sdk-go-v2/service/servicediscovery/types"
 	sesv2 "github.com/aws/aws-sdk-go-v2/service/sesv2"
 	sesv2types "github.com/aws/aws-sdk-go-v2/service/sesv2/types"
 	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
@@ -1689,6 +1691,68 @@ func BuildCodepipelineFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.Pipelines {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildCloudmapFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualCloudmapFetchFuncs(conf, funcs)
+
+	funcs["namespace"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []servicediscoverytypes.NamespaceSummary
+
+		if !conf.getBoolDefaultTrue("aws.cloudmap.namespace.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource cloudmap[namespace]")
+			return resources, objects, nil
+		}
+		paginator := servicediscovery.NewListNamespacesPaginator(conf.APIs.Servicediscovery, &servicediscovery.ListNamespacesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Namespaces {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["discoveryservice"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []servicediscoverytypes.ServiceSummary
+
+		if !conf.getBoolDefaultTrue("aws.cloudmap.discoveryservice.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource cloudmap[discoveryservice]")
+			return resources, objects, nil
+		}
+		paginator := servicediscovery.NewListServicesPaginator(conf.APIs.Servicediscovery, &servicediscovery.ListServicesInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Services {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

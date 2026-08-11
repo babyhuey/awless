@@ -279,6 +279,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateDeploymentgroup(f.config(), f.Graph, f.Logger)
 		}
+	case "creatediscoveryservice":
+		return func() any {
+			return awsspec.NewCreateDiscoveryservice(f.config(), f.Graph, f.Logger)
+		}
 	case "createdistribution":
 		return func() any {
 			return awsspec.NewCreateDistribution(f.config(), f.Graph, f.Logger)
@@ -398,6 +402,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createmfadevice":
 		return func() any {
 			return awsspec.NewCreateMfadevice(f.config(), f.Graph, f.Logger)
+		}
+	case "createnamespace":
+		return func() any {
+			return awsspec.NewCreateNamespace(f.config(), f.Graph, f.Logger)
 		}
 	case "createnatgateway":
 		return func() any {
@@ -667,6 +675,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteDeploymentgroup(f.config(), f.Graph, f.Logger)
 		}
+	case "deletediscoveryservice":
+		return func() any {
+			return awsspec.NewDeleteDiscoveryservice(f.config(), f.Graph, f.Logger)
+		}
 	case "deletedistribution":
 		return func() any {
 			return awsspec.NewDeleteDistribution(f.config(), f.Graph, f.Logger)
@@ -786,6 +798,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletemfadevice":
 		return func() any {
 			return awsspec.NewDeleteMfadevice(f.config(), f.Graph, f.Logger)
+		}
+	case "deletenamespace":
+		return func() any {
+			return awsspec.NewDeleteNamespace(f.config(), f.Graph, f.Logger)
 		}
 	case "deletenatgateway":
 		return func() any {

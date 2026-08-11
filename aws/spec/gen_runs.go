@@ -63,6 +63,7 @@ import (
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	servicediscovery "github.com/aws/aws-sdk-go-v2/service/servicediscovery"
 	sesv2 "github.com/aws/aws-sdk-go-v2/service/sesv2"
 	sfn "github.com/aws/aws-sdk-go-v2/service/sfn"
 	sns "github.com/aws/aws-sdk-go-v2/service/sns"
@@ -4453,6 +4454,84 @@ func (cmd *CreateDeploymentgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateDiscoveryservice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDiscoveryservice {
+	cmd := new(CreateDiscoveryservice)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = servicediscovery.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateDiscoveryservice) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateDiscoveryservice) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &servicediscovery.CreateServiceInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in servicediscovery.CreateServiceInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateService(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("servicediscovery.CreateService call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create discoveryservice: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create discoveryservice '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create discoveryservice done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateDiscoveryservice) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("discoveryservice"), nil
+}
+
+func (cmd *CreateDiscoveryservice) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDistribution {
 	cmd := new(CreateDistribution)
 	if len(l) > 0 {
@@ -6836,6 +6915,75 @@ func (cmd *CreateMfadevice) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *CreateMfadevice) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateNamespace(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateNamespace {
+	cmd := new(CreateNamespace)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = servicediscovery.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateNamespace) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateNamespace) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create namespace: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create namespace '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create namespace done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateNamespace) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("namespace"), nil
+}
+
+func (cmd *CreateNamespace) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12337,6 +12485,84 @@ func (cmd *DeleteDeploymentgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteDiscoveryservice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDiscoveryservice {
+	cmd := new(DeleteDiscoveryservice)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = servicediscovery.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteDiscoveryservice) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteDiscoveryservice) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &servicediscovery.DeleteServiceInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in servicediscovery.DeleteServiceInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteService(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("servicediscovery.DeleteService call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete discoveryservice: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete discoveryservice '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete discoveryservice done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteDiscoveryservice) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("discoveryservice"), nil
+}
+
+func (cmd *DeleteDiscoveryservice) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteDistribution(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDistribution {
 	cmd := new(DeleteDistribution)
 	if len(l) > 0 {
@@ -14743,6 +14969,84 @@ func (cmd *DeleteMfadevice) dryRun(renv env.Running, params map[string]any) (any
 }
 
 func (cmd *DeleteMfadevice) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteNamespace(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNamespace {
+	cmd := new(DeleteNamespace)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = servicediscovery.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteNamespace) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteNamespace) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &servicediscovery.DeleteNamespaceInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in servicediscovery.DeleteNamespaceInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteNamespace(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("servicediscovery.DeleteNamespace call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete namespace: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete namespace '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete namespace done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteNamespace) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("namespace"), nil
+}
+
+func (cmd *DeleteNamespace) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

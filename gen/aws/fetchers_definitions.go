@@ -345,6 +345,14 @@ var FetchersDefs = []fetchersDef{
 		},
 	},
 	{
+		Name: "cloudmap",
+		API:  []string{"servicediscovery"},
+		Fetchers: []fetcher{
+			{API: "servicediscovery", ResourceType: cloud.Namespace, AWSType: "servicediscoverytypes.NamespaceSummary", APIMethod: "ListNamespaces", Input: "servicediscovery.ListNamespacesInput{}", Output: "servicediscovery.ListNamespacesOutput", OutputsExtractor: "Namespaces", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "servicediscovery", ResourceType: cloud.DiscoveryService, AWSType: "servicediscoverytypes.ServiceSummary", APIMethod: "ListServices", Input: "servicediscovery.ListServicesInput{}", Output: "servicediscovery.ListServicesOutput", OutputsExtractor: "Services", Multipage: true, NextPageMarker: "NextToken"},
+		},
+	},
+	{
 		Name:   "globalaccelerator",
 		Global: true,
 		API:    []string{"globalaccelerator"},

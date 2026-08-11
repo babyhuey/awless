@@ -458,6 +458,20 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.namespace": {
+		"name":        "Name for the namespace",
+		"description": "Description of the namespace",
+		"vpc":         "VPC to back the namespace with a private hosted zone, making instances resolvable by DNS inside it; without a VPC discovery is HTTP-only",
+	},
+	"delete.namespace": {"id": "Identifier of the namespace to delete; it must have no services left, which AWS enforces"},
+	"create.discoveryservice": {
+		"name":             "Name for the service",
+		"namespace":        "Identifier of the namespace the service belongs to",
+		"description":      "Description of the service",
+		"dns-file":         "Path to the DNS configuration in JSON: the record types the service registers and their TTLs",
+		"healthcheck-file": "Path to the health check configuration in JSON",
+	},
+	"delete.discoveryservice": {"id": "Identifier of the service to delete"},
 	"create.vpcpeering": {
 		"vpc":         "Identifier of the requesting VPC",
 		"peer-vpc":    "Identifier of the VPC to peer with; the connection stays pending until that side accepts",

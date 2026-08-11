@@ -245,6 +245,15 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.namespace": {
+		"awless create namespace name=internal vpc=vpc-1234",
+		"awless create namespace name=http-only description=\"HTTP discovery only\"",
+	},
+	"delete.namespace": {"awless delete namespace id=ns-1234abcd"},
+	"create.discoveryservice": {
+		"awless create discoveryservice name=api namespace=ns-1234abcd dns-file=/home/jsmith/dns.json",
+	},
+	"delete.discoveryservice": {"awless delete discoveryservice id=srv-1234abcd"},
 	"create.vpcpeering": {
 		"awless create vpcpeering vpc=vpc-1234 peer-vpc=vpc-5678",
 		"awless create vpcpeering vpc=vpc-1234 peer-vpc=vpc-5678 peer-owner=210987654321 peer-region=eu-west-1",

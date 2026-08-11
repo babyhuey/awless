@@ -81,6 +81,6 @@ func allResourceTypes() []string {
 		cloud.KafkaCluster, cloud.Broker,
 		cloud.FSxFileSystem, cloud.FSxBackup,
 		cloud.Accelerator, cloud.AcceleratorListener,
-		cloud.VpcPeering,
+		cloud.VpcPeering, cloud.Namespace, cloud.DiscoveryService,
 	}
 }

@@ -155,6 +155,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateDeployment(f.Cfg, f.Graph, f.Log) }
 	case "createdeploymentgroup":
 		return func() any { return NewCreateDeploymentgroup(f.Cfg, f.Graph, f.Log) }
+	case "creatediscoveryservice":
+		return func() any { return NewCreateDiscoveryservice(f.Cfg, f.Graph, f.Log) }
 	case "createdistribution":
 		return func() any { return NewCreateDistribution(f.Cfg, f.Graph, f.Log) }
 	case "createdynamodbtable":
@@ -215,6 +217,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateLoginprofile(f.Cfg, f.Graph, f.Log) }
 	case "createmfadevice":
 		return func() any { return NewCreateMfadevice(f.Cfg, f.Graph, f.Log) }
+	case "createnamespace":
+		return func() any { return NewCreateNamespace(f.Cfg, f.Graph, f.Log) }
 	case "createnatgateway":
 		return func() any { return NewCreateNatgateway(f.Cfg, f.Graph, f.Log) }
 	case "createnetworkinterface":
@@ -349,6 +353,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteDeployapplication(f.Cfg, f.Graph, f.Log) }
 	case "deletedeploymentgroup":
 		return func() any { return NewDeleteDeploymentgroup(f.Cfg, f.Graph, f.Log) }
+	case "deletediscoveryservice":
+		return func() any { return NewDeleteDiscoveryservice(f.Cfg, f.Graph, f.Log) }
 	case "deletedistribution":
 		return func() any { return NewDeleteDistribution(f.Cfg, f.Graph, f.Log) }
 	case "deletedynamodbtable":
@@ -409,6 +415,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteLoginprofile(f.Cfg, f.Graph, f.Log) }
 	case "deletemfadevice":
 		return func() any { return NewDeleteMfadevice(f.Cfg, f.Graph, f.Log) }
+	case "deletenamespace":
+		return func() any { return NewDeleteNamespace(f.Cfg, f.Graph, f.Log) }
 	case "deletenatgateway":
 		return func() any { return NewDeleteNatgateway(f.Cfg, f.Graph, f.Log) }
 	case "deletenetworkinterface":
@@ -696,6 +704,7 @@ var (
 	_ command = &CreateDeployapplication{}
 	_ command = &CreateDeployment{}
 	_ command = &CreateDeploymentgroup{}
+	_ command = &CreateDiscoveryservice{}
 	_ command = &CreateDistribution{}
 	_ command = &CreateDynamodbtable{}
 	_ command = &CreateEkscluster{}
@@ -726,6 +735,7 @@ var (
 	_ command = &CreateLoggroup{}
 	_ command = &CreateLoginprofile{}
 	_ command = &CreateMfadevice{}
+	_ command = &CreateNamespace{}
 	_ command = &CreateNatgateway{}
 	_ command = &CreateNetworkinterface{}
 	_ command = &CreatePipeline{}
@@ -793,6 +803,7 @@ var (
 	_ command = &DeleteDbsubnetgroup{}
 	_ command = &DeleteDeployapplication{}
 	_ command = &DeleteDeploymentgroup{}
+	_ command = &DeleteDiscoveryservice{}
 	_ command = &DeleteDistribution{}
 	_ command = &DeleteDynamodbtable{}
 	_ command = &DeleteEkscluster{}
@@ -823,6 +834,7 @@ var (
 	_ command = &DeleteLoggroup{}
 	_ command = &DeleteLoginprofile{}
 	_ command = &DeleteMfadevice{}
+	_ command = &DeleteNamespace{}
 	_ command = &DeleteNatgateway{}
 	_ command = &DeleteNetworkinterface{}
 	_ command = &DeletePipeline{}

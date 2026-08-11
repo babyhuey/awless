@@ -141,6 +141,7 @@ const (
 	InlinePolicies                    = "cloud:inlinePolicies"
 	InputParameters                   = "cloud:inputParameters"
 	Instance                          = "cloud:instance"
+	InstanceCount                     = "cloud:instanceCount"
 	InstanceOwner                     = "cloud:instanceOwner"
 	Instances                         = "cloud:instances"
 	InsufficientDataActions           = "cloud:insufficientDataActions"
@@ -239,6 +240,7 @@ const (
 	SecondaryAvailabilityZone         = "cloud:secondaryAvailabilityZone"
 	SecurityGroups                    = "cloud:securityGroups"
 	SendingEnabled                    = "cloud:sendingEnabled"
+	ServiceCount                      = "cloud:serviceCount"
 	ServiceName                       = "cloud:serviceName"
 	Set                               = "cloud:set"
 	ShardCount                        = "cloud:shardCount"
@@ -453,6 +455,7 @@ func init() {
 		properties.InlinePolicies:                    InlinePolicies,
 		properties.InputParameters:                   InputParameters,
 		properties.Instance:                          Instance,
+		properties.InstanceCount:                     InstanceCount,
 		properties.InstanceOwner:                     InstanceOwner,
 		properties.Instances:                         Instances,
 		properties.InsufficientDataActions:           InsufficientDataActions,
@@ -551,6 +554,7 @@ func init() {
 		properties.SecondaryAvailabilityZone:         SecondaryAvailabilityZone,
 		properties.SecurityGroups:                    SecurityGroups,
 		properties.SendingEnabled:                    SendingEnabled,
+		properties.ServiceCount:                      ServiceCount,
 		properties.ServiceName:                       ServiceName,
 		properties.Set:                               Set,
 		properties.ShardCount:                        ShardCount,
@@ -765,6 +769,7 @@ var Properties = RDFProperties{
 	InlinePolicies:                    {ID: InlinePolicies, RdfType: "rdf:Property", RdfsLabel: "InlinePolicies", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	InputParameters:                   {ID: InputParameters, RdfType: "rdf:Property", RdfsLabel: "InputParameters", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Instance:                          {ID: Instance, RdfType: "rdf:Property", RdfsLabel: "Instance", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	InstanceCount:                     {ID: InstanceCount, RdfType: "rdf:Property", RdfsLabel: "InstanceCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	InstanceOwner:                     {ID: InstanceOwner, RdfType: "rdf:Property", RdfsLabel: "InstanceOwner", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Instances:                         {ID: Instances, RdfType: "rdf:Property", RdfsLabel: "Instances", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	InsufficientDataActions:           {ID: InsufficientDataActions, RdfType: "rdf:Property", RdfsLabel: "InsufficientDataActions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
@@ -863,6 +868,7 @@ var Properties = RDFProperties{
 	SecondaryAvailabilityZone:         {ID: SecondaryAvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "SecondaryAvailabilityZone", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SecurityGroups:                    {ID: SecurityGroups, RdfType: "rdf:Property", RdfsLabel: "SecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	SendingEnabled:                    {ID: SendingEnabled, RdfType: "rdf:Property", RdfsLabel: "SendingEnabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
+	ServiceCount:                      {ID: ServiceCount, RdfType: "rdf:Property", RdfsLabel: "ServiceCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	ServiceName:                       {ID: ServiceName, RdfType: "rdf:Property", RdfsLabel: "ServiceName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ShardCount:                        {ID: ShardCount, RdfType: "rdf:Property", RdfsLabel: "ShardCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},

@@ -857,6 +857,25 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.Subnets:     {name: "SubnetIds", transform: extractValueFn},
 		properties.Created:     {name: "CreationTimestamp", transform: extractTimeFn},
 	},
+	// Cloud Map
+	cloud.Namespace: {
+		properties.ID:           {name: "Id", transform: extractValueFn},
+		properties.Name:         {name: "Name", transform: extractValueFn},
+		properties.Arn:          {name: "Arn", transform: extractValueFn},
+		properties.Type:         {name: "Type", transform: extractValueFn},
+		properties.Description:  {name: "Description", transform: extractValueFn},
+		properties.ServiceCount: {name: "ServiceCount", transform: extractValueFn},
+		properties.Created:      {name: "CreateDate", transform: extractTimeFn},
+	},
+	cloud.DiscoveryService: {
+		properties.ID:            {name: "Id", transform: extractValueFn},
+		properties.Name:          {name: "Name", transform: extractValueFn},
+		properties.Arn:           {name: "Arn", transform: extractValueFn},
+		properties.Type:          {name: "Type", transform: extractValueFn},
+		properties.Description:   {name: "Description", transform: extractValueFn},
+		properties.InstanceCount: {name: "InstanceCount", transform: extractValueFn},
+		properties.Created:       {name: "CreateDate", transform: extractTimeFn},
+	},
 	// Global Accelerator
 	cloud.Accelerator: {
 		properties.Name:          {name: "Name", transform: extractValueFn},

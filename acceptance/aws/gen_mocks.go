@@ -177,6 +177,10 @@ type secretsmanagerMock struct {
 	basicMock
 }
 
+type servicediscoveryMock struct {
+	basicMock
+}
+
 type sesv2Mock struct {
 	basicMock
 }
