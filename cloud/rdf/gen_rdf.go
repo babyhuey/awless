@@ -83,6 +83,7 @@ const (
 	CopyTagsToSnapshot                = "cloud:copyTagsToSnapshot"
 	Country                           = "cloud:country"
 	Created                           = "cloud:created"
+	DBName                            = "cloud:dbName"
 	DBSecurityGroups                  = "cloud:dbSecurityGroups"
 	DBSubnetGroup                     = "cloud:dbSubnetGroup"
 	Default                           = "cloud:default"
@@ -145,6 +146,7 @@ const (
 	MACAddress                        = "cloud:macAddress"
 	Main                              = "cloud:main"
 	ManagedBy                         = "cloud:managedBy"
+	MasterUsername                    = "cloud:masterUsername"
 	MaxSize                           = "cloud:maxSize"
 	MemberClusters                    = "cloud:memberClusters"
 	Memory                            = "cloud:memory"
@@ -160,6 +162,7 @@ const (
 	NetworkInterfaces                 = "cloud:networkInterfaces"
 	NewInstancesProtected             = "cloud:newInstancesProtected"
 	NodeCount                         = "cloud:nodeCount"
+	NodeType                          = "cloud:nodeType"
 	Notifications                     = "cloud:notifications"
 	OKActions                         = "cloud:okActions"
 	OptionGroups                      = "cloud:optionGroups"
@@ -361,6 +364,7 @@ func init() {
 		properties.CopyTagsToSnapshot:                CopyTagsToSnapshot,
 		properties.Country:                           Country,
 		properties.Created:                           Created,
+		properties.DBName:                            DBName,
 		properties.DBSecurityGroups:                  DBSecurityGroups,
 		properties.DBSubnetGroup:                     DBSubnetGroup,
 		properties.Default:                           Default,
@@ -423,6 +427,7 @@ func init() {
 		properties.MACAddress:                        MACAddress,
 		properties.Main:                              Main,
 		properties.ManagedBy:                         ManagedBy,
+		properties.MasterUsername:                    MasterUsername,
 		properties.MaxSize:                           MaxSize,
 		properties.MemberClusters:                    MemberClusters,
 		properties.Memory:                            Memory,
@@ -438,6 +443,7 @@ func init() {
 		properties.NetworkInterfaces:                 NetworkInterfaces,
 		properties.NewInstancesProtected:             NewInstancesProtected,
 		properties.NodeCount:                         NodeCount,
+		properties.NodeType:                          NodeType,
 		properties.Notifications:                     Notifications,
 		properties.OKActions:                         OKActions,
 		properties.OptionGroups:                      OptionGroups,
@@ -639,6 +645,7 @@ var Properties = RDFProperties{
 	CopyTagsToSnapshot:                {ID: CopyTagsToSnapshot, RdfType: "rdf:Property", RdfsLabel: "CopyTagsToSnapshot", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Country:                           {ID: Country, RdfType: "rdf:Property", RdfsLabel: "Country", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Created:                           {ID: Created, RdfType: "rdf:Property", RdfsLabel: "Created", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
+	DBName:                            {ID: DBName, RdfType: "rdf:Property", RdfsLabel: "DBName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DBSecurityGroups:                  {ID: DBSecurityGroups, RdfType: "rdf:Property", RdfsLabel: "DBSecurityGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	DBSubnetGroup:                     {ID: DBSubnetGroup, RdfType: "rdf:Property", RdfsLabel: "DBSubnetGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Default:                           {ID: Default, RdfType: "rdf:Property", RdfsLabel: "Default", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
@@ -701,6 +708,7 @@ var Properties = RDFProperties{
 	MACAddress:                        {ID: MACAddress, RdfType: "rdf:Property", RdfsLabel: "MACAddress", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Main:                              {ID: Main, RdfType: "rdf:Property", RdfsLabel: "Main", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	ManagedBy:                         {ID: ManagedBy, RdfType: "rdf:Property", RdfsLabel: "ManagedBy", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	MasterUsername:                    {ID: MasterUsername, RdfType: "rdf:Property", RdfsLabel: "MasterUsername", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MaxSize:                           {ID: MaxSize, RdfType: "rdf:Property", RdfsLabel: "MaxSize", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	MemberClusters:                    {ID: MemberClusters, RdfType: "rdf:Property", RdfsLabel: "MemberClusters", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	Memory:                            {ID: Memory, RdfType: "rdf:Property", RdfsLabel: "Memory", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
@@ -716,6 +724,7 @@ var Properties = RDFProperties{
 	NetworkInterfaces:                 {ID: NetworkInterfaces, RdfType: "rdf:Property", RdfsLabel: "NetworkInterfaces", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	NewInstancesProtected:             {ID: NewInstancesProtected, RdfType: "rdf:Property", RdfsLabel: "NewInstancesProtected", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	NodeCount:                         {ID: NodeCount, RdfType: "rdf:Property", RdfsLabel: "NodeCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	NodeType:                          {ID: NodeType, RdfType: "rdf:Property", RdfsLabel: "NodeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Notifications:                     {ID: Notifications, RdfType: "rdf:Property", RdfsLabel: "Notifications", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	OKActions:                         {ID: OKActions, RdfType: "rdf:Property", RdfsLabel: "OKActions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	OptionGroups:                      {ID: OptionGroups, RdfType: "rdf:Property", RdfsLabel: "OptionGroups", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},

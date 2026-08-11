@@ -57,6 +57,8 @@ import (
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
+	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
+	redshifttypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -1431,6 +1433,68 @@ func BuildKinesisFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			for _, output := range out.StreamSummaries {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildRedshiftFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualRedshiftFetchFuncs(conf, funcs)
+
+	funcs["redshiftcluster"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []redshifttypes.Cluster
+
+		if !conf.getBoolDefaultTrue("aws.redshift.redshiftcluster.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource redshift[redshiftcluster]")
+			return resources, objects, nil
+		}
+		paginator := redshift.NewDescribeClustersPaginator(conf.APIs.Redshift, &redshift.DescribeClustersInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Clusters {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["redshiftsubnetgroup"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []redshifttypes.ClusterSubnetGroup
+
+		if !conf.getBoolDefaultTrue("aws.redshift.redshiftsubnetgroup.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource redshift[redshiftsubnetgroup]")
+			return resources, objects, nil
+		}
+		paginator := redshift.NewDescribeClusterSubnetGroupsPaginator(conf.APIs.Redshift, &redshift.DescribeClusterSubnetGroupsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.ClusterSubnetGroups {
 				objects = append(objects, output)
 				var res *graph.Resource
 				res, err = awsconv.NewResource(output)

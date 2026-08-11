@@ -29,7 +29,7 @@ import (
 var (
 	AccessService, InfraService, StorageService, MessagingService, DNSService, LambdaService, MonitoringService, CdnService, CloudformationService cloud.Service
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService        cloud.Service
-	ElasticacheService, EventbridgeService, StepfunctionsService, WafService, ConfigserviceService, KinesisService                                 cloud.Service
+	ElasticacheService, EventbridgeService, StepfunctionsService, WafService, ConfigserviceService, KinesisService, RedshiftService                cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]any, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -68,6 +68,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	WafService = NewWaf(cfg, profile, extraConf, log)
 	ConfigserviceService = NewConfigservice(cfg, profile, extraConf, log)
 	KinesisService = NewKinesis(cfg, profile, extraConf, log)
+	RedshiftService = NewRedshift(cfg, profile, extraConf, log)
 
 	cloud.ServiceRegistry[InfraService.Name()] = InfraService
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
@@ -92,6 +93,7 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	cloud.ServiceRegistry[WafService.Name()] = WafService
 	cloud.ServiceRegistry[ConfigserviceService.Name()] = ConfigserviceService
 	cloud.ServiceRegistry[KinesisService.Name()] = KinesisService
+	cloud.ServiceRegistry[RedshiftService.Name()] = RedshiftService
 
 	awsspec.CommandFactory = &awsspec.AWSFactory{
 		Log: log,

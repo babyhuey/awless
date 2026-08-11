@@ -275,6 +275,21 @@ var cliExamplesDoc = map[string][]string{
 	"update.stream": {
 		"awless update stream name=clickstream shards=8",
 	},
+	"create.redshiftcluster": {
+		"awless create redshiftcluster id=analytics username=admin type=ra3.xlplus manage-password=true cluster-type=single-node",
+		"awless create redshiftcluster id=analytics username=admin type=ra3.xlplus manage-password=true nodes=4 encrypted=true subnet-group=warehouse-private",
+	},
+	"delete.redshiftcluster": {
+		"awless delete redshiftcluster id=analytics snapshot=analytics-final",
+		"awless delete redshiftcluster id=analytics skip-snapshot=true",
+	},
+	"update.redshiftcluster": {
+		"awless update redshiftcluster id=analytics nodes=8",
+	},
+	"create.redshiftsubnetgroup": {
+		"awless create redshiftsubnetgroup name=warehouse-private description=\"Private warehouse subnets\" subnets=subnet-1234,subnet-5678",
+	},
+	"delete.redshiftsubnetgroup": {"awless delete redshiftsubnetgroup name=warehouse-private"},
 	"create.apigateway": {
 		"awless create apigateway name=my-api protocol=HTTP",
 		"awless create apigateway name=my-api protocol=HTTP target=arn:aws:lambda:us-west-2:123456789012:function:handler",

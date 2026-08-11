@@ -97,6 +97,8 @@ var ColumnsInListing = map[string][]string{
 	cloud.RuleGroup:           {properties.Name, properties.Scope, properties.ID, properties.Description},
 	cloud.ConfigRule:          {properties.Name, properties.Compliance, properties.State, properties.SourceIdentifier},
 	cloud.Stream:              {properties.Name, properties.State, properties.StreamMode, properties.Created},
+	cloud.RedshiftCluster:     {properties.ID, properties.State, properties.NodeType, properties.NodeCount, properties.Endpoint},
+	cloud.RedshiftSubnetGroup: {properties.Name, properties.State, properties.Vpc, properties.Description},
 }
 
 var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
@@ -725,5 +727,24 @@ var DefaultsColumnDefinitions = map[string][]ColumnDefinition{
 		StringColumnDefinition{Prop: properties.StreamMode, Friendly: "Mode"},
 		StringColumnDefinition{Prop: properties.Arn},
 		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	// Redshift
+	cloud.RedshiftCluster: {
+		StringColumnDefinition{Prop: properties.ID},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.NodeType, Friendly: "Node Type"},
+		StringColumnDefinition{Prop: properties.NodeCount, Friendly: "Nodes"},
+		StringColumnDefinition{Prop: properties.DBName, Friendly: "Database"},
+		StringColumnDefinition{Prop: properties.Endpoint},
+		StringColumnDefinition{Prop: properties.Vpc},
+		StringColumnDefinition{Prop: properties.Encrypted},
+		TimeColumnDefinition{StringColumnDefinition: StringColumnDefinition{Prop: properties.Created}},
+	},
+	cloud.RedshiftSubnetGroup: {
+		StringColumnDefinition{Prop: properties.Name},
+		StringColumnDefinition{Prop: properties.State},
+		StringColumnDefinition{Prop: properties.Vpc},
+		StringColumnDefinition{Prop: properties.Subnets},
+		StringColumnDefinition{Prop: properties.Description},
 	},
 }

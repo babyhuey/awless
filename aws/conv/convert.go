@@ -56,6 +56,7 @@ import (
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
+	redshifttypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	secretsmanagertypes "github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
@@ -256,6 +257,11 @@ func InitResource(source any) (*graph.Resource, error) {
 	// Kinesis
 	case kinesistypes.StreamSummary:
 		res = graph.InitResource(cloud.Stream, awssdk.ToString(ss.StreamName))
+	// Redshift
+	case redshifttypes.Cluster:
+		res = graph.InitResource(cloud.RedshiftCluster, awssdk.ToString(ss.ClusterIdentifier))
+	case redshifttypes.ClusterSubnetGroup:
+		res = graph.InitResource(cloud.RedshiftSubnetGroup, awssdk.ToString(ss.ClusterSubnetGroupName))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

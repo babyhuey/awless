@@ -1409,3 +1409,6 @@ func addManualConfigserviceFetchFuncs(conf *Config, funcs map[string]fetch.Func)
 
 func addManualKinesisFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
+
+func addManualRedshiftFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

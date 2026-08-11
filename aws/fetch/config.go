@@ -28,6 +28,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/redshift"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -76,6 +77,7 @@ type AWSAPI struct {
 	Wafv2                  *wafv2.Client
 	Configservice          *configservice.Client
 	Kinesis                *kinesis.Client
+	Redshift               *redshift.Client
 }
 
 type Config struct {

@@ -117,6 +117,10 @@ type rdsMock struct {
 	basicMock
 }
 
+type redshiftMock struct {
+	basicMock
+}
+
 type route53Mock struct {
 	basicMock
 }

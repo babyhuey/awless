@@ -10,6 +10,10 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Redshift.** Clusters and cluster subnet groups, with create/update/delete.
+  `awless create redshiftcluster id=analytics username=admin type=ra3.xlplus
+  manage-password=true` — `manage-password` keeps the credential in Secrets Manager and out
+  of the template log.
 - **Kinesis.** Data streams, with create/delete and resharding via `update stream`.
   `awless create stream name=clickstream mode=ON_DEMAND`.
 - **AWS Config.** Config rules, with create/update/delete, and each rule annotated with its

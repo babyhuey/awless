@@ -189,6 +189,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateQueue(f.Cfg, f.Graph, f.Log) }
 	case "createrecord":
 		return func() any { return NewCreateRecord(f.Cfg, f.Graph, f.Log) }
+	case "createredshiftcluster":
+		return func() any { return NewCreateRedshiftcluster(f.Cfg, f.Graph, f.Log) }
+	case "createredshiftsubnetgroup":
+		return func() any { return NewCreateRedshiftsubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "createreplicationgroup":
 		return func() any { return NewCreateReplicationgroup(f.Cfg, f.Graph, f.Log) }
 	case "createrepository":
@@ -327,6 +331,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteQueue(f.Cfg, f.Graph, f.Log) }
 	case "deleterecord":
 		return func() any { return NewDeleteRecord(f.Cfg, f.Graph, f.Log) }
+	case "deleteredshiftcluster":
+		return func() any { return NewDeleteRedshiftcluster(f.Cfg, f.Graph, f.Log) }
+	case "deleteredshiftsubnetgroup":
+		return func() any { return NewDeleteRedshiftsubnetgroup(f.Cfg, f.Graph, f.Log) }
 	case "deletereplicationgroup":
 		return func() any { return NewDeleteReplicationgroup(f.Cfg, f.Graph, f.Log) }
 	case "deleterepository":
@@ -473,6 +481,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewUpdatePolicy(f.Cfg, f.Graph, f.Log) }
 	case "updaterecord":
 		return func() any { return NewUpdateRecord(f.Cfg, f.Graph, f.Log) }
+	case "updateredshiftcluster":
+		return func() any { return NewUpdateRedshiftcluster(f.Cfg, f.Graph, f.Log) }
 	case "updates3object":
 		return func() any { return NewUpdateS3object(f.Cfg, f.Graph, f.Log) }
 	case "updatescalinggroup":
@@ -571,6 +581,8 @@ var (
 	_ command = &CreatePolicy{}
 	_ command = &CreateQueue{}
 	_ command = &CreateRecord{}
+	_ command = &CreateRedshiftcluster{}
+	_ command = &CreateRedshiftsubnetgroup{}
 	_ command = &CreateReplicationgroup{}
 	_ command = &CreateRepository{}
 	_ command = &CreateRole{}
@@ -640,6 +652,8 @@ var (
 	_ command = &DeletePolicy{}
 	_ command = &DeleteQueue{}
 	_ command = &DeleteRecord{}
+	_ command = &DeleteRedshiftcluster{}
+	_ command = &DeleteRedshiftsubnetgroup{}
 	_ command = &DeleteReplicationgroup{}
 	_ command = &DeleteRepository{}
 	_ command = &DeleteRole{}
@@ -713,6 +727,7 @@ var (
 	_ command = &UpdateLoginprofile{}
 	_ command = &UpdatePolicy{}
 	_ command = &UpdateRecord{}
+	_ command = &UpdateRedshiftcluster{}
 	_ command = &UpdateS3object{}
 	_ command = &UpdateScalinggroup{}
 	_ command = &UpdateSecret{}

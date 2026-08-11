@@ -770,4 +770,27 @@ var awsResourcesDef = map[string]map[string]*propertyTransform{
 		properties.StreamMode: {name: "StreamModeDetails.StreamMode", transform: extractValueFn},
 		properties.Created:    {name: "StreamCreationTimestamp", transform: extractTimeFn},
 	},
+	// Redshift
+	cloud.RedshiftCluster: {
+		properties.ID:             {name: "ClusterIdentifier", transform: extractValueFn},
+		properties.State:          {name: "ClusterStatus", transform: extractValueFn},
+		properties.NodeType:       {name: "NodeType", transform: extractValueFn},
+		properties.NodeCount:      {name: "NumberOfNodes", transform: extractValueFn},
+		properties.DBName:         {name: "DBName", transform: extractValueFn},
+		properties.MasterUsername: {name: "MasterUsername", transform: extractValueFn},
+		properties.Vpc:            {name: "VpcId", transform: extractValueFn},
+		properties.SubnetGroup:    {name: "ClusterSubnetGroupName", transform: extractValueFn},
+		properties.Zone:           {name: "AvailabilityZone", transform: extractValueFn},
+		properties.Version:        {name: "ClusterVersion", transform: extractValueFn},
+		properties.Encrypted:      {name: "Encrypted", transform: extractValueFn},
+		properties.Endpoint:       {name: "Endpoint.Address", transform: extractValueFn},
+		properties.Created:        {name: "ClusterCreateTime", transform: extractTimeFn},
+	},
+	cloud.RedshiftSubnetGroup: {
+		properties.Name:        {name: "ClusterSubnetGroupName", transform: extractValueFn},
+		properties.Description: {name: "Description", transform: extractValueFn},
+		properties.State:       {name: "SubnetGroupStatus", transform: extractValueFn},
+		properties.Vpc:         {name: "VpcId", transform: extractValueFn},
+		properties.Subnets:     {name: "Subnets", transform: extractStringSliceValues("SubnetIdentifier")},
+	},
 }

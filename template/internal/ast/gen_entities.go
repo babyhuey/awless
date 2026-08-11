@@ -71,6 +71,8 @@ var entities = map[Entity]struct{}{
 	"policy":              {},
 	"queue":               {},
 	"record":              {},
+	"redshiftcluster":     {},
+	"redshiftsubnetgroup": {},
 	"registry":            {},
 	"replicationgroup":    {},
 	"repository":          {},

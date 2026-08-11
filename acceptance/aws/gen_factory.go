@@ -347,6 +347,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateRecord(f.config(), f.Graph, f.Logger)
 		}
+	case "createredshiftcluster":
+		return func() any {
+			return awsspec.NewCreateRedshiftcluster(f.config(), f.Graph, f.Logger)
+		}
+	case "createredshiftsubnetgroup":
+		return func() any {
+			return awsspec.NewCreateRedshiftsubnetgroup(f.config(), f.Graph, f.Logger)
+		}
 	case "createreplicationgroup":
 		return func() any {
 			return awsspec.NewCreateReplicationgroup(f.config(), f.Graph, f.Logger)
@@ -622,6 +630,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deleterecord":
 		return func() any {
 			return awsspec.NewDeleteRecord(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteredshiftcluster":
+		return func() any {
+			return awsspec.NewDeleteRedshiftcluster(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteredshiftsubnetgroup":
+		return func() any {
+			return awsspec.NewDeleteRedshiftsubnetgroup(f.config(), f.Graph, f.Logger)
 		}
 	case "deletereplicationgroup":
 		return func() any {
@@ -914,6 +930,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "updaterecord":
 		return func() any {
 			return awsspec.NewUpdateRecord(f.config(), f.Graph, f.Logger)
+		}
+	case "updateredshiftcluster":
+		return func() any {
+			return awsspec.NewUpdateRedshiftcluster(f.config(), f.Graph, f.Logger)
 		}
 	case "updates3object":
 		return func() any {

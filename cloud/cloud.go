@@ -136,6 +136,9 @@ const (
 	ConfigRule string = "configrule"
 	//kinesis
 	Stream string = "stream"
+	//redshift
+	RedshiftCluster     string = "redshiftcluster"
+	RedshiftSubnetGroup string = "redshiftsubnetgroup"
 )
 
 type Service interface {

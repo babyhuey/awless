@@ -48,6 +48,7 @@ import (
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
+	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	secretsmanager "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -5828,6 +5829,162 @@ func (cmd *CreateRecord) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateRedshiftcluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRedshiftcluster {
+	cmd := new(CreateRedshiftcluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = redshift.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateRedshiftcluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateRedshiftcluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &redshift.CreateClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in redshift.CreateClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("redshift.CreateCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create redshiftcluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create redshiftcluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create redshiftcluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateRedshiftcluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("redshiftcluster"), nil
+}
+
+func (cmd *CreateRedshiftcluster) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateRedshiftsubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRedshiftsubnetgroup {
+	cmd := new(CreateRedshiftsubnetgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = redshift.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateRedshiftsubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateRedshiftsubnetgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &redshift.CreateClusterSubnetGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in redshift.CreateClusterSubnetGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateClusterSubnetGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("redshift.CreateClusterSubnetGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create redshiftsubnetgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create redshiftsubnetgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create redshiftsubnetgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateRedshiftsubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("redshiftsubnetgroup"), nil
+}
+
+func (cmd *CreateRedshiftsubnetgroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateReplicationgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateReplicationgroup {
 	cmd := new(CreateReplicationgroup)
 	if len(l) > 0 {
@@ -11423,6 +11580,162 @@ func (cmd *DeleteRecord) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *DeleteRecord) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteRedshiftcluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRedshiftcluster {
+	cmd := new(DeleteRedshiftcluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = redshift.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteRedshiftcluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteRedshiftcluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &redshift.DeleteClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in redshift.DeleteClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("redshift.DeleteCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete redshiftcluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete redshiftcluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete redshiftcluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteRedshiftcluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("redshiftcluster"), nil
+}
+
+func (cmd *DeleteRedshiftcluster) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteRedshiftsubnetgroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRedshiftsubnetgroup {
+	cmd := new(DeleteRedshiftsubnetgroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = redshift.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteRedshiftsubnetgroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteRedshiftsubnetgroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &redshift.DeleteClusterSubnetGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in redshift.DeleteClusterSubnetGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteClusterSubnetGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("redshift.DeleteClusterSubnetGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete redshiftsubnetgroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete redshiftsubnetgroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete redshiftsubnetgroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteRedshiftsubnetgroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("redshiftsubnetgroup"), nil
+}
+
+func (cmd *DeleteRedshiftsubnetgroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -17370,6 +17683,84 @@ func (cmd *UpdateRecord) dryRun(renv env.Running, params map[string]any) (any, e
 }
 
 func (cmd *UpdateRecord) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewUpdateRedshiftcluster(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *UpdateRedshiftcluster {
+	cmd := new(UpdateRedshiftcluster)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = redshift.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *UpdateRedshiftcluster) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *UpdateRedshiftcluster) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &redshift.ModifyClusterInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in redshift.ModifyClusterInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.ModifyCluster(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("redshift.ModifyCluster call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("update redshiftcluster: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("update redshiftcluster '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("update redshiftcluster done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *UpdateRedshiftcluster) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("redshiftcluster"), nil
+}
+
+func (cmd *UpdateRedshiftcluster) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
