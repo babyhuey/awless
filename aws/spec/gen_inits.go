@@ -189,6 +189,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateNatgateway(f.Cfg, f.Graph, f.Log) }
 	case "createnetworkinterface":
 		return func() any { return NewCreateNetworkinterface(f.Cfg, f.Graph, f.Log) }
+	case "createpipeline":
+		return func() any { return NewCreatePipeline(f.Cfg, f.Graph, f.Log) }
 	case "createpolicy":
 		return func() any { return NewCreatePolicy(f.Cfg, f.Graph, f.Log) }
 	case "createqueue":
@@ -209,6 +211,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateRoute(f.Cfg, f.Graph, f.Log) }
 	case "createroutetable":
 		return func() any { return NewCreateRoutetable(f.Cfg, f.Graph, f.Log) }
+	case "createrulegroup":
+		return func() any { return NewCreateRulegroup(f.Cfg, f.Graph, f.Log) }
 	case "creates3object":
 		return func() any { return NewCreateS3object(f.Cfg, f.Graph, f.Log) }
 	case "createscalinggroup":
@@ -247,6 +251,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateVolume(f.Cfg, f.Graph, f.Log) }
 	case "createvpc":
 		return func() any { return NewCreateVpc(f.Cfg, f.Graph, f.Log) }
+	case "createwebacl":
+		return func() any { return NewCreateWebacl(f.Cfg, f.Graph, f.Log) }
 	case "createzone":
 		return func() any { return NewCreateZone(f.Cfg, f.Graph, f.Log) }
 	case "deleteaccesskey":
@@ -359,6 +365,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteRoute(f.Cfg, f.Graph, f.Log) }
 	case "deleteroutetable":
 		return func() any { return NewDeleteRoutetable(f.Cfg, f.Graph, f.Log) }
+	case "deleterulegroup":
+		return func() any { return NewDeleteRulegroup(f.Cfg, f.Graph, f.Log) }
 	case "deletes3object":
 		return func() any { return NewDeleteS3object(f.Cfg, f.Graph, f.Log) }
 	case "deletescalinggroup":
@@ -397,6 +405,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteVolume(f.Cfg, f.Graph, f.Log) }
 	case "deletevpc":
 		return func() any { return NewDeleteVpc(f.Cfg, f.Graph, f.Log) }
+	case "deletewebacl":
+		return func() any { return NewDeleteWebacl(f.Cfg, f.Graph, f.Log) }
 	case "deletezone":
 		return func() any { return NewDeleteZone(f.Cfg, f.Graph, f.Log) }
 	case "detachalarm":
@@ -609,6 +619,7 @@ var (
 	_ command = &CreateMfadevice{}
 	_ command = &CreateNatgateway{}
 	_ command = &CreateNetworkinterface{}
+	_ command = &CreatePipeline{}
 	_ command = &CreatePolicy{}
 	_ command = &CreateQueue{}
 	_ command = &CreateRecord{}
@@ -619,6 +630,7 @@ var (
 	_ command = &CreateRole{}
 	_ command = &CreateRoute{}
 	_ command = &CreateRoutetable{}
+	_ command = &CreateRulegroup{}
 	_ command = &CreateS3object{}
 	_ command = &CreateScalinggroup{}
 	_ command = &CreateScalingpolicy{}
@@ -638,6 +650,7 @@ var (
 	_ command = &CreateUser{}
 	_ command = &CreateVolume{}
 	_ command = &CreateVpc{}
+	_ command = &CreateWebacl{}
 	_ command = &CreateZone{}
 	_ command = &DeleteAccesskey{}
 	_ command = &DeleteAlarm{}
@@ -694,6 +707,7 @@ var (
 	_ command = &DeleteRole{}
 	_ command = &DeleteRoute{}
 	_ command = &DeleteRoutetable{}
+	_ command = &DeleteRulegroup{}
 	_ command = &DeleteS3object{}
 	_ command = &DeleteScalinggroup{}
 	_ command = &DeleteScalingpolicy{}
@@ -713,6 +727,7 @@ var (
 	_ command = &DeleteUser{}
 	_ command = &DeleteVolume{}
 	_ command = &DeleteVpc{}
+	_ command = &DeleteWebacl{}
 	_ command = &DeleteZone{}
 	_ command = &DetachAlarm{}
 	_ command = &DetachClassicLoadbalancer{}

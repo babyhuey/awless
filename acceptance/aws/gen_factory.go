@@ -347,6 +347,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateNetworkinterface(f.config(), f.Graph, f.Logger)
 		}
+	case "createpipeline":
+		return func() any {
+			return awsspec.NewCreatePipeline(f.config(), f.Graph, f.Logger)
+		}
 	case "createpolicy":
 		return func() any {
 			return awsspec.NewCreatePolicy(f.config(), f.Graph, f.Logger)
@@ -386,6 +390,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createroutetable":
 		return func() any {
 			return awsspec.NewCreateRoutetable(f.config(), f.Graph, f.Logger)
+		}
+	case "createrulegroup":
+		return func() any {
+			return awsspec.NewCreateRulegroup(f.config(), f.Graph, f.Logger)
 		}
 	case "creates3object":
 		return func() any {
@@ -462,6 +470,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createvpc":
 		return func() any {
 			return awsspec.NewCreateVpc(f.config(), f.Graph, f.Logger)
+		}
+	case "createwebacl":
+		return func() any {
+			return awsspec.NewCreateWebacl(f.config(), f.Graph, f.Logger)
 		}
 	case "createzone":
 		return func() any {
@@ -687,6 +699,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteRoutetable(f.config(), f.Graph, f.Logger)
 		}
+	case "deleterulegroup":
+		return func() any {
+			return awsspec.NewDeleteRulegroup(f.config(), f.Graph, f.Logger)
+		}
 	case "deletes3object":
 		return func() any {
 			return awsspec.NewDeleteS3object(f.config(), f.Graph, f.Logger)
@@ -762,6 +778,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletevpc":
 		return func() any {
 			return awsspec.NewDeleteVpc(f.config(), f.Graph, f.Logger)
+		}
+	case "deletewebacl":
+		return func() any {
+			return awsspec.NewDeleteWebacl(f.config(), f.Graph, f.Logger)
 		}
 	case "deletezone":
 		return func() any {

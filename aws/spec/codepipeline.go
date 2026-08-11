@@ -25,15 +25,37 @@ import (
 	"github.com/bootswithdefer/awless/template/params"
 )
 
-// Pipelines are listed, deleted, and run. Creation is not offered: CreatePipeline takes a
-// whole PipelineDeclaration — role, artifact store and every stage with its actions —
-// which is a document rather than a set of flags, and the reflective setter has no way to
-// read one. Pipelines are normally defined in CloudFormation or Terraform anyway; what is
-// missing from those tools is operating them, which is what these commands do.
+// Pipelines are created from a JSON declaration, then listed, deleted and run.
+//
+// A pipeline is a document rather than a set of flags — role, artifact store, and every
+// stage with its actions — so `create pipeline` takes a file. The shape is the same
+// `pipeline` object the AWS CLI's `create-pipeline` accepts, without the outer wrapper.
 //
 // `start pipeline` rather than `start execution` because the execution entity belongs to
 // Step Functions, and an execution here has no independent existence: it is started by
 // naming the pipeline.
+
+type CreatePipeline struct {
+	_      string `action:"create" entity:"pipeline" awsAPI:"codepipeline" awsCall:"CreatePipeline" awsInput:"codepipeline.CreatePipelineInput" awsOutput:"codepipeline.CreatePipelineOutput"`
+	logger *logger.Logger
+	graph  cloud.GraphAPI
+	api    *codepipeline.Client
+	// The declaration carries its own name, so there is no separate name param to
+	// contradict it.
+	DefinitionFile *string `awsName:"Pipeline" awsType:"awsfiletostruct" templateName:"definition-file"`
+}
+
+func (cmd *CreatePipeline) ParamsSpec() params.Spec {
+	return params.NewSpec(params.AllOf(params.Key("definition-file")))
+}
+
+func (cmd *CreatePipeline) ExtractResult(i any) string {
+	out, ok := i.(*codepipeline.CreatePipelineOutput)
+	if !ok || out.Pipeline == nil {
+		return ""
+	}
+	return awssdk.ToString(out.Pipeline.Name)
+}
 
 type DeletePipeline struct {
 	_      string `action:"delete" entity:"pipeline" awsAPI:"codepipeline" awsCall:"DeletePipeline" awsInput:"codepipeline.DeletePipelineInput" awsOutput:"codepipeline.DeletePipelineOutput"`

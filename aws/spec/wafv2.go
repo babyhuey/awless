@@ -68,6 +68,185 @@ func findIPSet(renv env.Running, api *wafv2.Client, name string, scope wafv2type
 	}
 }
 
+// A web ACL and a rule group are documents rather than sets of flags: the default action,
+// the visibility config and the rules themselves are nested structures with no flat
+// spelling. Those three come from a JSON file, in the same shape the AWS CLI accepts, while
+// the name and scope stay ordinary params because they are what the user thinks in.
+type CreateWebacl struct {
+	_      string `action:"create" entity:"webacl" awsAPI:"wafv2" awsCall:"CreateWebACL" awsInput:"wafv2.CreateWebACLInput" awsOutput:"wafv2.CreateWebACLOutput"`
+	logger *logger.Logger
+	graph  cloud.GraphAPI
+	api    *wafv2.Client
+	Name   *string `awsName:"Name" awsType:"awsstr" templateName:"name"`
+	Scope  *string `awsName:"Scope" awsType:"awsstr" templateName:"scope"`
+	// Required by AWS: an ACL with no default action would neither allow nor block.
+	DefaultActionFile *string `awsName:"DefaultAction" awsType:"awsfiletostruct" templateName:"default-action-file"`
+	VisibilityFile    *string `awsName:"VisibilityConfig" awsType:"awsfiletostruct" templateName:"visibility-file"`
+	RulesFile         *string `awsName:"Rules" awsType:"awsfiletostruct" templateName:"rules-file"`
+	Description       *string `awsName:"Description" awsType:"awsstr" templateName:"description"`
+}
+
+func (cmd *CreateWebacl) ParamsSpec() params.Spec {
+	return params.NewSpec(params.AllOf(
+		params.Key("name"),
+		params.Key("default-action-file"), params.Key("visibility-file"),
+		params.Opt(params.Suggested("scope", "rules-file"), "description"),
+	))
+}
+
+func (cmd *CreateWebacl) BeforeRun(renv env.Running) error {
+	if StringValue(cmd.Scope) == "" {
+		cmd.Scope = String(defaultWafScope)
+	}
+	return nil
+}
+
+func (cmd *CreateWebacl) ExtractResult(i any) string {
+	out, ok := i.(*wafv2.CreateWebACLOutput)
+	if !ok || out.Summary == nil {
+		return StringValue(cmd.Name)
+	}
+	return awssdk.ToString(out.Summary.Name)
+}
+
+// findWebACL returns the id and lock token for a named web ACL within a scope.
+func findWebACL(renv env.Running, api *wafv2.Client, name string, scope wafv2types.Scope) (id, lockToken string, err error) {
+	var next *string
+	for {
+		out, lerr := api.ListWebACLs(renv.RequestContext(), &wafv2.ListWebACLsInput{Scope: scope, NextMarker: next})
+		if lerr != nil {
+			return "", "", lerr
+		}
+		for _, acl := range out.WebACLs {
+			if awssdk.ToString(acl.Name) == name {
+				return awssdk.ToString(acl.Id), awssdk.ToString(acl.LockToken), nil
+			}
+		}
+		if out.NextMarker == nil || awssdk.ToString(out.NextMarker) == "" {
+			return "", "", fmt.Errorf("no web acl named %q in scope %s", name, scope)
+		}
+		next = out.NextMarker
+	}
+}
+
+type DeleteWebacl struct {
+	_      string `action:"delete" entity:"webacl" awsAPI:"wafv2"`
+	logger *logger.Logger
+	graph  cloud.GraphAPI
+	api    *wafv2.Client
+	Name   *string `templateName:"name"`
+	Scope  *string `templateName:"scope"`
+}
+
+func (cmd *DeleteWebacl) ParamsSpec() params.Spec {
+	return params.NewSpec(params.AllOf(
+		params.Key("name"),
+		params.Opt(params.Suggested("scope")),
+	))
+}
+
+func (cmd *DeleteWebacl) ManualRun(renv env.Running) (any, error) {
+	scope := wafScope(cmd.Scope)
+	id, lockToken, err := findWebACL(renv, cmd.api, StringValue(cmd.Name), scope)
+	if err != nil {
+		return nil, err
+	}
+
+	return cmd.api.DeleteWebACL(renv.RequestContext(), &wafv2.DeleteWebACLInput{
+		Name:      cmd.Name,
+		Scope:     scope,
+		Id:        awssdk.String(id),
+		LockToken: awssdk.String(lockToken),
+	})
+}
+
+type CreateRulegroup struct {
+	_      string `action:"create" entity:"rulegroup" awsAPI:"wafv2" awsCall:"CreateRuleGroup" awsInput:"wafv2.CreateRuleGroupInput" awsOutput:"wafv2.CreateRuleGroupOutput"`
+	logger *logger.Logger
+	graph  cloud.GraphAPI
+	api    *wafv2.Client
+	Name   *string `awsName:"Name" awsType:"awsstr" templateName:"name"`
+	Scope  *string `awsName:"Scope" awsType:"awsstr" templateName:"scope"`
+	// Capacity is fixed at creation and cannot be raised later, so it is required
+	// rather than guessed.
+	Capacity       *int64  `awsName:"Capacity" awsType:"awsint64" templateName:"capacity"`
+	VisibilityFile *string `awsName:"VisibilityConfig" awsType:"awsfiletostruct" templateName:"visibility-file"`
+	RulesFile      *string `awsName:"Rules" awsType:"awsfiletostruct" templateName:"rules-file"`
+	Description    *string `awsName:"Description" awsType:"awsstr" templateName:"description"`
+}
+
+func (cmd *CreateRulegroup) ParamsSpec() params.Spec {
+	return params.NewSpec(params.AllOf(
+		params.Key("name"), params.Key("capacity"), params.Key("visibility-file"),
+		params.Opt(params.Suggested("scope", "rules-file"), "description"),
+	))
+}
+
+func (cmd *CreateRulegroup) BeforeRun(renv env.Running) error {
+	if StringValue(cmd.Scope) == "" {
+		cmd.Scope = String(defaultWafScope)
+	}
+	return nil
+}
+
+func (cmd *CreateRulegroup) ExtractResult(i any) string {
+	out, ok := i.(*wafv2.CreateRuleGroupOutput)
+	if !ok || out.Summary == nil {
+		return StringValue(cmd.Name)
+	}
+	return awssdk.ToString(out.Summary.Name)
+}
+
+func findRuleGroup(renv env.Running, api *wafv2.Client, name string, scope wafv2types.Scope) (id, lockToken string, err error) {
+	var next *string
+	for {
+		out, lerr := api.ListRuleGroups(renv.RequestContext(), &wafv2.ListRuleGroupsInput{Scope: scope, NextMarker: next})
+		if lerr != nil {
+			return "", "", lerr
+		}
+		for _, group := range out.RuleGroups {
+			if awssdk.ToString(group.Name) == name {
+				return awssdk.ToString(group.Id), awssdk.ToString(group.LockToken), nil
+			}
+		}
+		if out.NextMarker == nil || awssdk.ToString(out.NextMarker) == "" {
+			return "", "", fmt.Errorf("no rule group named %q in scope %s", name, scope)
+		}
+		next = out.NextMarker
+	}
+}
+
+type DeleteRulegroup struct {
+	_      string `action:"delete" entity:"rulegroup" awsAPI:"wafv2"`
+	logger *logger.Logger
+	graph  cloud.GraphAPI
+	api    *wafv2.Client
+	Name   *string `templateName:"name"`
+	Scope  *string `templateName:"scope"`
+}
+
+func (cmd *DeleteRulegroup) ParamsSpec() params.Spec {
+	return params.NewSpec(params.AllOf(
+		params.Key("name"),
+		params.Opt(params.Suggested("scope")),
+	))
+}
+
+func (cmd *DeleteRulegroup) ManualRun(renv env.Running) (any, error) {
+	scope := wafScope(cmd.Scope)
+	id, lockToken, err := findRuleGroup(renv, cmd.api, StringValue(cmd.Name), scope)
+	if err != nil {
+		return nil, err
+	}
+
+	return cmd.api.DeleteRuleGroup(renv.RequestContext(), &wafv2.DeleteRuleGroupInput{
+		Name:      cmd.Name,
+		Scope:     scope,
+		Id:        awssdk.String(id),
+		LockToken: awssdk.String(lockToken),
+	})
+}
+
 type CreateIpset struct {
 	_           string `action:"create" entity:"ipset" awsAPI:"wafv2"`
 	logger      *logger.Logger

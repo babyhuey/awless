@@ -245,6 +245,20 @@ var cliExamplesDoc = map[string][]string{
 	"stop.execution": {
 		"awless stop execution arn=arn:aws:states:us-west-2:123456789012:execution:order-flow:order-4711 cause=Superseded",
 	},
+	"create.pipeline": {
+		"awless create pipeline definition-file=/home/jsmith/build-and-deploy.json",
+	},
+	"create.webacl": {
+		"awless create webacl name=public-api default-action-file=/home/jsmith/allow.json visibility-file=/home/jsmith/visibility.json rules-file=/home/jsmith/rules.json",
+	},
+	"delete.webacl": {
+		"awless delete webacl name=public-api",
+		"awless delete webacl name=edge-acl scope=CLOUDFRONT",
+	},
+	"create.rulegroup": {
+		"awless create rulegroup name=rate-limits capacity=100 visibility-file=/home/jsmith/visibility.json rules-file=/home/jsmith/rules.json",
+	},
+	"delete.rulegroup": {"awless delete rulegroup name=rate-limits"},
 	"create.ipset": {
 		"awless create ipset name=blocklist addresses=203.0.113.0/24,198.51.100.7/32",
 		"awless create ipset name=cdn-blocklist addresses=203.0.113.0/24 scope=CLOUDFRONT description=\"Blocked at the edge\"",

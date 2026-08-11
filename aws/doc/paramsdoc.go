@@ -458,6 +458,33 @@ var paramsDoc = map[string]map[string]string{
 		"cause": "Human-readable reason the execution was stopped",
 		"error": "Error code describing why the execution was stopped",
 	},
+	"create.pipeline": {
+		"definition-file": "Path to the pipeline declaration in JSON, in the shape the AWS CLI's create-pipeline accepts without the outer wrapper; the pipeline's name comes from the document",
+	},
+	"create.webacl": {
+		"name":                "Name for the web ACL",
+		"scope":               "REGIONAL for ALB and API Gateway, or CLOUDFRONT (us-east-1 only); defaults to REGIONAL",
+		"default-action-file": "Path to the default action in JSON, e.g. {\"allow\":{}} or {\"block\":{}}",
+		"visibility-file":     "Path to the visibility config in JSON: metric name and whether CloudWatch metrics and sampled requests are enabled",
+		"rules-file":          "Path to the rules array in JSON; an ACL with no rules only applies its default action",
+		"description":         "Description of the web ACL",
+	},
+	"delete.webacl": {
+		"name":  "Name of the web ACL to delete",
+		"scope": "Scope the web ACL lives in; defaults to REGIONAL",
+	},
+	"create.rulegroup": {
+		"name":            "Name for the rule group",
+		"scope":           "REGIONAL or CLOUDFRONT; defaults to REGIONAL",
+		"capacity":        "Web ACL capacity units to reserve; fixed at creation and cannot be raised later",
+		"visibility-file": "Path to the visibility config in JSON",
+		"rules-file":      "Path to the rules array in JSON",
+		"description":     "Description of the rule group",
+	},
+	"delete.rulegroup": {
+		"name":  "Name of the rule group to delete",
+		"scope": "Scope the rule group lives in; defaults to REGIONAL",
+	},
 	"create.ipset": {
 		"name":        "Name for the IP set",
 		"addresses":   "CIDR ranges to include; a set holds either IPv4 or IPv6, not both",

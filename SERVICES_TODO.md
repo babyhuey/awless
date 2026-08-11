@@ -8,8 +8,6 @@ ElastiCache, EventBridge, Step Functions, WAF v2, AWS Config, Kinesis, Redshift,
 
 | Rank | Service | Resources | Complexity |
 |------|---------|-----------|------------|
-| - | CodePipeline (partial) | pipeline **creation**; listing, deletion and running are done | Medium |
-| - | WAF v2 (partial) | web ACL and rule group **creation** only; listing and IP sets are done | Medium |
 | 1 | Transit Gateway* | transit gateways, attachments, route tables | Low |
 | 2 | VPC Endpoints* | VPC endpoints, endpoint services | Low |
 | 3 | CodeDeploy | applications, deployment groups, deployments | Medium |

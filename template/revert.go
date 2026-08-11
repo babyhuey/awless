@@ -130,7 +130,7 @@ func (s *Template) Revert() (*Template, error) {
 				// produced a revert that failed validation with "unexpected param id".
 				// Taken from the create's own param rather than from the command result,
 				// which is not populated for every one of them.
-				case "application", "buildproject", "cachesubnetgroup", "environment", "dynamodbtable", "ekscluster", "configrule", "eventbus", "eventrule", "ipset", "loggroup", "redshiftsubnetgroup", "ssmparameter", "stream", "trail":
+				case "application", "buildproject", "cachesubnetgroup", "environment", "rulegroup", "webacl", "dynamodbtable", "ekscluster", "configrule", "eventbus", "eventrule", "ipset", "loggroup", "redshiftsubnetgroup", "ssmparameter", "stream", "trail":
 					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
 				case "eksnodegroup":
 					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
@@ -152,7 +152,9 @@ func (s *Template) Revert() (*Template, error) {
 					params = append(params, fmt.Sprintf("service-namespace=%s", printItem(cmd.ParamNodes["service-namespace"])))
 				case "loginprofile":
 					params = append(params, fmt.Sprintf("username=%s", printItem(cmd.ParamNodes["username"])))
-				case "bucket", "launchconfiguration", "scalinggroup", "alarm", "dbsubnetgroup", "keypair":
+				// pipeline takes its name from the definition document rather than a param, so the
+				// revert has to read it back from the command result.
+				case "bucket", "launchconfiguration", "scalinggroup", "alarm", "dbsubnetgroup", "keypair", "pipeline":
 					params = append(params, fmt.Sprintf("name=%s", quoteParamIfNeeded(cmd.CmdResult)))
 					if cmd.Entity == "scalinggroup" {
 						params = append(params, "force=true")

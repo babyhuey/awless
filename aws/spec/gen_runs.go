@@ -5841,6 +5841,84 @@ func (cmd *CreateNetworkinterface) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreatePipeline(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreatePipeline {
+	cmd := new(CreatePipeline)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = codepipeline.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreatePipeline) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreatePipeline) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &codepipeline.CreatePipelineInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in codepipeline.CreatePipelineInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreatePipeline(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("codepipeline.CreatePipeline call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create pipeline: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create pipeline '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create pipeline done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreatePipeline) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("pipeline"), nil
+}
+
+func (cmd *CreatePipeline) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreatePolicy(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreatePolicy {
 	cmd := new(CreatePolicy)
 	if len(l) > 0 {
@@ -6650,6 +6728,84 @@ func (cmd *CreateRoutetable) dryRun(renv env.Running, params map[string]any) (an
 }
 
 func (cmd *CreateRoutetable) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateRulegroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateRulegroup {
+	cmd := new(CreateRulegroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = wafv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateRulegroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateRulegroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &wafv2.CreateRuleGroupInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in wafv2.CreateRuleGroupInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateRuleGroup(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("wafv2.CreateRuleGroup call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create rulegroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create rulegroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create rulegroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateRulegroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("rulegroup"), nil
+}
+
+func (cmd *CreateRulegroup) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -8235,6 +8391,84 @@ func (cmd *CreateVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *CreateVpc) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateWebacl(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateWebacl {
+	cmd := new(CreateWebacl)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = wafv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateWebacl) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateWebacl) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &wafv2.CreateWebACLInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in wafv2.CreateWebACLInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateWebACL(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("wafv2.CreateWebACL call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create webacl: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create webacl '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create webacl done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateWebacl) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("webacl"), nil
+}
+
+func (cmd *CreateWebacl) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12719,6 +12953,75 @@ func (cmd *DeleteRoutetable) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteRulegroup(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteRulegroup {
+	cmd := new(DeleteRulegroup)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = wafv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteRulegroup) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteRulegroup) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete rulegroup: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete rulegroup '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete rulegroup done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteRulegroup) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("rulegroup"), nil
+}
+
+func (cmd *DeleteRulegroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteS3object(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteS3object {
 	cmd := new(DeleteS3object)
 	if len(l) > 0 {
@@ -14310,6 +14613,75 @@ func (cmd *DeleteVpc) dryRun(renv env.Running, params map[string]any) (any, erro
 }
 
 func (cmd *DeleteVpc) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteWebacl(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteWebacl {
+	cmd := new(DeleteWebacl)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = wafv2.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteWebacl) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteWebacl) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	output, err := cmd.ManualRun(renv)
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete webacl: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete webacl '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete webacl done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteWebacl) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("webacl"), nil
+}
+
+func (cmd *DeleteWebacl) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

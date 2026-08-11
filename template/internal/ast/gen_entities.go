@@ -83,6 +83,7 @@ var entities = map[Entity]struct{}{
 	"role":                {},
 	"route":               {},
 	"routetable":          {},
+	"rulegroup":           {},
 	"s3object":            {},
 	"scalinggroup":        {},
 	"scalingpolicy":       {},
@@ -102,5 +103,6 @@ var entities = map[Entity]struct{}{
 	"user":                {},
 	"volume":              {},
 	"vpc":                 {},
+	"webacl":              {},
 	"zone":                {},
 }

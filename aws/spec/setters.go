@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -62,6 +63,7 @@ const (
 	awsuserdatatobase64      = "awsuserdatatobase64"
 	awsfiletobyteslice       = "awsfiletobyteslice"
 	awsfiletostring          = "awsfiletostring"
+	awsfiletostruct          = "awsfiletostruct"
 	awsdimensionslice        = "awsdimensionslice"
 	awsparameterslice        = "awsparameterslice"
 	awsecskeyvalue           = "awsecskeyvalue"
@@ -310,6 +312,19 @@ func setFieldWithType(ctx context.Context, v, i any, fieldPath string, destType 
 			return err
 		}
 		v = string(b)
+	case awsfiletostruct:
+		var b []byte
+		b, err = os.ReadFile(castString(v))
+		if err != nil {
+			return err
+		}
+		// Some AWS inputs are documents rather than flags — a pipeline's stages, a web
+		// ACL's rules — with a shape no set of dotted paths can express. Those are
+		// taken as a JSON file and decoded straight into the destination field.
+		v, err = decodeIntoFieldType(i, fieldPath, b)
+		if err != nil {
+			return err
+		}
 	case awsint64slice:
 		var awsint int64
 		awsint, err = castInt64(v)
@@ -898,4 +913,44 @@ func setValueAtPath(i any, path string, v any) {
 			}
 		}
 	}
+}
+
+// decodeIntoFieldType reads a JSON document into a fresh value of whatever type sits at
+// fieldPath on i, and returns it for setValueAtPath to assign.
+//
+// The AWS SDK v2 types carry no json tags, which works out because Go matches field names
+// case-insensitively: the camelCase the AWS CLI accepts — "roleArn", "artifactStore" —
+// lands on RoleArn and ArtifactStore. Nested structs, slices, string-keyed maps and the
+// enum types all decode, since every enum is a defined string type.
+//
+// Unknown fields are rejected. A misspelled key would otherwise be dropped in silence and
+// produce a request missing the thing the user thought they had configured, which is the
+// same failure mode as a wrong awsName and just as hard to see.
+func decodeIntoFieldType(i any, fieldPath string, data []byte) (any, error) {
+	t := reflect.TypeOf(i)
+	for t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+
+	for _, segment := range strings.Split(fieldPath, ".") {
+		if t.Kind() != reflect.Struct {
+			return nil, fmt.Errorf("cannot resolve %q: %s is not a struct", fieldPath, t)
+		}
+		field, ok := t.FieldByName(segment)
+		if !ok {
+			return nil, fmt.Errorf("cannot resolve %q: no field %s on %s", fieldPath, segment, t)
+		}
+		t = field.Type
+		for t.Kind() == reflect.Pointer {
+			t = t.Elem()
+		}
+	}
+
+	out := reflect.New(t)
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(out.Interface()); err != nil {
+		return nil, fmt.Errorf("reading the document for %s: %w", fieldPath, err)
+	}
+	return out.Interface(), nil
 }

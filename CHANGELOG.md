@@ -10,6 +10,11 @@
   `start`/`stop` on a rule and `attach`/`detach` for rule targets.
   `awless create eventrule name=nightly schedule="rate(1 hour)"`, then
   `awless attach eventtarget rule=nightly id=report arn=<lambda-arn>`.
+- **Document-shaped inputs.** Some AWS inputs are documents rather than flags, and now take
+  a JSON file: `awless create pipeline definition-file=build-and-deploy.json`, and
+  `create webacl` / `create rulegroup` with their default action, visibility config and
+  rules. The file uses the same camelCase shape the AWS CLI accepts. A misspelled key is
+  rejected rather than dropped.
 - **Elastic Beanstalk.** Applications and environments, both with create/update/delete.
   `awless update environment name=web-api-prod version=build-43` deploys a version;
   `delete environment` maps to Beanstalk's TerminateEnvironment.
