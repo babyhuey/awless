@@ -73,6 +73,9 @@ completion, e.g. on macOS:
 	(or, if you want to preserve completion within new terminal sessions)
 	$ echo 'source <(awless completion bash)' >> ~/.bashrc`,
 	RunE: runCompletionBash,
+	// These write generated shell code; a failure is an I/O problem rather than a
+	// usage mistake. Set here because this command has no applyHooks pre-run.
+	SilenceUsage: true,
 }
 
 var zshAutocompleteCmd = &cobra.Command{
@@ -87,6 +90,9 @@ completion of awless commands.
 	$ echo 'source <(awless completion zsh)' >> ~/.zshrc
 zsh completions are only supported in versions of zsh >= 5.2`,
 	RunE: runCompletionZsh,
+	// These write generated shell code; a failure is an I/O problem rather than a
+	// usage mistake. Set here because this command has no applyHooks pre-run.
+	SilenceUsage: true,
 }
 
 func runCompletionBash(cmd *cobra.Command, args []string) error {

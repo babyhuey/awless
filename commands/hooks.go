@@ -40,6 +40,12 @@ import (
 // bypassed cobra's error handling and the single exit path in main.
 func applyHooks(funcs ...func(*cobra.Command, []string) error) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		// Cobra prints a command's usage for any error returned from this point on,
+		// which buries the real message under a screen of flags — an expired
+		// credential is not a usage mistake. Silenced here rather than on RootCmd
+		// because cobra runs PersistentPreRunE only after parsing flags and
+		// validating args, so genuine usage errors still get their usage shown.
+		cmd.SilenceUsage = true
 		for _, fn := range funcs {
 			if err := fn(cmd, args); err != nil {
 				return err
