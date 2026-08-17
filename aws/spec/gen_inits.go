@@ -147,6 +147,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateConfigurationset(f.Cfg, f.Graph, f.Log) }
 	case "createcontainercluster":
 		return func() any { return NewCreateContainercluster(f.Cfg, f.Graph, f.Log) }
+	case "createcorenetwork":
+		return func() any { return NewCreateCorenetwork(f.Cfg, f.Graph, f.Log) }
 	case "createcrawler":
 		return func() any { return NewCreateCrawler(f.Cfg, f.Graph, f.Log) }
 	case "createdatabase":
@@ -159,6 +161,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateDeployment(f.Cfg, f.Graph, f.Log) }
 	case "createdeploymentgroup":
 		return func() any { return NewCreateDeploymentgroup(f.Cfg, f.Graph, f.Log) }
+	case "createdirectconnectgateway":
+		return func() any { return NewCreateDirectconnectgateway(f.Cfg, f.Graph, f.Log) }
+	case "createdirectconnectgatewayassociation":
+		return func() any { return NewCreateDirectconnectgatewayassociation(f.Cfg, f.Graph, f.Log) }
 	case "creatediscoveryservice":
 		return func() any { return NewCreateDiscoveryservice(f.Cfg, f.Graph, f.Log) }
 	case "createdistribution":
@@ -187,6 +193,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateFsxfilesystem(f.Cfg, f.Graph, f.Log) }
 	case "createfunction":
 		return func() any { return NewCreateFunction(f.Cfg, f.Graph, f.Log) }
+	case "createglobalnetwork":
+		return func() any { return NewCreateGlobalnetwork(f.Cfg, f.Graph, f.Log) }
 	case "creategluedatabase":
 		return func() any { return NewCreateGluedatabase(f.Cfg, f.Graph, f.Log) }
 	case "creategroup":
@@ -227,6 +235,14 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewCreateNatgateway(f.Cfg, f.Graph, f.Log) }
 	case "createnetworkinterface":
 		return func() any { return NewCreateNetworkinterface(f.Cfg, f.Graph, f.Log) }
+	case "createnetworkmanagerconnection":
+		return func() any { return NewCreateNetworkmanagerconnection(f.Cfg, f.Graph, f.Log) }
+	case "createnetworkmanagerdevice":
+		return func() any { return NewCreateNetworkmanagerdevice(f.Cfg, f.Graph, f.Log) }
+	case "createnetworkmanagerlink":
+		return func() any { return NewCreateNetworkmanagerlink(f.Cfg, f.Graph, f.Log) }
+	case "createnetworkmanagersite":
+		return func() any { return NewCreateNetworkmanagersite(f.Cfg, f.Graph, f.Log) }
 	case "createpipeline":
 		return func() any { return NewCreatePipeline(f.Cfg, f.Graph, f.Log) }
 	case "createpolicy":
@@ -351,6 +367,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteContainercluster(f.Cfg, f.Graph, f.Log) }
 	case "deletecontainertask":
 		return func() any { return NewDeleteContainertask(f.Cfg, f.Graph, f.Log) }
+	case "deletecorenetwork":
+		return func() any { return NewDeleteCorenetwork(f.Cfg, f.Graph, f.Log) }
 	case "deletecrawler":
 		return func() any { return NewDeleteCrawler(f.Cfg, f.Graph, f.Log) }
 	case "deletedatabase":
@@ -361,6 +379,10 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteDeployapplication(f.Cfg, f.Graph, f.Log) }
 	case "deletedeploymentgroup":
 		return func() any { return NewDeleteDeploymentgroup(f.Cfg, f.Graph, f.Log) }
+	case "deletedirectconnectgateway":
+		return func() any { return NewDeleteDirectconnectgateway(f.Cfg, f.Graph, f.Log) }
+	case "deletedirectconnectgatewayassociation":
+		return func() any { return NewDeleteDirectconnectgatewayassociation(f.Cfg, f.Graph, f.Log) }
 	case "deletediscoveryservice":
 		return func() any { return NewDeleteDiscoveryservice(f.Cfg, f.Graph, f.Log) }
 	case "deletedistribution":
@@ -389,6 +411,8 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteFsxfilesystem(f.Cfg, f.Graph, f.Log) }
 	case "deletefunction":
 		return func() any { return NewDeleteFunction(f.Cfg, f.Graph, f.Log) }
+	case "deleteglobalnetwork":
+		return func() any { return NewDeleteGlobalnetwork(f.Cfg, f.Graph, f.Log) }
 	case "deletegluedatabase":
 		return func() any { return NewDeleteGluedatabase(f.Cfg, f.Graph, f.Log) }
 	case "deletegroup":
@@ -429,6 +453,14 @@ func (f *AWSFactory) Build(key string) func() any {
 		return func() any { return NewDeleteNatgateway(f.Cfg, f.Graph, f.Log) }
 	case "deletenetworkinterface":
 		return func() any { return NewDeleteNetworkinterface(f.Cfg, f.Graph, f.Log) }
+	case "deletenetworkmanagerconnection":
+		return func() any { return NewDeleteNetworkmanagerconnection(f.Cfg, f.Graph, f.Log) }
+	case "deletenetworkmanagerdevice":
+		return func() any { return NewDeleteNetworkmanagerdevice(f.Cfg, f.Graph, f.Log) }
+	case "deletenetworkmanagerlink":
+		return func() any { return NewDeleteNetworkmanagerlink(f.Cfg, f.Graph, f.Log) }
+	case "deletenetworkmanagersite":
+		return func() any { return NewDeleteNetworkmanagersite(f.Cfg, f.Graph, f.Log) }
 	case "deletepipeline":
 		return func() any { return NewDeletePipeline(f.Cfg, f.Graph, f.Log) }
 	case "deletepolicy":
@@ -708,12 +740,15 @@ var (
 	_ command = &CreateConfigrule{}
 	_ command = &CreateConfigurationset{}
 	_ command = &CreateContainercluster{}
+	_ command = &CreateCorenetwork{}
 	_ command = &CreateCrawler{}
 	_ command = &CreateDatabase{}
 	_ command = &CreateDbsubnetgroup{}
 	_ command = &CreateDeployapplication{}
 	_ command = &CreateDeployment{}
 	_ command = &CreateDeploymentgroup{}
+	_ command = &CreateDirectconnectgateway{}
+	_ command = &CreateDirectconnectgatewayassociation{}
 	_ command = &CreateDiscoveryservice{}
 	_ command = &CreateDistribution{}
 	_ command = &CreateDynamodbtable{}
@@ -728,6 +763,7 @@ var (
 	_ command = &CreateFsxbackup{}
 	_ command = &CreateFsxfilesystem{}
 	_ command = &CreateFunction{}
+	_ command = &CreateGlobalnetwork{}
 	_ command = &CreateGluedatabase{}
 	_ command = &CreateGroup{}
 	_ command = &CreateIdentitypool{}
@@ -748,6 +784,10 @@ var (
 	_ command = &CreateNamespace{}
 	_ command = &CreateNatgateway{}
 	_ command = &CreateNetworkinterface{}
+	_ command = &CreateNetworkmanagerconnection{}
+	_ command = &CreateNetworkmanagerdevice{}
+	_ command = &CreateNetworkmanagerlink{}
+	_ command = &CreateNetworkmanagersite{}
 	_ command = &CreatePipeline{}
 	_ command = &CreatePolicy{}
 	_ command = &CreateQueue{}
@@ -810,11 +850,14 @@ var (
 	_ command = &DeleteConfigurationset{}
 	_ command = &DeleteContainercluster{}
 	_ command = &DeleteContainertask{}
+	_ command = &DeleteCorenetwork{}
 	_ command = &DeleteCrawler{}
 	_ command = &DeleteDatabase{}
 	_ command = &DeleteDbsubnetgroup{}
 	_ command = &DeleteDeployapplication{}
 	_ command = &DeleteDeploymentgroup{}
+	_ command = &DeleteDirectconnectgateway{}
+	_ command = &DeleteDirectconnectgatewayassociation{}
 	_ command = &DeleteDiscoveryservice{}
 	_ command = &DeleteDistribution{}
 	_ command = &DeleteDynamodbtable{}
@@ -829,6 +872,7 @@ var (
 	_ command = &DeleteFsxbackup{}
 	_ command = &DeleteFsxfilesystem{}
 	_ command = &DeleteFunction{}
+	_ command = &DeleteGlobalnetwork{}
 	_ command = &DeleteGluedatabase{}
 	_ command = &DeleteGroup{}
 	_ command = &DeleteIdentitypool{}
@@ -849,6 +893,10 @@ var (
 	_ command = &DeleteNamespace{}
 	_ command = &DeleteNatgateway{}
 	_ command = &DeleteNetworkinterface{}
+	_ command = &DeleteNetworkmanagerconnection{}
+	_ command = &DeleteNetworkmanagerdevice{}
+	_ command = &DeleteNetworkmanagerlink{}
+	_ command = &DeleteNetworkmanagersite{}
 	_ command = &DeletePipeline{}
 	_ command = &DeletePolicy{}
 	_ command = &DeleteQueue{}

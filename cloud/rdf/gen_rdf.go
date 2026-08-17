@@ -36,11 +36,13 @@ const (
 	AlarmNames                        = "cloud:alarmNames"
 	Alias                             = "cloud:alias"
 	Aliases                           = "cloud:aliases"
+	AmazonSideAsn                     = "cloud:amazonSideAsn"
 	Application                       = "cloud:application"
 	ApproximateMessageCount           = "cloud:approximateMessageCount"
 	Architecture                      = "cloud:architecture"
 	Arn                               = "cloud:arn"
 	Association                       = "cloud:association"
+	AssociationState                  = "cloud:associationState"
 	Associations                      = "cloud:associations"
 	Attachable                        = "cloud:attachable"
 	Attached                          = "cloud:attached"
@@ -52,6 +54,7 @@ const (
 	AvailabilityZone                  = "cloud:availabilityZone"
 	AvailabilityZones                 = "cloud:availabilityZones"
 	BackupRetentionPeriod             = "cloud:backupRetentionPeriod"
+	Bandwidth                         = "cloud:bandwidth"
 	BrokerCount                       = "cloud:brokerCount"
 	Bucket                            = "cloud:bucketName"
 	CacheNodeType                     = "cloud:cacheNodeType"
@@ -82,12 +85,16 @@ const (
 	ComputePlatform                   = "cloud:computePlatform"
 	ComputeType                       = "cloud:computeType"
 	Config                            = "cloud:config"
+	ConnectedDevice                   = "cloud:connectedDevice"
+	ConnectedLink                     = "cloud:connectedLink"
+	ConnectionId                      = "cloud:connectionId"
 	ContainerInstance                 = "cloud:containerInstance"
 	ContainersImages                  = "cloud:containersImages"
 	ContainerTask                     = "cloud:containerTask"
 	Continent                         = "cloud:continent"
 	Cooldown                          = "cloud:cooldown"
 	CopyTagsToSnapshot                = "cloud:copyTagsToSnapshot"
+	CoreNetwork                       = "cloud:coreNetwork"
 	Country                           = "cloud:country"
 	Created                           = "cloud:created"
 	Database                          = "cloud:database"
@@ -103,11 +110,14 @@ const (
 	Deployments                       = "cloud:deployments"
 	Description                       = "cloud:description"
 	DesiredCapacity                   = "cloud:desiredCapacity"
+	DeviceId                          = "cloud:deviceId"
 	Dimensions                        = "cloud:dimensions"
+	DirectConnectGateway              = "cloud:directConnectGateway"
 	DisableRollback                   = "cloud:disableRollback"
 	DNSName                           = "cloud:dnsName"
 	DockerVersion                     = "cloud:dockerVersion"
 	Document                          = "cloud:document"
+	EdgeLocation                      = "cloud:edgeLocation"
 	Enabled                           = "cloud:enabled"
 	Encrypted                         = "cloud:encrypted"
 	Endpoint                          = "cloud:endpoint"
@@ -121,6 +131,7 @@ const (
 	Fingerprint                       = "cloud:fingerprint"
 	Frequency                         = "cloud:frequency"
 	GlobalID                          = "cloud:globalID"
+	GlobalNetwork                     = "cloud:globalNetwork"
 	GlueVersion                       = "cloud:glueVersion"
 	GranteeType                       = "cloud:granteeType"
 	Grants                            = "cloud:grants"
@@ -162,6 +173,8 @@ const (
 	License                           = "cloud:license"
 	Lifecycle                         = "cloud:lifecycle"
 	LoadBalancer                      = "cloud:loadBalancer"
+	LagId                             = "cloud:lagId"
+	LinkId                            = "cloud:linkId"
 	Location                          = "cloud:location"
 	LocationURI                       = "cloud:locationUri"
 	Locked                            = "cloud:locked"
@@ -177,6 +190,7 @@ const (
 	MetricName                        = "cloud:metricName"
 	MinSize                           = "cloud:minSize"
 	Modified                          = "cloud:modified"
+	Model                             = "cloud:model"
 	MonitoringInterval                = "cloud:monitoringInterval"
 	MonitoringRole                    = "cloud:monitoringRole"
 	MultiAZ                           = "cloud:multiAZ"
@@ -197,12 +211,14 @@ const (
 	Parameters                        = "cloud:parameters"
 	PasswordLastUsed                  = "cloud:passwordLastUsed"
 	Path                              = "cloud:path"
+	PartnerName                       = "cloud:partnerName"
 	PathPrefix                        = "cloud:pathPrefix"
 	Pattern                           = "cloud:pattern"
 	PeerOwner                         = "cloud:peerOwner"
 	PeerRegion                        = "cloud:peerRegion"
 	PeerVpc                           = "cloud:peerVpc"
 	PendingTasksCount                 = "cloud:pendingTasksCount"
+	PeeringType                       = "cloud:peeringType"
 	PipelineType                      = "cloud:pipelineType"
 	PlacementGroup                    = "cloud:placementGroup"
 	PlatformDetails                   = "cloud:platformDetails"
@@ -248,6 +264,8 @@ const (
 	Set                               = "cloud:set"
 	ShardCount                        = "cloud:shardCount"
 	Size                              = "cloud:size"
+	SerialNumber                      = "cloud:serialNumber"
+	SiteId                            = "cloud:siteId"
 	SolutionStack                     = "cloud:solutionStack"
 	Source                            = "cloud:source"
 	SourceIdentifier                  = "cloud:sourceIdentifier"
@@ -283,9 +301,12 @@ const (
 	Value                             = "cloud:value"
 	VerificationStatus                = "cloud:verificationStatus"
 	Version                           = "cloud:version"
+	Vendor                            = "cloud:vendor"
 	VersionLabel                      = "cloud:versionLabel"
 	Virtualization                    = "cloud:virtualization"
+	VirtualGateway                    = "cloud:virtualGateway"
 	Volume                            = "cloud:volume"
+	Vlan                              = "cloud:vlan"
 	Vpc                               = "cloud:vpc"
 	Vpcs                              = "cloud:vpcs"
 	WebACL                            = "cloud:webACL"
@@ -353,11 +374,13 @@ func init() {
 		properties.AlarmNames:                        AlarmNames,
 		properties.Alias:                             Alias,
 		properties.Aliases:                           Aliases,
+		properties.AmazonSideAsn:                     AmazonSideAsn,
 		properties.Application:                       Application,
 		properties.ApproximateMessageCount:           ApproximateMessageCount,
 		properties.Architecture:                      Architecture,
 		properties.Arn:                               Arn,
 		properties.Association:                       Association,
+		properties.AssociationState:                  AssociationState,
 		properties.Associations:                      Associations,
 		properties.Attachable:                        Attachable,
 		properties.Attached:                          Attached,
@@ -369,6 +392,7 @@ func init() {
 		properties.AvailabilityZone:                  AvailabilityZone,
 		properties.AvailabilityZones:                 AvailabilityZones,
 		properties.BackupRetentionPeriod:             BackupRetentionPeriod,
+		properties.Bandwidth:                         Bandwidth,
 		properties.BrokerCount:                       BrokerCount,
 		properties.Bucket:                            Bucket,
 		properties.CacheNodeType:                     CacheNodeType,
@@ -399,12 +423,16 @@ func init() {
 		properties.ComputePlatform:                   ComputePlatform,
 		properties.ComputeType:                       ComputeType,
 		properties.Config:                            Config,
+		properties.ConnectedDevice:                   ConnectedDevice,
+		properties.ConnectedLink:                     ConnectedLink,
+		properties.ConnectionId:                      ConnectionId,
 		properties.ContainerInstance:                 ContainerInstance,
 		properties.ContainersImages:                  ContainersImages,
 		properties.ContainerTask:                     ContainerTask,
 		properties.Continent:                         Continent,
 		properties.Cooldown:                          Cooldown,
 		properties.CopyTagsToSnapshot:                CopyTagsToSnapshot,
+		properties.CoreNetwork:                       CoreNetwork,
 		properties.Country:                           Country,
 		properties.Created:                           Created,
 		properties.Database:                          Database,
@@ -420,11 +448,14 @@ func init() {
 		properties.Deployments:                       Deployments,
 		properties.Description:                       Description,
 		properties.DesiredCapacity:                   DesiredCapacity,
+		properties.DeviceId:                          DeviceId,
 		properties.Dimensions:                        Dimensions,
+		properties.DirectConnectGateway:              DirectConnectGateway,
 		properties.DisableRollback:                   DisableRollback,
 		properties.DNSName:                           DNSName,
 		properties.DockerVersion:                     DockerVersion,
 		properties.Document:                          Document,
+		properties.EdgeLocation:                      EdgeLocation,
 		properties.Enabled:                           Enabled,
 		properties.Encrypted:                         Encrypted,
 		properties.Endpoint:                          Endpoint,
@@ -438,6 +469,7 @@ func init() {
 		properties.Fingerprint:                       Fingerprint,
 		properties.Frequency:                         Frequency,
 		properties.GlobalID:                          GlobalID,
+		properties.GlobalNetwork:                     GlobalNetwork,
 		properties.GlueVersion:                       GlueVersion,
 		properties.GranteeType:                       GranteeType,
 		properties.Grants:                            Grants,
@@ -479,6 +511,8 @@ func init() {
 		properties.License:                           License,
 		properties.Lifecycle:                         Lifecycle,
 		properties.LoadBalancer:                      LoadBalancer,
+		properties.LagId:                             LagId,
+		properties.LinkId:                            LinkId,
 		properties.Location:                          Location,
 		properties.LocationURI:                       LocationURI,
 		properties.Locked:                            Locked,
@@ -494,6 +528,7 @@ func init() {
 		properties.MetricName:                        MetricName,
 		properties.MinSize:                           MinSize,
 		properties.Modified:                          Modified,
+		properties.Model:                             Model,
 		properties.MonitoringInterval:                MonitoringInterval,
 		properties.MonitoringRole:                    MonitoringRole,
 		properties.MultiAZ:                           MultiAZ,
@@ -514,12 +549,14 @@ func init() {
 		properties.Parameters:                        Parameters,
 		properties.PasswordLastUsed:                  PasswordLastUsed,
 		properties.Path:                              Path,
+		properties.PartnerName:                       PartnerName,
 		properties.PathPrefix:                        PathPrefix,
 		properties.Pattern:                           Pattern,
 		properties.PeerOwner:                         PeerOwner,
 		properties.PeerRegion:                        PeerRegion,
 		properties.PeerVpc:                           PeerVpc,
 		properties.PendingTasksCount:                 PendingTasksCount,
+		properties.PeeringType:                       PeeringType,
 		properties.PipelineType:                      PipelineType,
 		properties.PlacementGroup:                    PlacementGroup,
 		properties.PlatformDetails:                   PlatformDetails,
@@ -565,6 +602,8 @@ func init() {
 		properties.Set:                               Set,
 		properties.ShardCount:                        ShardCount,
 		properties.Size:                              Size,
+		properties.SerialNumber:                      SerialNumber,
+		properties.SiteId:                            SiteId,
 		properties.SolutionStack:                     SolutionStack,
 		properties.Source:                            Source,
 		properties.SourceIdentifier:                  SourceIdentifier,
@@ -600,9 +639,12 @@ func init() {
 		properties.Value:                             Value,
 		properties.VerificationStatus:                VerificationStatus,
 		properties.Version:                           Version,
+		properties.Vendor:                            Vendor,
 		properties.VersionLabel:                      VersionLabel,
 		properties.Virtualization:                    Virtualization,
+		properties.VirtualGateway:                    VirtualGateway,
 		properties.Volume:                            Volume,
+		properties.Vlan:                              Vlan,
 		properties.Vpc:                               Vpc,
 		properties.Vpcs:                              Vpcs,
 		properties.WebACL:                            WebACL,
@@ -670,11 +712,13 @@ var Properties = RDFProperties{
 	AlarmNames:                        {ID: AlarmNames, RdfType: "rdf:Property", RdfsLabel: "AlarmNames", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
 	Alias:                             {ID: Alias, RdfType: "rdf:Property", RdfsLabel: "Alias", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Aliases:                           {ID: Aliases, RdfType: "rdf:Property", RdfsLabel: "Aliases", RdfsDefinedBy: "rdfs:list", RdfsDataType: "xsd:string"},
+	AmazonSideAsn:                     {ID: AmazonSideAsn, RdfType: "rdf:Property", RdfsLabel: "AmazonSideAsn", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Application:                       {ID: Application, RdfType: "rdf:Property", RdfsLabel: "Application", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ApproximateMessageCount:           {ID: ApproximateMessageCount, RdfType: "rdf:Property", RdfsLabel: "ApproximateMessageCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Architecture:                      {ID: Architecture, RdfType: "rdf:Property", RdfsLabel: "Architecture", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Arn:                               {ID: Arn, RdfType: "rdf:Property", RdfsLabel: "Arn", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Association:                       {ID: Association, RdfType: "rdf:Property", RdfsLabel: "Association", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	AssociationState:                  {ID: AssociationState, RdfType: "rdf:Property", RdfsLabel: "AssociationState", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Associations:                      {ID: Associations, RdfType: "rdf:Property", RdfsLabel: "Associations", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
 	Attachable:                        {ID: Attachable, RdfType: "rdf:Property", RdfsLabel: "Attachable", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	Attached:                          {ID: Attached, RdfType: "rdf:Property", RdfsLabel: "Attached", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
@@ -686,6 +730,7 @@ var Properties = RDFProperties{
 	AvailabilityZone:                  {ID: AvailabilityZone, RdfType: "rdf:Property", RdfsLabel: "AvailabilityZone", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	AvailabilityZones:                 {ID: AvailabilityZones, RdfType: "rdf:Property", RdfsLabel: "AvailabilityZones", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	BackupRetentionPeriod:             {ID: BackupRetentionPeriod, RdfType: "rdf:Property", RdfsLabel: "BackupRetentionPeriod", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
+	Bandwidth:                         {ID: Bandwidth, RdfType: "rdf:Property", RdfsLabel: "Bandwidth", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	BrokerCount:                       {ID: BrokerCount, RdfType: "rdf:Property", RdfsLabel: "BrokerCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Bucket:                            {ID: Bucket, RdfType: "rdf:Property", RdfsLabel: "Bucket", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	CacheNodeType:                     {ID: CacheNodeType, RdfType: "rdf:Property", RdfsLabel: "CacheNodeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -716,12 +761,16 @@ var Properties = RDFProperties{
 	ComputePlatform:                   {ID: ComputePlatform, RdfType: "rdf:Property", RdfsLabel: "ComputePlatform", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ComputeType:                       {ID: ComputeType, RdfType: "rdf:Property", RdfsLabel: "ComputeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Config:                            {ID: Config, RdfType: "rdf:Property", RdfsLabel: "Config", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ConnectedDevice:                   {ID: ConnectedDevice, RdfType: "rdf:Property", RdfsLabel: "ConnectedDevice", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ConnectedLink:                     {ID: ConnectedLink, RdfType: "rdf:Property", RdfsLabel: "ConnectedLink", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	ConnectionId:                      {ID: ConnectionId, RdfType: "rdf:Property", RdfsLabel: "ConnectionId", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ContainerInstance:                 {ID: ContainerInstance, RdfType: "rdf:Property", RdfsLabel: "ContainerInstance", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	ContainersImages:                  {ID: ContainersImages, RdfType: "rdf:Property", RdfsLabel: "ContainersImages", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
 	ContainerTask:                     {ID: ContainerTask, RdfType: "rdf:Property", RdfsLabel: "ContainerTask", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	Continent:                         {ID: Continent, RdfType: "rdf:Property", RdfsLabel: "Continent", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Cooldown:                          {ID: Cooldown, RdfType: "rdf:Property", RdfsLabel: "Cooldown", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	CopyTagsToSnapshot:                {ID: CopyTagsToSnapshot, RdfType: "rdf:Property", RdfsLabel: "CopyTagsToSnapshot", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	CoreNetwork:                       {ID: CoreNetwork, RdfType: "rdf:Property", RdfsLabel: "CoreNetwork", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Country:                           {ID: Country, RdfType: "rdf:Property", RdfsLabel: "Country", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Created:                           {ID: Created, RdfType: "rdf:Property", RdfsLabel: "Created", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	Database:                          {ID: Database, RdfType: "rdf:Property", RdfsLabel: "Database", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -737,11 +786,14 @@ var Properties = RDFProperties{
 	Deployments:                       {ID: Deployments, RdfType: "rdf:Property", RdfsLabel: "Deployments", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
 	Description:                       {ID: Description, RdfType: "rdf:Property", RdfsLabel: "Description", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DesiredCapacity:                   {ID: DesiredCapacity, RdfType: "rdf:Property", RdfsLabel: "DesiredCapacity", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	DeviceId:                          {ID: DeviceId, RdfType: "rdf:Property", RdfsLabel: "DeviceId", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Dimensions:                        {ID: Dimensions, RdfType: "rdf:Property", RdfsLabel: "Dimensions", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
+	DirectConnectGateway:              {ID: DirectConnectGateway, RdfType: "rdf:Property", RdfsLabel: "DirectConnectGateway", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DisableRollback:                   {ID: DisableRollback, RdfType: "rdf:Property", RdfsLabel: "DisableRollback", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	DNSName:                           {ID: DNSName, RdfType: "rdf:Property", RdfsLabel: "DNSName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	DockerVersion:                     {ID: DockerVersion, RdfType: "rdf:Property", RdfsLabel: "DockerVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Document:                          {ID: Document, RdfType: "rdf:Property", RdfsLabel: "Document", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	EdgeLocation:                      {ID: EdgeLocation, RdfType: "rdf:Property", RdfsLabel: "EdgeLocation", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Enabled:                           {ID: Enabled, RdfType: "rdf:Property", RdfsLabel: "Enabled", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	Encrypted:                         {ID: Encrypted, RdfType: "rdf:Property", RdfsLabel: "Encrypted", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
 	Endpoint:                          {ID: Endpoint, RdfType: "rdf:Property", RdfsLabel: "Endpoint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -755,6 +807,7 @@ var Properties = RDFProperties{
 	Fingerprint:                       {ID: Fingerprint, RdfType: "rdf:Property", RdfsLabel: "Fingerprint", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Frequency:                         {ID: Frequency, RdfType: "rdf:Property", RdfsLabel: "Frequency", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	GlobalID:                          {ID: GlobalID, RdfType: "rdf:Property", RdfsLabel: "GlobalID", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	GlobalNetwork:                     {ID: GlobalNetwork, RdfType: "rdf:Property", RdfsLabel: "GlobalNetwork", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	GlueVersion:                       {ID: GlueVersion, RdfType: "rdf:Property", RdfsLabel: "GlueVersion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	GranteeType:                       {ID: GranteeType, RdfType: "rdf:Property", RdfsLabel: "GranteeType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Grants:                            {ID: Grants, RdfType: "rdf:Property", RdfsLabel: "Grants", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:Grant"},
@@ -796,6 +849,8 @@ var Properties = RDFProperties{
 	License:                           {ID: License, RdfType: "rdf:Property", RdfsLabel: "License", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Lifecycle:                         {ID: Lifecycle, RdfType: "rdf:Property", RdfsLabel: "Lifecycle", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	LoadBalancer:                      {ID: LoadBalancer, RdfType: "rdf:Property", RdfsLabel: "LoadBalancer", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	LagId:                             {ID: LagId, RdfType: "rdf:Property", RdfsLabel: "LagId", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	LinkId:                            {ID: LinkId, RdfType: "rdf:Property", RdfsLabel: "LinkId", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Location:                          {ID: Location, RdfType: "rdf:Property", RdfsLabel: "Location", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	LocationURI:                       {ID: LocationURI, RdfType: "rdf:Property", RdfsLabel: "LocationURI", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Locked:                            {ID: Locked, RdfType: "rdf:Property", RdfsLabel: "Locked", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:boolean"},
@@ -811,6 +866,7 @@ var Properties = RDFProperties{
 	MetricName:                        {ID: MetricName, RdfType: "rdf:Property", RdfsLabel: "MetricName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MinSize:                           {ID: MinSize, RdfType: "rdf:Property", RdfsLabel: "MinSize", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Modified:                          {ID: Modified, RdfType: "rdf:Property", RdfsLabel: "Modified", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
+	Model:                             {ID: Model, RdfType: "rdf:Property", RdfsLabel: "Model", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MonitoringInterval:                {ID: MonitoringInterval, RdfType: "rdf:Property", RdfsLabel: "MonitoringInterval", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MonitoringRole:                    {ID: MonitoringRole, RdfType: "rdf:Property", RdfsLabel: "MonitoringRole", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	MultiAZ:                           {ID: MultiAZ, RdfType: "rdf:Property", RdfsLabel: "MultiAZ", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -831,12 +887,14 @@ var Properties = RDFProperties{
 	Parameters:                        {ID: Parameters, RdfType: "rdf:Property", RdfsLabel: "Parameters", RdfsDefinedBy: "rdfs:list", RdfsDataType: "cloud-owl:KeyValue"},
 	PasswordLastUsed:                  {ID: PasswordLastUsed, RdfType: "rdf:Property", RdfsLabel: "PasswordLastUsed", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:dateTime"},
 	Path:                              {ID: Path, RdfType: "rdf:Property", RdfsLabel: "Path", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	PartnerName:                       {ID: PartnerName, RdfType: "rdf:Property", RdfsLabel: "PartnerName", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PathPrefix:                        {ID: PathPrefix, RdfType: "rdf:Property", RdfsLabel: "PathPrefix", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Pattern:                           {ID: Pattern, RdfType: "rdf:Property", RdfsLabel: "Pattern", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PeerOwner:                         {ID: PeerOwner, RdfType: "rdf:Property", RdfsLabel: "PeerOwner", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PeerRegion:                        {ID: PeerRegion, RdfType: "rdf:Property", RdfsLabel: "PeerRegion", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PeerVpc:                           {ID: PeerVpc, RdfType: "rdf:Property", RdfsLabel: "PeerVpc", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PendingTasksCount:                 {ID: PendingTasksCount, RdfType: "rdf:Property", RdfsLabel: "PendingTasksCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	PeeringType:                       {ID: PeeringType, RdfType: "rdf:Property", RdfsLabel: "PeeringType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PipelineType:                      {ID: PipelineType, RdfType: "rdf:Property", RdfsLabel: "PipelineType", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PlacementGroup:                    {ID: PlacementGroup, RdfType: "rdf:Property", RdfsLabel: "PlacementGroup", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	PlatformDetails:                   {ID: PlatformDetails, RdfType: "rdf:Property", RdfsLabel: "PlatformDetails", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -882,6 +940,8 @@ var Properties = RDFProperties{
 	Set:                               {ID: Set, RdfType: "rdf:Property", RdfsLabel: "Set", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	ShardCount:                        {ID: ShardCount, RdfType: "rdf:Property", RdfsLabel: "ShardCount", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Size:                              {ID: Size, RdfType: "rdf:Property", RdfsLabel: "Size", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
+	SerialNumber:                      {ID: SerialNumber, RdfType: "rdf:Property", RdfsLabel: "SerialNumber", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	SiteId:                            {ID: SiteId, RdfType: "rdf:Property", RdfsLabel: "SiteId", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SolutionStack:                     {ID: SolutionStack, RdfType: "rdf:Property", RdfsLabel: "SolutionStack", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Source:                            {ID: Source, RdfType: "rdf:Property", RdfsLabel: "Source", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	SourceIdentifier:                  {ID: SourceIdentifier, RdfType: "rdf:Property", RdfsLabel: "SourceIdentifier", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
@@ -917,9 +977,12 @@ var Properties = RDFProperties{
 	Value:                             {ID: Value, RdfType: "rdf:Property", RdfsLabel: "Value", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	VerificationStatus:                {ID: VerificationStatus, RdfType: "rdf:Property", RdfsLabel: "VerificationStatus", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Version:                           {ID: Version, RdfType: "rdf:Property", RdfsLabel: "Version", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	Vendor:                            {ID: Vendor, RdfType: "rdf:Property", RdfsLabel: "Vendor", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	VersionLabel:                      {ID: VersionLabel, RdfType: "rdf:Property", RdfsLabel: "VersionLabel", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Virtualization:                    {ID: Virtualization, RdfType: "rdf:Property", RdfsLabel: "Virtualization", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
+	VirtualGateway:                    {ID: VirtualGateway, RdfType: "rdf:Property", RdfsLabel: "VirtualGateway", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},
 	Volume:                            {ID: Volume, RdfType: "rdf:Property", RdfsLabel: "Volume", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
+	Vlan:                              {ID: Vlan, RdfType: "rdf:Property", RdfsLabel: "Vlan", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:int"},
 	Vpc:                               {ID: Vpc, RdfType: "rdf:Property", RdfsLabel: "Vpc", RdfsDefinedBy: "rdfs:Class", RdfsDataType: "xsd:string"},
 	Vpcs:                              {ID: Vpcs, RdfType: "rdf:Property", RdfsLabel: "Vpcs", RdfsDefinedBy: "rdfs:list", RdfsDataType: "rdfs:Class"},
 	WebACL:                            {ID: WebACL, RdfType: "rdf:Property", RdfsLabel: "WebACL", RdfsDefinedBy: "rdfs:Literal", RdfsDataType: "xsd:string"},

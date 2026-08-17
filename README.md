@@ -137,6 +137,8 @@ If you have previously used the AWS CLI or aws-shell, you don't need to configur
 | **Cloud Map** | namespaces, services |
 | **AWS Backup** | backup plans, vaults |
 | **VPC Endpoints** | gateway and interface endpoints |
+| **Direct Connect** | connections, virtual interfaces, LAGs, gateways, gateway associations |
+| **Network Manager (Cloud WAN)** | global networks, core networks, sites, links, devices, connections, peerings |
 
 Services in **bold** are new in this fork. All of them support create/update/delete, not
 just listing — see [Changes in this fork](#changes-in-this-fork).
@@ -194,6 +196,11 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless ls vpcpeerings
       $ awless ls namespaces
       $ awless ls backupplans
+      $ awless ls directconnectconnections
+      $ awless ls directconnectgateways
+      $ awless ls globalnetworks
+      $ awless ls corenetworks
+      $ awless ls networkmanagersites
       $ ...
       (see awless ls -h)
 
@@ -202,7 +209,7 @@ just listing — see [Changes in this fork](#changes-in-this-fork).
       $ awless run ~/templates/my-infra.aws
       etc.
 
-- **194 CRUD one-liners** integrated in the awless templating engine, each with `-h`
+- **320 CRUD one-liners** integrated in the awless templating engine, each with `-h`
   documentation and worked examples:
 
       $ awless create instance -h
@@ -271,9 +278,9 @@ Take the tour at [Getting Started (wiki)](https://github.com/wallix/awless/wiki/
 
 ### New services
 
-EKS, DynamoDB, Secrets Manager, KMS, API Gateway v2, SSM, EFS, CloudTrail and CloudWatch
-Logs. All are writable, not list-only: 27 create/update/delete commands were added across
-them.
+EKS, DynamoDB, Secrets Manager, KMS, API Gateway v2, SSM, EFS, CloudTrail, CloudWatch
+Logs, Direct Connect, and Network Manager (Cloud WAN). All are writable, not list-only:
+43 create/update/delete commands were added across them.
 
 ### Bugs fixed
 
@@ -334,7 +341,7 @@ the old spelling.
 
 ### Engineering
 
-- **200 acceptance tests covering all 194 commands**, running with no network access
+- **361 acceptance tests covering all 320 commands**, running with no network access
 - 51 linters enabled, including `errcheck`, `errorlint`, `noctx`, `contextcheck`,
   `musttag` and `bidichk`
 - Native Go fuzzing, `govulncheck` in CI, and CI actions pinned to commit SHAs

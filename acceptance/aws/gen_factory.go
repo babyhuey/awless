@@ -263,6 +263,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewCreateContainercluster(f.config(), f.Graph, f.Logger)
 		}
+	case "createcorenetwork":
+		return func() any {
+			return awsspec.NewCreateCorenetwork(f.config(), f.Graph, f.Logger)
+		}
 	case "createcrawler":
 		return func() any {
 			return awsspec.NewCreateCrawler(f.config(), f.Graph, f.Logger)
@@ -286,6 +290,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createdeploymentgroup":
 		return func() any {
 			return awsspec.NewCreateDeploymentgroup(f.config(), f.Graph, f.Logger)
+		}
+	case "createdirectconnectgateway":
+		return func() any {
+			return awsspec.NewCreateDirectconnectgateway(f.config(), f.Graph, f.Logger)
+		}
+	case "createdirectconnectgatewayassociation":
+		return func() any {
+			return awsspec.NewCreateDirectconnectgatewayassociation(f.config(), f.Graph, f.Logger)
 		}
 	case "creatediscoveryservice":
 		return func() any {
@@ -342,6 +354,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createfunction":
 		return func() any {
 			return awsspec.NewCreateFunction(f.config(), f.Graph, f.Logger)
+		}
+	case "createglobalnetwork":
+		return func() any {
+			return awsspec.NewCreateGlobalnetwork(f.config(), f.Graph, f.Logger)
 		}
 	case "creategluedatabase":
 		return func() any {
@@ -422,6 +438,22 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "createnetworkinterface":
 		return func() any {
 			return awsspec.NewCreateNetworkinterface(f.config(), f.Graph, f.Logger)
+		}
+	case "createnetworkmanagerconnection":
+		return func() any {
+			return awsspec.NewCreateNetworkmanagerconnection(f.config(), f.Graph, f.Logger)
+		}
+	case "createnetworkmanagerdevice":
+		return func() any {
+			return awsspec.NewCreateNetworkmanagerdevice(f.config(), f.Graph, f.Logger)
+		}
+	case "createnetworkmanagerlink":
+		return func() any {
+			return awsspec.NewCreateNetworkmanagerlink(f.config(), f.Graph, f.Logger)
+		}
+	case "createnetworkmanagersite":
+		return func() any {
+			return awsspec.NewCreateNetworkmanagersite(f.config(), f.Graph, f.Logger)
 		}
 	case "createpipeline":
 		return func() any {
@@ -671,6 +703,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 		return func() any {
 			return awsspec.NewDeleteContainertask(f.config(), f.Graph, f.Logger)
 		}
+	case "deletecorenetwork":
+		return func() any {
+			return awsspec.NewDeleteCorenetwork(f.config(), f.Graph, f.Logger)
+		}
 	case "deletecrawler":
 		return func() any {
 			return awsspec.NewDeleteCrawler(f.config(), f.Graph, f.Logger)
@@ -690,6 +726,14 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletedeploymentgroup":
 		return func() any {
 			return awsspec.NewDeleteDeploymentgroup(f.config(), f.Graph, f.Logger)
+		}
+	case "deletedirectconnectgateway":
+		return func() any {
+			return awsspec.NewDeleteDirectconnectgateway(f.config(), f.Graph, f.Logger)
+		}
+	case "deletedirectconnectgatewayassociation":
+		return func() any {
+			return awsspec.NewDeleteDirectconnectgatewayassociation(f.config(), f.Graph, f.Logger)
 		}
 	case "deletediscoveryservice":
 		return func() any {
@@ -746,6 +790,10 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletefunction":
 		return func() any {
 			return awsspec.NewDeleteFunction(f.config(), f.Graph, f.Logger)
+		}
+	case "deleteglobalnetwork":
+		return func() any {
+			return awsspec.NewDeleteGlobalnetwork(f.config(), f.Graph, f.Logger)
 		}
 	case "deletegluedatabase":
 		return func() any {
@@ -826,6 +874,22 @@ func (f *AcceptanceFactory) Build(key string) func() any {
 	case "deletenetworkinterface":
 		return func() any {
 			return awsspec.NewDeleteNetworkinterface(f.config(), f.Graph, f.Logger)
+		}
+	case "deletenetworkmanagerconnection":
+		return func() any {
+			return awsspec.NewDeleteNetworkmanagerconnection(f.config(), f.Graph, f.Logger)
+		}
+	case "deletenetworkmanagerdevice":
+		return func() any {
+			return awsspec.NewDeleteNetworkmanagerdevice(f.config(), f.Graph, f.Logger)
+		}
+	case "deletenetworkmanagerlink":
+		return func() any {
+			return awsspec.NewDeleteNetworkmanagerlink(f.config(), f.Graph, f.Logger)
+		}
+	case "deletenetworkmanagersite":
+		return func() any {
+			return awsspec.NewDeleteNetworkmanagersite(f.config(), f.Graph, f.Logger)
 		}
 	case "deletepipeline":
 		return func() any {

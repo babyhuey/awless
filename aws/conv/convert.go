@@ -47,6 +47,7 @@ import (
 	cognitoidentitytypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentity/types"
 	cognitoidentityprovidertypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
+	directconnecttypes "github.com/aws/aws-sdk-go-v2/service/directconnect/types"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	ecrtypes "github.com/aws/aws-sdk-go-v2/service/ecr/types"
@@ -67,6 +68,7 @@ import (
 	kmstypes "github.com/aws/aws-sdk-go-v2/service/kms/types"
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	mqtypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
+	networkmanagertypes "github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	redshifttypes "github.com/aws/aws-sdk-go-v2/service/redshift/types"
 	route53types "github.com/aws/aws-sdk-go-v2/service/route53/types"
@@ -347,6 +349,32 @@ func InitResource(source any) (*graph.Resource, error) {
 		res = graph.InitResource(cloud.Application, awssdk.ToString(ss.ApplicationName))
 	case elasticbeanstalktypes.EnvironmentDescription:
 		res = graph.InitResource(cloud.Environment, awssdk.ToString(ss.EnvironmentName))
+	// Direct Connect
+	case directconnecttypes.Connection:
+		res = graph.InitResource(cloud.DirectConnectConnection, awssdk.ToString(ss.ConnectionId))
+	case directconnecttypes.VirtualInterface:
+		res = graph.InitResource(cloud.DirectConnectVirtualInterface, awssdk.ToString(ss.VirtualInterfaceId))
+	case directconnecttypes.Lag:
+		res = graph.InitResource(cloud.DirectConnectLag, awssdk.ToString(ss.LagId))
+	case directconnecttypes.DirectConnectGateway:
+		res = graph.InitResource(cloud.DirectConnectGateway, awssdk.ToString(ss.DirectConnectGatewayId))
+	case directconnecttypes.DirectConnectGatewayAssociation:
+		res = graph.InitResource(cloud.DirectConnectGatewayAssociation, awssdk.ToString(ss.AssociationId))
+	// Network Manager (Cloud WAN)
+	case networkmanagertypes.GlobalNetwork:
+		res = graph.InitResource(cloud.GlobalNetwork, awssdk.ToString(ss.GlobalNetworkId))
+	case networkmanagertypes.CoreNetworkSummary:
+		res = graph.InitResource(cloud.CoreNetwork, awssdk.ToString(ss.CoreNetworkId))
+	case networkmanagertypes.Site:
+		res = graph.InitResource(cloud.NetworkManagerSite, awssdk.ToString(ss.SiteId))
+	case networkmanagertypes.Link:
+		res = graph.InitResource(cloud.NetworkManagerLink, awssdk.ToString(ss.LinkId))
+	case networkmanagertypes.Device:
+		res = graph.InitResource(cloud.NetworkManagerDevice, awssdk.ToString(ss.DeviceId))
+	case networkmanagertypes.Connection:
+		res = graph.InitResource(cloud.NetworkManagerConnection, awssdk.ToString(ss.ConnectionId))
+	case networkmanagertypes.Peering:
+		res = graph.InitResource(cloud.NetworkManagerPeering, awssdk.ToString(ss.PeeringId))
 	default:
 		return nil, fmt.Errorf("unknown type of resource %T", source)
 	}

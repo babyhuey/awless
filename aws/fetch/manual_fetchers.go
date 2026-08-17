@@ -1713,3 +1713,9 @@ func addManualCloudmapFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 
 func addManualBackupFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
 }
+
+func addManualDirectconnectFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}
+
+func addManualNetworkmanagerFetchFuncs(conf *Config, funcs map[string]fetch.Func) {
+}

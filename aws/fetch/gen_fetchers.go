@@ -75,6 +75,8 @@ import (
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	mq "github.com/aws/aws-sdk-go-v2/service/mq"
 	mqtypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
+	networkmanager "github.com/aws/aws-sdk-go-v2/service/networkmanager"
+	networkmanagertypes "github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
@@ -2219,6 +2221,102 @@ func BuildBeanstalkFetchFuncs(conf *Config) fetch.Funcs {
 				return resources, objects, err
 			}
 			resources = append(resources, res)
+		}
+
+		return resources, objects, nil
+	}
+	return funcs
+}
+func BuildDirectconnectFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualDirectconnectFetchFuncs(conf, funcs)
+	return funcs
+}
+func BuildNetworkmanagerFetchFuncs(conf *Config) fetch.Funcs {
+	funcs := make(map[string]fetch.Func)
+
+	addManualNetworkmanagerFetchFuncs(conf, funcs)
+
+	funcs["globalnetwork"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []networkmanagertypes.GlobalNetwork
+
+		if !conf.getBoolDefaultTrue("aws.networkmanager.globalnetwork.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource networkmanager[globalnetwork]")
+			return resources, objects, nil
+		}
+		paginator := networkmanager.NewDescribeGlobalNetworksPaginator(conf.APIs.Networkmanager, &networkmanager.DescribeGlobalNetworksInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.GlobalNetworks {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["corenetwork"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []networkmanagertypes.CoreNetworkSummary
+
+		if !conf.getBoolDefaultTrue("aws.networkmanager.corenetwork.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource networkmanager[corenetwork]")
+			return resources, objects, nil
+		}
+		paginator := networkmanager.NewListCoreNetworksPaginator(conf.APIs.Networkmanager, &networkmanager.ListCoreNetworksInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.CoreNetworks {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
+		}
+
+		return resources, objects, nil
+	}
+
+	funcs["networkmanagerpeering"] = func(ctx context.Context, cache fetch.Cache) ([]*graph.Resource, any, error) {
+		var resources []*graph.Resource
+		var objects []networkmanagertypes.Peering
+
+		if !conf.getBoolDefaultTrue("aws.networkmanager.networkmanagerpeering.sync") && !getBoolFromContext(ctx, "force") {
+			conf.Log.Verbose("sync: *disabled* for resource networkmanager[networkmanagerpeering]")
+			return resources, objects, nil
+		}
+		paginator := networkmanager.NewListPeeringsPaginator(conf.APIs.Networkmanager, &networkmanager.ListPeeringsInput{})
+		for paginator.HasMorePages() {
+			out, err := paginator.NextPage(ctx)
+			if err != nil {
+				return resources, objects, err
+			}
+			for _, output := range out.Peerings {
+				objects = append(objects, output)
+				var res *graph.Resource
+				res, err = awsconv.NewResource(output)
+				if err != nil {
+					return resources, objects, err
+				}
+				resources = append(resources, res)
+			}
 		}
 
 		return resources, objects, nil

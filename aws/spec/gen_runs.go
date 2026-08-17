@@ -40,6 +40,7 @@ import (
 	cognitoidentity "github.com/aws/aws-sdk-go-v2/service/cognitoidentity"
 	cognitoidentityprovider "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
+	directconnect "github.com/aws/aws-sdk-go-v2/service/directconnect"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	ecr "github.com/aws/aws-sdk-go-v2/service/ecr"
@@ -59,6 +60,7 @@ import (
 	kinesis "github.com/aws/aws-sdk-go-v2/service/kinesis"
 	lambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	mq "github.com/aws/aws-sdk-go-v2/service/mq"
+	networkmanager "github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
 	route53 "github.com/aws/aws-sdk-go-v2/service/route53"
@@ -4152,6 +4154,84 @@ func (cmd *CreateContainercluster) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewCreateCorenetwork(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateCorenetwork {
+	cmd := new(CreateCorenetwork)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateCorenetwork) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateCorenetwork) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.CreateCoreNetworkInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.CreateCoreNetworkInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateCoreNetwork(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.CreateCoreNetwork call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create corenetwork: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create corenetwork '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create corenetwork done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateCorenetwork) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("corenetwork"), nil
+}
+
+func (cmd *CreateCorenetwork) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewCreateCrawler(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateCrawler {
 	cmd := new(CreateCrawler)
 	if len(l) > 0 {
@@ -4608,6 +4688,162 @@ func (cmd *CreateDeploymentgroup) dryRun(renv env.Running, params map[string]any
 }
 
 func (cmd *CreateDeploymentgroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateDirectconnectgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDirectconnectgateway {
+	cmd := new(CreateDirectconnectgateway)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = directconnect.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateDirectconnectgateway) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateDirectconnectgateway) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &directconnect.CreateDirectConnectGatewayInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in directconnect.CreateDirectConnectGatewayInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateDirectConnectGateway(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("directconnect.CreateDirectConnectGateway call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create directconnectgateway: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create directconnectgateway '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create directconnectgateway done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateDirectconnectgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("directconnectgateway"), nil
+}
+
+func (cmd *CreateDirectconnectgateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateDirectconnectgatewayassociation(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateDirectconnectgatewayassociation {
+	cmd := new(CreateDirectconnectgatewayassociation)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = directconnect.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateDirectconnectgatewayassociation) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateDirectconnectgatewayassociation) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &directconnect.CreateDirectConnectGatewayAssociationInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in directconnect.CreateDirectConnectGatewayAssociationInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateDirectConnectGatewayAssociation(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("directconnect.CreateDirectConnectGatewayAssociation call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create directconnectgatewayassociation: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create directconnectgatewayassociation '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create directconnectgatewayassociation done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateDirectconnectgatewayassociation) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("directconnectgatewayassociation"), nil
+}
+
+func (cmd *CreateDirectconnectgatewayassociation) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -5689,6 +5925,84 @@ func (cmd *CreateFunction) dryRun(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *CreateFunction) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateGlobalnetwork(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateGlobalnetwork {
+	cmd := new(CreateGlobalnetwork)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateGlobalnetwork) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateGlobalnetwork) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.CreateGlobalNetworkInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.CreateGlobalNetworkInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateGlobalNetwork(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.CreateGlobalNetwork call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create globalnetwork: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create globalnetwork '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create globalnetwork done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateGlobalnetwork) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("globalnetwork"), nil
+}
+
+func (cmd *CreateGlobalnetwork) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -7322,6 +7636,318 @@ func (cmd *CreateNetworkinterface) dryRun(renv env.Running, params map[string]an
 }
 
 func (cmd *CreateNetworkinterface) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateNetworkmanagerconnection(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateNetworkmanagerconnection {
+	cmd := new(CreateNetworkmanagerconnection)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateNetworkmanagerconnection) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateNetworkmanagerconnection) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.CreateConnectionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.CreateConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateConnection(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.CreateConnection call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create networkmanagerconnection: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create networkmanagerconnection '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create networkmanagerconnection done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateNetworkmanagerconnection) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagerconnection"), nil
+}
+
+func (cmd *CreateNetworkmanagerconnection) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateNetworkmanagerdevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateNetworkmanagerdevice {
+	cmd := new(CreateNetworkmanagerdevice)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateNetworkmanagerdevice) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateNetworkmanagerdevice) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.CreateDeviceInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.CreateDeviceInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateDevice(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.CreateDevice call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create networkmanagerdevice: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create networkmanagerdevice '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create networkmanagerdevice done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateNetworkmanagerdevice) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagerdevice"), nil
+}
+
+func (cmd *CreateNetworkmanagerdevice) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateNetworkmanagerlink(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateNetworkmanagerlink {
+	cmd := new(CreateNetworkmanagerlink)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateNetworkmanagerlink) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateNetworkmanagerlink) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.CreateLinkInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.CreateLinkInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateLink(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.CreateLink call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create networkmanagerlink: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create networkmanagerlink '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create networkmanagerlink done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateNetworkmanagerlink) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagerlink"), nil
+}
+
+func (cmd *CreateNetworkmanagerlink) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewCreateNetworkmanagersite(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *CreateNetworkmanagersite {
+	cmd := new(CreateNetworkmanagersite)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *CreateNetworkmanagersite) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *CreateNetworkmanagersite) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.CreateSiteInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.CreateSiteInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.CreateSite(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.CreateSite call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("create networkmanagersite: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("create networkmanagersite '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("create networkmanagersite done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *CreateNetworkmanagersite) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagersite"), nil
+}
+
+func (cmd *CreateNetworkmanagersite) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -12408,6 +13034,84 @@ func (cmd *DeleteContainertask) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
+func NewDeleteCorenetwork(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCorenetwork {
+	cmd := new(DeleteCorenetwork)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteCorenetwork) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteCorenetwork) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.DeleteCoreNetworkInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.DeleteCoreNetworkInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteCoreNetwork(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.DeleteCoreNetwork call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete corenetwork: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete corenetwork '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete corenetwork done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteCorenetwork) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("corenetwork"), nil
+}
+
+func (cmd *DeleteCorenetwork) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
 func NewDeleteCrawler(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteCrawler {
 	cmd := new(DeleteCrawler)
 	if len(l) > 0 {
@@ -12795,6 +13499,162 @@ func (cmd *DeleteDeploymentgroup) dryRun(renv env.Running, params map[string]any
 }
 
 func (cmd *DeleteDeploymentgroup) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteDirectconnectgateway(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDirectconnectgateway {
+	cmd := new(DeleteDirectconnectgateway)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = directconnect.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteDirectconnectgateway) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteDirectconnectgateway) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &directconnect.DeleteDirectConnectGatewayInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in directconnect.DeleteDirectConnectGatewayInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteDirectConnectGateway(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("directconnect.DeleteDirectConnectGateway call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete directconnectgateway: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete directconnectgateway '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete directconnectgateway done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteDirectconnectgateway) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("directconnectgateway"), nil
+}
+
+func (cmd *DeleteDirectconnectgateway) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteDirectconnectgatewayassociation(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteDirectconnectgatewayassociation {
+	cmd := new(DeleteDirectconnectgatewayassociation)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = directconnect.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteDirectconnectgatewayassociation) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteDirectconnectgatewayassociation) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &directconnect.DeleteDirectConnectGatewayAssociationInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in directconnect.DeleteDirectConnectGatewayAssociationInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteDirectConnectGatewayAssociation(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("directconnect.DeleteDirectConnectGatewayAssociation call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete directconnectgatewayassociation: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete directconnectgatewayassociation '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete directconnectgatewayassociation done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteDirectconnectgatewayassociation) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("directconnectgatewayassociation"), nil
+}
+
+func (cmd *DeleteDirectconnectgatewayassociation) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -13903,6 +14763,84 @@ func (cmd *DeleteFunction) dryRun(renv env.Running, params map[string]any) (any,
 }
 
 func (cmd *DeleteFunction) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteGlobalnetwork(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteGlobalnetwork {
+	cmd := new(DeleteGlobalnetwork)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteGlobalnetwork) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteGlobalnetwork) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.DeleteGlobalNetworkInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.DeleteGlobalNetworkInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteGlobalNetwork(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.DeleteGlobalNetwork call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete globalnetwork: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete globalnetwork '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete globalnetwork done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteGlobalnetwork) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("globalnetwork"), nil
+}
+
+func (cmd *DeleteGlobalnetwork) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 
@@ -15541,6 +16479,318 @@ func (cmd *DeleteNetworkinterface) dryRun(renv env.Running, params map[string]an
 }
 
 func (cmd *DeleteNetworkinterface) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteNetworkmanagerconnection(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNetworkmanagerconnection {
+	cmd := new(DeleteNetworkmanagerconnection)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteNetworkmanagerconnection) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteNetworkmanagerconnection) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.DeleteConnectionInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.DeleteConnectionInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteConnection(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.DeleteConnection call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete networkmanagerconnection: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete networkmanagerconnection '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete networkmanagerconnection done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteNetworkmanagerconnection) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagerconnection"), nil
+}
+
+func (cmd *DeleteNetworkmanagerconnection) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteNetworkmanagerdevice(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNetworkmanagerdevice {
+	cmd := new(DeleteNetworkmanagerdevice)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteNetworkmanagerdevice) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteNetworkmanagerdevice) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.DeleteDeviceInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.DeleteDeviceInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteDevice(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.DeleteDevice call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete networkmanagerdevice: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete networkmanagerdevice '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete networkmanagerdevice done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteNetworkmanagerdevice) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagerdevice"), nil
+}
+
+func (cmd *DeleteNetworkmanagerdevice) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteNetworkmanagerlink(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNetworkmanagerlink {
+	cmd := new(DeleteNetworkmanagerlink)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteNetworkmanagerlink) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteNetworkmanagerlink) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.DeleteLinkInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.DeleteLinkInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteLink(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.DeleteLink call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete networkmanagerlink: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete networkmanagerlink '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete networkmanagerlink done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteNetworkmanagerlink) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagerlink"), nil
+}
+
+func (cmd *DeleteNetworkmanagerlink) inject(params map[string]any) error {
+	return structSetter(cmd, params)
+}
+
+func NewDeleteNetworkmanagersite(cfg aws.Config, g cloud.GraphAPI, l ...*logger.Logger) *DeleteNetworkmanagersite {
+	cmd := new(DeleteNetworkmanagersite)
+	if len(l) > 0 {
+		cmd.logger = l[0]
+	} else {
+		cmd.logger = logger.DiscardLogger
+	}
+	if cfg.Region != "" {
+		cmd.api = networkmanager.NewFromConfig(cfg)
+	}
+	cmd.graph = g
+	return cmd
+}
+
+func (cmd *DeleteNetworkmanagersite) Run(renv env.Running, params map[string]any) (any, error) {
+	if renv.IsDryRun() {
+		return cmd.dryRun(renv, params)
+	}
+	return cmd.run(renv, params)
+}
+
+func (cmd *DeleteNetworkmanagersite) run(renv env.Running, params map[string]any) (any, error) {
+	if err := cmd.inject(params); err != nil {
+		return nil, fmt.Errorf("cannot set params on command struct: %w", err)
+	}
+
+	if v, ok := implementsBeforeRun(cmd); ok {
+		if brErr := v.BeforeRun(renv); brErr != nil {
+			return nil, fmt.Errorf("before run: %s", brErr)
+		}
+	}
+
+	input := &networkmanager.DeleteSiteInput{}
+	if err := structInjector(cmd, input, renv); err != nil {
+		return nil, fmt.Errorf("cannot inject in networkmanager.DeleteSiteInput: %w", err)
+	}
+	if v, ok := implementsInputPostProcessor(cmd); ok {
+		v.PostProcessInput(input)
+	}
+	start := time.Now()
+	output, err := cmd.api.DeleteSite(renv.RequestContext(), input)
+	renv.Log().ExtraVerbosef("networkmanager.DeleteSite call took %s", time.Since(start))
+	if err != nil {
+		return nil, decorateAWSError(err)
+	}
+
+	var extracted any
+	if v, ok := implementsResultExtractor(cmd); ok {
+		if output != nil {
+			extracted = v.ExtractResult(output)
+		} else {
+			renv.Log().Warning("delete networkmanagersite: AWS command returned nil output")
+		}
+	}
+
+	if extracted != nil {
+		renv.Log().Verbosef("delete networkmanagersite '%s' done", extracted)
+	} else {
+		renv.Log().Verbose("delete networkmanagersite done")
+	}
+
+	if v, ok := implementsAfterRun(cmd); ok {
+		if brErr := v.AfterRun(renv, output); brErr != nil {
+			return nil, fmt.Errorf("after run: %s", brErr)
+		}
+	}
+
+	return extracted, nil
+}
+
+func (cmd *DeleteNetworkmanagersite) dryRun(renv env.Running, params map[string]any) (any, error) {
+	return fakeDryRunID("networkmanagersite"), nil
+}
+
+func (cmd *DeleteNetworkmanagersite) inject(params map[string]any) error {
 	return structSetter(cmd, params)
 }
 

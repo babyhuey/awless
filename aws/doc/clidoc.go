@@ -914,4 +914,36 @@ var cliExamplesDoc = map[string][]string{
 		"awless update securitygroup id=@ssh-only inbound=authorize protocol=tcp cidr=0.0.0.0/0 portrange=26257",
 		"awless update securitygroup id=@ssh-only inbound=authorize protocol=tcp securitygroup=sg-123457 portrange=8080",
 	},
+	// Direct Connect
+	"create.directconnectgateway": {
+		"awless create directconnectgateway name=my-dcgw",
+		"awless create directconnectgateway name=my-dcgw amazon-side-asn=65000",
+	},
+	"delete.directconnectgateway": {"awless delete directconnectgateway id=abcd1234-ab12-cd34-ef56-abcdef123456"},
+	"create.directconnectgatewayassociation": {
+		"awless create directconnectgatewayassociation gateway=abcd1234-ab12-cd34-ef56-abcdef123456 associated-gateway=tgw-1234abcd",
+		"awless create directconnectgatewayassociation gateway=abcd1234-ab12-cd34-ef56-abcdef123456 virtual-gateway=vgw-1234abcd",
+	},
+	"delete.directconnectgatewayassociation": {"awless delete directconnectgatewayassociation id=abcd1234-ab12-cd34-ef56-abcdef123456"},
+	// Network Manager
+	"create.globalnetwork": {"awless create globalnetwork description='Production WAN'"},
+	"delete.globalnetwork": {"awless delete globalnetwork id=global-network-1234"},
+	"create.corenetwork":   {"awless create corenetwork global-network=global-network-1234 description='Core network'"},
+	"delete.corenetwork":   {"awless delete corenetwork id=core-network-1234"},
+	"create.networkmanagersite": {
+		"awless create networkmanagersite global-network=global-network-1234 description='London office'",
+	},
+	"delete.networkmanagersite": {"awless delete networkmanagersite id=site-1234 global-network=global-network-1234"},
+	"create.networkmanagerdevice": {
+		"awless create networkmanagerdevice global-network=global-network-1234 model='ISR 4451' vendor=Cisco site=site-1234",
+	},
+	"delete.networkmanagerdevice": {"awless delete networkmanagerdevice id=device-1234 global-network=global-network-1234"},
+	"create.networkmanagerlink": {
+		"awless create networkmanagerlink global-network=global-network-1234 site=site-1234 type=broadband provider=Verizon",
+	},
+	"delete.networkmanagerlink": {"awless delete networkmanagerlink id=link-1234 global-network=global-network-1234"},
+	"create.networkmanagerconnection": {
+		"awless create networkmanagerconnection global-network=global-network-1234 device=device-1234 connected-device=device-5678",
+	},
+	"delete.networkmanagerconnection": {"awless delete networkmanagerconnection id=connection-1234 global-network=global-network-1234"},
 }

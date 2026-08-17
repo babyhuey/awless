@@ -141,6 +141,9 @@ func (s *Template) Revert() (*Template, error) {
 				case "apigatewaystage":
 					params = append(params, fmt.Sprintf("api=%s", printItem(cmd.ParamNodes["api"])))
 					params = append(params, fmt.Sprintf("name=%s", printItem(cmd.ParamNodes["name"])))
+				case "networkmanagersite", "networkmanagerdevice", "networkmanagerlink", "networkmanagerconnection":
+					params = append(params, fmt.Sprintf("id=%s", quoteParamIfNeeded(cmd.CmdResult)))
+					params = append(params, fmt.Sprintf("global-network=%s", printItem(cmd.ParamNodes["global-network"])))
 				case "accesskey":
 					params = append(params, fmt.Sprintf("id=%s", quoteParamIfNeeded(cmd.CmdResult)))
 					params = append(params, fmt.Sprintf("user=%s", printItem(cmd.ParamNodes["user"])))

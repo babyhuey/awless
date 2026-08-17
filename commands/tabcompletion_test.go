@@ -225,7 +225,7 @@ func TestGuessEntityType(t *testing.T) {
 		{hole: "any"},
 		{hole: "inst"},
 		{hole: "gateway"},
-		{hole: "gateway.", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
+		{hole: "gateway.", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage", "directconnectgateway", "directconnectgatewayassociation"}},
 		{hole: "instance", types: []string{"instance"}},
 		{hole: "instance.ip", types: []string{"instance"}, prop: "ip"},
 		{hole: "securitygroup.id", types: []string{"securitygroup"}, prop: "id"},
@@ -235,14 +235,14 @@ func TestGuessEntityType(t *testing.T) {
 		{hole: "subnet.cidr", types: []string{"subnet"}, prop: "cidr"},
 		{hole: "subnet.cidr.any", types: []string{"subnet"}},
 		{hole: "vpc.instance", types: []string{"instance"}},
-		{hole: "route.gateway", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
+		{hole: "route.gateway", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage", "directconnectgateway", "directconnectgatewayassociation"}},
 		{hole: "route.table", types: []string{"transitgatewayroutetable", "routetable", "dynamodbtable", "gluetable"}},
 
 		{hole: "zone.1", types: []string{"zone"}, prop: "1"},
 		{hole: "availabilityzone.1", types: []string{"availabilityzone"}, prop: "1"},
 
-		{hole: "gateway.1", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
-		{hole: "gateway.in", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage"}},
+		{hole: "gateway.1", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage", "directconnectgateway", "directconnectgatewayassociation"}},
+		{hole: "gateway.in", types: []string{"transitgateway", "transitgatewayattachment", "transitgatewayroutetable", "internetgateway", "natgateway", "apigateway", "apigatewayroute", "apigatewaystage", "directconnectgateway", "directconnectgatewayassociation"}},
 		{hole: "gateway.inst", types: []string{"instance", "containerinstance", "instanceprofile"}},
 
 		{hole: "gateway.inst.any", types: []string{"instance", "containerinstance", "instanceprofile"}},

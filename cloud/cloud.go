@@ -186,6 +186,20 @@ const (
 	TransitGatewayAttachment string = "transitgatewayattachment"
 	TransitGatewayRouteTable string = "transitgatewayroutetable"
 	VpcEndpoint              string = "vpcendpoint"
+	//direct connect
+	DirectConnectConnection         string = "directconnectconnection"
+	DirectConnectVirtualInterface   string = "directconnectvirtualinterface"
+	DirectConnectLag                string = "directconnectlag"
+	DirectConnectGateway            string = "directconnectgateway"
+	DirectConnectGatewayAssociation string = "directconnectgatewayassociation"
+	//network manager (cloud wan)
+	GlobalNetwork            string = "globalnetwork"
+	CoreNetwork              string = "corenetwork"
+	NetworkManagerSite       string = "networkmanagersite"
+	NetworkManagerLink       string = "networkmanagerlink"
+	NetworkManagerDevice     string = "networkmanagerdevice"
+	NetworkManagerConnection string = "networkmanagerconnection"
+	NetworkManagerPeering    string = "networkmanagerpeering"
 )
 
 type Service interface {

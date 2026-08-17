@@ -1653,4 +1653,68 @@ var paramsDoc = map[string]map[string]string{
 		"stickinessduration":  "The time period, in seconds, during which requests from a client should be routed to the same target. After this time period expires, the load balancer-generated cookie is considered stale. The range is 1 second to 1 week (604800 seconds). The default value is 1 day (86400 seconds)",
 		"unhealthythreshold":  "The number of consecutive health check failures required before considering a target unhealthy",
 	},
+	// Direct Connect
+	"create.directconnectgateway": {
+		"name":            "Name for the Direct Connect gateway",
+		"amazon-side-asn": "Private ASN for the Amazon side (64512–65534 or 4200000000–4294967294); defaults to 64512",
+	},
+	"delete.directconnectgateway": {"id": "Identifier of the Direct Connect gateway to delete"},
+	"create.directconnectgatewayassociation": {
+		"gateway":            "Identifier of the Direct Connect gateway",
+		"associated-gateway": "Identifier of the transit gateway or VGW to associate (use for TGW)",
+		"virtual-gateway":    "Identifier of the virtual private gateway to associate (legacy VGW path)",
+	},
+	"delete.directconnectgatewayassociation": {"id": "Identifier of the association to delete"},
+	// Network Manager
+	"create.globalnetwork": {"description": "Description of the global network"},
+	"delete.globalnetwork": {"id": "Identifier of the global network to delete"},
+	"create.corenetwork": {
+		"global-network": "Identifier of the global network this core network belongs to",
+		"description":    "Description of the core network",
+	},
+	"delete.corenetwork": {"id": "Identifier of the core network to delete"},
+	"create.networkmanagersite": {
+		"global-network": "Identifier of the global network",
+		"description":    "Description of the site",
+	},
+	"delete.networkmanagersite": {
+		"id":             "Identifier of the site to delete",
+		"global-network": "Identifier of the global network",
+	},
+	"create.networkmanagerdevice": {
+		"global-network": "Identifier of the global network",
+		"description":    "Description of the device",
+		"model":          "Device model (e.g. Cisco ISR 4451)",
+		"serial-number":  "Serial number of the device",
+		"type":           "Type of the device",
+		"vendor":         "Device vendor (e.g. Cisco)",
+		"site":           "Identifier of the site to associate the device with",
+	},
+	"delete.networkmanagerdevice": {
+		"id":             "Identifier of the device to delete",
+		"global-network": "Identifier of the global network",
+	},
+	"create.networkmanagerlink": {
+		"global-network": "Identifier of the global network",
+		"site":           "Identifier of the site the link belongs to",
+		"description":    "Description of the link",
+		"type":           "Type of the link (e.g. broadband, satellite)",
+		"provider":       "Provider of the link (e.g. AWS, Verizon)",
+	},
+	"delete.networkmanagerlink": {
+		"id":             "Identifier of the link to delete",
+		"global-network": "Identifier of the global network",
+	},
+	"create.networkmanagerconnection": {
+		"global-network":   "Identifier of the global network",
+		"device":           "Identifier of the first device",
+		"connected-device": "Identifier of the second device to connect to",
+		"link":             "Identifier of the link on the first device (optional)",
+		"connected-link":   "Identifier of the link on the second device (optional)",
+		"description":      "Description of the connection",
+	},
+	"delete.networkmanagerconnection": {
+		"id":             "Identifier of the connection to delete",
+		"global-network": "Identifier of the global network",
+	},
 }

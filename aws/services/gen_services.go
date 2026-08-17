@@ -57,6 +57,8 @@ import (
 	cognitoidentityprovidertypes "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	configservice "github.com/aws/aws-sdk-go-v2/service/configservice"
 	configservicetypes "github.com/aws/aws-sdk-go-v2/service/configservice/types"
+	directconnect "github.com/aws/aws-sdk-go-v2/service/directconnect"
+	directconnecttypes "github.com/aws/aws-sdk-go-v2/service/directconnect/types"
 	dynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	dynamodbtypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	ec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -97,6 +99,8 @@ import (
 	lambdatypes "github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	mq "github.com/aws/aws-sdk-go-v2/service/mq"
 	mqtypes "github.com/aws/aws-sdk-go-v2/service/mq/types"
+	networkmanager "github.com/aws/aws-sdk-go-v2/service/networkmanager"
+	networkmanagertypes "github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	rds "github.com/aws/aws-sdk-go-v2/service/rds"
 	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	redshift "github.com/aws/aws-sdk-go-v2/service/redshift"
@@ -171,6 +175,8 @@ var ServiceNames = []string{
 	"codedeploy",
 	"codebuild",
 	"beanstalk",
+	"directconnect",
+	"networkmanager",
 }
 
 var ResourceTypes = []string{
@@ -278,6 +284,18 @@ var ResourceTypes = []string{
 	"buildproject",
 	"application",
 	"environment",
+	"directconnectconnection",
+	"directconnectvirtualinterface",
+	"directconnectlag",
+	"directconnectgateway",
+	"directconnectgatewayassociation",
+	"globalnetwork",
+	"corenetwork",
+	"networkmanagerpeering",
+	"networkmanagersite",
+	"networkmanagerlink",
+	"networkmanagerdevice",
+	"networkmanagerconnection",
 }
 
 var ServicePerAPI = map[string]string{
@@ -330,220 +348,246 @@ var ServicePerAPI = map[string]string{
 	"codedeploy":              "codedeploy",
 	"codebuild":               "codebuild",
 	"elasticbeanstalk":        "beanstalk",
+	"directconnect":           "directconnect",
+	"networkmanager":          "networkmanager",
 }
 
 var ServicePerResourceType = map[string]string{
-	"vpcpeering":               "infra",
-	"transitgateway":           "infra",
-	"transitgatewayattachment": "infra",
-	"transitgatewayroutetable": "infra",
-	"vpcendpoint":              "infra",
-	"instance":                 "infra",
-	"subnet":                   "infra",
-	"vpc":                      "infra",
-	"keypair":                  "infra",
-	"securitygroup":            "infra",
-	"volume":                   "infra",
-	"internetgateway":          "infra",
-	"natgateway":               "infra",
-	"routetable":               "infra",
-	"availabilityzone":         "infra",
-	"image":                    "infra",
-	"importimagetask":          "infra",
-	"elasticip":                "infra",
-	"snapshot":                 "infra",
-	"networkinterface":         "infra",
-	"classicloadbalancer":      "infra",
-	"loadbalancer":             "infra",
-	"targetgroup":              "infra",
-	"listener":                 "infra",
-	"database":                 "infra",
-	"dbsubnetgroup":            "infra",
-	"launchconfiguration":      "infra",
-	"scalinggroup":             "infra",
-	"scalingpolicy":            "infra",
-	"repository":               "infra",
-	"containercluster":         "infra",
-	"containertask":            "infra",
-	"container":                "infra",
-	"containerinstance":        "infra",
-	"certificate":              "infra",
-	"user":                     "access",
-	"group":                    "access",
-	"role":                     "access",
-	"policy":                   "access",
-	"accesskey":                "access",
-	"instanceprofile":          "access",
-	"mfadevice":                "access",
-	"bucket":                   "storage",
-	"s3object":                 "storage",
-	"subscription":             "messaging",
-	"topic":                    "messaging",
-	"queue":                    "messaging",
-	"zone":                     "dns",
-	"record":                   "dns",
-	"function":                 "lambda",
-	"metric":                   "monitoring",
-	"alarm":                    "monitoring",
-	"distribution":             "cdn",
-	"stack":                    "cloudformation",
-	"ekscluster":               "eks",
-	"eksnodegroup":             "eks",
-	"dynamodbtable":            "dynamodb",
-	"secret":                   "secretsmanager",
-	"key":                      "secretsmanager",
-	"apigateway":               "apigateway",
-	"apigatewayroute":          "apigateway",
-	"apigatewaystage":          "apigateway",
-	"ssmparameter":             "ssm",
-	"filesystem":               "efs",
-	"mounttarget":              "efs",
-	"trail":                    "cloudtrail",
-	"loggroup":                 "cloudwatchlogs",
-	"cachecluster":             "elasticache",
-	"replicationgroup":         "elasticache",
-	"cachesubnetgroup":         "elasticache",
-	"eventbus":                 "eventbridge",
-	"eventrule":                "eventbridge",
-	"statemachine":             "stepfunctions",
-	"webacl":                   "waf",
-	"ipset":                    "waf",
-	"rulegroup":                "waf",
-	"configrule":               "configservice",
-	"stream":                   "kinesis",
-	"redshiftcluster":          "redshift",
-	"redshiftsubnetgroup":      "redshift",
-	"pipeline":                 "codepipeline",
-	"backupplan":               "backup",
-	"backupvault":              "backup",
-	"namespace":                "cloudmap",
-	"discoveryservice":         "cloudmap",
-	"accelerator":              "globalaccelerator",
-	"acceleratorlistener":      "globalaccelerator",
-	"fsxfilesystem":            "fsx",
-	"fsxbackup":                "fsx",
-	"broker":                   "mq",
-	"kafkacluster":             "msk",
-	"userpool":                 "cognito",
-	"identitypool":             "cognito",
-	"emailidentity":            "ses",
-	"configurationset":         "ses",
-	"gluedatabase":             "glue",
-	"crawler":                  "glue",
-	"job":                      "glue",
-	"gluetable":                "glue",
-	"deployapplication":        "codedeploy",
-	"deploymentgroup":          "codedeploy",
-	"buildproject":             "codebuild",
-	"application":              "beanstalk",
-	"environment":              "beanstalk",
+	"vpcpeering":                      "infra",
+	"transitgateway":                  "infra",
+	"transitgatewayattachment":        "infra",
+	"transitgatewayroutetable":        "infra",
+	"vpcendpoint":                     "infra",
+	"instance":                        "infra",
+	"subnet":                          "infra",
+	"vpc":                             "infra",
+	"keypair":                         "infra",
+	"securitygroup":                   "infra",
+	"volume":                          "infra",
+	"internetgateway":                 "infra",
+	"natgateway":                      "infra",
+	"routetable":                      "infra",
+	"availabilityzone":                "infra",
+	"image":                           "infra",
+	"importimagetask":                 "infra",
+	"elasticip":                       "infra",
+	"snapshot":                        "infra",
+	"networkinterface":                "infra",
+	"classicloadbalancer":             "infra",
+	"loadbalancer":                    "infra",
+	"targetgroup":                     "infra",
+	"listener":                        "infra",
+	"database":                        "infra",
+	"dbsubnetgroup":                   "infra",
+	"launchconfiguration":             "infra",
+	"scalinggroup":                    "infra",
+	"scalingpolicy":                   "infra",
+	"repository":                      "infra",
+	"containercluster":                "infra",
+	"containertask":                   "infra",
+	"container":                       "infra",
+	"containerinstance":               "infra",
+	"certificate":                     "infra",
+	"user":                            "access",
+	"group":                           "access",
+	"role":                            "access",
+	"policy":                          "access",
+	"accesskey":                       "access",
+	"instanceprofile":                 "access",
+	"mfadevice":                       "access",
+	"bucket":                          "storage",
+	"s3object":                        "storage",
+	"subscription":                    "messaging",
+	"topic":                           "messaging",
+	"queue":                           "messaging",
+	"zone":                            "dns",
+	"record":                          "dns",
+	"function":                        "lambda",
+	"metric":                          "monitoring",
+	"alarm":                           "monitoring",
+	"distribution":                    "cdn",
+	"stack":                           "cloudformation",
+	"ekscluster":                      "eks",
+	"eksnodegroup":                    "eks",
+	"dynamodbtable":                   "dynamodb",
+	"secret":                          "secretsmanager",
+	"key":                             "secretsmanager",
+	"apigateway":                      "apigateway",
+	"apigatewayroute":                 "apigateway",
+	"apigatewaystage":                 "apigateway",
+	"ssmparameter":                    "ssm",
+	"filesystem":                      "efs",
+	"mounttarget":                     "efs",
+	"trail":                           "cloudtrail",
+	"loggroup":                        "cloudwatchlogs",
+	"cachecluster":                    "elasticache",
+	"replicationgroup":                "elasticache",
+	"cachesubnetgroup":                "elasticache",
+	"eventbus":                        "eventbridge",
+	"eventrule":                       "eventbridge",
+	"statemachine":                    "stepfunctions",
+	"webacl":                          "waf",
+	"ipset":                           "waf",
+	"rulegroup":                       "waf",
+	"configrule":                      "configservice",
+	"stream":                          "kinesis",
+	"redshiftcluster":                 "redshift",
+	"redshiftsubnetgroup":             "redshift",
+	"pipeline":                        "codepipeline",
+	"backupplan":                      "backup",
+	"backupvault":                     "backup",
+	"namespace":                       "cloudmap",
+	"discoveryservice":                "cloudmap",
+	"accelerator":                     "globalaccelerator",
+	"acceleratorlistener":             "globalaccelerator",
+	"fsxfilesystem":                   "fsx",
+	"fsxbackup":                       "fsx",
+	"broker":                          "mq",
+	"kafkacluster":                    "msk",
+	"userpool":                        "cognito",
+	"identitypool":                    "cognito",
+	"emailidentity":                   "ses",
+	"configurationset":                "ses",
+	"gluedatabase":                    "glue",
+	"crawler":                         "glue",
+	"job":                             "glue",
+	"gluetable":                       "glue",
+	"deployapplication":               "codedeploy",
+	"deploymentgroup":                 "codedeploy",
+	"buildproject":                    "codebuild",
+	"application":                     "beanstalk",
+	"environment":                     "beanstalk",
+	"directconnectconnection":         "directconnect",
+	"directconnectvirtualinterface":   "directconnect",
+	"directconnectlag":                "directconnect",
+	"directconnectgateway":            "directconnect",
+	"directconnectgatewayassociation": "directconnect",
+	"globalnetwork":                   "networkmanager",
+	"corenetwork":                     "networkmanager",
+	"networkmanagerpeering":           "networkmanager",
+	"networkmanagersite":              "networkmanager",
+	"networkmanagerlink":              "networkmanager",
+	"networkmanagerdevice":            "networkmanager",
+	"networkmanagerconnection":        "networkmanager",
 }
 
 var APIPerResourceType = map[string]string{
-	"vpcpeering":               "ec2",
-	"transitgateway":           "ec2",
-	"transitgatewayattachment": "ec2",
-	"transitgatewayroutetable": "ec2",
-	"vpcendpoint":              "ec2",
-	"instance":                 "ec2",
-	"subnet":                   "ec2",
-	"vpc":                      "ec2",
-	"keypair":                  "ec2",
-	"securitygroup":            "ec2",
-	"volume":                   "ec2",
-	"internetgateway":          "ec2",
-	"natgateway":               "ec2",
-	"routetable":               "ec2",
-	"availabilityzone":         "ec2",
-	"image":                    "ec2",
-	"importimagetask":          "ec2",
-	"elasticip":                "ec2",
-	"snapshot":                 "ec2",
-	"networkinterface":         "ec2",
-	"classicloadbalancer":      "elb",
-	"loadbalancer":             "elbv2",
-	"targetgroup":              "elbv2",
-	"listener":                 "elbv2",
-	"database":                 "rds",
-	"dbsubnetgroup":            "rds",
-	"launchconfiguration":      "autoscaling",
-	"scalinggroup":             "autoscaling",
-	"scalingpolicy":            "autoscaling",
-	"repository":               "ecr",
-	"containercluster":         "ecs",
-	"containertask":            "ecs",
-	"container":                "ecs",
-	"containerinstance":        "ecs",
-	"certificate":              "acm",
-	"user":                     "iam",
-	"group":                    "iam",
-	"role":                     "iam",
-	"policy":                   "iam",
-	"accesskey":                "iam",
-	"instanceprofile":          "iam",
-	"mfadevice":                "iam",
-	"bucket":                   "s3",
-	"s3object":                 "s3",
-	"subscription":             "sns",
-	"topic":                    "sns",
-	"queue":                    "sqs",
-	"zone":                     "route53",
-	"record":                   "route53",
-	"function":                 "lambda",
-	"metric":                   "cloudwatch",
-	"alarm":                    "cloudwatch",
-	"distribution":             "cloudfront",
-	"stack":                    "cloudformation",
-	"ekscluster":               "eks",
-	"eksnodegroup":             "eks",
-	"dynamodbtable":            "dynamodb",
-	"secret":                   "secretsmanager",
-	"key":                      "kms",
-	"apigateway":               "apigatewayv2",
-	"apigatewayroute":          "apigatewayv2",
-	"apigatewaystage":          "apigatewayv2",
-	"ssmparameter":             "ssm",
-	"filesystem":               "efs",
-	"mounttarget":              "efs",
-	"trail":                    "cloudtrail",
-	"loggroup":                 "cloudwatchlogs",
-	"cachecluster":             "elasticache",
-	"replicationgroup":         "elasticache",
-	"cachesubnetgroup":         "elasticache",
-	"eventbus":                 "eventbridge",
-	"eventrule":                "eventbridge",
-	"statemachine":             "sfn",
-	"webacl":                   "wafv2",
-	"ipset":                    "wafv2",
-	"rulegroup":                "wafv2",
-	"configrule":               "configservice",
-	"stream":                   "kinesis",
-	"redshiftcluster":          "redshift",
-	"redshiftsubnetgroup":      "redshift",
-	"pipeline":                 "codepipeline",
-	"backupplan":               "backup",
-	"backupvault":              "backup",
-	"namespace":                "servicediscovery",
-	"discoveryservice":         "servicediscovery",
-	"accelerator":              "globalaccelerator",
-	"acceleratorlistener":      "globalaccelerator",
-	"fsxfilesystem":            "fsx",
-	"fsxbackup":                "fsx",
-	"broker":                   "mq",
-	"kafkacluster":             "kafka",
-	"userpool":                 "cognitoidentityprovider",
-	"identitypool":             "cognitoidentity",
-	"emailidentity":            "sesv2",
-	"configurationset":         "sesv2",
-	"gluedatabase":             "glue",
-	"crawler":                  "glue",
-	"job":                      "glue",
-	"gluetable":                "glue",
-	"deployapplication":        "codedeploy",
-	"deploymentgroup":          "codedeploy",
-	"buildproject":             "codebuild",
-	"application":              "elasticbeanstalk",
-	"environment":              "elasticbeanstalk",
+	"vpcpeering":                      "ec2",
+	"transitgateway":                  "ec2",
+	"transitgatewayattachment":        "ec2",
+	"transitgatewayroutetable":        "ec2",
+	"vpcendpoint":                     "ec2",
+	"instance":                        "ec2",
+	"subnet":                          "ec2",
+	"vpc":                             "ec2",
+	"keypair":                         "ec2",
+	"securitygroup":                   "ec2",
+	"volume":                          "ec2",
+	"internetgateway":                 "ec2",
+	"natgateway":                      "ec2",
+	"routetable":                      "ec2",
+	"availabilityzone":                "ec2",
+	"image":                           "ec2",
+	"importimagetask":                 "ec2",
+	"elasticip":                       "ec2",
+	"snapshot":                        "ec2",
+	"networkinterface":                "ec2",
+	"classicloadbalancer":             "elb",
+	"loadbalancer":                    "elbv2",
+	"targetgroup":                     "elbv2",
+	"listener":                        "elbv2",
+	"database":                        "rds",
+	"dbsubnetgroup":                   "rds",
+	"launchconfiguration":             "autoscaling",
+	"scalinggroup":                    "autoscaling",
+	"scalingpolicy":                   "autoscaling",
+	"repository":                      "ecr",
+	"containercluster":                "ecs",
+	"containertask":                   "ecs",
+	"container":                       "ecs",
+	"containerinstance":               "ecs",
+	"certificate":                     "acm",
+	"user":                            "iam",
+	"group":                           "iam",
+	"role":                            "iam",
+	"policy":                          "iam",
+	"accesskey":                       "iam",
+	"instanceprofile":                 "iam",
+	"mfadevice":                       "iam",
+	"bucket":                          "s3",
+	"s3object":                        "s3",
+	"subscription":                    "sns",
+	"topic":                           "sns",
+	"queue":                           "sqs",
+	"zone":                            "route53",
+	"record":                          "route53",
+	"function":                        "lambda",
+	"metric":                          "cloudwatch",
+	"alarm":                           "cloudwatch",
+	"distribution":                    "cloudfront",
+	"stack":                           "cloudformation",
+	"ekscluster":                      "eks",
+	"eksnodegroup":                    "eks",
+	"dynamodbtable":                   "dynamodb",
+	"secret":                          "secretsmanager",
+	"key":                             "kms",
+	"apigateway":                      "apigatewayv2",
+	"apigatewayroute":                 "apigatewayv2",
+	"apigatewaystage":                 "apigatewayv2",
+	"ssmparameter":                    "ssm",
+	"filesystem":                      "efs",
+	"mounttarget":                     "efs",
+	"trail":                           "cloudtrail",
+	"loggroup":                        "cloudwatchlogs",
+	"cachecluster":                    "elasticache",
+	"replicationgroup":                "elasticache",
+	"cachesubnetgroup":                "elasticache",
+	"eventbus":                        "eventbridge",
+	"eventrule":                       "eventbridge",
+	"statemachine":                    "sfn",
+	"webacl":                          "wafv2",
+	"ipset":                           "wafv2",
+	"rulegroup":                       "wafv2",
+	"configrule":                      "configservice",
+	"stream":                          "kinesis",
+	"redshiftcluster":                 "redshift",
+	"redshiftsubnetgroup":             "redshift",
+	"pipeline":                        "codepipeline",
+	"backupplan":                      "backup",
+	"backupvault":                     "backup",
+	"namespace":                       "servicediscovery",
+	"discoveryservice":                "servicediscovery",
+	"accelerator":                     "globalaccelerator",
+	"acceleratorlistener":             "globalaccelerator",
+	"fsxfilesystem":                   "fsx",
+	"fsxbackup":                       "fsx",
+	"broker":                          "mq",
+	"kafkacluster":                    "kafka",
+	"userpool":                        "cognitoidentityprovider",
+	"identitypool":                    "cognitoidentity",
+	"emailidentity":                   "sesv2",
+	"configurationset":                "sesv2",
+	"gluedatabase":                    "glue",
+	"crawler":                         "glue",
+	"job":                             "glue",
+	"gluetable":                       "glue",
+	"deployapplication":               "codedeploy",
+	"deploymentgroup":                 "codedeploy",
+	"buildproject":                    "codebuild",
+	"application":                     "elasticbeanstalk",
+	"environment":                     "elasticbeanstalk",
+	"directconnectconnection":         "directconnect",
+	"directconnectvirtualinterface":   "directconnect",
+	"directconnectlag":                "directconnect",
+	"directconnectgateway":            "directconnect",
+	"directconnectgatewayassociation": "directconnect",
+	"globalnetwork":                   "networkmanager",
+	"corenetwork":                     "networkmanager",
+	"networkmanagerpeering":           "networkmanager",
+	"networkmanagersite":              "networkmanager",
+	"networkmanagerlink":              "networkmanager",
+	"networkmanagerdevice":            "networkmanager",
+	"networkmanagerconnection":        "networkmanager",
 }
 
 type Infra struct {
@@ -6869,4 +6913,490 @@ func (s *Beanstalk) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, 
 
 func (s *Beanstalk) IsSyncDisabled() bool {
 	return !getBool(s.config, "aws.beanstalk.sync", true)
+}
+
+type Directconnect struct {
+	fetcher             fetch.Fetcher
+	region, profile     string
+	config              map[string]any
+	log                 *logger.Logger
+	DirectconnectClient *directconnect.Client
+}
+
+func NewDirectconnect(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	directconnectClient := directconnect.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		directconnectClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Directconnect{
+		DirectconnectClient: directconnectClient,
+		fetcher:             fetch.NewFetcher(awsfetch.BuildDirectconnectFetchFuncs(fetchConfig)),
+		config:              extraConf,
+		region:              region,
+		profile:             profile,
+		log:                 log,
+	}
+}
+
+func (s *Directconnect) Name() string {
+	return "directconnect"
+}
+
+func (s *Directconnect) Region() string {
+	return s.region
+}
+
+func (s *Directconnect) Profile() string {
+	return s.profile
+}
+
+func (s *Directconnect) ResourceTypes() []string {
+	return []string{
+		"directconnectconnection",
+		"directconnectvirtualinterface",
+		"directconnectlag",
+		"directconnectgateway",
+		"directconnectgatewayassociation",
+	}
+}
+
+func (s *Directconnect) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.directconnect.directconnectconnection.sync", true) {
+		list, err := s.fetcher.Get("directconnectconnection_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]directconnecttypes.Connection); !ok {
+			return gph, errors.New("cannot cast to '[]directconnecttypes.Connection' type from fetch context")
+		}
+		for _, r := range list.([]directconnecttypes.Connection) {
+			for _, fn := range addParentsFns["directconnectconnection"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *directconnecttypes.Connection) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.directconnect.directconnectvirtualinterface.sync", true) {
+		list, err := s.fetcher.Get("directconnectvirtualinterface_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]directconnecttypes.VirtualInterface); !ok {
+			return gph, errors.New("cannot cast to '[]directconnecttypes.VirtualInterface' type from fetch context")
+		}
+		for _, r := range list.([]directconnecttypes.VirtualInterface) {
+			for _, fn := range addParentsFns["directconnectvirtualinterface"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *directconnecttypes.VirtualInterface) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.directconnect.directconnectlag.sync", true) {
+		list, err := s.fetcher.Get("directconnectlag_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]directconnecttypes.Lag); !ok {
+			return gph, errors.New("cannot cast to '[]directconnecttypes.Lag' type from fetch context")
+		}
+		for _, r := range list.([]directconnecttypes.Lag) {
+			for _, fn := range addParentsFns["directconnectlag"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *directconnecttypes.Lag) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.directconnect.directconnectgateway.sync", true) {
+		list, err := s.fetcher.Get("directconnectgateway_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]directconnecttypes.DirectConnectGateway); !ok {
+			return gph, errors.New("cannot cast to '[]directconnecttypes.DirectConnectGateway' type from fetch context")
+		}
+		for _, r := range list.([]directconnecttypes.DirectConnectGateway) {
+			for _, fn := range addParentsFns["directconnectgateway"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *directconnecttypes.DirectConnectGateway) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.directconnect.directconnectgatewayassociation.sync", true) {
+		list, err := s.fetcher.Get("directconnectgatewayassociation_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]directconnecttypes.DirectConnectGatewayAssociation); !ok {
+			return gph, errors.New("cannot cast to '[]directconnecttypes.DirectConnectGatewayAssociation' type from fetch context")
+		}
+		for _, r := range list.([]directconnecttypes.DirectConnectGatewayAssociation) {
+			for _, fn := range addParentsFns["directconnectgatewayassociation"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *directconnecttypes.DirectConnectGatewayAssociation) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Directconnect) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Directconnect) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.directconnect.sync", true)
+}
+
+type Networkmanager struct {
+	fetcher              fetch.Fetcher
+	region, profile      string
+	config               map[string]any
+	log                  *logger.Logger
+	NetworkmanagerClient *networkmanager.Client
+}
+
+func NewNetworkmanager(cfg aws.Config, profile string, extraConf map[string]any, log *logger.Logger) cloud.Service {
+	region := cfg.Region
+	networkmanagerClient := networkmanager.NewFromConfig(cfg)
+
+	fetchConfig := awsfetch.NewConfig(
+		networkmanagerClient,
+	)
+	fetchConfig.Extra = extraConf
+	fetchConfig.Log = log
+
+	return &Networkmanager{
+		NetworkmanagerClient: networkmanagerClient,
+		fetcher:              fetch.NewFetcher(awsfetch.BuildNetworkmanagerFetchFuncs(fetchConfig)),
+		config:               extraConf,
+		region:               region,
+		profile:              profile,
+		log:                  log,
+	}
+}
+
+func (s *Networkmanager) Name() string {
+	return "networkmanager"
+}
+
+func (s *Networkmanager) Region() string {
+	return s.region
+}
+
+func (s *Networkmanager) Profile() string {
+	return s.profile
+}
+
+func (s *Networkmanager) ResourceTypes() []string {
+	return []string{
+		"globalnetwork",
+		"corenetwork",
+		"networkmanagerpeering",
+		"networkmanagersite",
+		"networkmanagerlink",
+		"networkmanagerdevice",
+		"networkmanagerconnection",
+	}
+}
+
+func (s *Networkmanager) Fetch(ctx context.Context) (cloud.GraphAPI, error) {
+	if s.IsSyncDisabled() {
+		return graph.NewGraph(), nil
+	}
+
+	allErrors := new(fetch.Error)
+
+	gph, err := s.fetcher.Fetch(context.WithValue(ctx, "region", s.region))
+	defer s.fetcher.Reset()
+
+	for _, e := range *fetch.WrapError(err) {
+		switch ee := e.(type) {
+		case nil:
+			continue
+		default:
+			var ae smithy.APIError
+			if errors.As(ee, &ae) && ae.ErrorMessage() == accessDenied {
+				allErrors.Add(cloud.ErrFetchAccessDenied)
+			} else {
+				allErrors.Add(ee)
+			}
+		}
+	}
+
+	if err := gph.AddResource(graph.InitResource(cloud.Region, s.region)); err != nil {
+		return gph, err
+	}
+
+	snap := gph.AsRDFGraphSnaphot()
+
+	errc := make(chan error)
+	var wg sync.WaitGroup
+	if getBool(s.config, "aws.networkmanager.globalnetwork.sync", true) {
+		list, err := s.fetcher.Get("globalnetwork_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]networkmanagertypes.GlobalNetwork); !ok {
+			return gph, errors.New("cannot cast to '[]networkmanagertypes.GlobalNetwork' type from fetch context")
+		}
+		for _, r := range list.([]networkmanagertypes.GlobalNetwork) {
+			for _, fn := range addParentsFns["globalnetwork"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *networkmanagertypes.GlobalNetwork) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.networkmanager.corenetwork.sync", true) {
+		list, err := s.fetcher.Get("corenetwork_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]networkmanagertypes.CoreNetworkSummary); !ok {
+			return gph, errors.New("cannot cast to '[]networkmanagertypes.CoreNetworkSummary' type from fetch context")
+		}
+		for _, r := range list.([]networkmanagertypes.CoreNetworkSummary) {
+			for _, fn := range addParentsFns["corenetwork"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *networkmanagertypes.CoreNetworkSummary) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.networkmanager.networkmanagerpeering.sync", true) {
+		list, err := s.fetcher.Get("networkmanagerpeering_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]networkmanagertypes.Peering); !ok {
+			return gph, errors.New("cannot cast to '[]networkmanagertypes.Peering' type from fetch context")
+		}
+		for _, r := range list.([]networkmanagertypes.Peering) {
+			for _, fn := range addParentsFns["networkmanagerpeering"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *networkmanagertypes.Peering) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.networkmanager.networkmanagersite.sync", true) {
+		list, err := s.fetcher.Get("networkmanagersite_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]networkmanagertypes.Site); !ok {
+			return gph, errors.New("cannot cast to '[]networkmanagertypes.Site' type from fetch context")
+		}
+		for _, r := range list.([]networkmanagertypes.Site) {
+			for _, fn := range addParentsFns["networkmanagersite"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *networkmanagertypes.Site) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.networkmanager.networkmanagerlink.sync", true) {
+		list, err := s.fetcher.Get("networkmanagerlink_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]networkmanagertypes.Link); !ok {
+			return gph, errors.New("cannot cast to '[]networkmanagertypes.Link' type from fetch context")
+		}
+		for _, r := range list.([]networkmanagertypes.Link) {
+			for _, fn := range addParentsFns["networkmanagerlink"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *networkmanagertypes.Link) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.networkmanager.networkmanagerdevice.sync", true) {
+		list, err := s.fetcher.Get("networkmanagerdevice_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]networkmanagertypes.Device); !ok {
+			return gph, errors.New("cannot cast to '[]networkmanagertypes.Device' type from fetch context")
+		}
+		for _, r := range list.([]networkmanagertypes.Device) {
+			for _, fn := range addParentsFns["networkmanagerdevice"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *networkmanagertypes.Device) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+	if getBool(s.config, "aws.networkmanager.networkmanagerconnection.sync", true) {
+		list, err := s.fetcher.Get("networkmanagerconnection_objects")
+		if err != nil {
+			return gph, err
+		}
+		if _, ok := list.([]networkmanagertypes.Connection); !ok {
+			return gph, errors.New("cannot cast to '[]networkmanagertypes.Connection' type from fetch context")
+		}
+		for _, r := range list.([]networkmanagertypes.Connection) {
+			for _, fn := range addParentsFns["networkmanagerconnection"] {
+				wg.Add(1)
+				go func(f addParentFn, snap tstore.RDFGraph, region string, res *networkmanagertypes.Connection) {
+					defer wg.Done()
+					err := f(gph, snap, region, res)
+					if err != nil {
+						errc <- err
+						return
+					}
+				}(fn, snap, s.region, &r)
+			}
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		close(errc)
+	}()
+
+	for err := range errc {
+		if err != nil {
+			allErrors.Add(err)
+		}
+	}
+
+	if allErrors.Any() {
+		return gph, allErrors
+	}
+
+	return gph, nil
+}
+
+func (s *Networkmanager) FetchByType(ctx context.Context, t string) (cloud.GraphAPI, error) {
+	defer s.fetcher.Reset()
+	return s.fetcher.FetchByType(context.WithValue(ctx, "region", s.region), t)
+}
+
+func (s *Networkmanager) IsSyncDisabled() bool {
+	return !getBool(s.config, "aws.networkmanager.sync", true)
 }

@@ -81,6 +81,10 @@ type configserviceMock struct {
 	basicMock
 }
 
+type directconnectMock struct {
+	basicMock
+}
+
 type dynamodbMock struct {
 	basicMock
 }
@@ -154,6 +158,10 @@ type lambdaMock struct {
 }
 
 type mqMock struct {
+	basicMock
+}
+
+type networkmanagerMock struct {
 	basicMock
 }
 

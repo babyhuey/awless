@@ -42,6 +42,10 @@ func APIToInterface(api string) string {
 		return "CloudTrailAPI"
 	case "cloudwatchlogs":
 		return "CloudWatchLogsAPI"
+	case "directconnect":
+		return "DirectConnectAPI"
+	case "networkmanager":
+		return "NetworkManagerAPI"
 	case "route53", "lambda":
 		return capitalize(api) + "API"
 	default:
@@ -453,6 +457,35 @@ var FetchersDefs = []fetchersDef{
 			// DescribeEnvironments takes a NextToken but has no paginator, so it is
 			// walked manually rather than truncated to the first page.
 			{API: "elasticbeanstalk", ResourceType: cloud.Environment, AWSType: "elasticbeanstalktypes.EnvironmentDescription", ManualFetcher: true},
+		},
+	},
+	{
+		Name: "directconnect",
+		API:  []string{"directconnect"},
+		Fetchers: []fetcher{
+			// Direct Connect publishes no paginators in the SDK despite responses
+			// carrying NextToken, so all fetchers are manual with continuation-token
+			// loops.
+			{API: "directconnect", ResourceType: cloud.DirectConnectConnection, AWSType: "directconnecttypes.Connection", ManualFetcher: true},
+			{API: "directconnect", ResourceType: cloud.DirectConnectVirtualInterface, AWSType: "directconnecttypes.VirtualInterface", ManualFetcher: true},
+			{API: "directconnect", ResourceType: cloud.DirectConnectLag, AWSType: "directconnecttypes.Lag", ManualFetcher: true},
+			{API: "directconnect", ResourceType: cloud.DirectConnectGateway, AWSType: "directconnecttypes.DirectConnectGateway", ManualFetcher: true},
+			{API: "directconnect", ResourceType: cloud.DirectConnectGatewayAssociation, AWSType: "directconnecttypes.DirectConnectGatewayAssociation", ManualFetcher: true},
+		},
+	},
+	{
+		Name: "networkmanager",
+		API:  []string{"networkmanager"},
+		Fetchers: []fetcher{
+			{API: "networkmanager", ResourceType: cloud.GlobalNetwork, AWSType: "networkmanagertypes.GlobalNetwork", APIMethod: "DescribeGlobalNetworks", Input: "networkmanager.DescribeGlobalNetworksInput{}", Output: "networkmanager.DescribeGlobalNetworksOutput", OutputsExtractor: "GlobalNetworks", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "networkmanager", ResourceType: cloud.CoreNetwork, AWSType: "networkmanagertypes.CoreNetworkSummary", APIMethod: "ListCoreNetworks", Input: "networkmanager.ListCoreNetworksInput{}", Output: "networkmanager.ListCoreNetworksOutput", OutputsExtractor: "CoreNetworks", Multipage: true, NextPageMarker: "NextToken"},
+			{API: "networkmanager", ResourceType: cloud.NetworkManagerPeering, AWSType: "networkmanagertypes.Peering", APIMethod: "ListPeerings", Input: "networkmanager.ListPeeringsInput{}", Output: "networkmanager.ListPeeringsOutput", OutputsExtractor: "Peerings", Multipage: true, NextPageMarker: "NextToken"},
+			// GetSites, GetLinks, GetDevices and GetConnections all require a
+			// GlobalNetworkId, so they fan out per global network.
+			{API: "networkmanager", ResourceType: cloud.NetworkManagerSite, AWSType: "networkmanagertypes.Site", ManualFetcher: true},
+			{API: "networkmanager", ResourceType: cloud.NetworkManagerLink, AWSType: "networkmanagertypes.Link", ManualFetcher: true},
+			{API: "networkmanager", ResourceType: cloud.NetworkManagerDevice, AWSType: "networkmanagertypes.Device", ManualFetcher: true},
+			{API: "networkmanager", ResourceType: cloud.NetworkManagerConnection, AWSType: "networkmanagertypes.Connection", ManualFetcher: true},
 		},
 	},
 }

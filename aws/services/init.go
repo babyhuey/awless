@@ -32,6 +32,7 @@ var (
 	EksService, DynamodbService, SecretsmanagerService, ApigatewayService, SsmService, EfsService, CloudtrailService, CloudwatchlogsService                     cloud.Service
 	ElasticacheService, EventbridgeService, StepfunctionsService, WafService, ConfigserviceService, KinesisService, RedshiftService, CodepipelineService        cloud.Service
 	CodebuildService, BeanstalkService, CodedeployService, GlueService, SesService, CognitoService, MskService, MqService, FsxService, GlobalacceleratorService cloud.Service
+	DirectconnectService, NetworkmanagerService                                                                                                                 cloud.Service
 )
 
 func Init(profile, region string, extraConf map[string]any, log *logger.Logger, profileSetterCallback func(val string) error, enableNetworkMonitor bool) error {
@@ -84,6 +85,8 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	GlobalacceleratorService = NewGlobalaccelerator(cfg, profile, extraConf, log)
 	CloudmapService = NewCloudmap(cfg, profile, extraConf, log)
 	BackupService = NewBackup(cfg, profile, extraConf, log)
+	DirectconnectService = NewDirectconnect(cfg, profile, extraConf, log)
+	NetworkmanagerService = NewNetworkmanager(cfg, profile, extraConf, log)
 
 	cloud.ServiceRegistry[InfraService.Name()] = InfraService
 	cloud.ServiceRegistry[AccessService.Name()] = AccessService
@@ -122,6 +125,8 @@ func Init(profile, region string, extraConf map[string]any, log *logger.Logger, 
 	cloud.ServiceRegistry[GlobalacceleratorService.Name()] = GlobalacceleratorService
 	cloud.ServiceRegistry[CloudmapService.Name()] = CloudmapService
 	cloud.ServiceRegistry[BackupService.Name()] = BackupService
+	cloud.ServiceRegistry[DirectconnectService.Name()] = DirectconnectService
+	cloud.ServiceRegistry[NetworkmanagerService.Name()] = NetworkmanagerService
 
 	awsspec.CommandFactory = &awsspec.AWSFactory{
 		Log: log,

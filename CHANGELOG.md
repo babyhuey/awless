@@ -1,3 +1,25 @@
+## v1.4.0
+
+### Added
+
+- **Direct Connect support.** Five resource types: connections, virtual interfaces, LAGs,
+  gateways, and gateway associations. Gateways and associations support create/delete;
+  connections, VIFs, and LAGs are list-only (physical resources ordered through the portal).
+  All fetchers use continuation-token loops because the SDK publishes no paginators.
+
+- **Network Manager (Cloud WAN) support.** Seven resource types: global networks, core
+  networks, sites, links, devices, connections, and peerings. All except peerings support
+  create/delete. Sites, links, devices, and connections fan out per global network (the API
+  requires `GlobalNetworkId`). Peerings are list-only (created implicitly by attachments).
+
+- 16 new CRUD commands across both services. 21 acceptance tests with input mapping
+  assertions and empty-response safety coverage.
+
+### Changed
+
+- Full Go module update (`go get -u ./...`). AWS SDK modules and all third-party
+  dependencies upgraded to latest.
+
 ## v1.3.0
 
 ### Fixed
